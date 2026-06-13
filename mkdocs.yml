@@ -1,0 +1,84 @@
+site_name: Notas a mano sobre análisis de complejidad computacional
+site_description: "Complemento digital de la segunda edición: conceptos, laboratorios, algoritmos y ejercicios."
+site_author: Carlos Eduardo Orozco Garcés, César Jesús Pardo Calvache y Mauro Callejas Cuervo
+site_url: https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/
+repo_url: https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional
+repo_name: Ver repositorio
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: es
+  custom_dir: docs/overrides
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+  palette:
+    - scheme: notas-light
+      toggle:
+        icon: material/weather-night
+        name: Usar modo oscuro
+    - scheme: notas-dark
+      toggle:
+        icon: material/weather-sunny
+        name: Usar modo claro
+  font: false
+
+plugins:
+  - search:
+      lang: es
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript:
+  - assets/javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Inicio: index.md
+  - La obra: obra.md
+  - Consideraciones teóricas: consideraciones-teoricas.md
+  - Capítulos:
+      - Recorrido: capitulos/index.md
+      - 2. Fundamentos: capitulos/capitulo-2.md
+      - 3. Notación asintótica: capitulos/capitulo-3.md
+      - 4. Algoritmos estructurados: capitulos/capitulo-4.md
+      - 5. Relaciones de recurrencia: capitulos/capitulo-5.md
+      - 6. Algoritmos recursivos: capitulos/capitulo-6.md
+      - 7. Búsquedas: capitulos/capitulo-7.md
+      - 8. Ordenamientos: capitulos/capitulo-8.md
+  - Algoritmos:
+      - Búsquedas: algoritmos/busquedas.md
+      - Ordenamientos: algoritmos/ordenamientos.md
+  - Recursos:
+      - Cómo usar los laboratorios: recursos.md
+      - Glosario de la obra: glosario.md
+      - Fe de erratas: erratas.md
+  - Autores: autores.md
+
+copyright: © 2026 Carlos Eduardo Orozco Garcés, César Jesús Pardo Calvache y Mauro Callejas Cuervo

@@ -1,0 +1,14 @@
+.DS_Store
+.idea/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Generated application bundles/build artifacts
+dist/
+build/
+site/
+
+# Generated figures produced by notebooks and simulations
+capitulo*/images/generadas/*
+!capitulo*/images/generadas/.gitkeep
