@@ -1,0 +1,1740 @@
+from __future__ import annotations
+
+from uuid import uuid4
+
+from IPython.display import HTML, display
+
+
+def _run_app(mode: str, allow_mode_selection: bool = False):
+    instance_prefix = f"asym-{uuid4().hex}-"
+    html = (
+        _BIG_O_HTML
+        .replace("__MODE__", mode)
+        .replace("__MODE_SELECTABLE__", str(allow_mode_selection).lower())
+        .replace("__MODE_SELECTOR_DISPLAY__", "grid")
+        .replace("__MODE_SELECTOR_DISABLED__", "" if allow_mode_selection else "disabled")
+        .replace("bo-", instance_prefix)
+    )
+    display(HTML(html))
+
+
+def run_comparison_app():
+    _run_app("big_o", allow_mode_selection=True)
+
+
+def run_big_o_app():
+    _run_app("big_o")
+
+
+def run_little_o_app():
+    _run_app("little_o")
+
+
+def run_big_omega_app():
+    _run_app("big_omega")
+
+
+def run_little_omega_app():
+    _run_app("little_omega")
+
+
+def run_theta_app():
+    _run_app("theta")
+
+
+run_app = run_big_o_app
+
+
+_BIG_O_HTML = r"""
+<style>
+#bo-wrap{background:#ffffff;font-family:sans-serif;padding:14px 4px;color:#333}
+#bo-wrap .plot-wrap{position:relative;width:100%;height:480px}
+#bo-wrap canvas{display:block;width:100%;height:480px;background:#ffffff;border:1px solid #e0e0e0;touch-action:none;cursor:grab}
+#bo-wrap .zoom-controls{position:absolute;top:10px;right:10px;z-index:2;display:flex;gap:4px}
+#bo-wrap .zoom-btn{width:34px;height:32px;border:1px solid #bbb;border-radius:3px;background:rgba(255,255,255,.94);color:#333;cursor:pointer;font-size:20px;line-height:1}
+#bo-wrap .zoom-btn:hover{background:#f1f1f1}
+#bo-wrap .zoom-btn.active{background:#e3f2fd;border-color:#1976D2;color:#0D47A1}
+#bo-wrap .zoom-btn:disabled{cursor:not-allowed;opacity:.45;background:rgba(245,245,245,.94)}
+#bo-wrap .zoom-n0{width:46px;font-size:13px;font-weight:700}
+#bo-wrap .zoom-small{width:38px;font-size:11px;font-weight:700}
+#bo-wrap .zoom-selection{position:absolute;display:none;z-index:1;border:1px dashed #1565C0;background:rgba(21,101,192,.12);pointer-events:none}
+#bo-wrap .axis-label{position:absolute;pointer-events:none;font-size:14px;color:#333}
+#bo-wrap .axis-x{left:82px;right:32px;bottom:8px;text-align:center}
+#bo-wrap .axis-y{left:-24px;top:50%;width:120px;text-align:center;transform:translateY(-50%) rotate(-90deg);transform-origin:center}
+#bo-wrap .controls-grid{display:flex;flex-flow:row wrap;column-gap:36px;row-gap:12px;margin-bottom:12px;align-items:flex-start;overflow:visible}
+#bo-wrap .control-section{display:grid;grid-template-columns:max-content;grid-template-rows:auto auto;row-gap:8px}
+#bo-wrap .control-section>.row-title{margin-bottom:4px}
+#bo-wrap .ctrl{display:flex;gap:28px;flex-wrap:wrap;margin:0 0 12px 4px;align-items:center;font-size:13px;color:#333}
+#bo-wrap .ctrl.vertical{flex-direction:column;align-items:flex-start;gap:8px}
+#bo-wrap .ctrl.vertical.additional{min-height:72px}
+#bo-wrap .controls-grid .ctrl{margin-bottom:0}
+#bo-wrap .ctrl label{display:flex;align-items:center;gap:8px;font-weight:700;min-height:32px}
+#bo-wrap .ctrl .label-text{display:inline-flex;align-items:center;justify-content:center;width:48px;min-width:48px;text-align:center}
+#bo-wrap .mode-section{display:__MODE_SELECTOR_DISPLAY__}
+#bo-wrap .theta-c{display:none}
+#bo-wrap .row-title{font-weight:700;color:#333;line-height:1.1}
+#bo-wrap select,#bo-wrap input[type=number],#bo-wrap input[type=text]{width:112px;height:32px;box-sizing:border-box;padding:2px 4px;border:1px solid #ccc;border-radius:3px;font-size:13px;text-align:center}
+#bo-wrap .stepper{display:inline-grid;grid-template-columns:34px 112px 34px;gap:4px;align-items:center}
+#bo-wrap .stepper-field{display:flex;align-items:center;justify-content:center;width:112px;height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:3px;background:#fff;text-align:center;font-size:14px}
+#bo-wrap .function-stepper{grid-template-columns:34px 176px 34px}
+#bo-wrap .function-stepper .stepper-field{width:176px;white-space:nowrap}
+#bo-wrap .editable-field{outline:none;cursor:text;font-weight:400}
+#bo-wrap .editable-field:focus{border-color:#1976D2;box-shadow:0 0 0 1px #1976D2}
+#bo-wrap .stepper input{width:112px}
+#bo-wrap .stepper button{width:34px;height:32px;border:1px solid #ccc;border-radius:3px;background:#f7f7f7;color:#333;cursor:pointer;font-size:13px;line-height:1}
+#bo-wrap .stepper button:hover{background:#eeeeee}
+#bo-wrap .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+#bo-wrap .card{background:#f7f7f7;border:1px solid #e8e8e8;border-radius:4px;padding:10px 14px}
+#bo-wrap .card .lbl{font-size:11px;color:#78909C;margin-bottom:3px}
+#bo-wrap .card .val{font-size:15px;font-weight:600}
+#bo-wrap .fml{margin-top:10px;background:#f7f7f7;border:1px solid #e8e8e8;border-radius:4px;padding:10px 20px;font-size:15px;color:#333;min-height:44px;text-align:center}
+#bo-wrap .info-sections{margin-top:12px}
+#bo-wrap .info-section{border:1px solid #dedede;border-radius:5px;background:#fff;margin-top:8px;overflow:hidden}
+#bo-wrap .info-section>summary{cursor:pointer;padding:10px 14px;font-weight:700;background:#f7f7f7;list-style-position:inside}
+#bo-wrap .info-section[open]>summary{border-bottom:1px solid #e2e2e2}
+#bo-wrap .section-content{padding:12px 18px}
+#bo-wrap .result-body{min-height:172px;box-sizing:border-box;text-align:center}
+#bo-wrap .result-equations{min-height:70px;display:flex;flex-direction:column;justify-content:center;text-align:center}
+#bo-wrap .result-body .cards,#bo-wrap .result-body .card,#bo-wrap .result-body .val{text-align:center}
+#bo-wrap .demo-title{font-weight:700;font-size:15px;margin:2px 0 8px;color:#333;text-align:left}
+#bo-wrap .demo-line{display:block;text-align:center;margin:6px 0}
+#bo-wrap .demo-sep{height:1px;background:#e0e0e0;margin:12px 0}
+#bo-wrap .theta-solutions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:12px 0}
+#bo-wrap .theta-solution{border:1px solid #e0e0e0;border-radius:4px;padding:10px;background:#fafafa;text-align:center}
+#bo-wrap .theta-intersection{border-top:1px solid #d0d0d0;margin-top:10px;padding-top:10px;text-align:center}
+#bo-wrap .solution-set{border:1px solid #e0e0e0;border-radius:4px;padding:10px;margin:12px 0;background:#fafafa;text-align:center}
+#bo-wrap .solution-title{font-weight:700;text-align:left}
+#bo-wrap #bo-limits{display:flex;justify-content:center;width:100%;overflow-x:auto}
+#bo-wrap table{margin:12px auto 0!important;border-collapse:collapse!important;text-align:center!important;width:auto!important;color:#333!important;background:#fff!important;border:0!important}
+#bo-wrap th,#bo-wrap td{padding:7px 14px!important;white-space:nowrap!important;border:0!important;border-bottom:1px solid #d0d0d0!important;color:#333!important;background:#fff!important;text-align:center!important;vertical-align:middle!important}
+#bo-wrap th{font-weight:700!important}
+#bo-wrap thead tr{border-bottom:1px solid #9E9E9E}
+#bo-wrap tbody tr.member td{background:#E8F5E9!important}
+#bo-wrap tbody tr.nonmember td{background:#FFEBEE!important}
+#bo-wrap .ok{color:#2E7D32;font-weight:700}
+#bo-wrap .bad{color:#B71C1C;font-weight:700}
+#bo-wrap .loose{color:#E65100;font-weight:700}
+#bo-wrap .instructions{margin:0 0 24px 0;color:#333}
+#bo-wrap .instructions .row-title{margin-bottom:4px}
+#bo-wrap .instructions ul{margin:0 0 0 18px;padding:0;font-size:13px;color:#555}
+#bo-wrap .instructions li{margin:2px 0}
+#bo-wrap .legend{position:absolute;left:92px;top:48px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:7px;width:250px;box-sizing:border-box;padding:7px 9px;border:1px solid rgba(80,80,80,.28);border-radius:4px;background:rgba(255,255,255,.90);box-shadow:0 1px 3px rgba(0,0,0,.10);font-size:14px;color:#333}
+#bo-wrap .legend .sw{display:inline-block;width:22px;height:0;border-top:3px solid currentColor;vertical-align:middle;margin-right:6px}
+#bo-wrap .note{margin:8px auto 0;max-width:980px;text-align:center;font-size:13px;color:#555}
+@media(max-width:900px){#bo-wrap .cards{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+<div id="bo-wrap">
+  <div class="instructions">
+    <div class="row-title">Instrucciones:</div>
+    <ul>
+      <li>Usa los controles para seleccionar \(C(n)\), \(g(n)\), el intervalo visible, las constantes y la escala.</li>
+      <li>Puedes escribir valores para \(a\) y \(b\), incluyendo valores como \(10^{20}\), \(1\) o \(15.5\).</li>
+      <li>Arrastra cerca del borde izquierdo o derecho de la gráfica para mover \(a\) o \(b\); arrastra el interior para desplazar la vista en los ejes \(x\) y \(y\).</li>
+      <li>Arrastra la línea verde de \(n_0\) para seleccionar cualquier umbral válido dentro del conjunto solución.</li>
+      <li>Con el botón TP activo, usa la rueda del mouse o el trackpad para reducir o ampliar la vista; también puedes utilizar los botones − y +.</li>
+      <li>Activa Seleccionar área y arrastra un rectángulo sobre la gráfica para ampliar una región específica.</li>
+    </ul>
+  </div>
+  <div class="controls-grid">
+  <div class="control-section mode-section">
+    <div class="row-title">Notación:</div>
+    <div class="ctrl vertical">
+      <label><span class="label-text">\(\mathcal{F}\)</span>
+        <select id="bo-mode" __MODE_SELECTOR_DISABLED__>
+          <option value="big_o">Big-O</option>
+          <option value="little_o">little-o</option>
+          <option value="big_omega">Big-Ω</option>
+          <option value="little_omega">little-ω</option>
+          <option value="theta">Theta</option>
+        </select>
+      </label>
+      <label><span class="label-text">\(\text{Escala}\)</span>
+        <select id="bo-scale">
+          <option value="linear" selected>Lineal</option>
+          <option value="log">Logarítmica</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  <div class="control-section">
+    <div class="row-title">Funciones de referencia:</div>
+    <div class="ctrl">
+    <label><span class="label-text">\(C(n)\)</span>
+      <span class="stepper function-stepper">
+        <button type="button" id="bo-cfn-dec">◀</button>
+        <span class="stepper-field" id="bo-cfn">—</span>
+        <button type="button" id="bo-cfn-inc">▶</button>
+      </span>
+    </label>
+    </div>
+    <div class="ctrl">
+    <label><span class="label-text">\(g(n)\)</span>
+      <span class="stepper function-stepper">
+        <button type="button" id="bo-gfn-dec">◀</button>
+        <span class="stepper-field" id="bo-gfn">—</span>
+        <button type="button" id="bo-gfn-inc">▶</button>
+      </span>
+    </label>
+    </div>
+  </div>
+  <div class="control-section">
+    <div class="row-title">Intervalo:</div>
+    <div class="ctrl vertical">
+    <label><span class="label-text">\(a\)</span>
+      <span class="stepper">
+        <button type="button" id="bo-a-dec">◀</button>
+        <span class="stepper-field editable-field" id="bo-a" role="textbox" contenteditable="true" data-raw="0">\(0\)</span>
+        <button type="button" id="bo-a-inc">▶</button>
+      </span>
+    </label>
+    <label><span class="label-text">\(b\)</span>
+      <span class="stepper">
+        <button type="button" id="bo-b-dec">◀</button>
+        <span class="stepper-field editable-field" id="bo-b" role="textbox" contenteditable="true" data-raw="10**20">\(10^{20}\)</span>
+        <button type="button" id="bo-b-inc">▶</button>
+      </span>
+    </label>
+    </div>
+  </div>
+  <div class="control-section">
+    <div class="row-title">Parámetros adicionales:</div>
+    <div class="ctrl vertical additional">
+    <label class="single-c"><span class="label-text">\(c\)</span><input type="number" id="bo-c" min="0.1" max="1000" value="1" step="0.1"></label>
+    <label class="theta-c"><span class="label-text">\(c_1\)</span><input type="number" id="bo-c1" min="0.1" max="1000" value="0.1" step="0.1"></label>
+    <label class="theta-c"><span class="label-text">\(c_2\)</span><input type="number" id="bo-c2" min="0.1" max="1000" value="1.1" step="0.1"></label>
+    <label class="little-c"><span class="label-text">\(\varepsilon\)</span><input type="number" id="bo-epsilon" min="0.000001" max="1000" value="0.01" step="0.01"></label>
+    </div>
+  </div>
+  </div>
+  <div class="plot-wrap">
+    <div class="zoom-controls" aria-label="Controles de zoom">
+      <button type="button" class="zoom-btn" id="bo-zoom-out" title="Alejar la vista" aria-label="Alejar la vista">−</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-in" title="Acercar la vista" aria-label="Acercar la vista">+</button>
+      <button type="button" class="zoom-btn zoom-n0" id="bo-zoom-n0" title="Ver el comportamiento alrededor de n₀" aria-label="Ver el comportamiento alrededor de n₀">n₀</button>
+      <button type="button" class="zoom-btn zoom-small" id="bo-lock-x" title="Bloquear el eje x" aria-label="Bloquear el eje x" aria-pressed="false">X</button>
+      <button type="button" class="zoom-btn zoom-small" id="bo-lock-y" title="Bloquear el eje y" aria-label="Bloquear el eje y" aria-pressed="false">Y</button>
+      <button type="button" class="zoom-btn zoom-small" id="bo-history-undo" title="Deshacer cambio de vista" aria-label="Deshacer cambio de vista" disabled>↶</button>
+      <button type="button" class="zoom-btn zoom-small" id="bo-history-redo" title="Rehacer cambio de vista" aria-label="Rehacer cambio de vista" disabled>↷</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-trackpad" title="Activar o desactivar el zoom con trackpad" aria-label="Activar o desactivar el zoom con trackpad" aria-pressed="false" style="font-size:11px;font-weight:700">TP</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-select" title="Seleccionar un área" aria-label="Seleccionar un área">□</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-reset" title="Restablecer el zoom" aria-label="Restablecer el zoom">↺</button>
+    </div>
+    <div class="zoom-selection" id="bo-zoom-selection"></div>
+    <canvas id="bo-cv"></canvas>
+    <div class="axis-label axis-x">\(\text{Tamaño de la entrada }(n)\)</div>
+    <div class="axis-label axis-y" id="bo-axis-y">—</div>
+    <div class="legend">
+      <span style="color:#1565C0"><span class="sw"></span><span id="bo-leg-c">—</span></span>
+      <span style="color:#EF6C00;display:none" id="bo-leg-low-wrap"><span class="sw"></span><span id="bo-leg-low">—</span></span>
+      <span style="color:#B71C1C"><span class="sw"></span><span id="bo-leg-cg">—</span></span>
+      <span style="color:#00838F"><span class="sw" style="border-top-style:dashed"></span><span id="bo-leg-threshold">—</span></span>
+      <span style="color:#2E7D32"><span class="sw" style="border-top-style:dotted"></span><span id="bo-leg-n0">—</span></span>
+    </div>
+  </div>
+  <div class="info-sections">
+    <details class="info-section" id="bo-result-section" open>
+      <summary>Resultado</summary>
+      <div class="section-content result-body">
+        <div class="result-equations">
+          <div id="bo-result-main">—</div>
+          <div id="bo-result-n0">—</div>
+        </div>
+        <div class="cards">
+          <div class="card"><div class="lbl">n₀ seleccionado</div><div class="val" id="bo-n0">—</div></div>
+          <div class="card"><div class="lbl" id="bo-c-rule-label">Condición sobre c</div><div class="val" id="bo-c-rule">—</div></div>
+          <div class="card"><div class="lbl">Conclusión</div><div class="val" id="bo-status">—</div></div>
+        </div>
+        <div class="note" id="bo-reading">—</div>
+      </div>
+    </details>
+    <details class="info-section" id="bo-limit-section">
+      <summary>Verificación por límite</summary>
+      <div class="section-content fml" id="bo-limit-proof">—</div>
+    </details>
+    <details class="info-section" id="bo-n0-section">
+      <summary>Conjunto solución y \(\boldsymbol{n_0}\)</summary>
+      <div class="section-content fml" id="bo-n0-proof">—</div>
+    </details>
+    <details class="info-section" id="bo-comparison-section">
+      <summary>Comparación con otras funciones</summary>
+      <div class="section-content"><div id="bo-limits"></div></div>
+    </details>
+  </div>
+</div>
+
+<script>
+(function(){
+  if(!window.__asymptoticMathJaxReady){
+    window.__asymptoticMathJaxReady=new Promise(function(resolve,reject){
+      window.MathJax={
+        loader:{load:['[tex]/boldsymbol','[tex]/cancel']},
+        tex:{
+          packages:{'[+]':['boldsymbol','cancel']},
+          inlineMath:[['\\(','\\)'],['$$','$$']],
+          displayMath:[['\\[','\\]'],['$$','$$']]
+        },
+        svg:{fontCache:'none'}
+      };
+      var script=document.createElement('script');
+      script.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+      script.async=true;
+      script.onload=function(){
+        var startup=window.MathJax && MathJax.startup && MathJax.startup.promise;
+        Promise.resolve(startup).then(function(){resolve(window.MathJax);},reject);
+      };
+      script.onerror=function(){reject(new Error('No fue posible cargar MathJax.'));};
+      document.head.appendChild(script);
+    });
+  }
+  var MODE='__MODE__';
+  var MODE_SELECTABLE=__MODE_SELECTABLE__;
+  var root=document.getElementById('bo-wrap');
+  var cv=document.getElementById('bo-cv'),ctx=cv.getContext('2d');
+  var staticBackground=document.createElement('canvas'),staticCurves=document.createElement('canvas');
+  var W=0,H=0,DPR=1,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,Y_RANGE_OVERRIDE=null,lastYRange=null,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,n0FocusActive=false,lockX=false,lockY=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null,staticLayerKey='',historyUndo=[],historyRedo=[],historyCapturePending=false,dynamicMathState={};
+  var FNS={
+    one:{label:'1',latex:'1',rank:0,fn:function(n){return 1;}},
+    log:{label:'log₂(n)',latex:'\\log_2(n)',rank:1,fn:function(n){return n<=1?0:Math.log2(n);}},
+    n:{label:'n',latex:'n',rank:2,fn:function(n){return n;}},
+    nlog:{label:'n·log₂(n)',latex:'n\\cdot\\log_2(n)',rank:3,fn:function(n){return n<=1?0:n*Math.log2(n);}},
+    n2:{label:'n²',latex:'n^2',rank:4,fn:function(n){return n*n;}},
+    n3:{label:'n³',latex:'n^3',rank:5,fn:function(n){return n*n*n;}},
+    book:{label:'n³+2n²+n+5',latex:'n^3+2n^2+n+5',rank:5,fn:function(n){return n*n*n+2*n*n+n+5;}},
+    n4:{label:'n⁴',latex:'n^4',rank:6,fn:function(n){return n*n*n*n;}},
+    exp:{label:'2ⁿ',latex:'2^n',rank:7,fn:function(n){return n>1023?Infinity:Math.pow(2,n);}},
+    fact:{label:'n!',latex:'n!',rank:8,fn:function(n){var m=Math.floor(n);if(m>170)return Infinity;var r=1;for(var i=2;i<=m;i++)r*=i;return r;}}
+  };
+  var ORDER=['one','log','n','nlog','n2','n3','n4','exp','fact'];
+  var C_ORDER=['book','one','log','n','nlog','n2','n3','exp','fact'];
+  var MAX_B=100000000000000000000;
+  var MIN_SPAN=0.000001;
+  function defaultGKeyForMode(){
+    if(MODE==='little_o')return 'n4';
+    if(MODE==='little_omega')return 'n2';
+    return 'n3';
+  }
+  var STATE_A=0,STATE_B=MAX_B,STATE_C_INDEX=0,STATE_G_INDEX=ORDER.indexOf(defaultGKeyForMode()),STATE_N0=null;
+  function el(id){return typeof document==='undefined'?null:document.getElementById(id);}
+  function cKey(){return C_ORDER[STATE_C_INDEX]}
+  function gKey(){return ORDER[STATE_G_INDEX]}
+  function cVal(){return Math.max(0.1,parseFloat(el('bo-c').value)||1)}
+  function c1Val(){return Math.max(0.1,parseFloat(el('bo-c1').value)||1)}
+  function c2Val(){return Math.max(0.1,parseFloat(el('bo-c2').value)||1)}
+  function epsilonVal(){
+    var input=el('bo-epsilon');
+    return Math.max(0.000001,parseFloat(input?input.value:0.01)||0.01);
+  }
+  function upperFactor(c){return isThetaMode()?c.c2:c}
+  function lowerFactor(c){return isThetaMode()?c.c1:c}
+  function scaleMode(){return el('bo-scale').value}
+  function isLogScale(){return scaleMode()==='log'}
+  function powerText(value){
+    if(!isFinite(value))return '∞';
+    if(value===0)return '0';
+    return '10**'+Math.round(Math.log10(Math.max(1,value)));
+  }
+  function fieldText(value){
+    if(!isFinite(value))return '';
+    if(value===0)return '0';
+    if(isPowerOfTen(value))return powerText(value);
+    return fmtNumber(value);
+  }
+  function powerLatex(value){
+    if(!isFinite(value))return '\\infty';
+    if(value===0)return '0';
+    return '10^{'+Math.round(Math.log10(Math.max(1,value)))+'}';
+  }
+  function isPowerOfTen(value){
+    if(!isFinite(value) || value<=0)return false;
+    var exp=Math.round(Math.log10(value));
+    return Math.abs(value-Math.pow(10,exp))<=Math.max(1e-9,Math.abs(value)*1e-10);
+  }
+  function valueLatex(value){
+    if(!isFinite(value))return '\\infty';
+    if(value===0)return '0';
+    if(isPowerOfTen(value))return powerLatex(value);
+    if(Math.abs(value)>=10000 || Math.abs(value)<0.001)return fmt(value);
+    return fmtNumber(value);
+  }
+  function fmtNumber(value){
+    if(!isFinite(value))return '∞';
+    if(Number.isInteger(value))return String(value);
+    return String(Math.round(value*1000000)/1000000);
+  }
+  function nextPower(value,allowZero){
+    if(allowZero && value<=0)return 1;
+    return Math.pow(10,Math.min(20,Math.floor(Math.log10(Math.max(1,value)))+1));
+  }
+  function previousPower(value,allowZero){
+    if(allowZero && value<=1)return 0;
+    return Math.pow(10,Math.max(0,Math.ceil(Math.log10(Math.max(1,value)))-1));
+  }
+  function axisScale(maxValue){
+    var exp=Math.max(0,Math.floor(Math.log10(Math.max(1,maxValue))));
+    if(exp<4)return {scale:1,label:''};
+    return {scale:Math.pow(10,exp),label:'10',exp:exp};
+  }
+  function fmtScaledAxis(value,scale){
+    if(!isFinite(value))return '∞';
+    if(value===0)return '0';
+    var scaled=value/scale;
+    return scaled.toFixed(2).replace(/\.?0+$/,'');
+  }
+  function fmt(x){
+    if(!isFinite(x))return '∞';
+    if(Math.abs(x)>=10000 || (Math.abs(x)>0 && Math.abs(x)<0.001)){
+      var exponent=Math.floor(Math.log10(Math.abs(x)));
+      var mantissa=Math.round(x/Math.pow(10,exponent)*100)/100;
+      return mantissa+'\\cdot 10^{'+exponent+'}';
+    }
+    return (Math.round(x*100)/100).toString();
+  }
+  function drawPowerOfTenLabel(x,y,align,baseline,exp){
+    ctx.save();
+    ctx.fillStyle='#333';
+    var base='10';
+    var expText=String(exp);
+    ctx.font='14px sans-serif';
+    var baseWidth=ctx.measureText(base).width;
+    ctx.font='10px sans-serif';
+    var expWidth=ctx.measureText(expText).width;
+    var gap=2;
+    var totalWidth=baseWidth+gap+expWidth;
+    var startX=align==='right'?x-totalWidth:(align==='center'?x-totalWidth/2:x);
+    ctx.textAlign='left';
+    ctx.textBaseline=baseline;
+    ctx.font='14px sans-serif';
+    ctx.fillText(base,startX,y);
+    ctx.font='10px sans-serif';
+    ctx.fillText(expText,startX+baseWidth+gap,y-6);
+    ctx.restore();
+  }
+  function limitValue(ck,gk){
+    if(FNS[ck].rank<FNS[gk].rank)return '0';
+    if(FNS[ck].rank===FNS[gk].rank)return '1';
+    return '∞';
+  }
+  function modeLatex(){
+    if(MODE==='little_o')return 'o';
+    if(MODE==='big_omega')return '\\Omega';
+    if(MODE==='little_omega')return '\\omega';
+    if(MODE==='theta')return '\\Theta';
+    return 'O';
+  }
+  function limitOperatorLatex(){
+    if(MODE==='big_o')return '\\limsup';
+    if(MODE==='big_omega')return '\\liminf';
+    return '\\lim';
+  }
+  function monomialProfile(key){
+    var profiles={
+      one:{n:0,log:0},log:{n:0,log:1},n:{n:1,log:0},
+      nlog:{n:1,log:1},n2:{n:2,log:0},n3:{n:3,log:0},n4:{n:4,log:0}
+    };
+    return profiles[key]||null;
+  }
+  function factorProductLatex(nPower,logPower){
+    var factors=[];
+    if(nPower===1)factors.push('n');
+    else if(nPower>1)factors.push('n^{'+nPower+'}');
+    if(logPower===1)factors.push('\\log_2(n)');
+    else if(logPower>1)factors.push('\\log_2^{'+logPower+'}(n)');
+    return factors.length?factors.join('\\cdot '):'1';
+  }
+  function simplifiedMonomialRatioLatex(ck,gk){
+    var left=monomialProfile(ck),right=monomialProfile(gk);
+    if(!left || !right)return null;
+    var nDelta=left.n-right.n,logDelta=left.log-right.log;
+    var numerator=factorProductLatex(Math.max(0,nDelta),Math.max(0,logDelta));
+    var denominator=factorProductLatex(Math.max(0,-nDelta),Math.max(0,-logDelta));
+    return denominator==='1'?numerator:'\\frac{'+numerator+'}{'+denominator+'}';
+  }
+  function bookDivisionLatex(gk){
+    var denominator=latexOf(gk);
+    return '\\frac{n^3}{'+denominator+'}+'+
+      '\\frac{2n^2}{'+denominator+'}+'+
+      '\\frac{n}{'+denominator+'}+'+
+      '\\frac{5}{'+denominator+'}';
+  }
+  function bookSimplifiedRatioLatex(gk){
+    var forms={
+      one:'n^3+2n^2+n+5',
+      log:'\\frac{n^3}{\\log_2(n)}+\\frac{2n^2}{\\log_2(n)}+\\frac{n}{\\log_2(n)}+\\frac{5}{\\log_2(n)}',
+      n:'n^2+2n+1+\\frac{5}{n}',
+      nlog:'\\frac{n^2}{\\log_2(n)}+\\frac{2n}{\\log_2(n)}+\\frac{1}{\\log_2(n)}+\\frac{5}{n\\log_2(n)}',
+      n2:'n+2+\\frac{1}{n}+\\frac{5}{n^2}',
+      n3:'1+\\frac{2}{n}+\\frac{1}{n^2}+\\frac{5}{n^3}',
+      n4:'\\frac{1}{n}+\\frac{2}{n^2}+\\frac{1}{n^3}+\\frac{5}{n^4}'
+    };
+    return forms[gk]||bookDivisionLatex(gk);
+  }
+  function simplifiedRatioLatex(ck,gk){
+    if(ck===gk)return '1';
+    if(ck==='book')return bookSimplifiedRatioLatex(gk);
+    return simplifiedMonomialRatioLatex(ck,gk)||'\\frac{'+latexOf(ck)+'}{'+latexOf(gk)+'}';
+  }
+  function canceledRatioLatex(ck,gk,simplified){
+    if(ck==='book' && gk==='n3'){
+      return '1+\\cancelto{0}{\\frac{2}{n}}+'+
+        '\\cancelto{0}{\\frac{1}{n^2}}+'+
+        '\\cancelto{0}{\\frac{5}{n^3}}';
+    }
+    if(limitValue(ck,gk)==='0')return '\\cancelto{0}{'+simplified+'}';
+    return simplified;
+  }
+  function limitProcedureHtml(ck,gk,operator){
+    var op=(operator||limitOperatorLatex())+'_{n\\to\\infty}';
+    var rawRatio='\\frac{'+cLatex()+'}{'+latexOf(gk)+'}';
+    var simplified=simplifiedRatioLatex(ck,gk);
+    var canceled=canceledRatioLatex(ck,gk,simplified);
+    var steps=[
+      'k&='+op+'\\left(\\frac{C(n)}{g(n)}\\right)',
+      '&='+op+'\\left('+rawRatio+'\\right)'
+    ];
+    if(ck==='book'){
+      var divided=bookDivisionLatex(gk);
+      steps.push('&='+op+'\\left('+divided+'\\right)');
+      if(simplified!==divided)steps.push('&='+op+'\\left('+simplified+'\\right)');
+    }else if(simplified!==rawRatio){
+      steps.push('&='+op+'\\left('+simplified+'\\right)');
+    }
+    if(canceled!==simplified)steps.push('&='+op+'\\left('+canceled+'\\right)');
+    steps.push('&='+displayLimitValue(limitValue(ck,gk)));
+    return '<div class="demo-line">'+texBlock(
+      '\\displaystyle \\begin{aligned}'+steps.join('\\\\[4pt]')+'\\end{aligned}'
+    )+'</div>';
+  }
+  function thetaLimitProcedureHtml(ck,gk){
+    return '<div class="theta-solutions">'+
+      '<div class="theta-solution"><div class="solution-title"><strong>Límite inferior (Big-'+titleTex('\\Omega')+'):</strong></div>'+
+        limitProcedureHtml(ck,gk,'\\liminf')+'</div>'+
+      '<div class="theta-solution"><div class="solution-title"><strong>Límite superior (Big-'+titleTex('O')+'):</strong></div>'+
+        limitProcedureHtml(ck,gk,'\\limsup')+'</div>'+
+      '</div>';
+  }
+  function isLowerMode(){return MODE==='big_omega' || MODE==='little_omega'}
+  function isThetaMode(){return MODE==='theta'}
+  function cColor(){return '#1565C0'}
+  function cgColor(){return isLowerMode()?'#EF6C00':'#B71C1C'}
+  function c1gColor(){return '#EF6C00'}
+  function n0Color(){return '#2E7D32'}
+  function areaColor(){
+    if(isThetaMode())return 'rgba(21,101,192,0.25)';
+    if(isLowerMode())return 'rgba(21,101,192,0.25)';
+    return 'rgba(183,28,28,0.30)';
+  }
+  function isMember(ck,gk){
+    if(MODE==='big_o')return FNS[ck].rank<=FNS[gk].rank;
+    if(MODE==='little_o')return FNS[ck].rank<FNS[gk].rank;
+    if(MODE==='big_omega')return FNS[ck].rank>=FNS[gk].rank;
+    if(MODE==='little_omega')return FNS[ck].rank>FNS[gk].rank;
+    if(MODE==='theta')return FNS[ck].rank===FNS[gk].rank;
+    return false;
+  }
+  function cLowerBound(ck,gk){
+    if(MODE==='theta')return isMember(ck,gk)?1:Infinity;
+    if(MODE==='little_o' || MODE==='little_omega')return isMember(ck,gk)?0:Infinity;
+    if(MODE==='big_omega'){
+      if(FNS[ck].rank<FNS[gk].rank)return Infinity;
+      return 0;
+    }
+    if(FNS[ck].rank>FNS[gk].rank)return Infinity;
+    if(FNS[ck].rank===FNS[gk].rank)return 1;
+    return 0;
+  }
+  function cUpperBound(ck,gk){
+    if(MODE==='big_omega' && FNS[ck].rank===FNS[gk].rank)return 1;
+    return Infinity;
+  }
+  function cRule(ck,gk){
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    if(bookAgainstCubic && MODE==='big_o')return 'c\\gt 1';
+    if(bookAgainstCubic && MODE==='big_omega')return '0\\lt c\\le 1';
+    if(bookAgainstCubic && MODE==='theta')return '0\\lt c_1\\le 1\\lt c_2';
+    var k=cLowerBound(ck,gk);
+    if(!isFinite(k))return MODE==='theta'?'\\text{No existen }c_1,c_2':'\\text{No existe }c';
+    var upper=cUpperBound(ck,gk);
+    if(isFinite(upper))return '0\\lt c\\le '+fmt(upper);
+    if(MODE==='theta')return '0\\lt c_1\\le '+displayLimitValue(limitValue(ck,gk))+'\\le c_2';
+    if(k===0)return 'c\\gt 0';
+    return 'c\\ge '+fmt(k);
+  }
+  function defaultC(ck,gk){
+    if(ck==='book' && gk==='n3' && MODE==='big_o')return 1.1;
+    var k=cLowerBound(ck,gk);
+    if(!isFinite(k))return '';
+    var upper=cUpperBound(ck,gk);
+    if(k===0)return 0.1;
+    if(isFinite(upper))return upper;
+    return k;
+  }
+  function latexOf(key){return FNS[key].latex}
+  function cLatex(){return latexOf(cKey())}
+  function cFn(ck,n){return FNS[ck].fn(n)}
+  function tex(content){return '\\('+content+'\\)'}
+  function texBlock(content){return '\\['+content+'\\]'}
+  function titleTex(content){return '\\(\\boldsymbol{'+content+'}\\)'}
+  function displayLimitValue(value){
+    if(value==='∞')return '\\infty';
+    return value;
+  }
+  function typeset(){
+    window.__asymptoticMathJaxReady.then(function(mathJax){
+      if(!root.isConnected)return;
+      if(mathJax.typesetClear)mathJax.typesetClear([root]);
+      return mathJax.typesetPromise([root]);
+    }).catch(function(error){
+      console.error('No fue posible componer las ecuaciones de la simulación.',error);
+    });
+  }
+  function renderDynamicMath(id,latex){
+    var state=dynamicMathState[id]||(dynamicMathState[id]={running:false,pending:null});
+    state.pending=latex;
+    if(state.running)return;
+    state.running=true;
+    var requested=state.pending;state.pending=null;
+    window.__asymptoticMathJaxReady.then(function(mathJax){
+      if(!root.isConnected || !mathJax.tex2svgPromise)return null;
+      return mathJax.tex2svgPromise(requested,{display:false});
+    }).then(function(rendered){
+      var currentNode=el(id);
+      if(rendered && currentNode && state.pending===null)currentNode.replaceChildren(rendered);
+    }).catch(function(error){
+      console.error('No fue posible actualizar el valor dinámico de n₀.',error);
+    }).finally(function(){
+      state.running=false;
+      if(state.pending!==null)renderDynamicMath(id,state.pending);
+    });
+  }
+  function updateDynamicN0(n0){
+    var latex=n0===null?'n_0\\text{ no existe}':'n_0='+thresholdNumber(n0);
+    renderDynamicMath('bo-n0',latex);
+    renderDynamicMath('bo-result-n0',latex);
+    renderDynamicMath('bo-leg-n0',isLogScale() && n0===0
+      ?'n_0=0\\;\\text{(no visible porque }\\log(0)\\text{ no está definido)}'
+      :latex);
+  }
+  function enforceC(ck,gk){
+    if(isThetaMode())return enforceThetaC(ck,gk);
+    var input=el('bo-c'),k=cLowerBound(ck,gk);
+    if(!isFinite(k)){
+      input.disabled=true;
+      input.value='';
+      return 1;
+    }
+    input.disabled=false;
+    input.min=k===0?0.1:k;
+    if(ck==='book' && gk==='n3' && MODE==='big_o')input.min=1.1;
+    var upper=cUpperBound(ck,gk);
+    input.max=isFinite(upper)?upper:1000;
+    if(input.value==='' || (parseFloat(input.value)||0)<parseFloat(input.min)){
+      input.value=defaultC(ck,gk);
+    }
+    if(isFinite(upper) && (parseFloat(input.value)||0)>upper){
+      input.value=upper;
+    }
+    return cVal();
+  }
+  function enforceThetaC(ck,gk){
+    var cInput=el('bo-c'),c1Input=el('bo-c1'),c2Input=el('bo-c2');
+    cInput.disabled=true;
+    if(!isMember(ck,gk)){
+      c1Input.disabled=true;c2Input.disabled=true;
+      c1Input.value='';c2Input.value='';
+      return {c1:1,c2:1};
+    }
+    c1Input.disabled=false;c2Input.disabled=false;
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    c1Input.min=0.1;c2Input.min=bookAgainstCubic?1.1:1;
+    c1Input.max=1;c2Input.max=1000;
+    if(c1Input.value==='' || (parseFloat(c1Input.value)||0)<=0 || (parseFloat(c1Input.value)||0)>1)c1Input.value=0.1;
+    if(c2Input.value==='' || (parseFloat(c2Input.value)||0)<parseFloat(c2Input.min))c2Input.value=bookAgainstCubic?1.1:1;
+    return {c1:c1Val(),c2:c2Val()};
+  }
+  function updateConstantControls(){
+    var theta=isThetaMode();
+    var little=isStrictMode();
+    Array.prototype.forEach.call(root.querySelectorAll('.single-c'),function(node){node.style.display=theta?'none':'flex';});
+    Array.prototype.forEach.call(root.querySelectorAll('.theta-c'),function(node){node.style.display=theta?'flex':'none';});
+    Array.prototype.forEach.call(root.querySelectorAll('.little-c'),function(node){node.style.display=little?'flex':'none';});
+  }
+  function relationClass(ck,gk){
+    if(!isMember(ck,gk))return 'bad';
+    if(MODE==='big_o' && FNS[ck].rank<FNS[gk].rank)return 'loose';
+    if(MODE==='big_omega' && FNS[ck].rank>FNS[gk].rank)return 'loose';
+    return 'ok';
+  }
+  function membershipText(ck,gk){
+    if(isMember(ck,gk))return '\\('+cLatex()+'\\in '+modeLatex()+'('+latexOf(gk)+')\\)';
+    return '\\('+cLatex()+'\\notin '+modeLatex()+'('+latexOf(gk)+')\\)';
+  }
+  /*
+   * Desde n=16, los cocientes de todas las parejas del catálogo son
+   * monótonos en la dirección indicada por rank. Esto se obtiene de sus
+   * derivadas (polinomios, logaritmos y 2^n) y de
+   * (n+1)!/n!=n+1 para el factorial. Por tanto, una vez satisfecha la
+   * desigualdad en esa cola, no puede aparecer otro cruce posterior.
+  */
+  var VERIFIED_TAIL_START=16;
+  var thresholdCacheKey='',thresholdCacheValue=null;
+  function tailCanSatisfy(ck,gk,c){
+    if(!isMember(ck,gk))return false;
+    if(FNS[ck].rank!==FNS[gk].rank)return true;
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    if(MODE==='big_o')return bookAgainstCubic?c>1:c>=1;
+    if(MODE==='big_omega')return c<=1;
+    if(isThetaMode())return c.c1<=1 && (bookAgainstCubic?c.c2>1:c.c2>=1);
+    return false;
+  }
+  function verifiedThreshold(predicate,tailPossible){
+    if(!tailPossible)return null;
+    var lastViolation=-1;
+    for(var n=0;n<=VERIFIED_TAIL_START;n++){
+      if(!predicate(n))lastViolation=n;
+    }
+    if(predicate(VERIFIED_TAIL_START))return lastViolation+1;
+
+    var low=VERIFIED_TAIL_START,high=VERIFIED_TAIL_START*2;
+    while(!predicate(high)){
+      low=high;high*=2;
+    }
+    while(low+1<high){
+      var middle=Math.floor((low+high)/2);
+      if(predicate(middle))high=middle;
+      else low=middle;
+    }
+    return high;
+  }
+  function estimateN0(ck,gk,c){
+    var cacheKey=MODE+'|'+ck+'|'+gk+'|'+JSON.stringify(c);
+    if(cacheKey===thresholdCacheKey)return thresholdCacheValue;
+    var predicate=function(n){return satisfiesInequality(ck,gk,c,n);};
+    var integerThreshold=verifiedThreshold(predicate,tailCanSatisfy(ck,gk,c));
+    thresholdCacheKey=cacheKey;
+    thresholdCacheValue=verifiedRealThreshold(predicate,integerThreshold);
+    return thresholdCacheValue;
+  }
+  function thetaThresholdComponents(ck,gk,c){
+    if(!isThetaMode())return [];
+    function solve(predicate,possible){
+      return verifiedRealThreshold(predicate,verifiedThreshold(predicate,possible));
+    }
+    var member=isMember(ck,gk);
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    return [
+      {kind:'lower',value:solve(
+        function(n){return c.c1*FNS[gk].fn(n)<=cFn(ck,n);},
+        member && c.c1<=1
+      )},
+      {kind:'upper',value:solve(
+        function(n){return cFn(ck,n)<=c.c2*FNS[gk].fn(n);},
+        member && (bookAgainstCubic?c.c2>1:c.c2>=1)
+      )}
+    ];
+  }
+  function verifiedRealThreshold(predicate,integerThreshold){
+    if(integerThreshold===null)return null;
+    if(integerThreshold===0)return 0;
+    var low=integerThreshold-1,high=integerThreshold;
+    for(var i=0;i<60;i++){
+      var middle=(low+high)/2;
+      if(predicate(middle))high=middle;
+      else low=middle;
+    }
+    if(Math.abs(high-Math.round(high))<1e-10)return Math.round(high);
+    return high;
+  }
+  function thresholdNumber(value){
+    if(value===null)return null;
+    return fmt(value);
+  }
+  function satisfiesInequality(ck,gk,c,n){
+    var left=cFn(ck,n),ref=FNS[gk].fn(n);
+    if(MODE==='big_o')return left<=c*ref;
+    if(MODE==='little_o')return left<c*ref;
+    if(MODE==='big_omega')return left>=c*ref;
+    if(MODE==='little_omega')return left>c*ref;
+    if(isThetaMode())return c.c1*ref<=left && left<=c.c2*ref;
+    return false;
+  }
+  function parsePowerInput(value,allowZero){
+    var text=String(value).trim().replace(/\s+/g,'');
+    if(allowZero && text==='0')return 0;
+    var match=text.match(/^10(?:\\*\\*|\\^)(\\d+)$/);
+    if(match)return Math.pow(10,Math.min(20,parseInt(match[1],10)));
+    var numeric=parseFloat(text);
+    if(!isFinite(numeric))return allowZero?0:1;
+    return numeric;
+  }
+  function inequalityLatex(){
+    var base='';
+    if(MODE==='big_o')base='C(n)\\le c\\cdot g(n)';
+    if(MODE==='little_o')base='C(n)\\lt c\\cdot g(n)';
+    if(MODE==='big_omega')base='C(n)\\ge c\\cdot g(n)';
+    if(MODE==='little_omega')base='C(n)\\gt c\\cdot g(n)';
+    if(isThetaMode())base='c_1\\cdot g(n)\\le C(n)\\le c_2\\cdot g(n)';
+    return base;
+  }
+  function substitutedInequalityLatex(ck,gk,c){
+    var base='';
+    if(MODE==='big_o')base=cLatex()+'\\le '+fmt(c)+'\\cdot '+latexOf(gk);
+    if(MODE==='little_o')base=cLatex()+'\\lt '+fmt(c)+'\\cdot '+latexOf(gk);
+    if(MODE==='big_omega')base=cLatex()+'\\ge '+fmt(c)+'\\cdot '+latexOf(gk);
+    if(MODE==='little_omega')base=cLatex()+'\\gt '+fmt(c)+'\\cdot '+latexOf(gk);
+    if(isThetaMode())base=fmt(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk);
+    return base;
+  }
+  function isStrictMode(){return MODE==='little_o' || MODE==='little_omega'}
+  function solutionIncludesBoundary(ck,gk,c,threshold){
+    if(threshold===null)return false;
+    return !isStrictMode();
+  }
+  function realThresholdSetLatex(threshold,includesBoundary){
+    if(threshold===null)return '\\varnothing';
+    var value=thresholdNumber(threshold);
+    return (includesBoundary?'[':'(')+value+',\\infty)';
+  }
+  function minimumSelectedN0(threshold){
+    if(threshold===null)return null;
+    return isStrictMode()?threshold+epsilonVal():threshold;
+  }
+  function selectedN0(threshold){
+    var minimum=minimumSelectedN0(threshold);
+    if(minimum===null){STATE_N0=null;return null;}
+    if(STATE_N0===null || STATE_N0<minimum)STATE_N0=minimum;
+    return STATE_N0;
+  }
+  function resetSelectedN0(){
+    STATE_N0=null;
+  }
+  function defaultN0Latex(threshold){
+    if(isStrictMode()){
+      return 'n_0='+thresholdNumber(threshold)+'+\\varepsilon='+
+        thresholdNumber(minimumSelectedN0(threshold));
+    }
+    return 'n_0='+thresholdNumber(threshold);
+  }
+  function defaultN0Html(threshold){
+    return '<div class="demo-title">Valor de '+titleTex('n_0')+' seleccionado por defecto:</div>'+
+      '<div class="demo-line">'+texBlock(defaultN0Latex(threshold))+'</div>';
+  }
+  function thetaPartialSolutionsHtml(ck,gk,c){
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    var lowerPossible=isMember(ck,gk) && c.c1<=1;
+    var upperPossible=isMember(ck,gk) && (bookAgainstCubic?c.c2>1:c.c2>=1);
+    var lowerThreshold=verifiedThreshold(
+      function(n){return c.c1*FNS[gk].fn(n)<=cFn(ck,n);},
+      lowerPossible
+    );
+    var upperThreshold=verifiedThreshold(
+      function(n){return cFn(ck,n)<=c.c2*FNS[gk].fn(n);},
+      upperPossible
+    );
+    var lowerA=verifiedRealThreshold(
+      function(n){return c.c1*FNS[gk].fn(n)<=cFn(ck,n);},
+      lowerThreshold
+    );
+    var upperA=verifiedRealThreshold(
+      function(n){return cFn(ck,n)<=c.c2*FNS[gk].fn(n);},
+      upperThreshold
+    );
+    var intersection=(lowerA===null || upperA===null)?null:Math.max(lowerA,upperA);
+    var thetaN0Html=intersection===null?''
+      :defaultN0Html(intersection);
+    return '<div class="theta-solutions">'+
+      '<div class="theta-solution"><b>Desigualdad izquierda '+titleTex('c_1\\cdot g(n)\\le C(n)')+':</b>'+
+        '<div class="demo-line">'+texBlock(fmt(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex())+'</div>'+
+        '<div class="demo-line">'+texBlock('S_1='+realThresholdSetLatex(lowerA,true))+'</div></div>'+
+      '<div class="theta-solution"><b>Desigualdad derecha '+titleTex('C(n)\\le c_2\\cdot g(n)')+':</b>'+
+        '<div class="demo-line">'+texBlock(cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk))+'</div>'+
+        '<div class="demo-line">'+texBlock('S_2='+realThresholdSetLatex(upperA,true))+'</div></div>'+
+      '</div>'+
+      '<div class="theta-intersection"><div class="solution-title">Valores que cumplen ambas desigualdades '+titleTex('S_1\\cap S_2')+':</div>'+
+        '<div class="demo-line">'+texBlock('n\\in '+realThresholdSetLatex(intersection,true))+'</div>'+
+        thetaN0Html+'</div>';
+  }
+  function singleSolutionSetHtml(ck,gk,c,n0){
+    if(n0===null){
+      return '<div class="solution-set"><div class="solution-title">Conjunto solución:</div>'+
+        '<div class="demo-line">'+texBlock('n\\in\\varnothing')+'</div>'+
+        '<div class="demo-line">No existe un valor de \\(n_0\\) a partir del cual la desigualdad se cumpla siempre.</div></div>';
+    }
+    var includesBoundary=solutionIncludesBoundary(ck,gk,c,n0);
+    return '<div class="solution-set"><div class="solution-title">Conjunto solución:</div>'+
+      '<div class="demo-line">'+texBlock('n\\in '+realThresholdSetLatex(n0,includesBoundary))+'</div>'+
+      defaultN0Html(n0)+'</div>';
+  }
+  function limitProofHtml(ck,gk,c){
+    var limitProcedure=isThetaMode()?thetaLimitProcedureHtml(ck,gk):limitProcedureHtml(ck,gk);
+    var thereforeBlock='<div class="demo-title">Por lo tanto:</div>'+
+      '<div class="demo-line">'+texBlock('\\displaystyle '+cRule(ck,gk))+'</div>';
+    return '<div class="demo-title">Criterio correspondiente a la notación:</div>'+
+      limitProcedure+thereforeBlock;
+  }
+  function n0ProofHtml(ck,gk,c,n0){
+    var n0Title=isThetaMode()
+      ?'Determinación de '+titleTex('n_0')+' para '+titleTex('c_1='+fmt(c.c1))+' y '+titleTex('c_2='+fmt(c.c2))+':'
+      :'Determinación de '+titleTex('n_0')+' para '+titleTex('c='+fmt(c))+':';
+    var inequalityLine=texBlock('\\displaystyle '+inequalityLatex());
+    var substitutedInequalityLine=texBlock('\\displaystyle '+substitutedInequalityLatex(ck,gk,c));
+    var partialSolutions=isThetaMode()?thetaPartialSolutionsHtml(ck,gk,c):'';
+    var singleSolution=isThetaMode()?'':singleSolutionSetHtml(ck,gk,c,n0);
+    if(n0===null){
+      return '<div class="demo-title">'+n0Title+'</div>'+
+        '<div class="demo-line">'+inequalityLine+'</div>'+
+        '<div class="demo-line">'+substitutedInequalityLine+'</div>'+
+        partialSolutions+
+        singleSolution+
+        '<div class="demo-line">'+texBlock('\\displaystyle n_0\\text{ no existe para las constantes seleccionadas}')+'</div>';
+    }
+    return '<div class="demo-title">'+n0Title+'</div>'+
+      '<div class="demo-line">'+inequalityLine+'</div>'+
+      '<div class="demo-line">'+substitutedInequalityLine+'</div>'+
+      partialSolutions+
+      singleSolution;
+  }
+  function resultSummaryHtml(ck,gk,c,threshold){
+    var relation=cLatex()+(isMember(ck,gk)?'\\in ':'\\notin ')+modeLatex()+'('+latexOf(gk)+')';
+    var solution='n\\in '+realThresholdSetLatex(
+      threshold,solutionIncludesBoundary(ck,gk,c,threshold)
+    );
+    return texBlock('\\displaystyle \\begin{gathered}'+relation+'\\\\[4pt]'+solution+'\\end{gathered}');
+  }
+  function readingText(ck,gk){
+    if(!isMember(ck,gk))return 'La función seleccionada no satisface la relación asintótica de esta notación con la referencia actual.';
+    if(MODE==='big_o')return 'La curva azul queda eventualmente debajo de la cota construida con la función de referencia.';
+    if(MODE==='little_o')return 'La curva azul queda estrictamente por debajo de cualquier múltiplo positivo de la referencia para valores suficientemente grandes.';
+    if(MODE==='big_omega')return 'La curva azul queda eventualmente por encima de la cota inferior construida con la función de referencia.';
+    if(MODE==='little_omega')return 'La curva azul supera estrictamente cualquier múltiplo positivo de la referencia para valores suficientemente grandes.';
+    if(MODE==='theta')return 'La curva azul queda atrapada entre las dos cotas construidas con la misma función de referencia.';
+    return '';
+  }
+  function resize(){
+    var dpr=window.devicePixelRatio||1;
+    var r=cv.getBoundingClientRect();
+    var pixelWidth=Math.max(1,Math.round(r.width*dpr));
+    var pixelHeight=Math.max(1,Math.round(r.height*dpr));
+    if(cv.width!==pixelWidth || cv.height!==pixelHeight){
+      cv.width=pixelWidth;cv.height=pixelHeight;
+      staticLayerKey='';
+    }
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    W=r.width;H=r.height;DPR=dpr;
+  }
+  function interval(){
+    return [STATE_A,STATE_B];
+  }
+  function syncInputs(a,b){
+    a=Math.max(0,Math.min(MAX_B-1,a));
+    b=Math.max(MIN_SPAN,Math.min(MAX_B,b));
+    if(b-a<MIN_SPAN)b=Math.min(MAX_B,a+MIN_SPAN);
+    if(b-a<MIN_SPAN)a=Math.max(0,b-MIN_SPAN);
+    STATE_A=a;STATE_B=b;
+    setEditableField('bo-a',a);
+    setEditableField('bo-b',b);
+  }
+  function setEditableField(id,value){
+    var target=el(id);
+    target.dataset.raw=fieldText(value);
+    target.dataset.lastValue=String(value);
+    if(document.activeElement===target)return;
+    target.innerHTML=tex(valueLatex(value));
+  }
+  function beginEditableField(id){
+    var target=el(id);
+    target.textContent=target.dataset.raw || '';
+  }
+  function sanitizeEditableField(id){
+    var target=el(id);
+    var text=target.textContent.replace(/[^0-9.*]/g,'');
+    var firstDot=text.indexOf('.');
+    if(firstDot!==-1)text=text.slice(0,firstDot+1)+text.slice(firstDot+1).replace(/\\./g,'');
+    target.textContent=text;
+  }
+  function adaptiveSampleCount(ck,gk){
+    var count=Math.ceil(Math.max(320,W-PAD.l-PAD.r)/4);
+    if(isLogScale())count=Math.ceil(count*1.25);
+    if(FNS[ck].rank>=7 || FNS[gk].rank>=7)count=Math.ceil(count*1.4);
+    return Math.max(120,Math.min(520,count));
+  }
+  function sample(a,b,ck,gk,c){
+    var pointCount=adaptiveSampleCount(ck,gk);
+    var cacheKey=scaleMode()+'|'+W+'|'+a+'|'+b+'|'+ck+'|'+gk+'|'+JSON.stringify(c)+'|'+pointCount;
+    if(cacheKey===sampleCacheKey)return sampleCacheValue;
+    var xs=[],ys1=[],ys2=[],ys3=[],ys4=[],mx=0,mn=Infinity;
+    var logSampling=isLogScale();
+    var logLo=logSampling?Math.log10(logXMin(a,b)):0;
+    var logHi=logSampling?Math.log10(Math.max(b,logXMin(a,b))):0;
+    var positions=[];
+    for(var i=0;i<=pointCount;i++){
+      positions.push(logSampling?Math.pow(10,logLo+(logHi-logLo)*i/pointCount):a+(b-a)*i/pointCount);
+    }
+    var crossing=estimateN0(ck,gk,c);
+    if(crossing!==null && crossing>=a && crossing<=b){
+      positions.push(crossing);
+      if(logSampling && crossing>0){
+        var logStep=(logHi-logLo)/pointCount;
+        positions.push(crossing/Math.pow(10,logStep/3),crossing*Math.pow(10,logStep/3));
+      }else{
+        var step=(b-a)/pointCount;
+        positions.push(Math.max(a,crossing-step/3),Math.min(b,crossing+step/3));
+      }
+    }
+    positions.sort(function(left,right){return left-right;});
+    for(var positionIndex=0;positionIndex<positions.length;positionIndex++){
+      var n=positions[positionIndex];
+      if(positionIndex>0 && Math.abs(n-positions[positionIndex-1])<=Math.max(1e-12,Math.abs(n)*1e-14))continue;
+      var v1=cFn(ck,n),v2=FNS[gk].fn(n),v3=upperFactor(c)*v2,v4=lowerFactor(c)*v2;
+      if(isFinite(v1)&&isFinite(v2)&&isFinite(v3)&&isFinite(v4)){
+        xs.push(n);ys1.push(v1);ys2.push(v2);ys3.push(v3);ys4.push(v4);
+        mx=Math.max(mx,v1,v2,v3,v4);
+        [v1,v2,v3,v4].forEach(function(v){if(v>0)mn=Math.min(mn,v);});
+      }
+    }
+    sampleCacheKey=cacheKey;
+    sampleCacheValue={xs:xs,c:ys1,g:ys2,cg:ys3,c1g:ys4,max:mx||1,min:isFinite(mn)?mn:1};
+    return sampleCacheValue;
+  }
+  function logXMin(a,b){
+    if(a>0)return a;
+    return 1;
+  }
+  function xTransform(n,a,b){
+    if(isLogScale())return Math.log10(Math.max(n,logXMin(a,b)));
+    return n;
+  }
+  function visualXMin(a,b){return a<=0?-0.05*(b-a):a}
+  function xDisplayBounds(a,b){
+    var lo=isLogScale()?xTransform(logXMin(a,b),a,b):visualXMin(a,b);
+    var bpos=xTransform(b,a,b);
+    var span=Math.max(bpos-lo,1e-9);
+    return {lo:lo-span*0.06,hi:bpos+span*0.06};
+  }
+  function tx(n,a,b){
+    var bounds=xDisplayBounds(a,b);
+    return PAD.l+(xTransform(n,a,b)-bounds.lo)/(bounds.hi-bounds.lo)*(W-PAD.l-PAD.r);
+  }
+  function yTransform(y){
+    if(scaleMode()==='log')return Math.log10(y);
+    return y;
+  }
+  function yBounds(data){
+    if(!isLogScale())return {min:0,max:Math.max(data.max*1.08,10)};
+    var min=Math.max(data.min/1.2,1e-9);
+    var max=Math.max(data.max*1.08,min*10);
+    return {min:min,max:max};
+  }
+  function ty(y,yrange){
+    var base;
+    if(scaleMode()==='log'){
+      if(!(y>0))return null;
+      var lo=yTransform(yrange.min),hi=yTransform(yrange.max);
+      base=H-PAD.b-(yTransform(y)-lo)/(hi-lo)*(H-PAD.t-PAD.b);
+    }else{
+      base=H-PAD.b-y/yrange.max*(H-PAD.t-PAD.b);
+    }
+    var center=(PAD.t+H-PAD.b)/2;
+    return center+(base-center)*Y_SCALE+Y_OFFSET;
+  }
+  function fx(px,a,b){
+    var ratio=(px-PAD.l)/(W-PAD.l-PAD.r);
+    var bounds=xDisplayBounds(a,b);
+    if(isLogScale()){
+      return Math.pow(10,bounds.lo+ratio*(bounds.hi-bounds.lo));
+    }
+    return bounds.lo+ratio*(bounds.hi-bounds.lo);
+  }
+  function niceTicks(lo,hi,count){
+    var range=Math.max(hi-lo,1e-9),raw=range/count;
+    var pow=Math.pow(10,Math.floor(Math.log10(raw)));
+    var mult=[1,2,5,10],step=pow;
+    for(var i=0;i<mult.length;i++){if(raw<=mult[i]*pow){step=mult[i]*pow;break;}}
+    var ticks=[],start=Math.ceil(lo/step)*step;
+    for(var v=start;v<=hi+step*0.5;v+=step)ticks.push(v);
+    return ticks;
+  }
+  function logTicks(ymin,ymax){
+    var minExp=Math.floor(Math.log10(Math.max(ymin,1e-9)));
+    var maxExp=Math.ceil(Math.log10(Math.max(ymax,ymin*10)));
+    var step=Math.max(1,Math.ceil((maxExp-minExp+1)/6));
+    var ticks=[];
+    for(var exp=minExp;exp<=maxExp;exp+=step)ticks.push(Math.pow(10,exp));
+    var top=Math.pow(10,maxExp);
+    if(ticks[ticks.length-1]!==top)ticks.push(top);
+    return ticks.filter(function(v,index,arr){return v>=ymin && v<=ymax && arr.indexOf(v)===index;});
+  }
+  function logXTicks(a,b){
+    var lo=logXMin(a,b),hi=Math.max(b,lo);
+    var minExp=Math.floor(Math.log10(lo));
+    var maxExp=Math.ceil(Math.log10(hi));
+    var step=Math.max(1,Math.ceil((maxExp-minExp+1)/6));
+    var ticks=[];
+    for(var exp=minExp;exp<=maxExp;exp+=step){
+      var value=Math.pow(10,exp);
+      if(value>=lo && value<=hi)ticks.push(value);
+    }
+    if(ticks.indexOf(hi)===-1 && isPowerOfTen(hi))ticks.push(hi);
+    return ticks;
+  }
+  function drawAxes(a,b,yrange){
+    ctx.save();
+    ctx.strokeStyle='#dddddd';ctx.lineWidth=0.7;ctx.setLineDash([]);
+    ctx.fillStyle='#333';ctx.font='14px sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
+    var xScale=isLogScale()?{scale:1,label:''}:axisScale(b);
+    var xt=isLogScale()?logXTicks(a,b):niceTicks(0,b,5);
+    for(var i=0;i<xt.length;i++){
+      var x=tx(xt[i],a,b);
+      ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,H-PAD.b);ctx.stroke();
+      if(isLogScale())drawPowerOfTenLabel(x,H-PAD.b+8,'center','top',Math.round(Math.log10(xt[i])));
+      else ctx.fillText(fmtScaledAxis(xt[i],xScale.scale),x,H-PAD.b+8);
+    }
+    if(xScale.label){
+      drawPowerOfTenLabel(W-PAD.r,H-PAD.b+25,'right','top',xScale.exp);
+    }
+    ctx.textAlign='right';ctx.textBaseline='middle';
+    var yScale=isLogScale()?{scale:1,label:''}:axisScale(yrange.max);
+    var yt=isLogScale()?logTicks(yrange.min,yrange.max):niceTicks(0,yrange.max,5);
+    for(var j=0;j<yt.length;j++){
+      var y=ty(yt[j],yrange);
+      if(y===null || y<PAD.t || y>H-PAD.b)continue;
+      ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();
+      if(isLogScale())drawPowerOfTenLabel(PAD.l-8,y,'right','middle',Math.round(Math.log10(yt[j])));
+      else ctx.fillText(fmtScaledAxis(yt[j],yScale.scale),PAD.l-8,y);
+    }
+    if(yScale.label){
+      drawPowerOfTenLabel(PAD.l,PAD.t-8,'left','bottom',yScale.exp);
+    }
+    ctx.setLineDash([]);ctx.strokeStyle='#333';ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(PAD.l,PAD.t);ctx.lineTo(PAD.l,H-PAD.b);ctx.lineTo(W-PAD.r,H-PAD.b);ctx.stroke();
+    ctx.restore();
+  }
+  function drawLine(xs,ys,a,b,yrange,color,width,dash){
+    ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width||2;ctx.setLineDash(dash||[]);
+    ctx.beginPath();
+    var started=false;
+    for(var i=0;i<xs.length;i++){
+      var x=tx(xs[i],a,b),y=ty(ys[i],yrange);
+      if(y===null){started=false;continue;}
+      if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);
+    }
+    ctx.stroke();ctx.restore();
+  }
+  function drawValidArea(data,a,b,yrange,n0){
+    if(n0===null)return;
+    var upper=[],lower=[];
+    for(var i=0;i<data.xs.length;i++){
+      if(data.xs[i]<n0)continue;
+      var top=null,bottom=null;
+      if(MODE==='big_o' && data.cg[i]>=data.c[i]){top=data.cg[i];bottom=data.c[i];}
+      if(MODE==='little_o' && data.cg[i]>data.c[i]){top=data.cg[i];bottom=data.c[i];}
+      if(MODE==='big_omega' && data.c[i]>=data.cg[i]){top=data.c[i];bottom=data.cg[i];}
+      if(MODE==='little_omega' && data.c[i]>data.cg[i]){top=data.c[i];bottom=data.cg[i];}
+      if(isThetaMode()){
+        var low=data.c1g[i],high=data.cg[i];
+        if(data.c[i]>=low && data.c[i]<=high){top=high;bottom=low;}
+      }
+      if(top!==null && (!isLogScale() || (top>0 && bottom>0))){
+        upper.push([tx(data.xs[i],a,b),ty(top,yrange)]);
+        lower.push([tx(data.xs[i],a,b),ty(bottom,yrange)]);
+      }
+    }
+    if(upper.length<2)return;
+    ctx.save();
+    ctx.fillStyle=areaColor();
+    ctx.beginPath();
+    ctx.moveTo(upper[0][0],upper[0][1]);
+    for(var j=1;j<upper.length;j++)ctx.lineTo(upper[j][0],upper[j][1]);
+    for(var k=lower.length-1;k>=0;k--)ctx.lineTo(lower[k][0],lower[k][1]);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  function drawN0(n0,a,b,ck,yrange){
+    if(n0===null || n0<a || n0>b)return;
+    if(isLogScale() && n0===0)return;
+    var x=tx(n0,a,b), y=ty(cFn(ck,n0),yrange);
+    ctx.save();
+    ctx.strokeStyle=n0Color();ctx.fillStyle=n0Color();ctx.lineWidth=2;ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,H-PAD.b);ctx.stroke();
+    ctx.restore();
+  }
+  function drawThresholdAndCrossings(threshold,a,b,ck,gk,c,yrange){
+    if(threshold===null || threshold<a || threshold>b || (isLogScale() && threshold===0))return;
+    var x=tx(threshold,a,b);
+    ctx.save();
+    ctx.strokeStyle='#00838F';ctx.lineWidth=1.6;ctx.setLineDash([7,4]);
+    ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,H-PAD.b);ctx.stroke();
+    ctx.setLineDash([]);
+    var points=isThetaMode()?thetaThresholdComponents(ck,gk,c):[{kind:'single',value:threshold}];
+    points.forEach(function(point){
+      if(point.value===null || point.value<a || point.value>b || (isLogScale() && point.value===0))return;
+      var px=tx(point.value,a,b),py=ty(cFn(ck,point.value),yrange);
+      if(py===null || py<PAD.t || py>H-PAD.b)return;
+      var reference=FNS[gk].fn(point.value);
+      var bound=point.kind==='lower'?c.c1*reference:
+        (point.kind==='upper'?c.c2*reference:c*reference);
+      var left=cFn(ck,point.value);
+      if(Math.abs(left-bound)>Math.max(1e-8,Math.abs(left)*1e-7,Math.abs(bound)*1e-7))return;
+      ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);
+      ctx.fillStyle=point.kind==='lower'?'#EF6C00':'#00838F';
+      ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+    });
+    ctx.restore();
+  }
+  function drawN0DisplacementFade(threshold,n0,a,b){
+    var initialN0=minimumSelectedN0(threshold);
+    if(initialN0===null || n0===null || n0<=initialN0+1e-12)return;
+    var left=PAD.l;
+    var right=Math.min(W-PAD.r,tx(n0,a,b));
+    if(right<=left)return;
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,0.48)';
+    ctx.fillRect(left,PAD.t,right-left,H-PAD.t-PAD.b);
+    ctx.fillStyle='rgba(120,120,120,0.12)';
+    ctx.fillRect(left,PAD.t,right-left,H-PAD.t-PAD.b);
+    ctx.restore();
+  }
+  function drawEndpointMarker(n,a,b,label){
+    var x=tx(n,a,b),y=H-PAD.b;
+    ctx.save();
+    ctx.textAlign='center';ctx.textBaseline='top';
+    var axisTitle='Tamaño de la entrada (n)';
+    var axisCenter=PAD.l+(W-PAD.l-PAD.r)/2;
+    ctx.font='14px sans-serif';
+    var axisHalfWidth=ctx.measureText(axisTitle).width/2+12;
+    ctx.font='bold 12px sans-serif';
+    var labelHalfWidth=ctx.measureText(label).width/2;
+    var overlapsAxisTitle=x+labelHalfWidth>=axisCenter-axisHalfWidth &&
+      x-labelHalfWidth<=axisCenter+axisHalfWidth;
+    if(!overlapsAxisTitle){
+      ctx.fillStyle='#6A1B9A';ctx.strokeStyle='#6A1B9A';
+      ctx.beginPath();
+      ctx.moveTo(x,y+22);ctx.lineTo(x-6,y+33);ctx.lineTo(x+6,y+33);ctx.closePath();ctx.fill();
+      ctx.fillText(label,x,y+36);
+    }
+    ctx.restore();
+  }
+  function prepareStaticCanvas(layer){
+    if(layer.width!==cv.width || layer.height!==cv.height){
+      layer.width=cv.width;layer.height=cv.height;
+    }
+    var layerContext=layer.getContext('2d');
+    layerContext.setTransform(DPR,0,0,DPR,0,0);
+    layerContext.clearRect(0,0,W,H);
+    return layerContext;
+  }
+  function renderStaticLayers(key,data,a,b,yrange){
+    if(key===staticLayerKey)return;
+    staticLayerKey=key;
+    var visibleContext=ctx;
+    var backgroundContext=prepareStaticCanvas(staticBackground);
+    ctx=backgroundContext;
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+    drawAxes(a,b,yrange);
+
+    var curvesContext=prepareStaticCanvas(staticCurves);
+    ctx=curvesContext;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(PAD.l,PAD.t,W-PAD.l-PAD.r,H-PAD.t-PAD.b);
+    ctx.clip();
+    drawLine(data.xs,data.c,a,b,yrange,cColor(),2.4);
+    drawLine(data.xs,data.cg,a,b,yrange,cgColor(),2.4);
+    if(isThetaMode())drawLine(data.xs,data.c1g,a,b,yrange,c1gColor(),2.0);
+    ctx.restore();
+    ctx=visibleContext;
+  }
+  function drawStaticLayer(layer){
+    ctx.drawImage(layer,0,0,layer.width,layer.height,0,0,W,H);
+  }
+  function draw(){
+    resize();
+    var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
+    var ab=interval();syncInputs(ab[0],ab[1]);var a=interval()[0],b=interval()[1];
+    var data=sample(a,b,ck,gk,c),automaticYRange=yBounds(data);
+    var yrange=Y_RANGE_OVERRIDE||automaticYRange;
+    lastYRange={min:yrange.min,max:yrange.max};
+    var threshold=estimateN0(ck,gk,c),n0=selectedN0(threshold),lim=limitValue(ck,gk);
+    var layerKey=[MODE,scaleMode(),W,H,DPR,a,b,ck,gk,JSON.stringify(c),yrange.min,yrange.max,Y_SCALE,Y_OFFSET].join('|');
+    renderStaticLayers(layerKey,data,a,b,yrange);
+    ctx.clearRect(0,0,W,H);
+    drawStaticLayer(staticBackground);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(PAD.l,PAD.t,W-PAD.l-PAD.r,H-PAD.t-PAD.b);
+    ctx.clip();
+    drawValidArea(data,a,b,yrange,n0);
+    drawStaticLayer(staticCurves);
+    drawN0DisplacementFade(threshold,n0,a,b);
+    drawThresholdAndCrossings(threshold,a,b,ck,gk,c,yrange);
+    drawN0(n0,a,b,ck,yrange);
+    ctx.restore();
+    drawEndpointMarker(a,a,b,'a');
+    drawEndpointMarker(b,a,b,'b');
+    if(drag==='n0')updateDynamicN0(n0);
+    else updateText(a,b,ck,gk,c,threshold,lim);
+  }
+  function requestDraw(){
+    if(drawFramePending)return;
+    drawFramePending=true;
+    var schedule=window.requestAnimationFrame||function(callback){return setTimeout(callback,16);};
+    schedule(function(){
+      drawFramePending=false;
+      if(root.isConnected)draw();
+    });
+  }
+  function updateText(a,b,ck,gk,c,threshold,lim){
+    var n0=selectedN0(threshold),cls=relationClass(ck,gk);
+    el('bo-result-main').innerHTML=resultSummaryHtml(ck,gk,c,threshold);
+    el('bo-result-n0').innerHTML=n0===null?tex('n_0\\text{ no existe}'):tex('n_0='+thresholdNumber(n0));
+    el('bo-n0').innerHTML=n0===null?tex('\\text{No existe}') : tex('n_0='+thresholdNumber(n0));
+    el('bo-c-rule-label').textContent=isThetaMode()?'Condición sobre c₁,c₂':'Condición sobre c';
+    el('bo-c-rule').innerHTML=tex(cRule(ck,gk));
+    el('bo-status').className='val '+cls;
+    el('bo-status').innerHTML=membershipText(ck,gk);
+    var reading=readingText(ck,gk);
+    if(isLogScale() && n0===0){
+      reading+=' El valor n₀ = 0 no se muestra en la gráfica porque log(0) no está definido.';
+    }
+    el('bo-reading').innerHTML=reading;
+    el('bo-axis-y').innerHTML=tex(modeLatex()+'(g(n))');
+    el('bo-cfn').innerHTML=tex(cLatex());
+    el('bo-gfn').innerHTML=tex(latexOf(gk));
+    el('bo-leg-c').innerHTML=tex('C(n)='+cLatex());
+    el('bo-leg-c').parentElement.style.color=cColor();
+    el('bo-leg-cg').parentElement.style.color=cgColor();
+    el('bo-leg-cg').innerHTML=isThetaMode()?tex('c_2\\cdot g(n)='+fmt(c.c2)+'\\cdot '+latexOf(gk)):tex('c\\cdot g(n)='+fmt(c)+'\\cdot '+latexOf(gk));
+    el('bo-leg-low-wrap').style.display=isThetaMode()?'inline':'none';
+    el('bo-leg-low-wrap').style.color=c1gColor();
+    el('bo-leg-low').innerHTML=tex('c_1\\cdot g(n)='+fmt(c.c1)+'\\cdot '+latexOf(gk));
+    el('bo-leg-threshold').parentElement.style.display=threshold===null?'none':'inline';
+    el('bo-leg-threshold').innerHTML=threshold===null?'':tex(
+      (isStrictMode()?'\\inf(I)=':'\\min(I)=')+thresholdNumber(threshold)
+    );
+    el('bo-leg-n0').parentElement.style.color=n0Color();
+    el('bo-leg-n0').innerHTML=n0===null
+      ?tex('n_0\\text{ no existe}')
+      :(isLogScale() && n0===0
+        ?tex('n_0=0\\;\\text{(no visible porque }\\log(0)\\text{ no está definido)}')
+        :tex('n_0='+thresholdNumber(n0)));
+    var focusButton=el('bo-zoom-n0');
+    focusButton.disabled=n0===null || (isLogScale() && n0===0);
+    focusButton.classList.toggle('active',n0FocusActive);
+    focusButton.title=isLogScale() && n0===0
+      ?'n₀ = 0 no puede mostrarse en una escala logarítmica'
+      :'Ver el comportamiento alrededor de n₀';
+    el('bo-limit-proof').innerHTML=limitProofHtml(ck,gk,c);
+    el('bo-n0-proof').innerHTML=n0ProofHtml(ck,gk,c,threshold);
+    renderLimits(ck,gk);
+    typeset();
+  }
+  function renderLimits(ck,selectedG){
+    var html='<table><thead><tr><th>'+tex('\\mathbf{g(n)}')+'</th>'+
+      '<th>Resultado del límite '+tex('(k)')+'</th><th>Pertenencia</th></tr></thead><tbody>';
+    ORDER.forEach(function(gk){
+      var cls=relationClass(ck,gk);
+      var rowClass=(isMember(ck,gk)?'member':'nonmember')+(gk===selectedG?' active':'');
+      html+='<tr class="'+rowClass+'"><td>'+tex(latexOf(gk))+'</td>'+
+        '<td>'+tex(displayLimitValue(limitValue(ck,gk)))+'</td>'+
+        '<td class="'+cls+'">'+membershipText(ck,gk)+'</td></tr>';
+    });
+    html+='</tbody></table>';
+    el('bo-limits').innerHTML=html;
+  }
+  function pointer(ev){
+    var r=cv.getBoundingClientRect();
+    return {x:ev.clientX-r.left,y:ev.clientY-r.top};
+  }
+  function viewSnapshot(){
+    return {
+      mode:MODE,a:STATE_A,b:STATE_B,cIndex:STATE_C_INDEX,gIndex:STATE_G_INDEX,n0:STATE_N0,
+      c:el('bo-c').value,c1:el('bo-c1').value,c2:el('bo-c2').value,epsilon:el('bo-epsilon').value,
+      scale:el('bo-scale').value,yOffset:Y_OFFSET,yScale:Y_SCALE,
+      yRange:Y_RANGE_OVERRIDE?{min:Y_RANGE_OVERRIDE.min,max:Y_RANGE_OVERRIDE.max}:null,
+      focus:n0FocusActive,lockX:lockX,lockY:lockY
+    };
+  }
+  function updateHistoryButtons(){
+    el('bo-history-undo').disabled=historyUndo.length===0;
+    el('bo-history-redo').disabled=historyRedo.length===0;
+  }
+  function captureHistory(){
+    var snapshot=viewSnapshot();
+    if(!historyUndo.length || JSON.stringify(historyUndo[historyUndo.length-1])!==JSON.stringify(snapshot)){
+      historyUndo.push(snapshot);
+      if(historyUndo.length>50)historyUndo.shift();
+    }
+    historyRedo=[];
+    updateHistoryButtons();
+  }
+  function captureHistoryBurst(){
+    if(historyCapturePending)return;
+    historyCapturePending=true;captureHistory();
+    setTimeout(function(){historyCapturePending=false;},250);
+  }
+  function restoreSnapshot(snapshot){
+    MODE=snapshot.mode;STATE_A=snapshot.a;STATE_B=snapshot.b;
+    STATE_C_INDEX=snapshot.cIndex;STATE_G_INDEX=snapshot.gIndex;STATE_N0=snapshot.n0;
+    el('bo-mode').value=MODE;el('bo-c').value=snapshot.c;el('bo-c1').value=snapshot.c1;
+    el('bo-c2').value=snapshot.c2;el('bo-epsilon').value=snapshot.epsilon;
+    el('bo-scale').value=snapshot.scale;
+    Y_OFFSET=snapshot.yOffset;Y_SCALE=snapshot.yScale;
+    Y_RANGE_OVERRIDE=snapshot.yRange?{min:snapshot.yRange.min,max:snapshot.yRange.max}:null;
+    n0FocusActive=snapshot.focus;lockX=snapshot.lockX;lockY=snapshot.lockY;
+    el('bo-lock-x').classList.toggle('active',lockX);
+    el('bo-lock-y').classList.toggle('active',lockY);
+    el('bo-lock-x').setAttribute('aria-pressed',lockX?'true':'false');
+    el('bo-lock-y').setAttribute('aria-pressed',lockY?'true':'false');
+    updateConstantControls();syncInputs(STATE_A,STATE_B);draw();
+  }
+  function undoHistory(){
+    if(!historyUndo.length)return;
+    historyRedo.push(viewSnapshot());
+    restoreSnapshot(historyUndo.pop());updateHistoryButtons();
+  }
+  function redoHistory(){
+    if(!historyRedo.length)return;
+    historyUndo.push(viewSnapshot());
+    restoreSnapshot(historyRedo.pop());updateHistoryButtons();
+  }
+  function deactivateN0Focus(){
+    if(!n0FocusActive)return;
+    n0FocusActive=false;
+    el('bo-zoom-n0').classList.remove('active');
+  }
+  function handleEndpointInput(id){
+    var input=el(id),raw=parsePowerInput(input.textContent,id==='bo-a');
+    if(!isFinite(raw))return;
+    if(id==='bo-a')syncInputs(raw,STATE_B);
+    if(id==='bo-b')syncInputs(STATE_A,raw);
+    typeset();
+  }
+  function stepFunction(kind,direction){
+    captureHistory();
+    if(kind==='c'){
+      STATE_C_INDEX=Math.max(0,Math.min(C_ORDER.length-1,STATE_C_INDEX+direction));
+    }else{
+      STATE_G_INDEX=Math.max(0,Math.min(ORDER.length-1,STATE_G_INDEX+direction));
+    }
+    var dc=defaultC(cKey(),gKey());
+    el('bo-c').value=dc;
+    if(isThetaMode()){el('bo-c1').value=0.1;el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;}
+    resetSelectedN0();
+    Y_RANGE_OVERRIDE=null;
+    updateConstantControls();
+    requestDraw();
+  }
+  function stepEndpoint(kind,direction){
+    if(lockX)return;
+    captureHistory();deactivateN0Focus();
+    if(kind==='a'){
+      var nextA=direction>0?nextPower(STATE_A,true):previousPower(STATE_A,true);
+      syncInputs(Math.min(nextA,STATE_B-1),STATE_B);
+    }else{
+      var nextB=direction>0?nextPower(STATE_B,false):previousPower(STATE_B,false);
+      syncInputs(STATE_A,Math.max(nextB,STATE_A+1));
+    }
+    draw();
+  }
+  function resetInterval(){
+    syncInputs(0,MAX_B);
+  }
+  function zoomCenter(a,b){
+    if(isLogScale())return Math.sqrt(Math.max(1,a)*Math.max(1,b));
+    return a+(b-a)/2;
+  }
+  function zoomAt(focus,factor){
+    if(lockX)return;
+    captureHistoryBurst();
+    deactivateN0Focus();
+    var ab=interval(),a=ab[0],b=ab[1],span=b-a;
+    focus=Math.max(a,Math.min(b,focus));
+    var nextSpan=Math.max(MIN_SPAN,Math.min(MAX_B,span*factor));
+    var ratio=span>0?(focus-a)/span:0.5;
+    var nextA=focus-nextSpan*ratio,nextB=nextA+nextSpan;
+    if(nextA<0){nextB-=nextA;nextA=0;}
+    if(nextB>MAX_B){nextA-=nextB-MAX_B;nextB=MAX_B;}
+    syncInputs(Math.max(0,nextA),Math.min(MAX_B,nextB));
+    draw();
+  }
+  function zoomIn(){
+    var ab=interval();
+    zoomAt(zoomCenter(ab[0],ab[1]),0.5);
+  }
+  function zoomOut(){
+    var ab=interval();
+    zoomAt(zoomCenter(ab[0],ab[1]),2);
+  }
+  function resetZoom(){
+    captureHistory();deactivateN0Focus();
+    resetInterval();
+    Y_OFFSET=0;Y_SCALE=1;Y_RANGE_OVERRIDE=null;
+    draw();
+  }
+  function preserveViewportForParameterChange(){
+    if(Y_RANGE_OVERRIDE===null && lastYRange){
+      Y_RANGE_OVERRIDE={min:lastYRange.min,max:lastYRange.max};
+    }
+  }
+  function focusVerticalAroundCurves(data,yrange){
+    var values=data.c.concat(data.cg);
+    if(isThetaMode())values=values.concat(data.c1g);
+    values=values.filter(function(value){return isFinite(value) && (!isLogScale() || value>0);});
+    if(!values.length)return;
+    var low=Math.min.apply(null,values),high=Math.max.apply(null,values);
+    var padding=Math.max((high-low)*0.18,Math.max(Math.abs(low),Math.abs(high))*0.002,1e-9);
+    low=isLogScale()?Math.max(1e-9,low/1.08):low-padding;
+    high=isLogScale()?high*1.08:high+padding;
+    var top=ty(high,yrange),bottom=ty(low,yrange);
+    if(top===null || bottom===null || Math.abs(bottom-top)<1e-9)return;
+    var plotHeight=H-PAD.t-PAD.b,plotCenter=(PAD.t+H-PAD.b)/2;
+    var bandCenter=(top+bottom)/2;
+    Y_SCALE=Math.min(80,plotHeight*0.78/Math.abs(bottom-top));
+    Y_OFFSET=-(bandCenter-plotCenter)*Y_SCALE;
+  }
+  function focusAroundN0(){
+    var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
+    var n0=selectedN0(estimateN0(ck,gk,c));
+    if(n0===null || (isLogScale() && n0===0))return;
+    captureHistory();
+    var nextA,nextB;
+    if(isLogScale()){
+      nextA=Math.max(1e-9,n0/Math.pow(10,0.12));
+      nextB=Math.min(MAX_B,n0*Math.pow(10,0.18));
+    }else{
+      var radius=Math.max(0.05,Math.abs(n0)*0.03,epsilonVal()*2);
+      nextA=Math.max(0,n0-radius);
+      nextB=Math.min(MAX_B,n0+radius*1.2);
+    }
+    if(nextB-nextA<MIN_SPAN){
+      nextA=Math.max(0,n0-MIN_SPAN);
+      nextB=Math.min(MAX_B,n0+MIN_SPAN);
+    }
+    selectionMode=false;cancelSelection();
+    el('bo-zoom-select').classList.remove('active');
+    cv.style.cursor='grab';
+    if(!lockX)syncInputs(nextA,nextB);
+    if(!lockY){Y_OFFSET=0;Y_SCALE=1;}
+    var focusedInterval=interval();
+    var focusData=sample(focusedInterval[0],focusedInterval[1],ck,gk,c);
+    if(!lockY){
+      Y_RANGE_OVERRIDE=yBounds(focusData);
+      focusVerticalAroundCurves(focusData,Y_RANGE_OVERRIDE);
+    }
+    n0FocusActive=true;
+    draw();
+  }
+  function clampPlotPoint(p){
+    return {x:Math.max(PAD.l,Math.min(W-PAD.r,p.x)),y:Math.max(PAD.t,Math.min(H-PAD.b,p.y))};
+  }
+  function showSelection(start,current){
+    var box=el('bo-zoom-selection');
+    var left=Math.min(start.x,current.x),top=Math.min(start.y,current.y);
+    box.style.display='block';box.style.left=left+'px';box.style.top=top+'px';
+    box.style.width=Math.abs(current.x-start.x)+'px';box.style.height=Math.abs(current.y-start.y)+'px';
+  }
+  function cancelSelection(){
+    selectionStart=null;el('bo-zoom-selection').style.display='none';
+  }
+  function finishSelection(current){
+    if(!selectionStart)return;
+    current=clampPlotPoint(current);
+    var start=selectionStart,x1=Math.min(start.x,current.x),x2=Math.max(start.x,current.x);
+    var y1=Math.min(start.y,current.y),y2=Math.max(start.y,current.y);
+    cancelSelection();
+    if(x2-x1<8 || y2-y1<8)return;
+    var ab=interval(),a=ab[0],b=ab[1];
+    var nextA=Math.max(a,Math.min(b,fx(x1,a,b))),nextB=Math.max(a,Math.min(b,fx(x2,a,b)));
+    if(!lockX && nextB-nextA>=MIN_SPAN)syncInputs(nextA,nextB);
+    var plotHeight=H-PAD.t-PAD.b,scaleFactor=plotHeight/(y2-y1),center=(PAD.t+H-PAD.b)/2;
+    if(!lockY){
+      Y_SCALE*=scaleFactor;
+      Y_OFFSET=scaleFactor*center+scaleFactor*Y_OFFSET+PAD.t-scaleFactor*y1-center;
+    }
+    deactivateN0Focus();
+    selectionMode=false;el('bo-zoom-select').classList.remove('active');cv.style.cursor='grab';
+    draw();
+  }
+  var activePointers={};
+  function activePointerValues(){
+    return Object.keys(activePointers).map(function(id){return activePointers[id];});
+  }
+  function pointerDistance(points){
+    var dx=points[1].x-points[0].x,dy=points[1].y-points[0].y;
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+  function beginDrag(p,pointerType){
+    var ab=interval(),a=ab[0],b=ab[1];
+    if(selectionMode){selectionStart=clampPlotPoint(p);showSelection(selectionStart,selectionStart);return;}
+    var threshold=pointerType==='touch'?24:18;
+    var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
+    var currentN0=selectedN0(estimateN0(ck,gk,c));
+    var dn=currentN0===null?Infinity:Math.abs(p.x-tx(currentN0,a,b));
+    var da=Math.abs(p.x-tx(a,a,b)),db=Math.abs(p.x-tx(b,a,b));
+    var overN0=dn<threshold && p.y<H-PAD.b-18;
+    drag=overN0?'n0':(da<threshold?'a':(db<threshold?'b':'pan'));
+    panStart={x:p.x,y:p.y,a:a,b:b,yOffset:Y_OFFSET};
+    cv.style.cursor=drag==='pan'?'grabbing':'ew-resize';
+  }
+  function continueDrag(p){
+    if(selectionStart){showSelection(selectionStart,clampPlotPoint(p));return;}
+    if(!drag)return;
+    var ab=interval(),a=ab[0],b=ab[1],x=fx(p.x,a,b);
+    if(drag==='a' && !lockX){deactivateN0Focus();syncInputs(Math.min(Math.max(0,x),b-MIN_SPAN),b);}
+    if(drag==='b' && !lockX){deactivateN0Focus();syncInputs(a,Math.max(x,a+MIN_SPAN));}
+    if(drag==='n0'){
+      var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
+      var minimum=minimumSelectedN0(estimateN0(ck,gk,c));
+      if(minimum!==null)STATE_N0=Math.max(minimum,Math.min(MAX_B,x));
+    }
+    if(drag==='pan' && panStart){
+      var span=panStart.b-panStart.a;
+      var delta=fx(panStart.x,a,b)-fx(p.x,a,b);
+      var na=panStart.a+delta,nb=panStart.b+delta;
+      if(na<0){na=0;nb=na+span;}
+      if(nb>MAX_B){nb=MAX_B;na=Math.max(0,nb-span);}
+      if(!lockX)syncInputs(na,nb);
+      if(!lockY)Y_OFFSET=panStart.yOffset+(p.y-panStart.y);
+      if(!lockX || !lockY)deactivateN0Focus();
+    }
+    requestDraw();
+  }
+  cv.addEventListener('pointerdown',function(ev){
+    ev.preventDefault();
+    captureHistory();
+    cv.setPointerCapture(ev.pointerId);
+    activePointers[ev.pointerId]=pointer(ev);
+    var points=activePointerValues();
+    if(points.length>=2){pinchDistance=pointerDistance(points);drag=null;panStart=null;return;}
+    beginDrag(points[0],ev.pointerType);
+  });
+  cv.addEventListener('dblclick',function(){
+    resetZoom();
+  });
+  cv.addEventListener('wheel',function(ev){
+    if(!trackpadZoomEnabled)return;
+    ev.preventDefault();
+    var p=pointer(ev),ab=interval();
+    var factor=Math.max(0.5,Math.min(2,Math.exp(ev.deltaY*0.002)));
+    zoomAt(fx(p.x,ab[0],ab[1]),factor);
+  },{passive:false});
+  cv.addEventListener('pointermove',function(ev){
+    var currentPoint=pointer(ev);
+    if(!(ev.pointerId in activePointers))return;
+    activePointers[ev.pointerId]=currentPoint;
+    var points=activePointerValues();
+    if(points.length>=2){
+      var distance=pointerDistance(points),ab=interval();
+      var centerX=(points[0].x+points[1].x)/2;
+      if(pinchDistance && distance>0)zoomAt(fx(centerX,ab[0],ab[1]),pinchDistance/distance);
+      pinchDistance=distance;
+      return;
+    }
+    continueDrag(points[0]);
+  });
+  function endPointer(ev){
+    var p=pointer(ev);
+    if(selectionStart)finishSelection(p);
+    delete activePointers[ev.pointerId];
+    drag=null;panStart=null;pinchDistance=null;
+    if(!selectionMode)cv.style.cursor='grab';
+  }
+  cv.addEventListener('pointerup',endPointer);
+  cv.addEventListener('pointercancel',endPointer);
+  cv.addEventListener('gesturestart',function(ev){if(!trackpadZoomEnabled)return;ev.preventDefault();gestureScale=ev.scale||1;},{passive:false});
+  cv.addEventListener('gesturechange',function(ev){if(!trackpadZoomEnabled)return;ev.preventDefault();var ab=interval(),scale=ev.scale||gestureScale;zoomAt(zoomCenter(ab[0],ab[1]),gestureScale/scale);gestureScale=scale;},{passive:false});
+  el('bo-zoom-in').addEventListener('click',zoomIn);
+  el('bo-zoom-out').addEventListener('click',zoomOut);
+  el('bo-zoom-n0').addEventListener('click',focusAroundN0);
+  el('bo-history-undo').addEventListener('click',undoHistory);
+  el('bo-history-redo').addEventListener('click',redoHistory);
+  el('bo-lock-x').addEventListener('click',function(){
+    captureHistory();lockX=!lockX;
+    this.classList.toggle('active',lockX);this.setAttribute('aria-pressed',lockX?'true':'false');
+  });
+  el('bo-lock-y').addEventListener('click',function(){
+    captureHistory();lockY=!lockY;
+    this.classList.toggle('active',lockY);this.setAttribute('aria-pressed',lockY?'true':'false');
+  });
+  el('bo-zoom-trackpad').addEventListener('click',function(){
+    trackpadZoomEnabled=!trackpadZoomEnabled;
+    this.classList.toggle('active',trackpadZoomEnabled);
+    this.setAttribute('aria-pressed',trackpadZoomEnabled?'true':'false');
+  });
+  el('bo-zoom-select').addEventListener('click',function(){
+    selectionMode=!selectionMode;cancelSelection();
+    this.classList.toggle('active',selectionMode);cv.style.cursor=selectionMode?'crosshair':'grab';
+  });
+  el('bo-zoom-reset').addEventListener('click',function(){selectionMode=false;cancelSelection();el('bo-zoom-select').classList.remove('active');cv.style.cursor='grab';resetZoom();});
+  el('bo-mode').value=MODE;
+  if(MODE_SELECTABLE){
+    el('bo-mode').addEventListener('change',function(){
+      captureHistory();
+      MODE=this.value;
+      STATE_G_INDEX=ORDER.indexOf(defaultGKeyForMode());
+      resetSelectedN0();
+      Y_RANGE_OVERRIDE=null;
+      el('bo-c').value=defaultC(cKey(),gKey());
+      el('bo-c1').value=0.1;
+      el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;
+      updateConstantControls();
+      draw();
+    });
+  }
+  ['bo-c','bo-c1','bo-c2'].forEach(function(id){
+    el(id).addEventListener('focus',captureHistory);
+    el(id).addEventListener('input',function(){
+      preserveViewportForParameterChange();
+      draw();
+    });
+  });
+  el('bo-epsilon').addEventListener('focus',captureHistory);
+  el('bo-epsilon').addEventListener('input',function(){
+    if((parseFloat(this.value)||0)<=0)this.value=0.000001;
+    preserveViewportForParameterChange();
+    draw();
+  });
+  el('bo-scale').addEventListener('focus',captureHistory);
+  el('bo-scale').addEventListener('input',function(){Y_RANGE_OVERRIDE=null;deactivateN0Focus();draw();});
+  ['bo-a','bo-b'].forEach(function(id){
+    el(id).addEventListener('focus',function(){beginEditableField(id);});
+    el(id).addEventListener('input',function(){sanitizeEditableField(id);});
+    el(id).addEventListener('blur',function(){handleEndpointInput(id);draw();});
+    el(id).addEventListener('keydown',function(ev){
+      if(ev.key==='Enter'){ev.preventDefault();el(id).blur();}
+    });
+  });
+  el('bo-cfn-dec').addEventListener('click',function(){stepFunction('c',-1);});
+  el('bo-cfn-inc').addEventListener('click',function(){stepFunction('c',1);});
+  el('bo-gfn-dec').addEventListener('click',function(){stepFunction('g',-1);});
+  el('bo-gfn-inc').addEventListener('click',function(){stepFunction('g',1);});
+  el('bo-a-dec').addEventListener('click',function(){stepEndpoint('a',-1);});
+  el('bo-a-inc').addEventListener('click',function(){stepEndpoint('a',1);});
+  el('bo-b-dec').addEventListener('click',function(){stepEndpoint('b',-1);});
+  el('bo-b-inc').addEventListener('click',function(){stepEndpoint('b',1);});
+  if(window.ResizeObserver){
+    new ResizeObserver(function(){if(root.isConnected)draw();}).observe(cv.parentElement);
+  }else{
+    window.addEventListener('resize',function(){if(root.isConnected)draw();});
+  }
+  updateConstantControls();
+  el('bo-c').value=defaultC(cKey(),gKey());
+  el('bo-c1').value=0.1;
+  el('bo-c2').value=1.1;
+  syncInputs(STATE_A,STATE_B);
+  draw();
+})();
+</script>
+"""
+
+
+__all__ = [
+    "run_comparison_app",
+    "run_big_o_app",
+    "run_little_o_app",
+    "run_big_omega_app",
+    "run_little_omega_app",
+    "run_theta_app",
+    "run_app",
+]

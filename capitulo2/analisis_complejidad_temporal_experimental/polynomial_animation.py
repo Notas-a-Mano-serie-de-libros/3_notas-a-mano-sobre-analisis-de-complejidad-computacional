@@ -1,0 +1,392 @@
+"""Simulación teórica interactiva para complejidad polinomial general."""
+
+from __future__ import annotations
+
+import base64
+from io import BytesIO
+from pathlib import Path
+import sys
+
+from IPython.display import display
+import ipywidgets as widgets
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from capitulo2.analisis_complejidad_temporal_experimental.experimental_animation import (  # noqa: E402
+    mathjax_frame,
+)
+from capitulo2.analisis_complejidad_temporal_experimental.theoretical_graphs import (  # noqa: E402
+    GRAPH_STYLE,
+    apply_polynomial_y_axis,
+    label_polynomial_curves,
+    polynomial_visible_ceiling,
+    polynomial_values,
+)
+from common.widget_controls import compact_labeled_control  # noqa: E402
+
+try:
+    from google.colab import output as colab_output
+except ImportError:
+    colab_output = None
+
+
+DEFAULT_MAXIMUM_N = 10
+DEFAULT_MAX_DEGREE = 4
+MAX_DEGREE = None
+TABLE_MAX_DEGREE = 5
+STEPPER_FIELD_WIDTH = 184
+STEPPER_GROUP_WIDTH = 326
+
+
+def scientific_latex(value):
+    if value == 0:
+        return "0"
+    coefficient, exponent = f"{value:.6e}".split("e")
+    coefficient = coefficient.rstrip("0").rstrip(".")
+    if coefficient == "1":
+        return rf"10^{{{int(exponent)}}}"
+    return rf"{coefficient}\times 10^{{{int(exponent)}}}"
+
+
+def polynomial_table(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX_DEGREE):
+    rows = []
+    for degree in range(max_degree + 1):
+        theoretical_value = maximum_n**degree
+        rows.append(
+            "<tr>"
+            f"<td>\\({degree}\\)</td>"
+            f"<td>\\(n^{{{degree}}}\\)</td>"
+            f"<td>\\({scientific_latex(theoretical_value)}\\)</td>"
+            "</tr>"
+        )
+    return (
+        "<table>"
+        "<thead><tr>"
+        "<th>Grado (k)</th>"
+        "<th>Forma teórica</th>"
+        f"<th>Operaciones teóricas para \\(n={maximum_n}\\) [adimensional]</th>"
+        "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
+    )
+
+
+def polynomial_table_height(max_degree):
+    return 56 + 42 * (max_degree + 1)
+
+
+def polynomial_table_html(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX_DEGREE):
+    return mathjax_frame(polynomial_table(maximum_n, max_degree), polynomial_table_height(max_degree))
+
+
+def render_polynomial_figure(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX_DEGREE):
+    point_count = 10 ** (4 if max_degree <= 4 else 6)
+    n_values = np.linspace(1, maximum_n, point_count, dtype=np.float64)
+
+    plt.style.use("default")
+    plt.rcParams.update(GRAPH_STYLE)
+    fig_main, ax1 = plt.subplots(1, 1, figsize=(8, 4))
+    lines = {}
+    for degree in range(max_degree + 1):
+        (line,) = ax1.plot(
+            n_values,
+            polynomial_values(n_values, degree),
+            label=rf"$n^{{{degree}}}$",
+        )
+        lines[degree] = line
+    ax1.set_xlabel("Tamaño de la entrada ($n$)")
+    ax1.set_ylabel("Función de complejidad teórica")
+    if max_degree <= 4:
+        ax1.set_xlim([1, maximum_n + 0.6])
+        ax1.set_ylim([0, maximum_n])
+    else:
+        visible_ceiling = float(polynomial_visible_ceiling(max_degree, maximum_n))
+        ax1.set_xlim([2, maximum_n + 0.8])
+        apply_polynomial_y_axis(ax1, visible_ceiling)
+        ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+    ax1.set_title(rf"$C(n)=n^k$ para $k \in [0, {max_degree}]$")
+    label_polynomial_curves(ax1, max_degree, lines, n_values, maximum_n)
+    ax1.grid(True)
+    ax1.xaxis.set_major_formatter(plt.ScalarFormatter(useMathText=True))
+    ax1.yaxis.set_major_formatter(plt.ScalarFormatter(useMathText=True))
+    fig_main.tight_layout()
+
+    image_buffer = BytesIO()
+    fig_main.savefig(image_buffer, format="png", bbox_inches="tight", pad_inches=0.05)
+    plt.close(fig_main)
+    encoded_image = base64.b64encode(image_buffer.getvalue()).decode("ascii")
+    return f'<img src="data:image/png;base64,{encoded_image}" style="display:block;max-width:100%;height:auto;">'
+
+
+def readonly_math_value(formula):
+    return widgets.HTML(value=mathjax_frame(rf"\({formula}\)", 30, centered=True))
+
+
+def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
+    if colab_output is not None:
+        colab_output.enable_custom_widget_manager()
+
+    maximum_n_value = readonly_math_value(str(maximum_n))
+    maximum_n_value.layout = widgets.Layout(
+        width="100%",
+        height="32px",
+        border="1px solid var(--jp-border-color2, #bdbdbd)",
+        display="flex",
+        align_items="center",
+        justify_content="center",
+    )
+    maximum_n_value.add_class("constant-centered-math")
+    maximum_n_group = compact_labeled_control(
+        "Máximo n",
+        maximum_n_value,
+        field_width=STEPPER_FIELD_WIDTH,
+        group_width=STEPPER_GROUP_WIDTH,
+    )
+
+    degree_state = {"value": max(0, default_max_degree)}
+    degree_value = readonly_math_value(str(degree_state["value"]))
+    degree_value.layout = widgets.Layout(
+        width="100%",
+        height="32px",
+        border="1px solid var(--jp-border-color2, #bdbdbd)",
+        display="flex",
+        align_items="center",
+        justify_content="center",
+    )
+    degree_value.add_class("constant-centered-math")
+    degree_down = widgets.Button(description="◀", tooltip="Grado anterior", layout=widgets.Layout(width="100%", height="32px"))
+    degree_up = widgets.Button(description="▶", tooltip="Grado siguiente", layout=widgets.Layout(width="100%", height="32px"))
+    degree_stepper = widgets.HBox(
+        [degree_down, degree_value, degree_up],
+        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap="0px"),
+    )
+    degree_group = compact_labeled_control(
+        "Máximo k",
+        degree_stepper,
+        field_width=STEPPER_FIELD_WIDTH,
+        group_width=STEPPER_GROUP_WIDTH,
+    )
+
+    controls_row = widgets.Box(
+        [maximum_n_group, degree_group],
+        layout=widgets.Layout(
+            width="auto",
+            display="flex",
+            flex_flow="row wrap",
+            gap="12px 42px",
+            align_items="center",
+            overflow="visible",
+        ),
+    )
+    table_output = widgets.HTML(layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"))
+    table_container = widgets.VBox(
+        [table_output],
+        layout=widgets.Layout(
+            width="100%",
+            max_width="100%",
+            margin="18px 0 0 0",
+            overflow_x="hidden",
+            overflow_y="hidden",
+        ),
+    )
+    figure_output = widgets.HTML(layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"))
+
+    def refresh(*_):
+        max_degree = int(degree_state["value"])
+        degree_value.value = mathjax_frame(rf"\({max_degree}\)", 30, centered=True)
+        figure_output.value = render_polynomial_figure(maximum_n, max_degree)
+
+    def update_degree(value):
+        degree_state["value"] = max(0, value)
+        refresh()
+
+    def decrease_degree(_):
+        update_degree(degree_state["value"] - 1)
+
+    def increase_degree(_):
+        update_degree(degree_state["value"] + 1)
+
+    degree_down.on_click(decrease_degree)
+    degree_up.on_click(increase_degree)
+    table_output.value = polynomial_table_html(maximum_n, TABLE_MAX_DEGREE)
+    table_container.layout.height = f"{polynomial_table_height(TABLE_MAX_DEGREE)}px"
+    table_container.layout.overflow_y = "hidden"
+    refresh()
+
+    panel_header = widgets.HTML(
+        value='<div class="experimental-panel-title">Análisis teórico interactivo:</div>',
+        layout=widgets.Layout(width="100%"),
+    )
+    parameters_title = widgets.HTML(
+        value='<div class="experimental-section-title">Parámetros:</div>',
+        layout=widgets.Layout(width="100%"),
+    )
+    table_title = widgets.HTML(
+        value='<div class="experimental-section-title">Resultados por grado:</div>',
+        layout=widgets.Layout(width="100%"),
+    )
+    figure_title = widgets.HTML(
+        value='<div class="experimental-section-title">Resultado:</div>',
+        layout=widgets.Layout(width="100%"),
+    )
+    panel_content = widgets.VBox(
+        [
+            parameters_title,
+            controls_row,
+            table_title,
+            table_container,
+            figure_title,
+            figure_output,
+        ],
+        layout=widgets.Layout(width="100%", gap="0px"),
+    )
+    panel_content.add_class("experimental-panel-content")
+    main_panel = widgets.VBox(
+        [panel_header, panel_content],
+        layout=widgets.Layout(width="100%", gap="0px"),
+    )
+    main_panel.add_class("experimental-main-panel")
+
+    style = widgets.HTML(
+        """
+        <style>
+          .constant-centered-input input {
+            text-align: center !important;
+            box-sizing: border-box !important;
+            width: 100px !important;
+            min-width: 100px !important;
+            max-width: 100px !important;
+            height: 32px !important;
+            min-height: 32px !important;
+            max-height: 32px !important;
+            margin: 0 !important;
+          }
+          .constant-centered-math {
+            box-sizing: border-box !important;
+            width: 100px !important;
+            min-width: 100px !important;
+            max-width: 100px !important;
+            height: 32px !important;
+            min-height: 32px !important;
+            max-height: 32px !important;
+            margin: 0 !important;
+          }
+          .constant-centered-math .widget-htmlmath-content,
+          .constant-centered-math .widget-html-content {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .constant-animation-root,
+          .constant-animation-root .jupyter-widgets-output-area,
+          .constant-animation-root .output,
+          .constant-animation-root .output_area,
+          .constant-animation-root .output_subarea,
+          .constant-animation-root .output_scroll {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+          }
+          .constant-animation-root {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            padding: 14px 4px !important;
+            background: #fff !important;
+            color: #333 !important;
+            font-family: sans-serif !important;
+          }
+          .experimental-main-panel {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            margin: 0 !important;
+            border: 1px solid #dedede !important;
+            border-radius: 5px !important;
+            overflow: hidden !important;
+            background: #fff !important;
+          }
+          .experimental-panel-title {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            padding: 10px 14px !important;
+            border-bottom: 1px solid #e2e2e2 !important;
+            background: #f7f7f7 !important;
+            color: #333 !important;
+            font-weight: 700 !important;
+            text-align: left !important;
+          }
+          .experimental-panel-content {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            padding: 12px !important;
+            background: #fff !important;
+          }
+          .experimental-section-title {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 10px 0 8px !important;
+            color: #333 !important;
+            font-weight: 700 !important;
+            text-align: left !important;
+          }
+          .experimental-panel-content button {
+            border: 1px solid #ccc !important;
+            border-radius: 3px !important;
+            background: #f7f7f7 !important;
+            color: #333 !important;
+          }
+          .experimental-panel-content button:hover {
+            background: #eee !important;
+          }
+          .experimental-panel-content iframe,
+          .experimental-panel-content img {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            background: #fff !important;
+          }
+          .constant-animation-root .output_scroll {
+            height: auto !important;
+            max-height: none !important;
+            box-shadow: none !important;
+          }
+          .output_scroll:has(.constant-animation-root),
+          .output_area:has(.constant-animation-root),
+          .jp-OutputArea-output:has(.constant-animation-root) {
+            overflow-x: hidden !important;
+            height: auto !important;
+            max-height: none !important;
+            box-shadow: none !important;
+          }
+        </style>
+        """,
+        layout=widgets.Layout(height="0px", min_height="0px", overflow="hidden"),
+    )
+    app = widgets.VBox(
+        [style, main_panel],
+        layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"),
+    )
+    app.add_class("constant-animation-root")
+    display(app)
+
+
+__all__ = [
+    "DEFAULT_MAXIMUM_N",
+    "DEFAULT_MAX_DEGREE",
+    "MAX_DEGREE",
+    "TABLE_MAX_DEGREE",
+    "polynomial_table",
+    "polynomial_table_height",
+    "polynomial_table_html",
+    "render_polynomial_figure",
+    "run_app",
+    "scientific_latex",
+]

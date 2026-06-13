@@ -1,0 +1,932 @@
+"""Motor común para simulaciones experimentales interactivas del capítulo 2."""
+
+from __future__ import annotations
+
+import asyncio
+from dataclasses import dataclass
+from html import escape
+from pathlib import Path
+import sys
+
+from IPython.display import display
+import ipywidgets as widgets
+from matplotlib import ticker
+import numpy as np
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from common.widget_controls import button_control, compact_labeled_control
+
+try:
+    import nest_asyncio
+except ImportError:
+    nest_asyncio = None
+
+try:
+    from google.colab import output as colab_output
+except ImportError:
+    colab_output = None
+
+
+EXPERIMENT_POINTS = 200
+STEPPER_FIELD_WIDTH = 184
+STEPPER_LABEL_WIDTH = 88
+STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 2
+DEFAULT_MAXIMUM_EXPONENT = 5
+DEFAULT_EXECUTIONS = 10
+STATUS_PENDING = "pending"
+STATUS_LOADING = "loading"
+STATUS_COMPLETE = "complete"
+STATUS_SKIPPED = "skipped"
+
+
+def style_experiment_axis(ax, mode, title, legend_handles=None):
+    ax.set_xlabel(r"$\mathrm{Tamaño\ de\ la\ entrada}\ (n)$", fontsize=13)
+    ax.set_ylabel(
+        r"$\mathrm{Tiempo\ de\ ejecución\ promedio}\ [s]$"
+        if mode == "time"
+        else r"$\mathrm{Consumo\ de\ memoria\ promedio}\ [bytes]$",
+        fontsize=13,
+    )
+    ax.set_title(title, fontsize=15)
+    ax.xaxis.set_label_coords(0.5, -0.12)
+    ax.yaxis.set_label_coords(-0.075, 0.5)
+    ax.title.set_position((0.5, 1.02))
+
+    for axis in (ax.xaxis, ax.yaxis):
+        formatter = ticker.ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)
+        formatter.set_powerlimits((0, 0))
+        axis.set_major_formatter(formatter)
+        axis.get_offset_text().set_fontfamily("STIXGeneral")
+    ax.tick_params(axis="both", labelsize=10)
+    for label in (*ax.get_xticklabels(), *ax.get_yticklabels()):
+        label.set_fontfamily("STIXGeneral")
+
+    ax.grid(True, color="#CFD8DC", linestyle="-", linewidth=0.6, alpha=0.55)
+    for spine in ax.spines.values():
+        spine.set_color("#000000")
+        spine.set_linewidth(0.8)
+    legend_kwargs = {
+        "loc": "upper right",
+        "frameon": True,
+        "framealpha": 0.9,
+        "facecolor": "white",
+        "edgecolor": "#E0E0E0",
+    }
+    if legend_handles is None:
+        ax.legend(**legend_kwargs)
+    else:
+        ax.legend(handles=legend_handles, **legend_kwargs)
+
+
+@dataclass(frozen=True)
+class ExperimentProfile:
+    mode: str
+    theoretical_value: float
+    unit: str
+    metric: str
+    theoretical_metric: str
+    max_safe_elements: int
+    measure: object
+    render_result: object
+    warning_html: object
+    function_latex: str = ""
+    render_template: object = None
+    theoretical: object = None
+    prepare: object = None
+    measure_prepared: object = None
+    default_maximum_exponent: int = DEFAULT_MAXIMUM_EXPONENT
+    default_executions: int = DEFAULT_EXECUTIONS
+    experiment_points: int = EXPERIMENT_POINTS
+    figure_width: int = 800
+    figure_aspect_ratio: str = "2/1"
+    yield_every: int = 5
+
+
+def measure_profile_point(profile, n, executions):
+    if profile.prepare is not None and profile.measure_prepared is not None:
+        return profile.measure_prepared(profile.prepare(n), executions)
+    return profile.measure(n, executions)
+
+
+def next_order_of_magnitude(value):
+    value = max(1, int(value))
+    return 10 ** (int(np.floor(np.log10(value))) + 1)
+
+
+def previous_order_of_magnitude(value):
+    value = max(1, int(value))
+    exponent = int(np.ceil(np.log10(value))) - 1
+    return 10 ** max(0, exponent)
+
+
+def build_experiment_sizes(maximum_n, max_safe_elements, points=EXPERIMENT_POINTS):
+    safe_maximum = min(maximum_n, max_safe_elements)
+    dense_sizes = np.linspace(1, safe_maximum, num=min(points, safe_maximum), dtype=np.int64)
+    checkpoints = np.array(
+        [10**exponent for exponent in range(1, int(np.log10(maximum_n)) + 1)],
+        dtype=np.int64,
+    )
+    execution_sizes = np.unique(np.concatenate((dense_sizes, checkpoints)))
+    return execution_sizes, checkpoints
+
+
+def figure_placeholder_html(width=800, aspect_ratio="2/1"):
+    return figure_frame_html("", width, aspect_ratio)
+
+
+def figure_frame_html(content, width=800, aspect_ratio="2/1"):
+    return (
+        '<div class="experimental-figure-frame" '
+        f'style="width:100%;max-width:{width}px;aspect-ratio:{aspect_ratio};">'
+        f"{content}</div>"
+    )
+
+
+def mathjax_frame(content, height, centered=False):
+    content_layout = "display:flex;align-items:center;justify-content:center;height:100%;text-align:center;" if centered else ""
+    srcdoc = f"""<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+html,body{{width:100%;height:100%;margin:0;padding:0;background:#fff;overflow:hidden;}}
+body{{color:#000;font-size:16px;line-height:1.2;}}
+#content{{width:100%;visibility:hidden;background:#fff;{content_layout}}}
+body.math-ready #content{{visibility:visible;}}
+table{{border-collapse:collapse;width:max-content;max-width:100%;margin:0 auto;table-layout:auto;color:inherit;background:transparent;}}
+th,td{{padding:6px 14px;text-align:center;vertical-align:middle;white-space:nowrap;}}
+th{{font-weight:700;color:#000;background:#fff;border-bottom:1px solid #9e9e9e;}}
+td{{color:#000;background:#fff;}}
+tbody tr:nth-child(even) td{{background:#f3f4f6;}}
+.constant-status{{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;vertical-align:middle;}}
+.constant-result-symbol{{font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32;}}
+.constant-result-symbol.found{{color:#2d7d32;}}
+.constant-loading{{width:16px;height:16px;min-width:16px;border:2px solid #bdc1c6;border-top-color:#1a73e8;border-radius:50%;animation:constant-spin .75s linear infinite;box-sizing:border-box;}}
+.constant-status-pending,.constant-status-skipped{{font-size:14px;font-weight:400;color:#5f6368;}}
+@keyframes constant-spin{{to{{transform:rotate(360deg);}}}}
+mjx-container[jax="SVG"]{{font-size:100% !important;margin:0 !important;}}
+</style>
+<script>
+window.MathJax = {{
+  tex: {{inlineMath: [['\\\\(', '\\\\)']], processEscapes: true}},
+  svg: {{fontCache: 'none'}},
+  startup: {{typeset: false}}
+}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+<div id="content">{content}</div>
+<script>
+window.addEventListener('load', function () {{
+  if (window.MathJax && MathJax.typesetPromise) {{
+    MathJax.typesetPromise([document.getElementById('content')]).then(function () {{
+      document.body.classList.add('math-ready');
+    }});
+  }}
+}});
+</script>
+</body>
+</html>"""
+    return (
+        '<iframe class="constant-mathjax-frame" '
+        f'srcdoc="{escape(srcdoc, quote=True)}" '
+        f'style="display:block;width:100%;height:{height}px;border:0;overflow:hidden;background:#fff;" '
+        'scrolling="no"></iframe>'
+    )
+
+
+def formula_widget(formula):
+    return widgets.HTML(value=mathjax_frame(rf"\({formula}\)", 30, centered=True))
+
+
+def scientific_latex(value, pending=False, status=None):
+    if status == STATUS_SKIPPED:
+        return r"\text{No ejecutado}"
+    if not np.isfinite(value):
+        return r"\text{Pendiente}" if pending else r"\text{No ejecutado}"
+    coefficient, exponent = f"{value:.6e}".split("e")
+    return rf"{coefficient}\times 10^{{{int(exponent)}}}"
+
+
+def theoretical_value_for(profile, n):
+    if profile.theoretical is not None:
+        return profile.theoretical(int(n))
+    return profile.theoretical_value
+
+
+def status_html(measured, status=None, pending=False):
+    if status is None:
+        if np.isfinite(measured):
+            status = STATUS_COMPLETE
+        else:
+            status = STATUS_PENDING if pending else STATUS_SKIPPED
+    if status == STATUS_LOADING:
+        return '<span class="constant-status constant-loading" role="status" aria-label="Ejecutando" title="Ejecutando"></span>'
+    if status == STATUS_COMPLETE:
+        return '<span class="constant-status constant-result-symbol found" role="img" aria-label="Completado" title="Completado">✓</span>'
+    if status == STATUS_PENDING:
+        return '<span class="constant-status constant-status-pending">En espera</span>'
+    return '<span class="constant-status constant-status-skipped">Solo teórico</span>'
+
+
+def results_table(sizes, experimental, profile, pending=False, statuses=None):
+    if statuses is None:
+        statuses = [None] * len(sizes)
+
+    rows = []
+    for row_index, (n, measured) in enumerate(zip(sizes, experimental)):
+        status = statuses[row_index] if row_index < len(statuses) else None
+        exponent = int(np.log10(n))
+        formatted_n = f"{int(n):,}".replace(",", r"\,")
+        rows.append(
+            "<tr>"
+            f"<td>\\(10^{{{exponent}}}={formatted_n}\\)</td>"
+            f"<td>\\({scientific_latex(theoretical_value_for(profile, n))}\\)</td>"
+            f"<td>\\({scientific_latex(measured, pending=pending, status=status)}\\)</td>"
+            f"<td>{status_html(measured, status, pending=pending)}</td>"
+            "</tr>"
+        )
+    return (
+        "<table>"
+        "<thead><tr>"
+        "<th>Cantidad de datos (n)</th>"
+        f"<th>{profile.theoretical_metric} [{profile.unit}]</th>"
+        f"<th>{profile.metric} experimental [{profile.unit}]</th>"
+        "<th>Estado</th>"
+        "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
+    )
+
+
+def results_table_html(sizes, experimental, profile, pending=False, statuses=None):
+    table = results_table(sizes, experimental, profile, pending=pending, statuses=statuses)
+    return mathjax_frame(table, 48 + 42 * len(sizes))
+
+
+def results_table_widget(sizes, experimental, profile, pending=False, statuses=None):
+    return widgets.HTML(value=results_table_html(sizes, experimental, profile, pending=pending, statuses=statuses))
+
+
+def pending_table_html(maximum_n, profile):
+    _sizes, preview_checkpoints = build_experiment_sizes(
+        maximum_n,
+        profile.max_safe_elements,
+        points=profile.experiment_points,
+    )
+    preview_times = np.full(len(preview_checkpoints), np.nan)
+    return results_table_html(
+        preview_checkpoints,
+        preview_times,
+        profile,
+        pending=True,
+        statuses=[STATUS_PENDING] * len(preview_checkpoints),
+    )
+
+
+def effective_max_safe_elements(profile, force_full_execution=False):
+    if force_full_execution:
+        return 10**10
+    return profile.max_safe_elements
+
+
+def profile_warning_html(profile, maximum_n, executions, force_full_execution=False):
+    try:
+        return profile.warning_html(maximum_n, executions, profile.mode, force_full_execution)
+    except TypeError:
+        return profile.warning_html(maximum_n, executions, profile.mode)
+
+
+def run_app(profile, display_app=True):
+    if profile.mode not in {"time", "memory"}:
+        raise ValueError("mode debe ser 'time' o 'memory'")
+    if nest_asyncio is not None:
+        nest_asyncio.apply()
+    if colab_output is not None:
+        colab_output.enable_custom_widget_manager()
+
+    maximum_state = {"exponent": profile.default_maximum_exponent}
+    maximum_value = formula_widget(rf"10^{{{profile.default_maximum_exponent}}}")
+    maximum_value.layout = widgets.Layout(
+        width="100px",
+        min_width="100px",
+        max_width="100px",
+        height="32px",
+        flex="0 0 100px",
+        border="1px solid var(--jp-border-color2, #bdbdbd)",
+        display="flex",
+        align_items="center",
+        justify_content="center",
+    )
+    maximum_value.add_class("constant-centered-math")
+    step_button_layout = widgets.Layout(
+        width="42px",
+        min_width="42px",
+        max_width="42px",
+        height="32px",
+        flex="0 0 42px",
+    )
+    maximum_down = widgets.Button(description="◀", tooltip="Potencia anterior", layout=step_button_layout)
+    maximum_up = widgets.Button(description="▶", tooltip="Potencia siguiente", layout=step_button_layout)
+    maximum_stepper = widgets.HBox(
+        [maximum_down, maximum_value, maximum_up],
+        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap="0px"),
+    )
+    maximum_stepper.add_class("experimental-stepper")
+    maximum_group = compact_labeled_control(
+        "Máximo n",
+        maximum_stepper,
+        field_width=STEPPER_FIELD_WIDTH,
+        group_width=STEPPER_GROUP_WIDTH,
+        label_width=STEPPER_LABEL_WIDTH,
+    )
+    executions_control = widgets.Text(
+        value=str(profile.default_executions),
+        layout=widgets.Layout(
+            width="100px",
+            min_width="100px",
+            max_width="100px",
+            height="32px",
+            flex="0 0 100px",
+        ),
+    )
+    executions_control.add_class("constant-centered-input")
+    executions_down = widgets.Button(
+        description="◀",
+        tooltip="Orden de magnitud anterior",
+        layout=widgets.Layout(
+            width="42px",
+            min_width="42px",
+            max_width="42px",
+            height="32px",
+            flex="0 0 42px",
+        ),
+    )
+    executions_up = widgets.Button(
+        description="▶",
+        tooltip="Orden de magnitud siguiente",
+        layout=widgets.Layout(
+            width="42px",
+            min_width="42px",
+            max_width="42px",
+            height="32px",
+            flex="0 0 42px",
+        ),
+    )
+    executions_stepper = widgets.HBox(
+        [executions_down, executions_control, executions_up],
+        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap="0px"),
+    )
+    executions_stepper.add_class("experimental-stepper")
+    executions_group = compact_labeled_control(
+        "Ejecuciones",
+        executions_stepper,
+        field_width=STEPPER_FIELD_WIDTH,
+        group_width=STEPPER_GROUP_WIDTH,
+        label_width=STEPPER_LABEL_WIDTH,
+    )
+    controls_row = widgets.Box(
+        [maximum_group, executions_group],
+        layout=widgets.Layout(
+            width="auto",
+            display="flex",
+            flex_flow="row wrap",
+            gap="12px",
+            align_items="center",
+            overflow="visible",
+        ),
+    )
+    controls_row.add_class("experimental-parameters-grid")
+    apply_button = button_control(description="Ejecutar", button_style="success", width="150px")
+    apply_button.icon = "play"
+    reset_button = button_control(description="Reiniciar", button_style="warning", width="150px")
+    reset_button.icon = "refresh"
+    button_row = widgets.HBox(
+        [apply_button, reset_button],
+        layout=widgets.Layout(
+            width="100%", gap="10px", margin="12px 0 0 0",
+            flex_flow="row wrap", justify_content="flex-end", overflow="visible",
+        ),
+    )
+    force_execution = widgets.Checkbox(
+        value=False,
+        description="Ejecutar todos los valores",
+        indent=False,
+        layout=widgets.Layout(width="auto", margin="8px 0 0 0"),
+    )
+    warning_output = widgets.HTML()
+    warning_output.layout = widgets.Layout(width="100%", max_width="100%", overflow="hidden")
+    table_output = widgets.HTML(layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"))
+    figure_output = widgets.HTML(
+        value=figure_placeholder_html(profile.figure_width, profile.figure_aspect_ratio),
+        layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"),
+    )
+    execution_state = {"reset_requested": False, "task": None}
+    template_cache = {}
+
+    def execution_value():
+        try:
+            value = int(executions_control.value)
+        except ValueError:
+            value = 1
+        value = max(1, value)
+        executions_control.value = str(value)
+        return value
+
+    def maximum_n():
+        return 10 ** maximum_state["exponent"]
+
+    def placeholder_html():
+        selected_maximum = maximum_n()
+        if selected_maximum not in template_cache:
+            template_content = (
+                profile.render_template(selected_maximum)
+                if profile.render_template is not None
+                else ""
+            )
+            template_cache[selected_maximum] = figure_frame_html(
+                template_content,
+                profile.figure_width,
+                profile.figure_aspect_ratio,
+            )
+        return template_cache[selected_maximum]
+
+    def update_maximum(exponent):
+        maximum_state["exponent"] = min(10, max(1, exponent))
+        maximum_value.value = mathjax_frame(rf"\(10^{{{maximum_state['exponent']}}}\)", 30, centered=True)
+        refresh_warning()
+
+    def refresh_warning(*_):
+        warning_output.value = profile_warning_html(profile, maximum_n(), execution_value(), force_execution.value)
+        table_output.value = pending_table_html(maximum_n(), profile)
+        figure_output.value = placeholder_html()
+
+    def reset_app(*_):
+        execution_state["reset_requested"] = True
+        maximum_state["exponent"] = profile.default_maximum_exponent
+        maximum_value.value = mathjax_frame(rf"\(10^{{{profile.default_maximum_exponent}}}\)", 30, centered=True)
+        executions_control.value = str(profile.default_executions)
+        force_execution.value = False
+        warning_output.value = profile_warning_html(profile, maximum_n(), execution_value(), force_execution.value)
+        table_output.value = pending_table_html(maximum_n(), profile)
+        figure_output.value = placeholder_html()
+
+    def set_controls_enabled(enabled):
+        apply_button.disabled = not enabled
+        maximum_down.disabled = not enabled
+        maximum_up.disabled = not enabled
+        executions_control.disabled = not enabled
+        executions_down.disabled = not enabled
+        executions_up.disabled = not enabled
+        force_execution.disabled = not enabled
+
+    def decrease_maximum(_):
+        update_maximum(maximum_state["exponent"] - 1)
+
+    def increase_maximum(_):
+        update_maximum(maximum_state["exponent"] + 1)
+
+    def decrease_executions(_):
+        executions_control.value = str(previous_order_of_magnitude(execution_value()))
+        refresh_warning()
+
+    def increase_executions(_):
+        executions_control.value = str(next_order_of_magnitude(execution_value()))
+        refresh_warning()
+
+    def schedule_task(coro):
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(coro)
+            return None
+        return loop.create_task(coro)
+
+    async def run_experiment():
+        execution_state["reset_requested"] = False
+        set_controls_enabled(False)
+        try:
+            selected_maximum = maximum_n()
+            executions = execution_value()
+            execution_limit = effective_max_safe_elements(profile, force_execution.value)
+            sizes, checkpoints = build_experiment_sizes(
+                selected_maximum,
+                execution_limit,
+                points=profile.experiment_points,
+            )
+            experimental = np.full(len(sizes), np.nan)
+            checkpoint_times = np.full(len(checkpoints), np.nan)
+            checkpoint_statuses = [STATUS_PENDING] * len(checkpoints)
+            if checkpoint_statuses:
+                checkpoint_statuses[0] = STATUS_LOADING
+            checkpoint_indexes = {int(n): index for index, n in enumerate(checkpoints)}
+            table_output.value = results_table_html(
+                checkpoints,
+                checkpoint_times,
+                profile,
+                pending=True,
+                statuses=checkpoint_statuses,
+            )
+            for index, n in enumerate(sizes):
+                if execution_state["reset_requested"]:
+                    break
+                if n <= execution_limit:
+                    experimental[index] = measure_profile_point(profile, int(n), executions)
+                checkpoint_index = checkpoint_indexes.get(int(n))
+                if checkpoint_index is not None:
+                    checkpoint_times[checkpoint_index] = experimental[index]
+                    checkpoint_statuses[checkpoint_index] = STATUS_COMPLETE if np.isfinite(experimental[index]) else STATUS_SKIPPED
+                    if checkpoint_index + 1 < len(checkpoint_statuses):
+                        checkpoint_statuses[checkpoint_index + 1] = STATUS_LOADING
+                    table_output.value = results_table_html(
+                        checkpoints,
+                        checkpoint_times,
+                        profile,
+                        pending=True,
+                        statuses=checkpoint_statuses,
+                    )
+                if index % max(1, profile.yield_every) == 0 or checkpoint_index is not None:
+                    await asyncio.sleep(0.01)
+            if execution_state["reset_requested"]:
+                reset_app()
+            else:
+                table_html, figure_html = profile.render_result(
+                    sizes,
+                    experimental,
+                    checkpoints,
+                    checkpoint_times,
+                    checkpoint_statuses,
+                )
+                table_output.value = table_html
+                figure_output.value = figure_frame_html(
+                    figure_html,
+                    profile.figure_width,
+                    profile.figure_aspect_ratio,
+                )
+        finally:
+            execution_state["reset_requested"] = False
+            execution_state["task"] = None
+            set_controls_enabled(True)
+
+    def apply(_):
+        if execution_state["task"] is not None:
+            return
+        execution_state["task"] = "running"
+        task = schedule_task(run_experiment())
+        if task is not None:
+            execution_state["task"] = task
+
+    executions_control.observe(refresh_warning, names="value")
+    force_execution.observe(refresh_warning, names="value")
+    maximum_down.on_click(decrease_maximum)
+    maximum_up.on_click(increase_maximum)
+    executions_down.on_click(decrease_executions)
+    executions_up.on_click(increase_executions)
+    apply_button.on_click(apply)
+    reset_button.on_click(reset_app)
+    refresh_warning()
+
+    controls = widgets.VBox(
+        [controls_row, force_execution, button_row],
+        layout=widgets.Layout(width="100%", gap="10px"),
+    )
+    controls.add_class("experimental-controls")
+    analysis_kind = "temporal" if profile.mode == "time" else "espacial"
+    panel_header = widgets.HTML(
+        value=(
+            f'<div class="experimental-panel-title">'
+            f'Análisis experimental {analysis_kind}:</div>'
+        ),
+        layout=widgets.Layout(width="100%"),
+    )
+    def subpanel(title, children):
+        header = widgets.HTML(
+            value=f'<div class="experimental-subpanel-title">{title}</div>',
+            layout=widgets.Layout(width="100%"),
+        )
+        content = widgets.VBox(
+            children,
+            layout=widgets.Layout(width="100%", gap="0px"),
+        )
+        content.add_class("experimental-subpanel-content")
+        panel = widgets.VBox([header, content], layout=widgets.Layout(width="100%", gap="0px"))
+        panel.add_class("experimental-subpanel")
+        return panel
+
+    symbol = "T" if profile.mode == "time" else "S"
+    function_output = formula_widget(rf"{symbol}(n)={profile.function_latex}")
+    function_output.layout = widgets.Layout(width="100%", height="46px")
+    parameters_panel = subpanel("Parámetros:", [controls, warning_output])
+    function_panel = subpanel("Función analizada:", [function_output])
+    result_content = widgets.VBox(
+        [table_output, figure_output],
+        layout=widgets.Layout(width="100%", gap="12px", overflow_x="hidden"),
+    )
+    result_content.add_class("experimental-result-content")
+    result_panel = subpanel("Resultado:", [result_content])
+    panel_content = widgets.VBox(
+        [parameters_panel, function_panel, result_panel],
+        layout=widgets.Layout(width="100%", gap="0px"),
+    )
+    panel_content.add_class("experimental-panel-content")
+    main_panel = widgets.VBox(
+        [panel_header, panel_content],
+        layout=widgets.Layout(width="100%", gap="0px"),
+    )
+    main_panel.add_class("experimental-main-panel")
+    input_style = widgets.HTML(
+        """
+        <style>
+          .constant-centered-input input {
+            text-align: center !important;
+            box-sizing: border-box !important;
+            width: 100px !important;
+            min-width: 100px !important;
+            max-width: 100px !important;
+            height: 32px !important;
+            min-height: 32px !important;
+            max-height: 32px !important;
+            margin: 0 !important;
+          }
+          .constant-centered-input,
+          .constant-centered-math {
+            box-sizing: border-box !important;
+            width: 100px !important;
+            min-width: 100px !important;
+            max-width: 100px !important;
+            height: 32px !important;
+            min-height: 32px !important;
+            max-height: 32px !important;
+            margin: 0 !important;
+          }
+          .constant-centered-math .widget-htmlmath-content,
+          .constant-centered-math .widget-html-content {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .constant-animation-root,
+          .constant-animation-root .jupyter-widgets-output-area,
+          .constant-animation-root .output,
+          .constant-animation-root .output_area,
+          .constant-animation-root .output_subarea,
+          .constant-animation-root .output_scroll {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+          }
+          .constant-animation-root {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            padding: 14px 4px !important;
+            background: #fff !important;
+            color: #333 !important;
+            font-family: sans-serif !important;
+          }
+          .constant-animation-root label,
+          .constant-animation-root .widget-label,
+          .constant-animation-root .widget-checkbox,
+          .constant-animation-root .widget-checkbox .widget-label,
+          .constant-animation-root .widget-html-content {
+            color: #333 !important;
+          }
+          .constant-animation-root label,
+          .constant-animation-root .widget-label,
+          .constant-animation-root .widget-checkbox .widget-label {
+            font-weight: 700 !important;
+          }
+          .experimental-main-panel {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            margin: 0 !important;
+            border: 1px solid #dedede !important;
+            border-radius: 5px !important;
+            overflow: hidden !important;
+            background: #fff !important;
+          }
+          .experimental-panel-title {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            padding: 10px 14px !important;
+            border-bottom: 1px solid #e2e2e2 !important;
+            background: #f7f7f7 !important;
+            color: #333 !important;
+            font-weight: 700 !important;
+            text-align: left !important;
+          }
+          .experimental-panel-content {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            padding: 12px !important;
+            background: #fff !important;
+          }
+          .experimental-panel-content,
+          .experimental-panel-content > .widget-box,
+          .experimental-panel-content > .widget-vbox {
+            background: #fff !important;
+          }
+          .experimental-subpanel {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            margin: 0 !important;
+            border: 1px solid #e1e1e1 !important;
+            border-radius: 0 !important;
+            overflow: hidden !important;
+            background: #fff !important;
+          }
+          .experimental-subpanel + .experimental-subpanel {
+            border-top: 0 !important;
+          }
+          .experimental-subpanel-title {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 8px 12px !important;
+            border-bottom: 1px solid #e5e5e5 !important;
+            background: #f7f7f7 !important;
+            color: #333 !important;
+            font-weight: 700 !important;
+            text-align: left !important;
+          }
+          .experimental-subpanel-content {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            padding: 12px !important;
+            background: #fff !important;
+            overflow-x: hidden !important;
+          }
+          .experimental-controls {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            margin: 0 0 10px !important;
+            padding: 0 !important;
+            background: #fff !important;
+            overflow-x: hidden !important;
+          }
+          .experimental-parameters-grid {
+            box-sizing: border-box !important;
+            display: flex !important;
+            width: auto !important;
+            flex-flow: row wrap !important;
+            overflow: visible !important;
+          }
+          .experimental-parameters-grid > .widget-box {
+            box-sizing: border-box !important;
+            width: auto !important;
+            overflow: visible !important;
+          }
+          .experimental-controls button {
+            border: 1px solid #ccc !important;
+            border-radius: 3px !important;
+            background: #f7f7f7 !important;
+            color: #333 !important;
+          }
+          .experimental-controls button:hover {
+            background: #eee !important;
+          }
+          .experimental-stepper {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow: visible !important;
+          }
+          .experimental-stepper button {
+            box-sizing: border-box !important;
+            width: 42px !important;
+            min-width: 42px !important;
+            max-width: 42px !important;
+            flex: 0 0 42px !important;
+          }
+          .experimental-controls input {
+            border: 1px solid #ccc !important;
+            border-radius: 3px !important;
+            background: #fff !important;
+            color: #333 !important;
+          }
+          .constant-animation-root .widget-dropdown,
+          .constant-animation-root .widget-dropdown select,
+          .constant-animation-root select {
+            background: #fff !important;
+            color: #333 !important;
+            border-color: #ccc !important;
+            color-scheme: light !important;
+          }
+          .constant-animation-root .widget-dropdown option,
+          .constant-animation-root select option {
+            background: #fff !important;
+            color: #333 !important;
+          }
+          .experimental-subpanel-content,
+          .experimental-subpanel-content .widget-html,
+          .experimental-subpanel-content .widget-html-content,
+          .experimental-subpanel-content iframe {
+            background: #fff !important;
+          }
+          .experimental-panel-content iframe,
+          .experimental-panel-content img {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 auto !important;
+            background: #fff !important;
+          }
+          .experimental-result-content,
+          .experimental-result-content .widget-html,
+          .experimental-result-content .widget-html-content {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+          }
+          .experimental-figure-frame {
+            box-sizing: border-box !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto !important;
+            border: 1px solid #e5e5e5 !important;
+            background: #fff !important;
+            overflow: hidden !important;
+          }
+          .experimental-figure-frame img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+          }
+          .constant-animation-root .output_scroll {
+            height: auto !important;
+            max-height: none !important;
+            box-shadow: none !important;
+          }
+          .output_scroll:has(.constant-animation-root),
+          .output_area:has(.constant-animation-root),
+          .jp-OutputArea-output:has(.constant-animation-root) {
+            overflow-x: hidden !important;
+            height: auto !important;
+            max-height: none !important;
+            box-shadow: none !important;
+          }
+        </style>
+        """,
+        layout=widgets.Layout(height="0px", min_height="0px", overflow="hidden"),
+    )
+    app = widgets.VBox(
+        [input_style, main_panel],
+        layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"),
+    )
+    app.add_class("constant-animation-root")
+    app._experimental_reset = reset_app
+    if display_app:
+        display(app)
+    return app
+
+
+def run_selectable_app(profile_factory, initial_mode="time"):
+    if initial_mode not in {"time", "memory"}:
+        initial_mode = "time"
+
+    selector = widgets.Dropdown(
+        options=[("Temporal", "time"), ("Espacial", "memory")],
+        value=initial_mode,
+        description="Complejidad:",
+        style={"description_width": "110px"},
+        layout=widgets.Layout(width="360px"),
+    )
+    selector.add_class("experimental-mode-selector")
+    body = widgets.VBox(layout=widgets.Layout(width="100%"))
+    current_app = {"widget": None}
+
+    def update_mode(change=None):
+        mode = selector.value if change is None else change["new"]
+        previous = current_app["widget"]
+        if previous is not None:
+            reset_callback = getattr(previous, "_experimental_reset", None)
+            if reset_callback is not None:
+                reset_callback()
+        current_app["widget"] = run_app(profile_factory(mode), display_app=False)
+        body.children = (current_app["widget"],)
+
+    selector.observe(update_mode, names="value")
+    update_mode()
+    selector_panel = widgets.VBox(
+        [
+            widgets.HTML(value='<div class="experimental-panel-title">Tipo de análisis:</div>'),
+            widgets.Box([selector], layout=widgets.Layout(width="100%", padding="12px")),
+        ],
+        layout=widgets.Layout(width="100%", gap="0px"),
+    )
+    selector_panel.add_class("experimental-main-panel")
+    wrapper = widgets.VBox(
+        [selector_panel, body],
+        layout=widgets.Layout(width="100%", max_width="100%", gap="0px"),
+    )
+    wrapper.add_class("constant-animation-root")
+    display(wrapper)
+    return wrapper

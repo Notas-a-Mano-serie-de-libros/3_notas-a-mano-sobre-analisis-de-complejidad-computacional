@@ -1,0 +1,1213 @@
+from __future__ import annotations
+
+import asyncio
+import math
+import random
+import re
+from html import escape
+
+from IPython.display import display
+import ipywidgets as widgets
+
+from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
+from common.visual_roles import SEARCH_EXPONENTIAL_STYLES, SEARCH_RANGE_HIGHLIGHT_STYLES, SEARCH_ROLE_STYLES, SEARCH_SEQUENTIAL_STYLES, SEARCH_TERNARY_STYLES, TARGET
+from common.widget_controls import COMPACT_GROUP_WIDTH, bounded_int_control, button_control, compact_labeled_control, dropdown_control
+
+try:
+    import nest_asyncio
+except ImportError:
+    nest_asyncio = None
+
+try:
+    from google.colab import output as colab_output
+except ImportError:
+    colab_output = None
+
+
+DEFAULT_SIZE = 10
+MAX_SIZE = 64
+DEFAULT_TARGET = 50
+PROBABILITY_NOT_IN = 0.3
+FOUND_MESSAGE = "Elemento encontrado"
+NOT_FOUND_MESSAGE = "Elemento no encontrado"
+FONT_FAMILY = "Scheherazade New"
+SEARCH_NODES_PER_ROW = 10
+SEARCH_NODE_WIDTH = 54
+SEARCH_NODE_HEIGHT = 116
+SEARCH_NODE_GAP = 0
+SEARCH_LABEL_HEIGHT = 28
+SEARCH_MESSAGE_HEIGHT = 44
+SEARCH_VERTICAL_PADDING = 16
+SEARCH_RESULT_WIDTH = 42
+_SEARCH_DIMENSION_CACHE = {}
+TARGET_EXISTS = "exists"
+TARGET_MISSING = "missing"
+TARGET_POSITION_START = "start"
+TARGET_POSITION_END = "end"
+TARGET_POSITION_MIDDLE = "middle"
+TARGET_POSITION_RANDOM = "random"
+PHASE_RUNNING = "en ejecución"
+PHASE_DONE = "terminado"
+PHASE_INACTIVE = "inactiva"
+MAX_FORMULA_PROBE_STEPS = 512
+SEARCH_CONTROL_GRID_COLUMNS = "repeat(auto-fit, minmax(270px, 1fr))"
+TARGET_ROLE = "target"
+TARGET_ROLE_STYLE = TARGET
+BASE_ROLE_STYLES = SEARCH_ROLE_STYLES
+HIGHLIGHT_RANGE_ROLE_STYLES = SEARCH_RANGE_HIGHLIGHT_STYLES
+SEQUENTIAL_ROLE_STYLES = SEARCH_SEQUENTIAL_STYLES
+EXPONENTIAL_ROLE_STYLES = SEARCH_EXPONENTIAL_STYLES
+TERNARY_ROLE_STYLES = SEARCH_TERNARY_STYLES
+SEARCH_LEGEND_LABELS = {
+    "target": "objetivo",
+    "current": "actual",
+    "probe": "comparación",
+    "found": "encontrado",
+    "excluded": "descartado",
+    "range": "rango",
+}
+SEARCH_LEGEND_ROLES_BY_ALGORITHM = {
+    "secuencial": ("target", "current", "found", "excluded"),
+    "binaria": ("target", "current", "probe", "found", "excluded", "range"),
+    "interpolacion": ("target", "probe", "found", "excluded", "range"),
+    "saltos": ("target", "current", "found", "excluded", "range"),
+    "exponencial": ("target", "current", "probe", "found", "excluded", "range"),
+    "ternaria": ("target", "probe", "found", "excluded", "range"),
+}
+
+
+def colab_pause(seconds=0.45):
+    pause(seconds, colab_output)
+
+
+def generate_sorted_values(size=DEFAULT_SIZE):
+    return sorted(random.sample(range(101), size))
+
+
+def calculate_target(values, probability_not_in=PROBABILITY_NOT_IN):
+    if not values:
+        return DEFAULT_TARGET
+
+    if random.random() >= probability_not_in:
+        return random.choice(values)
+
+    outside_range = []
+    min_value, max_value = min(values), max(values)
+
+    if min_value > 0:
+        outside_range.append(random.randint(0, min_value - 1))
+    if max_value < 100:
+        outside_range.append(random.randint(max_value + 1, 100))
+
+    if outside_range:
+        return random.choice(outside_range)
+
+    return random.choice(values)
+
+
+def choose_target(values, target_mode=TARGET_EXISTS, target_position=TARGET_POSITION_RANDOM):
+    values = list(values)
+    if not values:
+        return DEFAULT_TARGET
+
+    if target_mode == TARGET_EXISTS:
+        positions = {
+            TARGET_POSITION_START: 0,
+            TARGET_POSITION_END: len(values) - 1,
+            TARGET_POSITION_MIDDLE: len(values) // 2,
+        }
+        index = positions.get(target_position)
+        if index is None:
+            return random.choice(values)
+        return values[index]
+
+    used = set(values)
+    minimum = min(values)
+    maximum = max(values)
+    for candidate in (minimum - 1, maximum + 1):
+        if candidate not in used:
+            return candidate
+
+    for offset in range(1, len(values) + 202):
+        candidate = minimum - offset
+        if candidate not in used:
+            return candidate
+        candidate = maximum + offset
+        if candidate not in used:
+            return candidate
+
+    return DEFAULT_TARGET
+
+
+def enforce_target_membership(values, target, target_mode):
+    values = list(values)
+    if not values:
+        return target
+
+    if target_mode == TARGET_EXISTS and target not in values:
+        return values[0]
+
+    if target_mode == TARGET_MISSING and target in values:
+        return choose_target(values, TARGET_MISSING)
+
+    return target
+
+
+def create_nodes(values):
+    return [
+        {
+            "value": value,
+            "index": index,
+            "role": "default",
+            "label": "",
+            "reviewed": False,
+        }
+        for index, value in enumerate(values)
+    ]
+
+
+def mark_target_node(state):
+    target = state.get("target")
+    for node in state.get("arr", []):
+        node["is_target"] = node["value"] == target
+        if node["is_target"] and node["role"] == "default":
+            node["role"] = TARGET_ROLE
+        elif not node["is_target"] and node["role"] == TARGET_ROLE:
+            node["role"] = "default"
+    return state
+
+
+def resolve_node_style(node, role_styles):
+    fill, border, text = role_styles[node["role"]]
+    if node.get("is_target") and node["role"] in {"default", TARGET_ROLE}:
+        target_fill, _target_border, target_text = role_styles.get(TARGET_ROLE, TARGET_ROLE_STYLE)
+        return target_fill, border, target_text
+    return fill, border, text
+
+
+def css_token(value):
+    return re.sub(r"[^a-z0-9_-]+", "-", str(value or "").lower()).strip("-") or "none"
+
+
+def render_search_legend(state, role_styles, width=None):
+    items = []
+    roles = SEARCH_LEGEND_ROLES_BY_ALGORITHM.get(state.get("algorithm"), tuple(SEARCH_LEGEND_LABELS))
+    for role in roles:
+        if role not in role_styles:
+            continue
+        label = SEARCH_LEGEND_LABELS[role]
+        fill, border, _text = role_styles[role]
+        items.append(
+            f'<span class="search-legend-item"><span class="search-legend-swatch" '
+            f'style="background:{fill}; border:2px solid {border};"></span>{label}</span>'
+        )
+    width_style = f' style="width:min(100%, {width}px);"' if width else ""
+    return f'<div class="search-legend"{width_style}>{"".join(items)}</div>'
+
+
+def create_search_base_state(
+    size=DEFAULT_SIZE,
+    target=DEFAULT_TARGET,
+    values=None,
+    value_generator=generate_sorted_values,
+    target_picker=calculate_target,
+    **extra,
+):
+    values = sorted(values) if values is not None else value_generator(size)
+
+    if target is None:
+        target = target_picker(values)
+
+    state = {
+        "arr": create_nodes(values),
+        "target": target,
+        "search_active": False,
+        "search_complete": False,
+        "general_message": None,
+    }
+    state.update(extra)
+    mark_target_node(state)
+    return state
+
+
+def label_html(label, label_map):
+    parts = [label_map.get(part, escape(part)) for part in label.splitlines() if part.strip()]
+    return '<span class="label-separator">, </span>'.join(parts)
+
+
+def math_inline(expression):
+    html = escape(str(expression))
+    html = html.replace("m_1", "m<sub>1</sub>")
+    html = html.replace("m_2", "m<sub>2</sub>")
+    return f'<span class="math-inline">{html}</span>'
+
+
+def range_inline(low, high):
+    return math_inline(f"[{low}, {high}]")
+
+
+def message_html(message):
+    patterns = (
+        (r"Comienza en la posición (-?\d+)", lambda m: f"Comienza en la posición {math_inline(m.group(1))}"),
+        (r"(-?\d+) no coincide; avanza al siguiente elemento\.", lambda m: f"{math_inline(m.group(1))} no coincide; avanza al siguiente elemento."),
+        (r"Evalúa el punto medio en la posición (-?\d+)\.", lambda m: f"Evalúa el punto medio en la posición {math_inline(m.group(1))}."),
+        (r"(?:Búsqueda (?:lineal|binaria): )?[Ee]valúa m en la posición (-?\d+)\.", lambda m: f"Búsqueda binaria: evalúa {math_inline('m')} en la posición {math_inline(m.group(1))}."),
+        (r"(?:Búsqueda (?:lineal|binaria): )?(-?\d+) es menor que (-?\d+); descarta la mitad izquierda\.", lambda m: f"Búsqueda binaria: {math_inline(f'{m.group(1)} < {m.group(2)}')}; descarta la mitad izquierda."),
+        (r"(?:Búsqueda (?:lineal|binaria): )?(-?\d+) es mayor que (-?\d+); descarta la mitad derecha\.", lambda m: f"Búsqueda binaria: {math_inline(f'{m.group(1)} > {m.group(2)}')}; descarta la mitad derecha."),
+        (r"Estima la posición (-?\d+) usando la distribución de valores\.", lambda m: f"Estima la posición {math_inline(m.group(1))} usando la distribución de valores."),
+        (r"Estima p en la posición (-?\d+) usando la distribución de valores\.", lambda m: f"Estima {math_inline('p')} en la posición {math_inline(m.group(1))} usando la distribución de valores."),
+        (r"(-?\d+) es menor que (-?\d+); mueve inicio a la derecha\.", lambda m: f"{math_inline(f'{m.group(1)} < {m.group(2)}')}; mueve {math_inline('inicio')} a la derecha."),
+        (r"(-?\d+) es mayor que (-?\d+); mueve fin a la izquierda\.", lambda m: f"{math_inline(f'{m.group(1)} > {m.group(2)}')}; mueve {math_inline('fin')} a la izquierda."),
+        (r"(-?\d+) es menor que (-?\d+); mueve a a la derecha\.", lambda m: f"{math_inline(f'{m.group(1)} < {m.group(2)}')}; mueve {math_inline('a')} a la derecha."),
+        (r"(-?\d+) es mayor que (-?\d+); mueve b a la izquierda\.", lambda m: f"{math_inline(f'{m.group(1)} > {m.group(2)}')}; mueve {math_inline('b')} a la izquierda."),
+        (r"(?:Fase de saltos: )?Muestra el bloque \[(-?\d+), (-?\d+)\]\.", lambda m: f"Fase de saltos: muestra el bloque {range_inline(m.group(1), m.group(2))}."),
+        (r"(?:Búsqueda secuencial: )?(-?\d+) es mayor o igual que (-?\d+); comienza la búsqueda secuencial en este bloque\.", lambda m: f"Búsqueda secuencial: {math_inline(f'{m.group(1)} >= {m.group(2)}')}; comienza la búsqueda secuencial en este bloque."),
+        (r"(?:Fase de saltos: )?(-?\d+) es menor que (-?\d+); pasa al siguiente bloque\.", lambda m: f"Fase de saltos: {math_inline(f'{m.group(1)} < {m.group(2)}')}; pasa al siguiente bloque."),
+        (r"(?:Búsqueda secuencial: )?Compara la posición (-?\d+) dentro del bloque\.", lambda m: f"Búsqueda secuencial: compara la posición {math_inline(m.group(1))} dentro del bloque."),
+        (r"(?:Búsqueda secuencial: )?(-?\d+) no coincide; avanza dentro del bloque\.", lambda m: f"Búsqueda secuencial: {math_inline(m.group(1))} no coincide; avanza dentro del bloque."),
+        (r"(?:Fase exponencial: )?[Ee]l índice i = (-?\d+) supera el arreglo; rango calculado \[(-?\d+), (-?\d+)\]\.", lambda m: f"Fase exponencial: el índice {math_inline(f'i = {m.group(1)}')} supera el arreglo; rango calculado {range_inline(m.group(2), m.group(3))}."),
+        (r"(?:Fase exponencial: )?(-?\d+) es mayor que (-?\d+); rango calculado \[(-?\d+), (-?\d+)\]\.", lambda m: f"Fase exponencial: {math_inline(f'{m.group(1)} > {m.group(2)}')}; rango calculado {range_inline(m.group(3), m.group(4))}."),
+        (r"(?:Fase exponencial: )?(-?\d+) no coincide; actualiza i a (-?\d+)\.", lambda m: f"Fase exponencial: {math_inline(m.group(1))} no coincide; actualiza {math_inline(f'i = {m.group(2)}')}."),
+        (r"(?:Fase exponencial: )?(-?\d+) no coincide; actualiza i a (-?\d+), que supera el arreglo\.", lambda m: f"Fase exponencial: {math_inline(m.group(1))} no coincide; actualiza {math_inline(f'i = {m.group(2)}')}, que supera el arreglo."),
+        (r"(?:Búsqueda (?:lineal|binaria): )?Aplica búsqueda binaria en el rango \[(-?\d+), (-?\d+)\]\.", lambda m: f"Búsqueda binaria: aplica búsqueda binaria en el rango {range_inline(m.group(1), m.group(2))}."),
+        (r"Compara contra m1 = (-?\d+) y m2 = (-?\d+)\.", lambda m: f"Compara contra {math_inline(f'm_1 = {m.group(1)}')} y {math_inline(f'm_2 = {m.group(2)}')}."),
+        (r"(-?\d+) es menor que (-?\d+); descarta desde m1 hacia la derecha\.", lambda m: f"{math_inline(f'{m.group(1)} < {m.group(2)}')}; descarta desde {math_inline('m_1')} hacia la derecha."),
+        (r"(-?\d+) es mayor que (-?\d+); descarta desde m2 hacia la izquierda\.", lambda m: f"{math_inline(f'{m.group(1)} > {m.group(2)}')}; descarta desde {math_inline('m_2')} hacia la izquierda."),
+        (r"(-?\d+) está entre (-?\d+) y (-?\d+); descarta los extremos\.", lambda m: f"{math_inline(f'{m.group(2)} < {m.group(1)} < {m.group(3)}')}; descarta los extremos."),
+        (r"Elemento de interés: (-?\d+)", lambda m: f"Elemento de interés: {math_inline(m.group(1))}"),
+    )
+    for pattern, renderer in patterns:
+        match = re.fullmatch(pattern, message)
+        if match:
+            return renderer(match)
+    return escape(message)
+
+
+def node_html(node, role_styles, label_map):
+    fill, border, text = resolve_node_style(node, role_styles)
+    label = f"<div class='node-label'>{label_html(node['label'], label_map)}</div>" if node["label"] else "<div class='node-label'>&nbsp;</div>"
+    return f"""
+    <div class="node-wrap">
+      <div class="node-index">{node["index"]}</div>
+      <div class="node" style="background:{fill}; color:{text};">
+        <div class="node-value">{node["value"]}</div>
+      </div>
+      {label}
+    </div>
+    """
+
+
+def calculate_search_dimensions(state):
+    node_count = len(state["arr"])
+    if node_count in _SEARCH_DIMENSION_CACHE:
+        return _SEARCH_DIMENSION_CACHE[node_count]
+    rows = max(1, math.ceil(node_count / SEARCH_NODES_PER_ROW))
+    nodes_height = (rows * SEARCH_NODE_HEIGHT) + ((rows - 1) * SEARCH_NODE_GAP) + SEARCH_VERTICAL_PADDING
+    step_height = 22
+    legend_height = 58
+    app_height = SEARCH_MESSAGE_HEIGHT + step_height + legend_height + nodes_height + SEARCH_VERTICAL_PADDING
+    dimensions = {
+        "nodes_height": nodes_height,
+        "app_height": app_height,
+        "nodes_width": SEARCH_NODES_PER_ROW * SEARCH_NODE_WIDTH + (SEARCH_NODES_PER_ROW - 1) * SEARCH_NODE_GAP,
+        "result_width": SEARCH_RESULT_WIDTH,
+    }
+    _SEARCH_DIMENSION_CACHE[node_count] = dimensions
+    return dimensions
+
+
+def search_labeled_control(label, control):
+    group = compact_labeled_control(
+        label,
+        control,
+        field_width=140,
+        group_width=246,
+        label_width=92,
+    )
+    group.layout.gap = "10px"
+    return group
+
+
+def _build_search_css() -> str:
+    """CSS estático para la visualización de búsqueda — se inyecta una sola vez."""
+    return f"""<style>
+  @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400&display=swap');
+  .search-simulation-root {{
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    background: #ffffff;
+    color: #2f2f2f;
+    padding: 14px 4px;
+    box-sizing: border-box;
+  }}
+  .search-simulation-root,
+  .search-simulation-root * {{
+    box-sizing: border-box;
+  }}
+  .search-simulation-root .widget-html,
+  .search-simulation-root .widget-html-content,
+  .search-simulation-root .widget-htmlmath,
+  .search-simulation-root .widget-htmlmath-content {{
+    color: #333333 !important;
+    background: transparent !important;
+  }}
+  .search-simulation-root .widget-html-content,
+  .search-simulation-root .widget-htmlmath-content {{
+    margin: 0 !important;
+  }}
+  .search-main-panel {{
+    width: 100%;
+    border: 1px solid #dedede;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #ffffff;
+  }}
+  .search-panel-title,
+  .search-subpanel-title {{
+    width: 100%;
+    margin: 0;
+    padding: 10px 14px;
+    border-bottom: 1px solid #dedede;
+    background: #f5f5f5;
+    color: #333333;
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: left;
+  }}
+  .search-panel-content {{
+    width: 100%;
+    padding: 12px;
+    background: #ffffff;
+  }}
+  .search-subpanel {{
+    width: 100%;
+    margin: 0;
+    border: 1px solid #e1e1e1;
+    background: #ffffff;
+  }}
+  .search-subpanel + .search-subpanel {{
+    border-top: 0;
+  }}
+  .search-subpanel-title {{
+    padding: 8px 12px;
+    border-bottom-color: #e5e5e5;
+    background: #f7f7f7;
+  }}
+  .search-subpanel-content {{
+    width: 100%;
+    padding: 12px;
+    background: #ffffff;
+  }}
+  .search-formula-content {{
+    padding: 12px !important;
+  }}
+  .search-result-content {{
+    padding: 0 !important;
+  }}
+  .search-result-content > .widget-html-content {{
+    margin: 0 !important;
+    padding: 0 !important;
+  }}
+  .search-simulation-root .widget-label,
+  .search-simulation-root label,
+  .search-simulation-root .widget-readout,
+  .search-simulation-root .widget-checkbox,
+  .search-simulation-root .widget-checkbox .widget-label {{
+    color: #333333 !important;
+  }}
+  .search-simulation-root label,
+  .search-simulation-root .widget-label,
+  .search-simulation-root .widget-checkbox .widget-label {{
+    font-weight: 700 !important;
+  }}
+  .search-simulation-root select,
+  .search-simulation-root input {{
+    background: #ffffff !important;
+    color: #333333 !important;
+  }}
+  .search-simulation-root .widget-dropdown {{
+    width: 140px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    color-scheme: light !important;
+  }}
+  .search-simulation-root .widget-dropdown select {{
+    width: 140px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 2px 4px !important;
+    border: 1px solid #cccccc !important;
+    border-radius: 3px !important;
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    color-scheme: light !important;
+    font-size: 13px !important;
+    text-align: center !important;
+    appearance: auto !important;
+    -webkit-appearance: menulist !important;
+  }}
+  .search-simulation-root .widget-dropdown select:focus {{
+    outline: none !important;
+    border-color: #1976d2 !important;
+    box-shadow: 0 0 0 1px #1976d2 !important;
+  }}
+  .search-simulation-root .widget-dropdown option {{
+    background: #ffffff !important;
+    color: #333333 !important;
+  }}
+  .search-simulation-root .widget-button {{
+    min-height: 38px;
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    background: #f7f7f7;
+    color: #333333;
+    box-shadow: none;
+  }}
+  .search-simulation-root .widget-button:hover {{
+    background: #eeeeee;
+  }}
+  .search-app {{
+    width: 100%;
+    font-family: '{FONT_FAMILY}', serif;
+    color: #111111;
+    background: #ffffff;
+    box-sizing: border-box;
+    padding: 0 8px 10px;
+    margin: 0;
+  }}
+  .search-message {{
+    height: {SEARCH_MESSAGE_HEIGHT}px;
+    line-height: 28px;
+    font-size: 22px;
+    font-weight: 400;
+    text-align: center;
+    margin: 2px 0 8px;
+    padding: 0 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }}
+  .search-step-strip {{
+    height: 22px;
+    line-height: 20px;
+    margin: 2px auto 10px;
+    text-align: center;
+    font-size: 15px;
+    color: #555555;
+    box-sizing: border-box;
+    overflow: hidden;
+  }}
+  .search-legend {{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 16px;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 -8px 24px;
+    width: calc(100% + 16px) !important;
+    min-height: 34px;
+    font-size: 15px;
+    line-height: 18px;
+    color: #333333;
+    box-sizing: border-box;
+    align-content: center;
+    padding: 7px 10px;
+    border: 1px solid #e5e7eb;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    background: #f9fafb;
+  }}
+  .search-legend-item {{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }}
+  .search-legend-swatch {{
+    width: 14px;
+    height: 14px;
+    border: 2px solid #111111;
+    box-sizing: border-box;
+  }}
+  .search-nodes {{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    align-content: flex-start;
+    gap: {SEARCH_NODE_GAP}px;
+    margin: 0 auto;
+    padding: 6px 0;
+    contain: layout paint;
+  }}
+  .search-array-line {{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+  }}
+  .search-array-line .search-nodes {{
+    margin: 0;
+  }}
+  .search-result {{
+    width: {SEARCH_RESULT_WIDTH}px;
+    min-width: {SEARCH_RESULT_WIDTH}px;
+    height: 54px;
+    align-self: flex-start;
+    margin-top: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    contain: layout paint;
+  }}
+  .search-result-symbol {{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    font-family: '{FONT_FAMILY}', serif;
+    font-size: 30px;
+    line-height: 1;
+    font-weight: 700;
+    color: #111111;
+    transition: color 100ms ease, transform 100ms ease;
+  }}
+  .search-result-symbol.found {{
+    color: #2d7d32;
+  }}
+  .search-result-symbol.missing {{
+    color: #b85450;
+  }}
+  .node-wrap {{
+    width: {SEARCH_NODE_WIDTH}px;
+    height: {SEARCH_NODE_HEIGHT}px;
+    text-align: center;
+    flex: 0 0 {SEARCH_NODE_WIDTH}px;
+    display: flex;
+    flex-direction: column;
+  }}
+  .node-label {{
+    margin-top: 8px;
+    height: {SEARCH_LABEL_HEIGHT}px;
+    min-height: {SEARCH_LABEL_HEIGHT}px;
+    overflow: visible;
+    font-size: 20px;
+    line-height: 24px;
+    color: #222222;
+    white-space: nowrap;
+  }}
+  .label-separator {{
+    font-style: normal;
+  }}
+  .math-label {{
+    font-family: '{FONT_FAMILY}', serif;
+    font-style: italic;
+  }}
+  .math-word {{
+    font-style: normal;
+  }}
+  .math-inline {{
+    font-family: '{FONT_FAMILY}', serif;
+    font-style: italic;
+    white-space: nowrap;
+    margin: 0 0.08em;
+  }}
+  .node {{
+    height: 54px;
+    flex: 0 0 54px;
+    box-sizing: border-box;
+    border: 2px solid #111111;
+    border-left-width: 0;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+    transition: background-color 100ms ease, color 100ms ease;
+  }}
+  .node-wrap:nth-child({SEARCH_NODES_PER_ROW}n + 1) .node {{
+    border-left-width: 2px;
+  }}
+  .node-value {{
+    font-size: 26px;
+    font-weight: 400;
+  }}
+  .node-index {{
+    height: 24px;
+    flex: 0 0 24px;
+    line-height: 24px;
+    margin-bottom: 6px;
+    font-size: 20px;
+    color: #444444;
+  }}
+  @media (max-width: 760px) {{
+    .search-message {{
+      font-size: 22px;
+      line-height: 25px;
+    }}
+    .search-legend {{
+      justify-content: flex-start;
+      gap: 8px 10px;
+    }}
+    .search-step-strip {{
+      text-align: left;
+    }}
+    .search-result {{
+      width: 34px;
+      min-width: 34px;
+    }}
+    .search-array-line .search-nodes {{
+      max-width: calc(100% - 38px);
+    }}
+  }}
+  @media (prefers-reduced-motion: reduce) {{
+    .search-result-symbol,
+    .node {{
+      transition: none;
+    }}
+  }}
+</style>"""
+
+
+# CSS inyectado una sola vez; las dimensiones dinámicas van como inline styles en el HTML
+_SEARCH_CSS = _build_search_css()
+
+
+def render_result_symbol(state):
+    if not state.get("search_complete"):
+        return ""
+
+    found = any(node["role"] == "found" for node in state.get("arr", []))
+    symbol = "✓" if found else "×"
+    label = "Encontrado" if found else "No encontrado"
+    class_name = "found" if found else "missing"
+    return (
+        f'<span class="search-result-symbol {class_name}" role="img" '
+        f'aria-label="{label}" title="{label}">{symbol}</span>'
+    )
+
+
+def render_search_step_status(state):
+    total = state.get("step_total", 0)
+    if total <= 0:
+        return "&nbsp;"
+    current = min(state.get("step_index", 0), total)
+    return escape(f"Paso {current} / {total}")
+
+
+def render_state_html(state, role_styles, label_map):
+    message = message_html(state["general_message"] or f"Elemento de interés: {state['target']}")
+    node_cache = state.setdefault("_node_html_cache", {})
+    node_markup = []
+    for node in state["arr"]:
+        key = (
+            node["index"],
+            node["value"],
+            node["role"],
+            node["label"],
+            node.get("is_target", False),
+        )
+        if key not in node_cache:
+            node_cache[key] = node_html(node, role_styles, label_map)
+        node_markup.append(node_cache[key])
+    nodes = "".join(node_markup)
+    dimensions = calculate_search_dimensions(state)
+    result = render_result_symbol(state)
+    step_status = render_search_step_status(state)
+    legend_width = dimensions["nodes_width"] + dimensions["result_width"] + 4
+    legend = render_search_legend(state, role_styles, legend_width)
+    found = any(node["role"] == "found" for node in state.get("arr", []))
+    status_class = " search-app-found" if found else " search-app-missing"
+    complete_class = f" search-app-complete{status_class}" if state.get("search_complete") else ""
+    phase_class = f" search-phase-{css_token(state.get('phase'))}"
+    return (
+        f'<div class="search-app{complete_class}{phase_class}" style="min-height: {dimensions["app_height"]}px;">'
+        f"{legend}"
+        f'<div class="search-message">{message}</div>'
+        f'<div class="search-step-strip" style="width: min(100%, {legend_width}px);">{step_status}</div>'
+        f'<div class="search-array-line">'
+        f'<div class="search-nodes" style="width: min(100%, {dimensions["nodes_width"]}px); min-height: {dimensions["nodes_height"]}px;">{nodes}</div>'
+        f'<div class="search-result" aria-live="polite">{result}</div>'
+        f'</div>'
+        f'</div>'
+    )
+
+
+def copy_search_node(node):
+    return dict(node)
+
+
+def copy_search_state(state):
+    copied = {}
+    for key, value in state.items():
+        if key.startswith("_"):
+            continue
+        if key == "arr":
+            copied[key] = [copy_search_node(node) for node in value]
+        elif isinstance(value, list):
+            copied[key] = list(value)
+        elif isinstance(value, dict):
+            copied[key] = dict(value)
+        else:
+            copied[key] = value
+    return copied
+
+
+def calculate_formula_reserved_height(state, step_search):
+    probe = copy_search_state(state)
+    max_height = formula_iframe_height(probe.get("formula", ""))
+    max_steps = min(MAX_FORMULA_PROBE_STEPS, max(16, len(probe.get("arr", [])) * 8 + 16))
+    steps = 0
+
+    for _ in range(max_steps):
+        if probe.get("search_complete"):
+            break
+        step_search(probe)
+        steps += 1
+        max_height = max(max_height, formula_iframe_height(probe.get("formula", "")))
+
+    state["step_total"] = steps
+    state.setdefault("step_index", 0)
+    return max_height
+
+
+def build_search_trace(state, step_search):
+    probe = copy_search_state(state)
+    step_index = state.get("step_index", 0)
+    while not probe.get("search_complete"):
+        step_search(probe)
+        step_index += 1
+        probe["step_index"] = step_index
+        yield copy_search_state(probe)
+
+
+def create_search_controls(default_size=DEFAULT_SIZE, max_size=MAX_SIZE, default_target=DEFAULT_TARGET):
+    target_readout = bounded_int_control(
+        value=default_target,
+        min_value=-100,
+        max_value=200,
+        step=1,
+        description="Objetivo",
+        disabled=True,
+        width="180px",
+    )
+    size_input = bounded_int_control(
+        value=default_size,
+        min_value=2,
+        max_value=max_size,
+        step=1,
+        description="Tamaño",
+        width="180px",
+    )
+    target_mode_input = dropdown_control(
+        options=(("Existe", TARGET_EXISTS), ("No existe", TARGET_MISSING)),
+        value=TARGET_EXISTS,
+        description="Elemento",
+        width="190px",
+    )
+    target_position_input = dropdown_control(
+        options=(
+            ("Inicio", TARGET_POSITION_START),
+            ("Fin", TARGET_POSITION_END),
+            ("Mitad", TARGET_POSITION_MIDDLE),
+            ("Aleatorio", TARGET_POSITION_RANDOM),
+        ),
+        value=TARGET_POSITION_RANDOM,
+        description="Posición",
+        width="190px",
+    )
+    step_button = button_control(description="Paso siguiente", button_style="info", width="150px")
+    auto_button = button_control(description="Ejecución automática", button_style="success", width="190px")
+    finish_button = button_control(description="Finalizar", button_style="", width="120px")
+    reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
+    book_button = button_control(description="Generar arreglo del libro", button_style="primary", width="210px")
+    step_button.icon = "step-forward"
+    auto_button.icon = "play"
+    finish_button.icon = "fast-forward"
+    reset_button.icon = "refresh"
+    book_button.icon = "book"
+    return {
+        "size": size_input,
+        "target_mode": target_mode_input,
+        "target_position": target_position_input,
+        "target_readout": target_readout,
+        "step": step_button,
+        "auto": auto_button,
+        "finish": finish_button,
+        "reset": reset_button,
+        "book": book_button,
+        "_groups": {
+            "size": search_labeled_control("Tamaño", size_input),
+            "target_mode": search_labeled_control("Elemento", target_mode_input),
+            "target_position": search_labeled_control("Posición", target_position_input),
+            "target_readout": search_labeled_control("Objetivo", target_readout),
+        },
+    }
+
+
+def run_search_app(
+    *,
+    create_state,
+    step_search,
+    render_html,
+    default_size=DEFAULT_SIZE,
+    max_size=MAX_SIZE,
+    default_target=DEFAULT_TARGET,
+    book_array=None,
+    book_target=None,
+    extra_controls=None,
+    state_kwargs=None,
+):
+    if nest_asyncio is not None:
+        nest_asyncio.apply()
+    if colab_output is not None:
+        colab_output.enable_custom_widget_manager()
+
+    extra_controls = extra_controls or {}
+    state_kwargs = state_kwargs or {}
+
+    controls = create_search_controls(default_size, max_size, default_target)
+    size_input = controls["size"]
+    target_mode_input = controls["target_mode"]
+    target_position_input = controls["target_position"]
+    target_readout = controls["target_readout"]
+    step_button = controls["step"]
+    auto_button = controls["auto"]
+    finish_button = controls["finish"]
+    reset_button = controls["reset"]
+    book_button = controls["book"]
+    formula_output = widgets.HTML(
+        value="",
+        layout=widgets.Layout(
+            width="100%",
+            min_height="0px",
+            padding="30px 0 0 0",
+            margin="0",
+            overflow="visible",
+        )
+    )
+    html_output = widgets.HTML(layout=widgets.Layout(width="100%"))
+    control_state = {"updating": False}
+    render_cache = OutputCache()
+    ui_state = {"first_row": None}
+    execution_state = {"run_id": 0}
+    state = None
+
+    def schedule_task(coro):
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(coro)
+            return None
+        return loop.create_task(coro)
+
+    def current_kwargs():
+        values = {name: control.value for name, control in extra_controls.items()}
+        values.update(state_kwargs)
+        return values
+
+    def first_row_controls():
+        groups = controls["_groups"]
+        row_controls = [groups["size"], groups["target_mode"]]
+        if target_mode_input.value == TARGET_EXISTS:
+            row_controls.append(groups["target_position"])
+        row_controls.append(groups["target_readout"])
+        row_controls.extend(extra_controls.values())
+        return row_controls
+
+    def update_target_readout(target):
+        control_state["updating"] = True
+        target_readout.value = target
+        control_state["updating"] = False
+
+    def update_target_position_visibility():
+        target_position_input.layout.display = None if target_mode_input.value == TARGET_EXISTS else "none"
+        if ui_state["first_row"] is not None:
+            row_controls = first_row_controls()
+            ui_state["first_row"].children = tuple(row_controls)
+
+    def build_state(values=None, target_override=None):
+        size = len(values) if values is not None else size_input.value
+        base_state = create_state(size=size, target=DEFAULT_TARGET, values=values, **current_kwargs())
+        node_values = [node["value"] for node in base_state["arr"]]
+        target = target_override
+        if target is None:
+            target = choose_target(
+                node_values,
+                target_mode_input.value,
+                target_position_input.value,
+            )
+        target = enforce_target_membership(node_values, target, target_mode_input.value)
+        state = create_state(size=len(node_values), target=target, values=node_values, **current_kwargs())
+        state["formula_reserved_height"] = calculate_formula_reserved_height(state, step_search)
+        update_target_readout(state["target"])
+        return state
+
+    def current_values():
+        return [node["value"] for node in state["arr"]]
+
+    def redraw():
+        formula = state.get("formula")
+        render_cache.update_outputs(
+            formula_output,
+            html_output,
+            formula,
+            render_html(state),
+            state.get("formula_reserved_height"),
+        )
+
+    def sync_execution_buttons():
+        complete = state["search_complete"]
+        step_button.disabled = complete
+        auto_button.disabled = complete
+        finish_button.disabled = complete
+
+    def enable_controls_for_new_array():
+        reset_button.disabled = False
+        book_button.disabled = False
+        step_button.disabled = False
+        auto_button.disabled = False
+        finish_button.disabled = False
+
+    def reset_algorithm(*_args):
+        nonlocal state
+        if control_state["updating"]:
+            return
+        state = build_state()
+        enable_controls_for_new_array()
+        redraw()
+
+    def on_target_mode_change(*_args):
+        nonlocal state
+        update_target_position_visibility()
+        state = build_state(values=current_values())
+        enable_controls_for_new_array()
+        redraw()
+
+    def on_target_position_change(*_args):
+        nonlocal state
+        if control_state["updating"]:
+            return
+        state = build_state(values=current_values())
+        enable_controls_for_new_array()
+        redraw()
+
+    def generate_book_array(*_args):
+        nonlocal state
+        if book_array is None:
+            return
+        control_state["updating"] = True
+        size_input.value = len(book_array)
+        control_state["updating"] = False
+        state = build_state(values=book_array)
+        enable_controls_for_new_array()
+        redraw()
+
+    def run_single_step(*_args):
+        if not state["search_complete"]:
+            step_search(state)
+            state["step_index"] = min(state.get("step_index", 0) + 1, state.get("step_total", 0))
+        redraw()
+        sync_execution_buttons()
+
+    async def run_auto_async(run_id):
+        nonlocal state
+        set_disabled((auto_button, step_button, reset_button, book_button), True)
+        finish_button.disabled = False
+        for snapshot in build_search_trace(state, step_search):
+            if execution_state["run_id"] != run_id:
+                return
+            state = snapshot
+            redraw()
+            await asyncio.sleep(0.45)
+        if execution_state["run_id"] == run_id:
+            reset_button.disabled = False
+            book_button.disabled = False
+            sync_execution_buttons()
+
+    def run_auto_sync(run_id):
+        nonlocal state
+        set_disabled((auto_button, step_button, reset_button, book_button), True)
+        finish_button.disabled = False
+        for snapshot in build_search_trace(state, step_search):
+            if execution_state["run_id"] != run_id:
+                return
+            state = snapshot
+            redraw()
+            colab_pause(0.45)
+        if execution_state["run_id"] == run_id:
+            reset_button.disabled = False
+            book_button.disabled = False
+            sync_execution_buttons()
+
+    def run_auto(*_args):
+        if state["search_complete"]:
+            return
+        execution_state["run_id"] += 1
+        run_id = execution_state["run_id"]
+        if colab_output is not None:
+            run_auto_sync(run_id)
+            return
+        schedule_task(run_auto_async(run_id))
+
+    def finish_without_animation(*_args):
+        nonlocal state
+        if state["search_complete"]:
+            return
+        execution_state["run_id"] += 1
+        set_disabled((auto_button, finish_button, step_button, reset_button, book_button), True)
+        final_state = None
+        for snapshot in build_search_trace(state, step_search):
+            final_state = snapshot
+        if final_state is not None:
+            state = final_state
+            state["step_index"] = state.get("step_total", state.get("step_index", 0))
+        redraw()
+        reset_button.disabled = False
+        book_button.disabled = False
+        sync_execution_buttons()
+
+    step_button.on_click(run_single_step)
+    auto_button.on_click(run_auto)
+    finish_button.on_click(finish_without_animation)
+    reset_button.on_click(reset_algorithm)
+    book_button.on_click(generate_book_array)
+    size_input.observe(lambda change: reset_algorithm() if change["name"] == "value" else None, names="value")
+    target_mode_input.observe(lambda change: on_target_mode_change() if change["name"] == "value" else None, names="value")
+    target_position_input.observe(lambda change: on_target_position_change() if change["name"] == "value" else None, names="value")
+    for control in extra_controls.values():
+        control.observe(lambda change: reset_algorithm() if change["name"] == "value" else None, names="value")
+
+    initial_row_controls = first_row_controls()
+    first_row_box = widgets.Box(
+        initial_row_controls,
+        layout=widgets.Layout(
+            width="auto",
+            display="flex",
+            flex_flow="row wrap",
+            gap="14px 28px",
+            align_items="center",
+            overflow="visible",
+        ),
+    )
+    ui_state["first_row"] = first_row_box
+    update_target_position_visibility()
+    button_row = widgets.HBox(
+        [step_button, auto_button, finish_button, reset_button, book_button],
+        layout=widgets.Layout(
+            width="100%",
+            gap="10px",
+            margin="16px 0 0 0",
+            flex_flow="row wrap",
+            justify_content="flex-end",
+        ),
+    )
+    parameters_content = widgets.VBox(
+        [first_row_box, button_row],
+        layout=widgets.Layout(width="100%"),
+    )
+    parameters_content.add_class("search-subpanel-content")
+    formula_output.add_class("search-subpanel-content")
+    formula_output.add_class("search-formula-content")
+    html_output.add_class("search-subpanel-content")
+    html_output.add_class("search-result-content")
+
+    def panel(title, content):
+        container = widgets.VBox(
+            [
+                widgets.HTML(f'<div class="search-subpanel-title">{escape(title)}</div>'),
+                content,
+            ],
+            layout=widgets.Layout(width="100%", gap="0"),
+        )
+        container.add_class("search-subpanel")
+        return container
+
+    panel_content = widgets.VBox(
+        [
+            panel("Parámetros:", parameters_content),
+            panel("Procedimiento:", formula_output),
+            panel("Resultado:", html_output),
+        ],
+        layout=widgets.Layout(width="100%", gap="0"),
+    )
+    panel_content.add_class("search-panel-content")
+    main_panel = widgets.VBox(
+        [
+            widgets.HTML('<div class="search-panel-title">Simulación de búsqueda:</div>'),
+            panel_content,
+        ],
+        layout=widgets.Layout(width="100%", gap="0"),
+    )
+    main_panel.add_class("search-main-panel")
+    css_widget = widgets.HTML(_SEARCH_CSS)
+    css_widget.layout = widgets.Layout(width="0", height="0", margin="0", padding="0")
+    layout = widgets.VBox(
+        [css_widget, main_panel],
+        layout=widgets.Layout(
+            width="100%",
+            max_width="100%",
+            gap="0",
+            overflow="hidden",
+        ),
+    )
+    layout.add_class("search-simulation-root")
+    display(layout)
+    state = build_state()
+    redraw()
+
+
+__all__ = [
+    "DEFAULT_SIZE",
+    "MAX_SIZE",
+    "DEFAULT_TARGET",
+    "PROBABILITY_NOT_IN",
+    "FOUND_MESSAGE",
+    "NOT_FOUND_MESSAGE",
+    "FONT_FAMILY",
+    "TARGET_EXISTS",
+    "TARGET_MISSING",
+    "TARGET_POSITION_START",
+    "TARGET_POSITION_END",
+    "TARGET_POSITION_MIDDLE",
+    "TARGET_POSITION_RANDOM",
+    "PHASE_RUNNING",
+    "PHASE_DONE",
+    "PHASE_INACTIVE",
+    "MAX_FORMULA_PROBE_STEPS",
+    "SEARCH_RESULT_WIDTH",
+    "TARGET_ROLE",
+    "TARGET_ROLE_STYLE",
+    "_SEARCH_DIMENSION_CACHE",
+    "BASE_ROLE_STYLES",
+    "HIGHLIGHT_RANGE_ROLE_STYLES",
+    "SEQUENTIAL_ROLE_STYLES",
+    "colab_pause",
+    "generate_sorted_values",
+    "calculate_target",
+    "choose_target",
+    "enforce_target_membership",
+    "create_nodes",
+    "mark_target_node",
+    "resolve_node_style",
+    "label_html",
+    "math_inline",
+    "message_html",
+    "calculate_search_dimensions",
+    "copy_search_node",
+    "copy_search_state",
+    "calculate_formula_reserved_height",
+    "build_search_trace",
+    "_SEARCH_CSS",
+    "render_result_symbol",
+    "render_state_html",
+    "run_search_app",
+]

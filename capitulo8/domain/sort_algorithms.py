@@ -1,0 +1,1640 @@
+from __future__ import annotations
+
+import random
+
+from common.visual_roles import (
+    SORT_ROLE_DEFAULT as ROLE_DEFAULT,
+    SORT_ROLE_EXCLUDED as ROLE_EXCLUDED,
+    SORT_ROLE_NAMES,
+    SORT_ROLE_SORTED as ROLE_SORTED,
+)
+from sort_messages import (
+    compare_positions_message,
+    compare_values_message,
+    final_message,
+    radix_bucket_message,
+    start_message,
+    swap_positions_message,
+)
+
+
+def ordered(left, right, descending=False):
+    return left >= right if descending else left <= right
+
+
+def relation_symbol(descending=False):
+    return "\\ge" if descending else "\\le"
+
+
+def make_event(values, message, formula, roles=None, labels=None, complete=False, **extra):
+    event_roles = list(roles or [ROLE_DEFAULT] * len(values))
+    validate_event_roles(event_roles, extra)
+    event = {
+        "arr": list(values),
+        "message": message,
+        "formula": formula,
+        "roles": event_roles,
+        "labels": list(labels or [""] * len(values)),
+        "sorting_complete": complete,
+    }
+    event.update(extra)
+    return event
+
+
+def validate_event_roles(roles, extra=None):
+    role_groups = [roles]
+    for key in ("merge_tree_nodes", "quick_tree_nodes"):
+        for node in (extra or {}).get(key, []):
+            role_groups.append(node.get("roles", []))
+    unknown = sorted({role for group in role_groups for role in group if role not in SORT_ROLE_NAMES})
+    if unknown:
+        raise ValueError(f"Roles visuales de ordenamiento no registrados: {unknown}")
+
+
+def gray_unsorted_roles_when_complete(roles, complete=False):
+    if not complete:
+        return roles
+    return [ROLE_SORTED if role == ROLE_SORTED else ROLE_EXCLUDED for role in roles]
+
+
+def mark(roles, labels, index, role, label=""):
+    if 0 <= index < len(roles):
+        roles[index] = role
+        labels[index] = label
+
+
+def tree_nodes(item):
+    result = [item]
+    if item.get("left") is not None:
+        result.extend(tree_nodes(item["left"]))
+    if item.get("right") is not None:
+        result.extend(tree_nodes(item["right"]))
+    return result
+
+
+def tree_ancestors(item):
+    result = []
+    while item is not None:
+        result.append(item)
+        item = item.get("parent")
+    return result
+
+
+def active_tree_ids(root, focus=None, visible_nodes=None, complete=False, include_children=True):
+    if complete:
+        nodes = visible_nodes if visible_nodes is not None else tree_nodes(root)
+        return {id(item) for item in nodes}
+    focus = focus or root
+    result = {id(item) for item in tree_ancestors(focus)}
+    if include_children:
+        if focus.get("left") is not None:
+            result.add(id(focus["left"]))
+        if focus.get("right") is not None:
+            result.add(id(focus["right"]))
+    return result
+
+
+def bubble_trace(values, descending=False):
+    arr = list(values)
+    n = len(arr)
+    trace = [make_event(arr, start_message("burbuja"), "")]
+    for i in range(n - 1):
+        swapped = False
+        boundary = n - 1 - i
+        for j in range(0, boundary):
+            roles = ["sorted" if index > boundary else "default" for index in range(n)]
+            labels = [""] * n
+            mark(roles, labels, boundary, "boundary", "b")
+            mark(roles, labels, j, "current", "j")
+            mark(roles, labels, j + 1, "compare", "j + 1")
+            trace.append(
+                make_event(
+                    arr,
+                    compare_positions_message(j, j + 1),
+                    rf"i = {i},\quad b = n - 1 - i = {boundary},\quad j = {j},\quad a_j = {arr[j]},\quad a_{{j+1}} = {arr[j + 1]},\quad {arr[j]} {relation_symbol(descending)} {arr[j + 1]}",
+                    roles,
+                    labels,
+                )
+            )
+            if not ordered(arr[j], arr[j + 1], descending):
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+                roles = ["sorted" if index > boundary else "default" for index in range(n)]
+                labels = [""] * n
+                mark(roles, labels, boundary, "boundary", "b")
+                mark(roles, labels, j, "current", "j")
+                mark(roles, labels, j + 1, "compare", "j + 1")
+                trace.append(
+                    make_event(
+                        arr,
+                        swap_positions_message(j, j + 1),
+                        rf"i = {i},\quad b = {boundary},\quad a_j \leftrightarrow a_{{j+1}},\quad a_j = {arr[j]},\quad a_{{j+1}} = {arr[j + 1]}",
+                        roles,
+                        labels,
+                    )
+                )
+        roles = ["sorted" if index >= boundary else "default" for index in range(n)]
+        labels = [""] * n
+        mark(roles, labels, boundary, "sorted", "ordenado")
+        trace.append(make_event(arr, f"Fija la posición {boundary}.", rf"i = {i},\quad b = n - 1 - i = {boundary}", roles, labels))
+        if not swapped:
+            break
+    trace.append(make_event(arr, final_message("burbuja"), r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    return trace
+
+
+def selection_trace(values, descending=False):
+    arr = list(values)
+    n = len(arr)
+    candidate_label = "mínimo" if descending else "máximo"
+    trace = [make_event(arr, start_message("seleccion"), "")]
+
+    def should_replace(candidate, current):
+        return current < candidate if descending else current > candidate
+
+    for i in range(n - 1, 0, -1):
+        selected = 0
+        roles = ["sorted" if index > i else "default" for index in range(n)]
+        labels = [""] * n
+        mark(roles, labels, i, "boundary", "i")
+        mark(roles, labels, selected, "current", candidate_label)
+        trace.append(
+            make_event(
+                arr,
+                f"Comienza el recorrido para ubicar el {candidate_label} en la posición {i}.",
+                rf"i = {i},\quad j = 1,\quad \text{{{candidate_label}}} = {arr[selected]}",
+                roles,
+                labels,
+            )
+        )
+
+        for j in range(1, i + 1):
+            candidate_value = arr[selected]
+            current_value = arr[j]
+            roles = ["sorted" if index > i else "default" for index in range(n)]
+            labels = [""] * n
+            mark(roles, labels, i, "boundary", "i")
+            mark(roles, labels, selected, "current", candidate_label)
+            mark(roles, labels, j, "compare", "j")
+            trace.append(
+                make_event(
+                    arr,
+                    compare_values_message(candidate_value, current_value),
+                    rf"i = {i},\quad j = {j},\quad \text{{{candidate_label}}} = {candidate_value},\quad a_j = {current_value}",
+                    roles,
+                    labels,
+                )
+            )
+            if should_replace(candidate_value, current_value):
+                selected = j
+                roles = ["sorted" if index > i else "default" for index in range(n)]
+                labels = [""] * n
+                mark(roles, labels, i, "boundary", "i")
+                mark(roles, labels, selected, "current", candidate_label)
+                trace.append(
+                    make_event(
+                        arr,
+                        f"{current_value} es el nuevo {candidate_label}.",
+                        rf"i = {i},\quad j = {j},\quad \text{{{candidate_label}}} = {current_value}",
+                        roles,
+                        labels,
+                    )
+                )
+        if selected != i:
+            arr[i], arr[selected] = arr[selected], arr[i]
+            roles = ["sorted" if index > i else "default" for index in range(n)]
+            labels = [""] * n
+            mark(roles, labels, selected, "swap", candidate_label)
+            mark(roles, labels, i, "sorted", "ordenado")
+            trace.append(
+                make_event(
+                    arr,
+                    f"Intercambia el {candidate_label} con el elemento en la posición {i}.",
+                    rf"i = {i},\quad \text{{{candidate_label}}} = {arr[i]}",
+                    roles,
+                    labels,
+                )
+            )
+        else:
+            roles = ["sorted" if index > i else "default" for index in range(n)]
+            labels = [""] * n
+            mark(roles, labels, i, "sorted", "ordenado")
+            trace.append(make_event(arr, f"El {candidate_label} ya está en la posición {i}.", rf"i = {i},\quad \text{{{candidate_label}}} = {arr[i]}", roles, labels))
+    trace.append(make_event(arr, final_message("seleccion"), r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    return trace
+
+
+def insertion_trace(values, descending=False):
+    arr = list(values)
+    n = len(arr)
+    trace = [make_event(arr, start_message("insercion"), "")]
+
+    def base_roles(limit):
+        return ["current" if index < limit else "default" for index in range(n)]
+
+    for i in range(1, n):
+        j = i - 1
+        roles = base_roles(i)
+        trace.append(make_event(arr, f"Comienza el ordenamiento; inserta el elemento en la posición {i}.", rf"i = {i},\quad j = {j}", roles, [""] * n))
+
+        roles = base_roles(i)
+        labels = [""] * n
+        mark(roles, labels, i, "compare", "i")
+        trace.append(make_event(arr, f"Marca el elemento en la posición {i} para insertarlo.", rf"i = {i},\quad valor = {arr[i]}", roles, labels))
+
+        while j >= 0:
+            current_index = j + 1
+            current_value = arr[current_index]
+            previous_value = arr[j]
+            roles = base_roles(i)
+            labels = [""] * n
+            mark(roles, labels, j, "current", "j")
+            mark(roles, labels, current_index, "compare", "i")
+            trace.append(make_event(arr, compare_values_message(previous_value, current_value), rf"i = {i},\quad j = {j},\quad a_j = {previous_value},\quad a_i = {current_value}", roles, labels))
+
+            if ordered(previous_value, current_value, descending):
+                break
+
+            arr[j], arr[current_index] = arr[current_index], arr[j]
+            roles = base_roles(i)
+            labels = [""] * n
+            mark(roles, labels, j, "compare", "i")
+            mark(roles, labels, current_index, "current", "j + 1")
+            trace.append(make_event(arr, f"Mueve {current_value} hacia la posición {j}.", rf"i = {i},\quad j = {j},\quad a_j = {arr[j]}", roles, labels))
+            j -= 1
+
+        inserted_index = j + 1
+        roles = base_roles(i)
+        labels = [""] * n
+        mark(roles, labels, inserted_index, "sorted", "insertado")
+        trace.append(make_event(arr, f"El elemento quedó insertado; actualiza i a la posición {i + 1}.", rf"i = {i + 1},\quad insertado = {inserted_index}", roles, labels))
+    trace.append(make_event(arr, final_message("insercion"), r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    return trace
+
+
+def binary_insertion_trace(values, descending=False):
+    arr = list(values)
+    n = len(arr)
+    trace = [make_event(arr, start_message("insercion_binaria"), "")]
+
+    def base_roles(limit):
+        return ["current" if index < limit else "default" for index in range(n)]
+
+    for i in range(1, n):
+        value = arr[i]
+        a = 0
+        b = i
+        last_m = None
+        roles = base_roles(i)
+        labels = [""] * n
+        mark(roles, labels, i, "compare", "i")
+        trace.append(
+            make_event(
+                arr,
+                f"Busca con búsqueda binaria la posición de inserción de {value}.",
+                rf"i = {i},\quad x = {value},\quad a = {a},\quad b = {b}",
+                roles,
+                labels,
+            )
+        )
+
+        while a < b:
+            m = a + (b - a) // 2
+            last_m = m
+            roles = base_roles(i)
+            labels = [""] * n
+            mark(roles, labels, i, "compare", "i")
+            mark(roles, labels, a, "boundary", "a")
+            mark(roles, labels, min(b, i - 1), "boundary", "b")
+            mark(roles, labels, m, "boundary", "m")
+            trace.append(
+                make_event(
+                    arr,
+                    f"Compara {value} con {arr[m]} en la posición media.",
+                    rf"m = a + \left\lfloor \frac{{b-a}}{{2}} \right\rfloor = {m},\quad x = {value},\quad a_m = {arr[m]}",
+                    roles,
+                    labels,
+                )
+            )
+            goes_right = arr[m] >= value if descending else arr[m] <= value
+            if goes_right:
+                a = m + 1
+                interval = rf"a = m + 1 = {a},\quad b = {b}"
+            else:
+                b = m
+                interval = rf"a = {a},\quad b = m = {b}"
+            roles = base_roles(i)
+            labels = [""] * n
+            mark(roles, labels, i, "compare", "i")
+            if a < i:
+                mark(roles, labels, a, "boundary", "a")
+            if b > 0:
+                mark(roles, labels, min(b, i - 1), "boundary", "b")
+            if last_m is not None:
+                mark(roles, labels, last_m, "boundary", "m")
+            trace.append(make_event(arr, "Actualiza el rango de búsqueda.", interval, roles, labels))
+
+        insert_at = a
+        roles = base_roles(i)
+        labels = [""] * n
+        mark(roles, labels, insert_at, "sorted", "pos")
+        if last_m is not None:
+            mark(roles, labels, last_m, "boundary", "m")
+        mark(roles, labels, i, "compare", "i")
+        m_formula = rf"m = {last_m},\quad " if last_m is not None else ""
+        trace.append(make_event(arr, f"La posición de inserción es {insert_at}.", rf"{m_formula}pos = {insert_at},\quad x = {value}", roles, labels))
+
+        j = i
+        while j > insert_at:
+            arr[j] = arr[j - 1]
+            roles = base_roles(i)
+            labels = [""] * n
+            mark(roles, labels, j - 1, "current", "j - 1")
+            mark(roles, labels, j, "compare", "j")
+            if last_m is not None:
+                mark(roles, labels, last_m, "boundary", "m")
+            trace.append(make_event(arr, f"Desplaza {arr[j]} una posición a la derecha.", rf"j = {j},\quad a_j = a_{{j-1}}", roles, labels))
+            j -= 1
+
+        arr[insert_at] = value
+        roles = base_roles(i + 1)
+        labels = [""] * n
+        mark(roles, labels, insert_at, "sorted", "insertado")
+        if last_m is not None:
+            mark(roles, labels, last_m, "boundary", "m")
+        trace.append(make_event(arr, f"Inserta {value} en la posición {insert_at}.", rf"i = {i},\quad insertado = {insert_at}", roles, labels))
+
+    trace.append(make_event(arr, final_message("insercion_binaria"), r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    return trace
+
+
+def shell_gaps(n, sequence="shell"):
+    if n <= 1:
+        return [1]
+
+    if sequence == "hibbard":
+        gaps = []
+        value = 1
+        while value < n:
+            gaps.append(value)
+            value = 2 * value + 1
+        return sorted(set(gaps), reverse=True)
+
+    if sequence == "sedgewick":
+        gaps = [1]
+        k = 1
+        while True:
+            even_gap = 9 * (4 ** k) - 9 * (2 ** k) + 1
+            odd_gap = (4 ** (k + 1)) - 3 * (2 ** (k + 1)) + 1
+            added = False
+            for gap in (even_gap, odd_gap):
+                if 0 < gap < n:
+                    gaps.append(gap)
+                    added = True
+            if min(even_gap, odd_gap) >= n and not added:
+                break
+            k += 1
+        return sorted(set(gaps), reverse=True)
+
+    if sequence == "pratt":
+        gaps = set()
+        value_2 = 1
+        while value_2 < n:
+            value = value_2
+            while value < n:
+                gaps.add(value)
+                value *= 3
+            value_2 *= 2
+        return sorted(gaps, reverse=True)
+
+    gaps = []
+    gap = n // 2
+    while gap > 0:
+        gaps.append(gap)
+        gap //= 2
+    return gaps or [1]
+
+
+def shell_gap_formula_terms(n, sequence, gap, order):
+    if sequence == "hibbard":
+        k = max(1, (gap + 1).bit_length() - 1)
+        return (
+            rf"h = 2^k - 1 = 2^{k} - 1 = {gap}",
+            rf"k = {k}",
+        )
+
+    if sequence == "sedgewick":
+        for k in range(1, max(2, n + 2)):
+            even_gap = 9 * (4 ** k) - 9 * (2 ** k) + 1
+            if even_gap == gap:
+                return (
+                    rf"h = 9\cdot4^k - 9\cdot2^k + 1 = 9\cdot4^{k} - 9\cdot2^{k} + 1 = {gap}",
+                    rf"k = {k}",
+                )
+            odd_gap = (4 ** (k + 1)) - 3 * (2 ** (k + 1)) + 1
+            if odd_gap == gap:
+                return (
+                    rf"h = 4^{{k+1}} - 3\cdot2^{{k+1}} + 1 = 4^{{{k + 1}}} - 3\cdot2^{{{k + 1}}} + 1 = {gap}",
+                    rf"k = {k}",
+                )
+        return rf"h = Sedgewick(k) = {gap}", r"k \geq 1"
+
+    if sequence == "pratt":
+        power_two = 1
+        p = 0
+        while power_two <= gap:
+            power_three = 1
+            q = 0
+            while power_two * power_three <= gap:
+                if power_two * power_three == gap:
+                    return (
+                        rf"h = 2^p3^q = 2^{p}3^{q} = {gap}",
+                        rf"p = {p},\quad q = {q}",
+                    )
+                power_three *= 3
+                q += 1
+            power_two *= 2
+            p += 1
+        return rf"h = 2^p3^q = {gap}", r"p,q \geq 0"
+
+    k = order + 1
+    return (
+        rf"h = \left\lfloor \frac{{n}}{{2^k}} \right\rfloor = \left\lfloor \frac{{{n}}}{{2^{k}}} \right\rfloor = {gap}",
+        rf"n = {n},\quad k = {k}",
+    )
+
+
+def shell_gap_formula(n, sequence, gap, order):
+    formula, _terms = shell_gap_formula_terms(n, sequence, gap, order)
+    return formula
+
+
+def shell_formula(first_line, *lines):
+    body = r"\\[8pt] ".join((first_line, *[line for line in lines if line]))
+    return rf"\begin{{array}}{{l}} {body} \end{{array}}"
+
+
+def shell_initial_formula(n, sequence="shell"):
+    gaps = shell_gaps(n, sequence)
+    first_gap = gaps[0] if gaps else 1
+    first_line, terms = shell_gap_formula_terms(n, sequence, first_gap, 0)
+    gap_values = ", ".join(str(gap) for gap in gaps)
+    return shell_formula(first_line, terms, rf"\text{{valores de }} h = [{gap_values}]")
+
+
+def shell_trace(values, descending=False, gap_sequence="shell"):
+    arr = list(values)
+    n = len(arr)
+    gaps = shell_gaps(n, gap_sequence)
+    trace = [
+        make_event(
+            arr,
+            start_message("shell"),
+            "",
+            gap_sequence=gap_sequence,
+            gap_values=list(gaps),
+        )
+    ]
+
+    def gap_label():
+        return ", ".join(str(gap) for gap in gaps)
+
+    for order, gap in enumerate(gaps):
+        gap_line, gap_terms = shell_gap_formula_terms(n, gap_sequence, gap, order)
+        roles = ["default"] * n
+        labels = [""] * n
+        for index in range(0, n, gap):
+            mark(roles, labels, index, "boundary", "h")
+        trace.append(
+            make_event(
+                arr,
+                f"Inicia la pasada con h = {gap}.",
+                shell_formula(gap_line, gap_terms, rf"\text{{valores de }} h = [{gap_label()}]"),
+                roles,
+                labels,
+                gap_sequence=gap_sequence,
+                gap_values=list(gaps),
+            )
+        )
+
+        for j in range(gap, n):
+            while j >= gap:
+                roles = ["default"] * n
+                labels = [""] * n
+                mark(roles, labels, j, "current", "j")
+                mark(roles, labels, j - gap, "compare", "j - h")
+                trace.append(
+                    make_event(
+                        arr,
+                        f"Compara la posición {j} con la posición {j - gap} usando h = {gap}.",
+                        shell_formula(
+                            gap_line,
+                            gap_terms,
+                            rf"j = {j}",
+                            rf"a_j = {arr[j]},\quad a_{{j-h}} = {arr[j - gap]}",
+                        ),
+                        roles,
+                        labels,
+                        gap_sequence=gap_sequence,
+                        gap_values=list(gaps),
+                    )
+                )
+
+                if ordered(arr[j - gap], arr[j], descending):
+                    break
+
+                arr[j - gap], arr[j] = arr[j], arr[j - gap]
+                roles = ["default"] * n
+                labels = [""] * n
+                mark(roles, labels, j - gap, "compare", "j - h")
+                mark(roles, labels, j, "current", "j")
+                trace.append(
+                    make_event(
+                        arr,
+                        f"Intercambia las posiciones {j - gap} y {j}.",
+                        shell_formula(gap_line, gap_terms, rf"j = {j}", rf"a_{{j-h}} \leftrightarrow a_j"),
+                        roles,
+                        labels,
+                        gap_sequence=gap_sequence,
+                        gap_values=list(gaps),
+                    )
+                )
+                j -= gap
+
+            roles = ["default"] * n
+            labels = [""] * n
+            mark(roles, labels, j, "sorted", "insertado")
+            trace.append(
+                make_event(
+                    arr,
+                    f"El elemento queda ubicado dentro de su subarreglo definido por h = {gap}.",
+                    shell_formula(gap_line, gap_terms, rf"j = {j}"),
+                    roles,
+                    labels,
+                    gap_sequence=gap_sequence,
+                    gap_values=list(gaps),
+                )
+            )
+
+    trace.append(
+        make_event(
+            arr,
+            final_message("shell"),
+            r"\text{arreglo ordenado}",
+            ["sorted"] * n,
+            [""] * n,
+            True,
+            gap_sequence=gap_sequence,
+            gap_values=list(gaps),
+        )
+    )
+    return trace
+
+
+def merge_trace(values, descending=False):
+    initial = list(values)
+    n = len(initial)
+
+    def node(start, values, depth=0, parent=None):
+        item = {
+            "start": start,
+            "end": start + len(values) - 1,
+            "depth": depth,
+            "values": list(values),
+            "roles": ["default"] * len(values),
+            "visible": False,
+            "sorted": False,
+            "parent": parent,
+            "left": None,
+            "right": None,
+        }
+        if len(values) > 1:
+            mid = len(values) // 2
+            item["left"] = node(start, values[:mid], depth + 1, item)
+            item["right"] = node(start + mid, values[mid:], depth + 1, item)
+        return item
+
+    root = node(0, initial)
+    root["visible"] = True
+    all_tree_nodes = tree_nodes(root)
+    max_tree_depth = max(item["depth"] for item in all_tree_nodes)
+    flat_values = list(initial)
+    flat_roles = ["default"] * n
+
+    def snapshot(focus=None, complete=False):
+        active = active_tree_ids(root, focus=focus, visible_nodes=all_tree_nodes, complete=complete)
+        nodes = []
+        for item in all_tree_nodes:
+            if not item["visible"]:
+                continue
+            roles = list(item["roles"]) if id(item) in active else ["excluded"] * len(item["values"])
+            nodes.append(
+                {
+                    "start": item["start"],
+                    "end": item["end"],
+                    "depth": item["depth"],
+                    "values": list(item["values"]),
+                    "roles": roles,
+                    "active": id(item) in active,
+                }
+            )
+        return nodes
+
+    def tree_meta(focus=None, complete=False):
+        return {
+            "merge_tree_nodes": snapshot(focus=focus, complete=complete),
+            "merge_tree_max_depth": max_tree_depth,
+        }
+
+    trace = [
+        make_event(
+            flat_values,
+            start_message("mezcla"),
+            "",
+            flat_roles,
+            [""] * n,
+            **tree_meta(),
+        )
+    ]
+
+    def set_flat_focus(start=None, end=None):
+        for index in range(n):
+            if start is None or start <= index <= end:
+                flat_roles[index] = "default"
+            else:
+                flat_roles[index] = "excluded"
+
+    def clear_roles():
+        for item in all_tree_nodes:
+            item["roles"] = ["default"] * len(item["values"])
+
+    def actions_for(item):
+        if len(item["values"]) == 1:
+            return [("leaf", item)]
+        return [("divide", item)] + actions_for(item["left"]) + actions_for(item["right"]) + [("merge", item)]
+
+    actions = actions_for(root)
+    trace.append(
+        make_event(
+            flat_values,
+            "Comienza el ordenamiento.",
+            r"fase = \text{inicio}",
+            flat_roles,
+            [""] * n,
+            **tree_meta(focus=root),
+        )
+    )
+
+    def append_event(message, formula, focus=None, complete=False):
+        trace.append(make_event(flat_values, message, formula, flat_roles, [""] * n, complete, **tree_meta(focus=focus, complete=complete)))
+
+    while actions:
+        action, current = actions.pop(0)
+        clear_roles()
+
+        if action == "divide":
+            current["visible"] = True
+            current["roles"] = ["current"] * len(current["values"])
+            if current["left"] is not None:
+                current["left"]["visible"] = True
+                current["left"]["roles"] = ["default"] * len(current["left"]["values"])
+            if current["right"] is not None:
+                current["right"]["visible"] = True
+                current["right"]["roles"] = ["default"] * len(current["right"]["values"])
+            set_flat_focus(current["start"], current["end"])
+            for index in range(current["start"], current["end"] + 1):
+                flat_roles[index] = "current"
+            append_event(f"Divide el subarreglo {current['values']}.", rf"inicio = {current['start']},\quad fin = {current['end']}", focus=current)
+            continue
+
+        if action == "leaf":
+            current["visible"] = True
+            current["sorted"] = True
+            current["roles"] = ["sorted"]
+            set_flat_focus(current["start"], current["end"])
+            flat_roles[current["start"]] = "sorted"
+            append_event(f"El subarreglo [{current['values'][0]}] ya está ordenado.", rf"caso\ base = [{current['values'][0]}]", focus=current)
+            continue
+
+        left_values = list(current["left"]["values"])
+        right_values = list(current["right"]["values"])
+        buffer = [None] * len(current["values"])
+        i = j = k = 0
+        current["values"] = list(buffer)
+        current["roles"] = ["write"] * len(current["values"])
+        current["visible"] = True
+        current["sorted"] = False
+        set_flat_focus(current["start"], current["end"])
+        append_event(f"Mezcla {left_values} y {right_values}.", rf"i = 0,\quad j = 0,\quad k = 0", focus=current)
+
+        while True:
+            clear_roles()
+            current["roles"] = ["write"] * len(current["values"])
+            if k >= len(current["values"]):
+                current["values"] = list(buffer)
+                current["roles"] = ["sorted"] * len(current["values"])
+                current["sorted"] = True
+                if current["left"] is not None:
+                    current["left"]["visible"] = False
+                if current["right"] is not None:
+                    current["right"]["visible"] = False
+                for offset, value in enumerate(current["values"]):
+                    flat_values[current["start"] + offset] = value
+                    flat_roles[current["start"] + offset] = "sorted"
+                append_event("Termina de ordenar el subarreglo.", rf"inicio = {current['start']},\quad fin = {current['end']}", focus=current)
+                break
+
+            current["roles"][k] = "write"
+            if i < len(current["left"]["roles"]):
+                current["left"]["roles"] = ["default"] * len(current["left"]["values"])
+                current["left"]["roles"][i] = "current"
+            if j < len(current["right"]["roles"]):
+                current["right"]["roles"] = ["default"] * len(current["right"]["values"])
+                current["right"]["roles"][j] = "compare"
+
+            set_flat_focus(current["start"], current["end"])
+            write_index = current["start"] + k
+            flat_roles[write_index] = "write"
+            if i < len(left_values):
+                flat_roles[current["left"]["start"] + i] = "current"
+            if j < len(right_values):
+                flat_roles[current["right"]["start"] + j] = "compare"
+
+            left = left_values[i] if i < len(left_values) else None
+            right = right_values[j] if j < len(right_values) else None
+            if left is None:
+                message = f"Inserta el elemento restante {right}."
+            elif right is None:
+                message = f"Inserta el elemento restante {left}."
+            else:
+                selected = "mayor" if descending else "menor"
+                message = f"Compara {left} y {right}; inserta el {selected}."
+            append_event(message, rf"i = {i},\quad j = {j},\quad k = {k}", focus=current)
+
+            if right is None or (left is not None and ordered(left, right, descending)):
+                value = left
+                i += 1
+            else:
+                value = right
+                j += 1
+            buffer[k] = value
+            current["values"] = list(buffer)
+            flat_values[current["start"] + k] = value
+            k += 1
+
+    root["roles"] = ["sorted"] * len(root["values"])
+    root["sorted"] = True
+    flat_roles = ["sorted"] * n
+    append_event(final_message("mezcla"), r"\text{arreglo ordenado}", focus=root, complete=True)
+    return trace
+
+
+def median_index_by_value(values, indexes):
+    ordered_indexes = sorted(indexes, key=lambda index: (values[index], index))
+    return ordered_indexes[len(ordered_indexes) // 2]
+
+
+def median_of_medians_value(items):
+    if len(items) <= 5:
+        return sorted(items)[len(items) // 2]
+    medians = []
+    for start in range(0, len(items), 5):
+        group = sorted(items[start:start + 5])
+        medians.append(group[len(group) // 2])
+    return median_of_medians_value(medians)
+
+
+def pivot_formula(values, low, high, strategy, pivot_index):
+    if strategy == "middle":
+        return rf"p = \left\lfloor \frac{{a+b}}{{2}} \right\rfloor = \left\lfloor \frac{{{low}+{high}}}{{2}} \right\rfloor = {pivot_index}"
+    if strategy == "median_three":
+        middle = (low + high) // 2
+        return (
+            rf"c = \left\lfloor \frac{{a+b}}{{2}} \right\rfloor = {middle},\quad "
+            rf"p = \operatorname{{mediana}}(a_a,a_c,a_b) = "
+            rf"\operatorname{{mediana}}({values[low]},{values[middle]},{values[high]}) = {values[pivot_index]}"
+        )
+    if strategy == "median_medians":
+        group_medians = []
+        for start in range(low, high + 1, 5):
+            group = sorted(values[start:min(start + 5, high + 1)])
+            group_medians.append(group[len(group) // 2])
+        medians_text = ",".join(str(value) for value in group_medians)
+        return (
+            rf"M = \{{{medians_text}\}},\quad "
+            rf"p = \operatorname{{mediana}}(M) = {values[pivot_index]}"
+        )
+    if strategy == "start":
+        return rf"p = a = {low}"
+    if strategy == "random":
+        return rf"p \in [a,b],\quad p = {pivot_index}"
+    return rf"p = b = {high}"
+
+
+def pivot_selection(values, low, high, strategy):
+    if strategy == "start":
+        pivot_index = low
+    elif strategy == "middle":
+        pivot_index = (low + high) // 2
+    elif strategy == "random":
+        pivot_index = random.randint(low, high)
+    elif strategy == "median_three":
+        middle = (low + high) // 2
+        pivot_index = median_index_by_value(values, (low, middle, high))
+    elif strategy == "median_medians":
+        pivot_value = median_of_medians_value(values[low:high + 1])
+        pivot_index = next(index for index in range(low, high + 1) if values[index] == pivot_value)
+    else:
+        pivot_index = high
+    labels = {
+        "start": "inicio",
+        "middle": "medio",
+        "end": "fin",
+        "random": "aleatorio",
+        "median_three": "mediana de tres",
+        "median_medians": "mediana de medianas",
+    }
+    return pivot_index, labels.get(strategy, "fin"), pivot_formula(values, low, high, strategy, pivot_index)
+
+
+def choose_pivot(values, low, high, strategy):
+    return pivot_selection(values, low, high, strategy)[0]
+
+
+def choose_pivot_index(length, strategy):
+    if strategy == "start":
+        return 0
+    if strategy == "middle":
+        return (length - 1) // 2
+    if strategy == "random":
+        return random.randint(0, length - 1)
+    return length - 1
+
+
+def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
+    initial = list(values)
+    n = len(initial)
+
+    def node(start, values, depth=0, parent=None):
+        return {
+            "start": start,
+            "end": start + len(values) - 1,
+            "depth": depth,
+            "values": list(values),
+            "roles": ["default"] * len(values),
+            "parent": parent,
+            "left": None,
+            "right": None,
+            "is_sorted": False,
+        }
+
+    root = node(0, initial)
+    visible_nodes = [root]
+    pending_nodes = [root]
+    sorted_mask = [False] * n
+    current = None
+    selected_pivot_index = None
+    pivot_index = None
+    partition_index = None
+    scan_index = None
+    phase = "start"
+
+    def active_ids(complete=False):
+        if complete:
+            return active_tree_ids(root, visible_nodes=visible_nodes, complete=True)
+        if current is None:
+            return {id(root)}
+        return active_tree_ids(root, focus=current, visible_nodes=visible_nodes, complete=complete)
+
+    def reset_roles(item, role="default"):
+        item["roles"] = [role] * len(item["values"])
+
+    def mark_sorted(item):
+        item["roles"] = ["sorted"] * len(item["values"])
+        item["is_sorted"] = True
+
+    def sync_with_parent(item):
+        parent = item["parent"]
+        if parent is None:
+            return
+        offset = item["start"] - parent["start"]
+        for index, value in enumerate(item["values"]):
+            parent["values"][offset + index] = value
+        sync_with_parent(parent)
+
+    def before_pivot(value, pivot_value):
+        return value >= pivot_value if descending else value <= pivot_value
+
+    def append_label(groups, index, text):
+        if index is not None and 0 <= index < len(groups):
+            groups[index].append(text)
+
+    def labels_for_node(item):
+        labels = [[] for _ in item["values"]]
+        if item is not current:
+            return labels
+        append_label(labels, partition_index, "i")
+        append_label(labels, scan_index, "j")
+        pivot_local = pivot_index if pivot_index is not None else selected_pivot_index
+        append_label(labels, pivot_local, "p")
+        ordered_labels = ["p", "i", "j"]
+        return [[label for label in ordered_labels if label in group] for group in labels]
+
+    def flat_roles_and_labels():
+        roles = ["default"] * n
+        label_groups = [[] for _ in range(n)]
+        if current is not None:
+            roles = ["excluded"] * n
+            for index in range(current["start"], current["end"] + 1):
+                roles[index] = "default"
+            if partition_index is not None:
+                append_label(label_groups, current["start"] + partition_index, "i")
+            if scan_index is not None and scan_index < len(current["values"]):
+                append_label(label_groups, current["start"] + scan_index, "j")
+            pivot_local = pivot_index if pivot_index is not None else selected_pivot_index
+            if pivot_local is not None:
+                append_label(label_groups, current["start"] + pivot_local, "p")
+            for local_index, role in enumerate(current["roles"]):
+                roles[current["start"] + local_index] = role
+        for index, is_sorted in enumerate(sorted_mask):
+            if is_sorted:
+                roles[index] = "sorted"
+        ordered_labels = ["p", "i", "j"]
+        labels = ["\n".join(label for label in ordered_labels if label in group) for group in label_groups]
+        return roles, labels
+
+    def snapshot(complete=False):
+        active = active_ids(complete=complete)
+        nodes = []
+        for item in visible_nodes:
+            roles = list(item["roles"])
+            labels = labels_for_node(item)
+            if id(item) not in active and not complete:
+                roles = ["excluded"] * len(item["values"])
+                labels = [[] for _ in item["values"]]
+            roles = gray_unsorted_roles_when_complete(roles, complete)
+            nodes.append(
+                {
+                    "start": item["start"],
+                    "end": item["end"],
+                    "depth": item["depth"],
+                    "values": list(item["values"]),
+                    "roles": roles,
+                    "labels": labels,
+                    "active": id(item) in active,
+                }
+            )
+        return nodes
+
+    def append_event(message, formula, complete=False):
+        roles, labels = flat_roles_and_labels()
+        trace.append(
+            make_event(
+                root["values"],
+                message,
+                formula,
+                roles,
+                labels,
+                complete,
+                quick_tree_nodes=snapshot(complete=complete),
+                quick_tree_max_depth=max(1, n - 1),
+            )
+        )
+
+    trace = []
+    append_event(start_message("rapido"), "")
+
+    phase = "select_node"
+    append_event("Comienza el ordenamiento.", r"fase = \text{inicio}")
+
+    while True:
+        if phase == "select_node":
+            if not pending_nodes:
+                current = None
+                selected_pivot_index = None
+                pivot_index = None
+                partition_index = None
+                scan_index = None
+                sorted_mask = [True] * n
+                mark_sorted(root)
+                append_event(final_message("rapido"), r"\text{arreglo ordenado}", complete=True)
+                break
+            current = pending_nodes.pop()
+            selected_pivot_index = None
+            pivot_index = None
+            partition_index = None
+            scan_index = None
+            reset_roles(current)
+            if len(current["values"]) <= 1:
+                mark_sorted(current)
+                sorted_mask[current["start"]] = True
+                append_event(f"El subarreglo {current['values']} ya está ordenado.", rf"caso\ base = {current['values']}")
+                current = None
+                phase = "select_node"
+                continue
+            append_event(f"Trabaja sobre el subarreglo {current['values']}.", rf"inicio = {current['start']},\quad fin = {current['end']}")
+            phase = "prepare_partition"
+            continue
+
+        if phase == "prepare_partition":
+            selected_pivot_index, pivot_label, pivot_formula_text = pivot_selection(
+                current["values"],
+                0,
+                len(current["values"]) - 1,
+                pivot_strategy,
+            )
+            reset_roles(current)
+            current["roles"][selected_pivot_index] = "pivot"
+            pivot_value = current["values"][selected_pivot_index]
+            append_event(
+                f"Selecciona el pivote {pivot_value} tomado de {pivot_label}.",
+                rf"{pivot_formula_text},\quad pivote = {pivot_value}",
+            )
+            phase = "move_pivot"
+            continue
+
+        if phase == "move_pivot":
+            selected_index = selected_pivot_index
+            last_index = len(current["values"]) - 1
+            selected_value = current["values"][selected_index]
+            reset_roles(current)
+            if selected_index != last_index:
+                end_value = current["values"][last_index]
+                current["values"][selected_index], current["values"][last_index] = end_value, selected_value
+                sync_with_parent(current)
+                current["roles"][selected_index] = "compare"
+                current["roles"][last_index] = "pivot"
+                message = f"Mueve el pivote {selected_value} al final del subarreglo para particionar."
+            else:
+                current["roles"][last_index] = "pivot"
+                message = "El pivote ya está al final del subarreglo."
+            pivot_index = last_index
+            partition_index = 0
+            scan_index = 0
+            append_event(message, rf"pivote = {selected_value},\quad i = 0,\quad j = 0")
+            phase = "compare"
+            continue
+
+        pivot_value = current["values"][pivot_index]
+
+        if phase == "compare":
+            reset_roles(current)
+            current["roles"][pivot_index] = "pivot"
+            if scan_index >= pivot_index:
+                current["roles"][partition_index] = "current"
+                append_event(f"Coloca el pivote {pivot_value} en su posición final.", rf"i = {partition_index},\quad pivote = {pivot_value}")
+                phase = "place_pivot"
+                continue
+            current["roles"][partition_index] = "current"
+            current["roles"][scan_index] = "compare"
+            scan_value = current["values"][scan_index]
+            append_event(f"Compara {scan_value} con el pivote {pivot_value}.", rf"i = {partition_index},\quad j = {scan_index},\quad pivote = {pivot_value}")
+            phase = "apply_compare"
+            continue
+
+        if phase == "apply_compare":
+            scan_value = current["values"][scan_index]
+            reset_roles(current)
+            current["roles"][pivot_index] = "pivot"
+            if before_pivot(scan_value, pivot_value):
+                if scan_index != partition_index:
+                    partition_value = current["values"][partition_index]
+                    current["values"][scan_index], current["values"][partition_index] = current["values"][partition_index], current["values"][scan_index]
+                    sync_with_parent(current)
+                    message = f"Intercambia {scan_value} con {partition_value}."
+                else:
+                    message = f"{scan_value} permanece antes del pivote."
+                current["roles"][partition_index] = "current"
+                current["roles"][scan_index] = "compare"
+                partition_index += 1
+            else:
+                current["roles"][scan_index] = "compare"
+                if partition_index < len(current["roles"]):
+                    current["roles"][partition_index] = "current"
+                message = f"{scan_value} permanece después del pivote."
+            scan_index += 1
+            append_event(message, rf"i = {partition_index},\quad j = {scan_index}")
+            phase = "compare"
+            continue
+
+        if partition_index != pivot_index:
+            current["values"][partition_index], current["values"][pivot_index] = current["values"][pivot_index], current["values"][partition_index]
+            sync_with_parent(current)
+        reset_roles(current)
+        current["roles"][partition_index] = "sorted"
+        global_pivot_index = current["start"] + partition_index
+        sorted_mask[global_pivot_index] = True
+        pivot_value = current["values"][partition_index]
+        append_event(f"El pivote {pivot_value} queda ordenado.", rf"p = {global_pivot_index},\quad pivote = {pivot_value}")
+
+        left_values = current["values"][:partition_index]
+        right_values = current["values"][partition_index + 1:]
+        current["left"] = None
+        current["right"] = None
+        children = []
+        if left_values:
+            current["left"] = node(current["start"], left_values, current["depth"] + 1, current)
+            children.append(current["left"])
+        if right_values:
+            current["right"] = node(current["start"] + partition_index + 1, right_values, current["depth"] + 1, current)
+            children.append(current["right"])
+        visible_nodes.extend(children)
+        for child in reversed(children):
+            pending_nodes.append(child)
+        current = None
+        selected_pivot_index = None
+        pivot_index = None
+        partition_index = None
+        scan_index = None
+        phase = "select_node"
+
+    return trace
+
+
+def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
+    arr = list(values)
+    n = len(arr)
+
+    def node(start, end, depth=0, parent=None):
+        return {
+            "start": start,
+            "end": end,
+            "depth": depth,
+            "values": list(arr[start:end + 1]),
+            "roles": ["default"] * (end - start + 1),
+            "parent": parent,
+            "left": None,
+            "right": None,
+        }
+
+    root = node(0, n - 1)
+    visible_nodes = [root]
+    sorted_mask = [False] * n
+    current = root
+    trace = []
+
+    def refresh_nodes():
+        for item in visible_nodes:
+            item["values"] = list(arr[item["start"]:item["end"] + 1])
+
+    def label_groups_for_node(item, global_labels, focus):
+        if global_labels is None or item is not focus:
+            return [[] for _ in item["values"]]
+        groups = []
+        for label in global_labels[item["start"]:item["end"] + 1]:
+            groups.append([part.strip() for part in label.replace(",", "\n").splitlines() if part.strip()])
+        return groups
+
+    def snapshot(focus=None, complete=False, global_labels=None):
+        refresh_nodes()
+        active = active_tree_ids(root, focus=focus, visible_nodes=visible_nodes, complete=complete)
+        nodes = []
+        for item in visible_nodes:
+            roles = list(item["roles"])
+            if id(item) not in active and not complete:
+                roles = ["excluded"] * len(item["values"])
+            roles = gray_unsorted_roles_when_complete(roles, complete)
+            nodes.append({
+                "start": item["start"],
+                "end": item["end"],
+                "depth": item["depth"],
+                "values": list(item["values"]),
+                "roles": roles,
+                "labels": label_groups_for_node(item, global_labels, focus),
+                "active": id(item) in active,
+            })
+        return nodes
+
+    def append_event(message, formula, focus=None, roles=None, labels=None, complete=False):
+        refresh_nodes()
+        event_roles = list(roles or ["sorted" if value else "default" for value in sorted_mask])
+        for index, is_sorted in enumerate(sorted_mask):
+            if is_sorted:
+                event_roles[index] = "sorted"
+        event_labels = labels or [""] * n
+        trace.append(make_event(
+            arr,
+            message,
+            formula,
+            event_roles,
+            event_labels,
+            complete,
+            quick_tree_nodes=snapshot(focus=focus, complete=complete, global_labels=event_labels),
+            quick_tree_max_depth=max(1, n - 1),
+        ))
+
+    append_event(start_message("rapido"), "", root)
+    append_event("Comienza el ordenamiento con el esquema de Hoare.", r"\text{esquema} = \text{Hoare}", root)
+    pending = [root]
+
+    def build_partition_roles(low, high, pivot_global, i=None, j=None, pivot_role="pivot"):
+        roles = ["excluded"] * n
+        labels = [""] * n
+        for index in range(low, high + 1):
+            roles[index] = "default"
+        if i is not None and low <= i <= high and i != pivot_global:
+            roles[i] = "current"
+            labels[i] = "i"
+        if j is not None and low <= j <= high and j != pivot_global:
+            roles[j] = "compare"
+            labels[j] = "j"
+        roles[pivot_global] = pivot_role
+        labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "p")))
+        return roles, labels
+
+    def build_cross_roles(low, high, pivot_global, i, j):
+        roles, labels = build_partition_roles(low, high, pivot_global)
+        markers = (
+            (max(low, min(high, i)), "current", "i"),
+            (max(low, min(high, j)), "compare", "j"),
+        )
+        for index, role, label in markers:
+            if index != pivot_global:
+                roles[index] = role
+            parts = [part.strip() for part in labels[index].split(",") if part.strip()]
+            if label not in parts:
+                parts.append(label)
+            labels[index] = ", ".join(parts)
+        return roles, labels
+
+    def left_side(value, pivot_value):
+        return value >= pivot_value if descending else value <= pivot_value
+
+    def right_side(value, pivot_value):
+        return value <= pivot_value if descending else value >= pivot_value
+
+    while pending:
+        current = pending.pop()
+        low, high = current["start"], current["end"]
+        current["roles"] = ["default"] * len(current["values"])
+        if low >= high:
+            sorted_mask[low] = True
+            current["roles"] = ["sorted"]
+            append_event(f"El subarreglo [{arr[low]}] ya está ordenado.", rf"caso\ base = [{arr[low]}]", current)
+            continue
+
+        pivot_global, pivot_label, pivot_formula_text = pivot_selection(arr, low, high, pivot_strategy)
+        pivot_value = arr[pivot_global]
+        roles, labels = build_partition_roles(low, high, pivot_global)
+        labels[low] = "a"
+        labels[high] = "b"
+        if pivot_global in (low, high):
+            edge_label = "a" if pivot_global == low else "b"
+            labels[pivot_global] = f"{edge_label}\np"
+        current["roles"] = list(roles[low:high + 1])
+        append_event(
+            f"Selecciona el pivote {pivot_value} tomado de {pivot_label}.",
+            rf"a = {low},\quad b = {high},\quad {pivot_formula_text},\quad pivote = {pivot_value}",
+            current,
+            roles,
+            labels,
+        )
+
+        i, j = low, high
+        while True:
+            while i <= high:
+                if i == pivot_global:
+                    i += 1
+                    continue
+                roles, labels = build_partition_roles(low, high, pivot_global, i=i, j=j)
+                current["roles"] = list(roles[low:high + 1])
+                append_event(
+                    f"Avanza i y compara {arr[i]} con el pivote {pivot_value}.",
+                    rf"i = {i},\quad a_i = {arr[i]},\quad pivote = {pivot_value}",
+                    current,
+                    roles,
+                    labels,
+                )
+                if not left_side(arr[i], pivot_value):
+                    break
+                i += 1
+
+            while j >= low:
+                if j == pivot_global:
+                    j -= 1
+                    continue
+                roles, labels = build_partition_roles(low, high, pivot_global, i=i, j=j)
+                current["roles"] = list(roles[low:high + 1])
+                append_event(
+                    f"Retrocede j y compara {arr[j]} con el pivote {pivot_value}.",
+                    rf"i = {i},\quad j = {j},\quad a_j = {arr[j]},\quad pivote = {pivot_value}",
+                    current,
+                    roles,
+                    labels,
+                )
+                if not right_side(arr[j], pivot_value):
+                    break
+                j -= 1
+
+            if i >= j:
+                pivot_final = i - 1 if pivot_global < i else i
+                pivot_final = max(low, min(high, pivot_final))
+                roles, labels = build_cross_roles(low, high, pivot_global, i, j)
+                append_event(
+                    f"Los índices se cruzan; el pivote se ubica en la posición {pivot_final}.",
+                    rf"i = {i},\quad j = {j},\quad p = {pivot_final}",
+                    current,
+                    roles,
+                    labels,
+                )
+                if pivot_global != pivot_final:
+                    arr[pivot_global], arr[pivot_final] = arr[pivot_final], arr[pivot_global]
+                roles, labels = build_partition_roles(low, high, pivot_final, pivot_role="sorted")
+                labels[pivot_final] = "\n".join(filter(None, (labels[pivot_final], "p")))
+                current["roles"] = list(roles[low:high + 1])
+                sorted_mask[pivot_final] = True
+                append_event(
+                    f"El pivote {pivot_value} queda ordenado en la posición {pivot_final}.",
+                    rf"p = {pivot_final},\quad pivote = {pivot_value}",
+                    current,
+                    roles,
+                    labels,
+                )
+                break
+
+            arr[i], arr[j] = arr[j], arr[i]
+            roles, labels = build_partition_roles(low, high, pivot_global, i=i, j=j)
+            roles[i] = "current"
+            roles[j] = "compare"
+            current["roles"] = list(roles[low:high + 1])
+            append_event(
+                swap_positions_message(i, j),
+                rf"i = {i},\quad j = {j},\quad a_i \leftrightarrow a_j",
+                current,
+                roles,
+                labels,
+            )
+            i += 1
+            j -= 1
+
+        children = []
+        if low < pivot_final:
+            left = node(low, pivot_final - 1, current["depth"] + 1, current)
+            current["left"] = left
+            children.append(left)
+        if pivot_final < high:
+            right = node(pivot_final + 1, high, current["depth"] + 1, current)
+            current["right"] = right
+            children.append(right)
+        visible_nodes.extend(children)
+        pending.extend(reversed(children))
+
+    sorted_mask = [True] * n
+    root["roles"] = ["sorted"] * n
+    append_event(final_message("rapido_hoare"), r"\text{arreglo ordenado}", root, complete=True)
+    return trace
+
+
+def quick_trace(values, descending=False, pivot_strategy="middle", partition_scheme="hoare"):
+    if partition_scheme == "lomuto":
+        return _lomuto_quick_trace(values, descending=descending, pivot_strategy=pivot_strategy)
+    return _hoare_quick_trace(values, descending=descending, pivot_strategy=pivot_strategy)
+
+
+def radix_trace(values, descending=False, radix_data_type="numero", radix_number_mode="positive", radix_base=10):
+    arr = list(values)
+    n = len(arr)
+    radix_base = int(radix_base)
+
+    def bucket_event(
+        message,
+        formula,
+        roles=None,
+        labels=None,
+        complete=False,
+        buckets=None,
+        active_bucket=None,
+        active_value=None,
+        phase=None,
+    ):
+        extra = {}
+        if buckets is not None:
+            extra["radix_buckets"] = [list(bucket) for bucket in buckets]
+            extra["radix_active_bucket"] = active_bucket
+            extra["radix_active_value"] = active_value
+            extra["radix_phase"] = phase
+            extra["radix_base"] = radix_base
+        return make_event(arr, message, formula, roles, labels, complete, **extra)
+
+    trace = [
+        bucket_event(
+            start_message("radix"),
+            "",
+            buckets=[[] for _ in range(radix_base)],
+            phase="initial",
+        )
+    ]
+    if n == 0:
+        trace.append(
+            bucket_event(
+                final_message("radix"),
+                r"\text{arreglo ordenado}",
+                complete=True,
+                buckets=[[] for _ in range(radix_base)],
+                phase="complete",
+            )
+        )
+        return trace
+
+    def radix_formula(*lines):
+        return r"\begin{array}{l} " + r"\\[8pt] ".join(line for line in lines if line) + r" \end{array}"
+
+    keys, key_formula, key_label = radix_keys(arr, radix_data_type, radix_number_mode)
+    max_key = max(keys) if keys else 0
+    digit_count = max(1, digits_in_base(max_key, radix_base))
+    if radix_data_type == "numero" and radix_number_mode == "positive" and radix_base == 10 and all(isinstance(value, int) and value >= 0 for value in arr):
+        max_value = max(arr)
+        pass_count_formula = rf"p = \operatorname{{digitos}}(\max(a)) = \operatorname{{digitos}}({max_value}) = {digit_count}"
+    else:
+        pass_count_formula = rf"p = \operatorname{{digitos}}_{{{radix_base}}}(\max({key_label})) = \operatorname{{digitos}}_{{{radix_base}}}({max_key}) = {digit_count}"
+    exp = 1
+    roles = ["default"] * n
+    labels = [""] * n
+    mark(roles, labels, keys.index(max_key), "boundary", "max")
+
+    trace.append(
+        bucket_event(
+            f"Calcula la cantidad de pasadas a partir de la clave máxima {max_key}.",
+            radix_formula(key_formula, pass_count_formula),
+            roles,
+            labels,
+            buckets=[[] for _ in range(radix_base)],
+            phase="initial",
+        )
+    )
+
+    for digit_index in range(digit_count):
+        buckets = [[] for _ in range(radix_base)]
+        key_buckets = [[] for _ in range(radix_base)]
+        digit_name = f"{radix_base}^{digit_index}"
+        pass_number = digit_index + 1
+        for index, (value, key) in enumerate(zip(arr, keys)):
+            digit = (key // exp) % radix_base
+            buckets[digit].append(value)
+            key_buckets[digit].append(key)
+            roles = ["default"] * n
+            labels = [""] * n
+            mark(roles, labels, index, "compare", "d")
+            dividend = value if key == value else key
+            trace.append(
+                bucket_event(
+                    radix_bucket_message(digit, value),
+                    radix_formula(
+                        key_formula,
+                        pass_count_formula,
+                        rf"i = {pass_number}",
+                        rf"d = \left\lfloor \frac{{{format_formula_value(dividend)}}}{{{digit_name}}} \right\rfloor \bmod {radix_base} = {format_bucket_digit(digit)}",
+                    ),
+                    roles,
+                    labels,
+                    buckets=buckets,
+                    active_bucket=digit,
+                    active_value=value,
+                    phase="distribution",
+                )
+            )
+
+        bucket_order = range(radix_base - 1, -1, -1) if descending else range(radix_base)
+        writable_buckets = [list(bucket) for bucket in buckets]
+        writable_key_buckets = [list(bucket) for bucket in key_buckets]
+
+        write_index = 0
+        for bucket in bucket_order:
+            while writable_buckets[bucket]:
+                value = writable_buckets[bucket].pop(0)
+                key = writable_key_buckets[bucket].pop(0)
+                arr[write_index] = value
+                keys[write_index] = key
+                roles = ["default"] * n
+                labels = [""] * n
+                mark(roles, labels, write_index, "write", "k")
+                trace.append(
+                    bucket_event(
+                        f"Escribe {value} en la posición {write_index} según el dígito {digit_index}.",
+                        radix_formula(
+                            key_formula,
+                            pass_count_formula,
+                            rf"i = {pass_number}",
+                            rf"k = {write_index},\quad a_k = {format_formula_value(value)}",
+                        ),
+                        roles,
+                        labels,
+                        buckets=writable_buckets,
+                        active_bucket=bucket,
+                        active_value=value,
+                        phase="write",
+                    )
+                )
+                write_index += 1
+
+        exp *= radix_base
+        trace.append(
+            bucket_event(
+                f"Finaliza la pasada del dígito {digit_index}.",
+                radix_formula(
+                    key_formula,
+                    pass_count_formula,
+                    rf"i = {pass_number}",
+                    rf"{radix_base}^{digit_index}\ \text{{procesado}}",
+                ),
+                ["sorted"] * n if digit_index == digit_count - 1 else ["default"] * n,
+                [""] * n,
+                buckets=[[] for _ in range(radix_base)],
+                phase="complete",
+            )
+        )
+
+    trace.append(
+        bucket_event(
+            final_message("radix"),
+            r"\text{arreglo ordenado}",
+            ["sorted"] * n,
+            [""] * n,
+            True,
+            buckets=[[] for _ in range(radix_base)],
+            phase="complete",
+        )
+    )
+    return trace
+
+
+def digits_in_base(value, base):
+    value = abs(int(value))
+    digits = 1
+    while value >= base:
+        value //= base
+        digits += 1
+    return digits
+
+
+def format_bucket_digit(digit):
+    return str(digit) if digit < 10 else chr(ord("A") + digit - 10)
+
+
+def format_formula_value(value):
+    if isinstance(value, float):
+        return f"{value:.2f}".rstrip("0").rstrip(".")
+    text = str(value)
+    return rf"\text{{{text}}}" if not isinstance(value, (int, float)) else text
+
+
+def radix_keys(values, data_type="numero", number_mode="positive"):
+    if data_type == "caracter":
+        keys = [ord(str(value)[0]) for value in values]
+        return keys, r"k = \operatorname{codigo}(a)", "k"
+    if data_type == "cadena":
+        strings = [str(value) for value in values]
+        width = max(len(value) for value in strings)
+        keys = []
+        for value in strings:
+            key = 0
+            for char in value.ljust(width, "\0"):
+                key = key * 257 + ord(char)
+            keys.append(key)
+        return keys, rf"k = \operatorname{{codigo}}_{{257}}(a),\quad longitud = {width}", "k"
+    if data_type == "fecha":
+        keys = [int(str(value).replace("-", "")) for value in values]
+        return keys, r"k = aaaammdd", "k"
+
+    if number_mode == "float":
+        raw_keys = [int(round(float(value) * 100)) for value in values]
+        min_key = min(raw_keys)
+        offset = -min_key if min_key < 0 else 0
+        keys = [key + offset for key in raw_keys]
+        return keys, rf"k = 100a + {offset}", "k"
+
+    raw_keys = [int(value) for value in values]
+    min_key = min(raw_keys)
+    offset = -min_key if min_key < 0 else 0
+    keys = [key + offset for key in raw_keys]
+    if offset:
+        return keys, rf"k = a + {offset}", "k"
+    return keys, r"k = a", "k"
+
+
+TRACE_BUILDERS = {
+    "burbuja": bubble_trace,
+    "seleccion": selection_trace,
+    "insercion": insertion_trace,
+    "insercion_binaria": binary_insertion_trace,
+    "shell": shell_trace,
+    "mezcla": merge_trace,
+    "rapido": quick_trace,
+    "radix": radix_trace,
+}
+
+
+
+__all__ = [
+    "bubble_trace",
+    "selection_trace",
+    "insertion_trace",
+    "binary_insertion_trace",
+    "shell_gaps",
+    "shell_trace",
+    "merge_trace",
+    "choose_pivot",
+    "quick_trace",
+    "radix_trace",
+    "TRACE_BUILDERS",
+]
