@@ -401,8 +401,8 @@ class TestCapitulo7BusquedaExponencial(unittest.TestCase):
             self.module.message_html("Aplica búsqueda binaria en el rango [2, 4]."),
         )
         self.assertIn(
-            "Búsqueda lineal:",
-            self.module.message_html("Búsqueda lineal: evalúa m en la posición 3."),
+            "Búsqueda binaria:",
+            self.module.message_html("Búsqueda binaria: evalúa m en la posición 3."),
         )
 
     def test_exponential_formula_always_shows_all_equations_in_single_rows(self):
@@ -410,7 +410,7 @@ class TestCapitulo7BusquedaExponencial(unittest.TestCase):
         initial_formula = state["formula"]
 
         self.assertIn("\\text{Fase exponencial (en ejecución)}", initial_formula)
-        self.assertIn("\\text{Búsqueda lineal (inactiva)}", initial_formula)
+        self.assertIn("\\text{Búsqueda binaria (inactiva)}", initial_formula)
         self.assertIn("i &= 2 \\cdot i", initial_formula)
         self.assertIn("\\mathrm{rango} &= \\left[\\frac{i}{2}, \\min(i, n - 1)\\right]", initial_formula)
         self.assertIn("m &= \\left\\lfloor\\frac{a + b}{2}\\right\\rfloor", initial_formula)
@@ -435,7 +435,7 @@ class TestCapitulo7BusquedaExponencial(unittest.TestCase):
             self.module.step_exponential_search(state)
         range_formula = state["formula"]
         self.assertIn("\\text{Fase exponencial (terminado)}", range_formula)
-        self.assertIn("\\text{Búsqueda lineal (inactiva)}", range_formula)
+        self.assertIn("\\text{Búsqueda binaria (inactiva)}", range_formula)
         self.assertIn("\\mathrm{rango} &= \\left[\\frac{i}{2}, \\min(i, n - 1)\\right] = ", range_formula)
         self.assertIn(" = [4, 7]", range_formula)
         self.assertIn("m &=", range_formula)
@@ -444,7 +444,7 @@ class TestCapitulo7BusquedaExponencial(unittest.TestCase):
         self.module.step_exponential_search(state)
         mid_formula = state["formula"]
         self.assertIn("\\text{Fase exponencial (terminado)}", mid_formula)
-        self.assertIn("\\text{Búsqueda lineal (en ejecución)}", mid_formula)
+        self.assertIn("\\text{Búsqueda binaria (en ejecución)}", mid_formula)
         self.assertIn("i &= 2 \\cdot i = 2 \\cdot 4 = 8", mid_formula)
         self.assertIn("m &= \\left\\lfloor\\frac{a + b}{2}\\right\\rfloor = ", mid_formula)
         self.assertIn(" = 5", mid_formula)
@@ -778,15 +778,18 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         module = self.modules["secuencial"]
         state = module.create_state(size=4, target=3, values=[1, 2, 3, 4])
 
+        self.assertEqual(state["formula"], "i = 0")
         module.step_linear_search(state)
         html = module.render_state_html(state)
         self.assertIn('<span class="math-label">i</span>', html)
         self.assertEqual([node["label"] for node in state["arr"]], ["i", "", "", ""])
         self.assertFalse(state["arr"][0]["reviewed"])
+        self.assertEqual(state["formula"], "i = 0")
 
         module.step_linear_search(state)
         labels = [node["label"] for node in state["arr"]]
         self.assertEqual(labels, ["", "i", "", ""])
+        self.assertEqual(state["formula"], "i = 1")
 
     def test_searches_expose_first_step_before_comparison(self):
         cases = (

@@ -23,7 +23,7 @@ FONT_FAMILY = "Scheherazade New"
 BOOK_ARRAY = [1, 2, 3, 4, 5, 6, 7, 8]
 BOOK_TARGET = 6
 EXPONENTIAL_PHASE_TITLE = "Fase exponencial"
-EXPONENTIAL_RANGE_PHASE_TITLE = "Búsqueda lineal"
+EXPONENTIAL_RANGE_PHASE_TITLE = "Búsqueda binaria"
 
 ROLE_STYLES = {
     "default": ("#ffffff", "#111111", "#111111"),
@@ -348,7 +348,7 @@ def step_exponential_search(state):
 
     if state["phase"] == "range_show":
         paint_range(state)
-        state["general_message"] = f"Búsqueda lineal: aplica búsqueda binaria en el rango [{state['low']}, {state['high']}]."
+        state["general_message"] = f"Búsqueda binaria: aplica búsqueda binaria en el rango [{state['low']}, {state['high']}]."
         state["phase"] = "binary_select"
         state["formula"] = build_range_formula(state)
         return
@@ -360,7 +360,7 @@ def step_exponential_search(state):
 
         state["mid"] = (state["low"] + state["high"]) // 2
         paint_binary_state(state, show_mid=True)
-        state["general_message"] = f"Búsqueda lineal: evalúa m en la posición {state['mid']}."
+        state["general_message"] = f"Búsqueda binaria: evalúa m en la posición {state['mid']}."
         state["phase"] = "binary_compare"
         state["formula"] = build_mid_formula(state)
         return
@@ -376,11 +376,11 @@ def step_exponential_search(state):
         state["formula"] = symbolic_mid_formula(state)
 
         if mid_value < state["target"]:
-            state["general_message"] = f"Búsqueda lineal: {mid_value} es menor que {state['target']}; descarta la mitad izquierda."
+            state["general_message"] = f"Búsqueda binaria: {mid_value} es menor que {state['target']}; descarta la mitad izquierda."
             mark_discarded_left(state, state["mid"])
             state["low"] = state["mid"] + 1
         else:
-            state["general_message"] = f"Búsqueda lineal: {mid_value} es mayor que {state['target']}; descarta la mitad derecha."
+            state["general_message"] = f"Búsqueda binaria: {mid_value} es mayor que {state['target']}; descarta la mitad derecha."
             mark_discarded_right(state, state["mid"])
             state["high"] = state["mid"] - 1
 

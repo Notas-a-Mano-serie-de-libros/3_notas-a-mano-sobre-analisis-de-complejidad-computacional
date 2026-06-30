@@ -58,6 +58,8 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertFalse(cache.update_html(widget, "\n  <div>uno</div>\n"))
         self.assertTrue(cache.update_formula(widget, r"x = 1"))
         self.assertIn("formula-renderer", widget.value)
+        self.assertIn("KaTeX_Main", widget.value)
+        self.assertIn("formula-var", widget.value)
         self.assertFalse(cache.update_formula(widget, r"x = 1"))
 
     def test_runtime_uses_original_synchronous_pause_for_colab(self):

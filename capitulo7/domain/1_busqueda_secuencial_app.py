@@ -16,6 +16,7 @@ NOT_FOUND_MESSAGE = "Elemento no encontrado"
 FONT_FAMILY = "Scheherazade New"
 BOOK_ARRAY = [0, 1, 2, 3, 4, 5, 6, 7]
 BOOK_TARGET = 6
+FORMULA_HEIGHT_SEQUENTIAL = "44px"
 
 ROLE_STYLES = {
     "default": ("#ffffff", "#111111", "#111111"),
@@ -26,6 +27,11 @@ ROLE_STYLES = {
     "range": ("#fff2cc", "#d6b656", "#111111"),
     "probe": ("#f8cecc", "#b85450", "#111111"),
 }
+
+def build_formula(state):
+    if state["current_index"] < len(state["arr"]):
+        return rf"i = {state['current_index']}"
+    return rf"i = {len(state['arr'])}"
 
 def mark_excluded_unreviewed(state):
     for node in state["arr"]:
@@ -43,6 +49,7 @@ def finish_found(state, index):
     state["arr"][index]["reviewed"] = True
     mark_excluded_unreviewed(state)
     state["general_message"] = FOUND_MESSAGE
+    state["formula"] = build_formula(state)
     state["search_complete"] = True
 
 def finish_not_found(state):
@@ -53,12 +60,14 @@ def finish_not_found(state):
             node["reviewed"] = True
 
     state["general_message"] = NOT_FOUND_MESSAGE
+    state["formula"] = build_formula(state)
     state["search_complete"] = True
 
 def create_state(size=DEFAULT_SIZE, target=DEFAULT_TARGET, values=None):
     state = create_search_base_state(size=size, target=target, values=values, current_index=0)
     state["current_index"] = 0
     state["phase"] = "show_current"
+    state["formula"] = build_formula(state)
     state["general_message"] = "Presiona Paso siguiente para iniciar la búsqueda secuencial."
     return state
 
@@ -69,6 +78,7 @@ def step_linear_search(state):
     if not state["search_active"]:
         state["search_active"] = True
         state["general_message"] = f"Comienza en la posición {state['current_index']}"
+        state["formula"] = build_formula(state)
 
     if state["current_index"] >= len(state["arr"]):
         finish_not_found(state)
@@ -81,6 +91,7 @@ def step_linear_search(state):
 
     if state["phase"] == "show_current":
         state["phase"] = "compare_current"
+        state["formula"] = build_formula(state)
         return
 
     if node["value"] == state["target"]:
@@ -92,6 +103,7 @@ def step_linear_search(state):
     node["label"] = ""
     state["general_message"] = f"{node['value']} no coincide; avanza al siguiente elemento."
     state["current_index"] += 1
+    state["formula"] = build_formula(state)
 
     if state["current_index"] < len(state["arr"]):
         state["arr"][state["current_index"]]["role"] = "current"
@@ -121,6 +133,7 @@ def run_app():
         default_target=DEFAULT_TARGET,
         book_array=BOOK_ARRAY,
         book_target=BOOK_TARGET,
+        formula_min_height=FORMULA_HEIGHT_SEQUENTIAL,
     )
 
 
@@ -130,6 +143,7 @@ __all__ = [
     "BOOK_ARRAY",
     "BOOK_TARGET",
     "ROLE_STYLES",
+    "build_formula",
     "create_state",
     "message_html",
     "render_state_html",

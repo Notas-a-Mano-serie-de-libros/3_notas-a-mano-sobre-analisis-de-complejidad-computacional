@@ -32,20 +32,25 @@ class OutputCache:
         html = (
             '<div class="formula-renderer">'
             "<style>"
+            "@font-face{font-family:'KaTeX_Main';src:url('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/fonts/KaTeX_Main-Regular.woff2') format('woff2');font-weight:400;font-style:normal;}"
+            "@font-face{font-family:'KaTeX_Main';src:url('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/fonts/KaTeX_Main-Bold.woff2') format('woff2');font-weight:700;font-style:normal;}"
+            "@font-face{font-family:'KaTeX_Math';src:url('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/fonts/KaTeX_Math-Italic.woff2') format('woff2');font-weight:400;font-style:italic;}"
             ".formula-renderer{width:100%;box-sizing:border-box;overflow:visible;"
-            "font-family:'Scheherazade New','Times New Roman',serif;"
-            "font-size:28px;font-weight:600;line-height:1.45;"
+            "font-family:'KaTeX_Main','Latin Modern Roman','Computer Modern Serif','STIX Two Text','STIXGeneral',serif;"
+            "font-size:16px;font-weight:400;line-height:1.25;"
             "color:#111111;}"
             "@media (prefers-color-scheme:dark){.formula-renderer{color:#f2f2f2;}}"
-            ".formula-line{display:flex;align-items:center;gap:8px;min-height:38px;white-space:nowrap;}"
+            ".formula-line{display:flex;align-items:center;gap:4px;min-height:24px;white-space:nowrap;}"
             ".formula-frac{display:inline-flex;flex-direction:column;align-items:center;"
-            "vertical-align:middle;line-height:1.05;margin:0 4px;}"
-            ".formula-num{border-bottom:2px solid currentColor;padding:0 6px 3px;}"
-            ".formula-den{padding:3px 6px 0;}"
-            ".formula-floor{display:inline-flex;align-items:center;gap:2px;}"
-            ".formula-root{display:inline-flex;align-items:center;gap:3px;}"
-            ".formula-sub{font-size:.62em;vertical-align:sub;line-height:0;}"
-            ".formula-sup{font-size:.62em;vertical-align:super;line-height:0;}"
+            "vertical-align:middle;line-height:1.02;margin:0 2px;font-size:.96em;}"
+            ".formula-num{border-bottom:1px solid currentColor;padding:0 3px 1px;}"
+            ".formula-den{padding:1px 3px 0;}"
+            ".formula-floor{display:inline-flex;align-items:center;gap:1px;}"
+            ".formula-root{display:inline-flex;align-items:center;gap:2px;}"
+            ".formula-sub{font-size:.68em;vertical-align:sub;line-height:0;}"
+            ".formula-sup{font-size:.68em;vertical-align:super;line-height:0;}"
+            ".formula-var{font-family:'KaTeX_Math','STIX Two Math','STIXGeneral',serif;font-style:italic;}"
+            ".formula-op,.formula-text{font-family:'KaTeX_Main','STIX Two Text','STIXGeneral',serif;font-style:normal;}"
             "</style>"
             f"{rows}"
             "</div>"
@@ -80,8 +85,10 @@ def _formula_lines(formula):
     text = text.replace(r"\displaystyle", "")
     text = re.sub(r"\\begin\{(?:array|aligned)\}(?:\{[^{}]*\})?", "", text)
     text = re.sub(r"\\end\{(?:array|aligned)\}", "", text)
-    text = re.sub(r"\\\\(?:\[[^\]]+\])?", "\n", text)
-    return [line.strip() for line in text.splitlines() if line.strip()]
+    line_break = "\uE000"
+    text = re.sub(r"\\\\(?:\[[^\]]+\])?", line_break, text)
+    text = re.sub(r"\s+", " ", text)
+    return [line.strip() for line in text.split(line_break) if line.strip()]
 
 
 def _math_html(expression):
@@ -99,10 +106,10 @@ class _FormulaParser:
         "neq": "≠",
         "in": "∈",
         "quad": "  ",
-        "min": "min",
-        "max": "max",
-        "log": "log",
-        "bmod": "mod",
+        "min": '<span class="formula-op">min</span>',
+        "max": '<span class="formula-op">max</span>',
+        "log": '<span class="formula-op">log</span>',
+        "bmod": '<span class="formula-op">mod</span>',
     }
 
     def __init__(self, text):
@@ -131,6 +138,8 @@ class _FormulaParser:
                 parts.append(escape(char))
             elif char == "&":
                 self.index += 1
+            elif char.isalpha():
+                parts.append(self.variable())
             else:
                 parts.append(escape(char))
                 self.index += 1
@@ -201,7 +210,13 @@ class _FormulaParser:
             elif char == "}":
                 depth -= 1
             self.index += 1
-        return escape(self.text[start:self.index - 1])
+        return f'<span class="formula-text">{escape(self.text[start:self.index - 1])}</span>'
+
+    def variable(self):
+        start = self.index
+        while self.index < len(self.text) and self.text[self.index].isalpha():
+            self.index += 1
+        return f'<span class="formula-var">{escape(self.text[start:self.index])}</span>'
 
     def next_text(self):
         if self.index >= len(self.text):
