@@ -475,7 +475,8 @@ def run_search_app(
     finish_button = widgets.Button(description="Finalizar", button_style="", layout=widgets.Layout(width="120px"))
     reset_button = widgets.Button(description="Generar nuevo arreglo", button_style="warning", layout=widgets.Layout(width="190px"))
     book_button = widgets.Button(description="Generar arreglo del libro", button_style="primary", layout=widgets.Layout(width="210px"))
-    formula_output = widgets.Output(
+    formula_output = widgets.HTML(
+        value="",
         layout=widgets.Layout(
             width="100%",
             min_height=formula_min_height,

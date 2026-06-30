@@ -749,7 +749,8 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
         colab_output.enable_custom_widget_manager()
 
     controls, controls_layout = build_controls(has_pivot=has_pivot, has_tree=has_tree)
-    formula_output = widgets.Output(
+    formula_output = widgets.HTML(
+        value="",
         layout=widgets.Layout(width="100%", padding="14px 0 10px 0", min_height=FORMULA_OUTPUT_HEIGHT),
     )
     html_output = widgets.HTML()

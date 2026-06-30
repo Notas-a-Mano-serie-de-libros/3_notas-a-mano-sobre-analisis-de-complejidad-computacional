@@ -201,7 +201,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("from common.animation_runtime import OutputCache, pause, set_disabled", source)
         self.assertIn("render_cache = OutputCache()", source)
         self.assertIn('formula = state["formula"]', source)
-        self.assertIn("widgets.Output", source)
+        self.assertIn("formula_output = widgets.HTML", source)
         self.assertNotIn("widgets.HTMLMath", source)
         self.assertIn("render_cache.update_formula(formula_output, formula)", source)
         self.assertIn("render_cache.update_html(html_output, render_state_html(state, include_styles=False))", source)
