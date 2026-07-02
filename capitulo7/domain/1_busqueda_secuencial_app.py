@@ -16,7 +16,6 @@ NOT_FOUND_MESSAGE = "Elemento no encontrado"
 FONT_FAMILY = "Scheherazade New"
 BOOK_ARRAY = [0, 1, 2, 3, 4, 5, 6, 7]
 BOOK_TARGET = 6
-FORMULA_HEIGHT_SEQUENTIAL = "44px"
 
 ROLE_STYLES = {
     "default": ("#ffffff", "#111111", "#111111"),
@@ -30,8 +29,16 @@ ROLE_STYLES = {
 
 def build_formula(state):
     if state["current_index"] < len(state["arr"]):
-        return rf"i = {state['current_index']}"
-    return rf"i = {len(state['arr'])}"
+        index = state["current_index"]
+    else:
+        index = len(state["arr"])
+
+    return rf"""
+\displaystyle
+\begin{{aligned}}
+i &= {index}
+\end{{aligned}}
+"""
 
 def mark_excluded_unreviewed(state):
     for node in state["arr"]:
@@ -133,7 +140,6 @@ def run_app():
         default_target=DEFAULT_TARGET,
         book_array=BOOK_ARRAY,
         book_target=BOOK_TARGET,
-        formula_min_height=FORMULA_HEIGHT_SEQUENTIAL,
     )
 
 

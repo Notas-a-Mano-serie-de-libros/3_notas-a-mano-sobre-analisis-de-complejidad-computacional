@@ -3,7 +3,6 @@ import random
 
 import ipywidgets as widgets
 from search_common import (
-    FORMULA_HEIGHT_INTERPOLATION,
     TARGET_ROLE_STYLE,
     create_search_base_state,
     message_html,
@@ -284,7 +283,6 @@ def run_app():
         default_target=DEFAULT_TARGET,
         book_array=BOOK_ARRAY,
         book_target=60,
-        formula_min_height=FORMULA_HEIGHT_INTERPOLATION,
         extra_controls={"uniform": uniform_checkbox},
     )
 

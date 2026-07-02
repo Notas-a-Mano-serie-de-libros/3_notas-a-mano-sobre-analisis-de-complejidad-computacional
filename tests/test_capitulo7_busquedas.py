@@ -118,12 +118,12 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         self.assertIn("ui_state[\"first_row\"].children = tuple(first_row_controls())", common_source)
         self.assertNotIn("Objetivo automático", source)
         self.assertNotIn("auto_target_checkbox", source)
-        self.assertIn("from common.animation_runtime import OutputCache, pause, set_disabled", common_source)
+        self.assertIn("from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled", common_source)
         self.assertIn("render_cache = OutputCache()", common_source)
         self.assertIn('formula = state.get("formula")', common_source)
         self.assertIn("formula_output = widgets.HTML", common_source)
         self.assertNotIn("widgets.HTMLMath", common_source)
-        self.assertIn("render_cache.update_formula(formula_output, formula)", common_source)
+        self.assertIn('render_cache.update_formula(formula_output, formula, state.get("formula_reserved_height"))', common_source)
         self.assertIn("render_cache.update_html(html_output, render_html(state))", common_source)
         self.assertNotIn("async def run_async", common_source)
         self.assertNotIn("schedule(", common_source)
@@ -139,7 +139,7 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         self.assertIn("m<sub>2</sub>", source)
         self.assertIn("math_inline", common_source)
         self.assertIn("font-size: 20px;", common_source)
-        self.assertIn("margin-top: 10px;", common_source)
+        self.assertIn("margin-top: 8px;", common_source)
 
     def test_array_labels_render_as_math_html(self):
         state = self.module.create_state(size=8, target=8, values=[1, 2, 3, 4, 5, 6, 7, 8])
@@ -150,6 +150,18 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         self.assertIn('<span class="math-label">b</span>', html)
         self.assertIn('<span class="math-label">m<sub>1</sub></span>', html)
         self.assertIn('<span class="math-label">m<sub>2</sub></span>', html)
+
+    def test_multiple_array_labels_share_one_line(self):
+        state = self.module.create_state(size=1, target=8, values=[8])
+        state["arr"][0]["label"] = "a\nb\nm1\nm2"
+        html = self.module.render_state_html(state)
+
+        self.assertIn('<span class="label-separator">, </span>', html)
+        self.assertNotIn("<br>", html)
+        self.assertIn(
+            '<span class="math-label">a</span><span class="label-separator">, </span><span class="math-label">b</span>',
+            html,
+        )
 
     def test_range_values_share_one_formula_row(self):
         state = self.module.create_state(size=8, target=8, values=[1, 2, 3, 4, 5, 6, 7, 8])
@@ -359,12 +371,12 @@ class TestCapitulo7BusquedaExponencial(unittest.TestCase):
         self.assertIn('formula = state.get("formula")', common_source)
         self.assertIn("formula_output = widgets.HTML", common_source)
         self.assertNotIn("widgets.HTMLMath", common_source)
-        self.assertIn("render_cache.update_formula(formula_output, formula)", common_source)
+        self.assertIn('render_cache.update_formula(formula_output, formula, state.get("formula_reserved_height"))', common_source)
         self.assertIn("render_cache.update_html(html_output, render_html(state))", common_source)
         self.assertIn("formula_output", common_source)
         self.assertIn("LABEL_HTML", source)
         self.assertIn("math_inline", common_source)
-        self.assertIn("margin-top: 10px;", common_source)
+        self.assertIn("margin-top: 8px;", common_source)
         self.assertIn('"common/animation_runtime.py"', bootstrap)
         self.assertIn("5_busqueda_exponencial_app.py", bootstrap)
         self.assertIn('"SIMULATION_NAME = \\"exponencial\\"\\n"', notebook)
@@ -559,7 +571,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                 self.assertIn("background:#fff2cc", html)
                 self.assertNotIn("border-color:", html)
                 self.assertIn("font-size: 20px;", common_source)
-                self.assertIn("margin-top: 10px;", common_source)
+                self.assertIn("margin-top: 8px;", common_source)
 
     def test_existing_target_starts_highlighted_in_all_remaining_searches(self):
         values = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -648,33 +660,52 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
 
     def test_formula_output_reserves_stable_space(self):
         common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
+        runtime_source = (PROJECT_ROOT / "common" / "animation_runtime.py").read_text(encoding="utf-8")
 
-        self.assertIn("min_height=formula_min_height", common_source)
-        self.assertIn('margin="0 0 10px 0"', common_source)
+        self.assertIn('min_height="0px"', common_source)
+        self.assertIn('padding="30px 0 0 0"', common_source)
+        self.assertIn('margin="0"', common_source)
         self.assertIn('overflow="visible"', common_source)
+        self.assertIn("widget.layout.min_height", runtime_source)
+        self.assertIn("formula_iframe_height(formula)", runtime_source)
+        self.assertIn("calculate_formula_reserved_height(state, step_search)", common_source)
+        self.assertIn('state["formula_reserved_height"]', common_source)
+        self.assertIn('state.get("formula_reserved_height")', common_source)
+        self.assertIn("self.max_formula_height", runtime_source)
+        self.assertIn("align-items:flex-end", runtime_source)
+        self.assertIn("justify-content:flex-start", runtime_source)
+        self.assertIn("text-align:left", runtime_source)
+        self.assertNotIn("frameElement.style.height", runtime_source)
 
-        expected_heights = {
-            "2_busqueda_binaria_app.py": "formula_min_height=FORMULA_HEIGHT_BINARY",
-            "3_busqueda_interpolacion_app.py": "formula_min_height=FORMULA_HEIGHT_INTERPOLATION",
-            "4_busqueda_saltos_app.py": "formula_min_height=FORMULA_HEIGHT_JUMP",
-            "5_busqueda_exponencial_app.py": "formula_min_height=FORMULA_HEIGHT_EXPONENTIAL",
-            "6_busqueda_ternaria_app.py": "formula_min_height=FORMULA_HEIGHT_TERNARY",
-        }
         for constant in (
-            'FORMULA_HEIGHT_BINARY = "170px"',
-            'FORMULA_HEIGHT_INTERPOLATION = "190px"',
-            'FORMULA_HEIGHT_JUMP = "250px"',
-            'FORMULA_HEIGHT_EXPONENTIAL = "320px"',
-            'FORMULA_HEIGHT_TERNARY = "280px"',
             'PHASE_RUNNING = "en ejecución"',
             'PHASE_DONE = "terminado"',
             'PHASE_INACTIVE = "inactiva"',
         ):
             self.assertIn(constant, common_source)
-        for filename, expected in expected_heights.items():
+        for filename in ("4_busqueda_saltos_app.py", "5_busqueda_exponencial_app.py"):
             with self.subTest(filename=filename):
                 source = (PROJECT_ROOT / "capitulo7" / "domain" / filename).read_text(encoding="utf-8")
-                self.assertIn(expected, source)
+                self.assertIn(r"\begin{{array}}{{l}}", source)
+                self.assertNotIn(r"\begin{{gathered}}", source)
+
+    def test_exponential_formula_space_is_reserved_before_binary_phase(self):
+        module = self.launchers._load_module("5_busqueda_exponencial_app.py", "capitulo7_exponential_reserved_height_test")
+        common = self.launchers._load_module("search_common.py", "capitulo7_search_common_reserved_height_test")
+        state = module.create_state(size=8, target=6, values=[1, 2, 3, 4, 5, 6, 7, 8])
+        reserved = common.calculate_formula_reserved_height(state, module.step_exponential_search)
+        initial_height = common.formula_iframe_height(state["formula"])
+
+        self.assertGreater(reserved, initial_height)
+
+        heights = []
+        for _ in range(32):
+            heights.append(common.formula_iframe_height(state["formula"]))
+            if state["search_complete"]:
+                break
+            module.step_exponential_search(state)
+
+        self.assertEqual(reserved, max(heights))
 
     def test_search_math_text_uses_same_font_as_array_values(self):
         common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
@@ -691,14 +722,14 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                 self.assertNotIn("mjx-container", source)
                 self.assertNotIn("display(HTML(", source)
 
-    def test_search_nodes_reserve_full_label_height(self):
+    def test_search_nodes_reserve_compact_label_height(self):
         common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
 
         self.assertIn("SEARCH_NODES_PER_ROW = 10", common_source)
         self.assertIn("SEARCH_NODE_WIDTH = 54", common_source)
-        self.assertIn("SEARCH_NODE_HEIGHT = 190", common_source)
+        self.assertIn("SEARCH_NODE_HEIGHT = 116", common_source)
         self.assertIn("SEARCH_NODE_GAP = 0", common_source)
-        self.assertIn("SEARCH_LABEL_HEIGHT = 96", common_source)
+        self.assertIn("SEARCH_LABEL_HEIGHT = 28", common_source)
         self.assertIn("SEARCH_MESSAGE_HEIGHT = 44", common_source)
         self.assertIn("def calculate_search_dimensions(state):", common_source)
         self.assertIn('min-height: {dimensions["app_height"]}px;', common_source)
@@ -721,6 +752,8 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("height: {SEARCH_LABEL_HEIGHT}px;", common_source)
         self.assertIn("min-height: {SEARCH_LABEL_HEIGHT}px;", common_source)
         self.assertIn("overflow: visible;", common_source)
+        self.assertIn("white-space: nowrap;", common_source)
+        self.assertIn("label-separator", common_source)
 
         for path in sorted((PROJECT_ROOT / "capitulo7" / "domain").glob("*_busqueda_*_app.py")):
             with self.subTest(path=path.name):
@@ -779,18 +812,18 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         module = self.modules["secuencial"]
         state = module.create_state(size=4, target=3, values=[1, 2, 3, 4])
 
-        self.assertEqual(state["formula"], "i = 0")
+        self.assertIn("i &= 0", state["formula"])
         module.step_linear_search(state)
         html = module.render_state_html(state)
         self.assertIn('<span class="math-label">i</span>', html)
         self.assertEqual([node["label"] for node in state["arr"]], ["i", "", "", ""])
         self.assertFalse(state["arr"][0]["reviewed"])
-        self.assertEqual(state["formula"], "i = 0")
+        self.assertIn("i &= 0", state["formula"])
 
         module.step_linear_search(state)
         labels = [node["label"] for node in state["arr"]]
         self.assertEqual(labels, ["", "i", "", ""])
-        self.assertEqual(state["formula"], "i = 1")
+        self.assertIn("i &= 1", state["formula"])
 
     def test_searches_expose_first_step_before_comparison(self):
         cases = (

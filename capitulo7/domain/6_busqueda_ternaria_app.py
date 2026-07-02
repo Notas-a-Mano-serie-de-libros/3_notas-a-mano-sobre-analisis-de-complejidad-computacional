@@ -1,7 +1,6 @@
 import math
 
 from search_common import (
-    FORMULA_HEIGHT_TERNARY,
     TARGET_ROLE_STYLE,
     create_search_base_state,
     message_html,
@@ -304,7 +303,6 @@ def run_app():
         default_target=DEFAULT_TARGET,
         book_array=BOOK_ARRAY,
         book_target=BOOK_TARGET,
-        formula_min_height=FORMULA_HEIGHT_TERNARY,
     )
 
 

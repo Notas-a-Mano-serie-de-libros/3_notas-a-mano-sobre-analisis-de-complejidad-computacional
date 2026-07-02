@@ -49,6 +49,8 @@ class TestPerformanceContracts(unittest.TestCase):
 
         class Widget:
             value = ""
+            class layout:
+                min_height = ""
 
         cache = runtime.OutputCache()
         widget = Widget()
@@ -60,7 +62,23 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("formula-mathjax-frame", widget.value)
         self.assertIn("srcdoc=", widget.value)
         self.assertIn("tex-svg.js", widget.value)
-        self.assertFalse(cache.update_formula(widget, r"x = 1"))
+        self.assertIn("visibility:hidden", widget.value)
+        self.assertNotIn("formula-fallback", widget.value)
+        self.assertIn('id=&quot;formula&quot; style=&quot;visibility:hidden&quot;', widget.value)
+        self.assertIn("style.visibility = &#x27;visible&#x27;", widget.value)
+        self.assertIn("previousElementSibling", widget.value)
+        self.assertIn("math-ready", widget.value)
+        self.assertIn("align-items:flex-end", widget.value)
+        self.assertIn("justify-content:flex-start", widget.value)
+        self.assertIn("text-align:left", widget.value)
+        first_height = widget.layout.min_height
+        tall_formula = r"x = \frac{1}{2}\\[18pt]y = \frac{3}{4}"
+        self.assertTrue(cache.update_formula(widget, tall_formula, 420))
+        self.assertEqual(widget.layout.min_height, "420px")
+        self.assertIn("formula-frame-stack", widget.value)
+        self.assertIn("visibility:hidden", widget.value)
+        self.assertGreaterEqual(int(widget.layout.min_height.removesuffix("px")), int(first_height.removesuffix("px")))
+        self.assertFalse(cache.update_formula(widget, tall_formula))
 
     def test_runtime_uses_original_synchronous_pause_for_colab(self):
         source = (PROJECT_ROOT / "common" / "animation_runtime.py").read_text(encoding="utf-8")
@@ -68,12 +86,26 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("def pause(seconds, colab_output=None):", source)
         self.assertIn("colab_output.eval_js", source)
         self.assertIn("time.sleep(seconds)", source)
-        self.assertIn("def update_formula(self, widget, formula):", source)
-        self.assertIn("def render_formula_html(self, formula):", source)
+        self.assertIn("def update_formula(self, widget, formula, reserved_height=None):", source)
+        self.assertIn("def render_formula_html(self, formula, height):", source)
+        self.assertIn("def render_formula_iframe(self, formula, height, hidden=False):", source)
         self.assertIn("def mathjax_srcdoc(formula):", source)
         self.assertIn("def formula_iframe_height(formula):", source)
         self.assertIn("tex-svg.js", source)
-        self.assertIn("widget.value = self.render_formula_html(formula) if formula else \"\"", source)
+        self.assertIn("visibility:hidden", source)
+        self.assertIn("formula-frame-stack", source)
+        self.assertIn("previousElementSibling", source)
+        self.assertNotIn("formula-fallback", source)
+        self.assertIn('id="formula" style="visibility:hidden"', source)
+        self.assertIn("style.visibility = 'visible'", source)
+        self.assertIn("math-ready", source)
+        self.assertIn("align-items:flex-end", source)
+        self.assertIn("justify-content:flex-start", source)
+        self.assertIn("text-align:left", source)
+        self.assertIn("widget.layout.min_height", source)
+        self.assertIn("self.max_formula_height", source)
+        self.assertNotIn("frameElement.style.height", source)
+        self.assertIn("widget.value = self.render_formula_html(formula, self.max_formula_height) if formula else \"\"", source)
         self.assertNotIn("class _FormulaParser:", source)
         self.assertNotIn("KaTeX_Main", source)
         self.assertNotIn('from IPython.display import Math, display', source)
@@ -83,6 +115,22 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertNotIn("def schedule", source)
         self.assertNotIn("threading", source)
         self.assertNotIn("_SCHEDULED_TASKS", source)
+
+    def test_formula_transition_keeps_previous_rendered_formula_visible(self):
+        runtime = load_module_from_path(
+            "common_animation_runtime_transition_test",
+            PROJECT_ROOT / "common" / "animation_runtime.py",
+        )
+        cache = runtime.OutputCache()
+        first = cache.render_formula_html(r"x = 1", 80)
+        second = cache.render_formula_html(r"y = 2", 80)
+
+        self.assertIn("formula-mathjax-frame", first)
+        self.assertNotIn("formula-frame-stack", first)
+        self.assertIn("formula-frame-stack", second)
+        self.assertIn(first, second)
+        self.assertIn("visibility:hidden", second)
+        self.assertNotIn("formula-fallback", second)
 
     def test_visual_contracts_keep_stable_dimensions_and_separated_css(self):
         search_common = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")

@@ -1,7 +1,6 @@
 import math
 
 from search_common import (
-    FORMULA_HEIGHT_JUMP,
     PHASE_DONE,
     PHASE_INACTIVE,
     PHASE_RUNNING,
@@ -277,7 +276,6 @@ def run_app():
         default_target=DEFAULT_TARGET,
         book_array=BOOK_ARRAY,
         book_target=6,
-        formula_min_height=FORMULA_HEIGHT_JUMP,
     )
 
 

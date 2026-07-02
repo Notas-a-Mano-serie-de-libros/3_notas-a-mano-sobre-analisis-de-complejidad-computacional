@@ -3,12 +3,13 @@ from __future__ import annotations
 import math
 import random
 import re
+from copy import deepcopy
 from html import escape
 
 from IPython.display import display
 import ipywidgets as widgets
 
-from common.animation_runtime import OutputCache, pause, set_disabled
+from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
 
 try:
     import nest_asyncio
@@ -30,9 +31,9 @@ NOT_FOUND_MESSAGE = "Elemento no encontrado"
 FONT_FAMILY = "Scheherazade New"
 SEARCH_NODES_PER_ROW = 10
 SEARCH_NODE_WIDTH = 54
-SEARCH_NODE_HEIGHT = 190
+SEARCH_NODE_HEIGHT = 116
 SEARCH_NODE_GAP = 0
-SEARCH_LABEL_HEIGHT = 96
+SEARCH_LABEL_HEIGHT = 28
 SEARCH_MESSAGE_HEIGHT = 44
 SEARCH_VERTICAL_PADDING = 16
 _SEARCH_DIMENSION_CACHE = {}
@@ -45,11 +46,7 @@ TARGET_POSITION_RANDOM = "random"
 PHASE_RUNNING = "en ejecución"
 PHASE_DONE = "terminado"
 PHASE_INACTIVE = "inactiva"
-FORMULA_HEIGHT_BINARY = "170px"
-FORMULA_HEIGHT_INTERPOLATION = "190px"
-FORMULA_HEIGHT_JUMP = "250px"
-FORMULA_HEIGHT_EXPONENTIAL = "320px"
-FORMULA_HEIGHT_TERNARY = "280px"
+MAX_FORMULA_PROBE_STEPS = 512
 TARGET_ROLE = "target"
 TARGET_ROLE_STYLE = ("#fff2cc", "#d6b656", "#111111")
 
@@ -209,8 +206,8 @@ def create_search_base_state(
 
 
 def label_html(label, label_map):
-    parts = [label_map.get(part, escape(part)) for part in label.splitlines()]
-    return "<br>".join(parts)
+    parts = [label_map.get(part, escape(part)) for part in label.splitlines() if part.strip()]
+    return '<span class="label-separator">, </span>'.join(parts)
 
 
 def math_inline(expression):
@@ -331,13 +328,17 @@ def _build_search_css() -> str:
     flex-direction: column;
   }}
   .node-label {{
-    margin-top: 10px;
+    margin-top: 8px;
     height: {SEARCH_LABEL_HEIGHT}px;
     min-height: {SEARCH_LABEL_HEIGHT}px;
     overflow: visible;
     font-size: 20px;
-    line-height: 22px;
+    line-height: 24px;
     color: #333333;
+    white-space: nowrap;
+  }}
+  .label-separator {{
+    font-style: normal;
   }}
   .math-label {{
     font-family: '{FONT_FAMILY}', serif;
@@ -410,6 +411,20 @@ def render_state_html(state, role_styles, label_map):
     )
 
 
+def calculate_formula_reserved_height(state, step_search):
+    probe = deepcopy(state)
+    max_height = formula_iframe_height(probe.get("formula", ""))
+    max_steps = min(MAX_FORMULA_PROBE_STEPS, max(16, len(probe.get("arr", [])) * 8 + 16))
+
+    for _ in range(max_steps):
+        if probe.get("search_complete"):
+            break
+        step_search(probe)
+        max_height = max(max_height, formula_iframe_height(probe.get("formula", "")))
+
+    return max_height
+
+
 def run_search_app(
     *,
     create_state,
@@ -422,7 +437,6 @@ def run_search_app(
     book_target=None,
     extra_controls=None,
     state_kwargs=None,
-    formula_min_height="0px",
 ):
     if nest_asyncio is not None:
         nest_asyncio.apply()
@@ -479,9 +493,9 @@ def run_search_app(
         value="",
         layout=widgets.Layout(
             width="100%",
-            min_height=formula_min_height,
-            padding="18px 0 18px 0",
-            margin="0 0 10px 0",
+            min_height="0px",
+            padding="30px 0 0 0",
+            margin="0",
             overflow="visible",
         )
     )
@@ -527,6 +541,7 @@ def run_search_app(
             )
         target = enforce_target_membership(node_values, target, target_mode_input.value)
         state = create_state(size=len(node_values), target=target, values=node_values, **current_kwargs())
+        state["formula_reserved_height"] = calculate_formula_reserved_height(state, step_search)
         update_target_readout(state["target"])
         return state
 
@@ -535,7 +550,7 @@ def run_search_app(
 
     def redraw():
         formula = state.get("formula")
-        render_cache.update_formula(formula_output, formula)
+        render_cache.update_formula(formula_output, formula, state.get("formula_reserved_height"))
         render_cache.update_html(html_output, render_html(state))
 
     def sync_execution_buttons():
@@ -659,11 +674,7 @@ __all__ = [
     "PHASE_RUNNING",
     "PHASE_DONE",
     "PHASE_INACTIVE",
-    "FORMULA_HEIGHT_BINARY",
-    "FORMULA_HEIGHT_INTERPOLATION",
-    "FORMULA_HEIGHT_JUMP",
-    "FORMULA_HEIGHT_EXPONENTIAL",
-    "FORMULA_HEIGHT_TERNARY",
+    "MAX_FORMULA_PROBE_STEPS",
     "TARGET_ROLE",
     "TARGET_ROLE_STYLE",
     "_SEARCH_DIMENSION_CACHE",
@@ -682,6 +693,7 @@ __all__ = [
     "math_inline",
     "message_html",
     "calculate_search_dimensions",
+    "calculate_formula_reserved_height",
     "_SEARCH_CSS",
     "render_state_html",
     "run_search_app",

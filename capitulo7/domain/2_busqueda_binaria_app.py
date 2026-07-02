@@ -1,6 +1,5 @@
 
 from search_common import (
-    FORMULA_HEIGHT_BINARY,
     TARGET_ROLE_STYLE,
     create_search_base_state,
     message_html,
@@ -203,7 +202,6 @@ def run_app():
         default_target=DEFAULT_TARGET,
         book_array=BOOK_ARRAY,
         book_target=10,
-        formula_min_height=FORMULA_HEIGHT_BINARY,
     )
 
 
