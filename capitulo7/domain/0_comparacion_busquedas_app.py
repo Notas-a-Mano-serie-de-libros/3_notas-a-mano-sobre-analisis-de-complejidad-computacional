@@ -38,6 +38,7 @@ DEFAULT_SIZE = 10
 BOOK_ARRAY = [0, 1, 2, 3, 4, 5, 6, 7]
 BOOK_TARGET = 6
 FONT_FAMILY = "Scheherazade New"
+COMPARISON_NODE_WIDTH = 54
 _MODULE_CACHE = {}
 
 ALGORITHMS = (
@@ -180,6 +181,20 @@ def render_index_row(nodes):
     return f'<div class="comparison-index-row">{indexes}</div>'
 
 
+def render_result_symbol(item):
+    if not item["state"]["search_complete"]:
+        return ""
+
+    found = any(node["role"] == "found" for node in item["state"]["arr"])
+    symbol = "✓" if found else "×"
+    label = "Encontrado" if found else "No encontrado"
+    class_name = "found" if found else "missing"
+    return (
+        f'<span class="comparison-result-symbol {class_name}" '
+        f'aria-label="{label}" title="{label}">{symbol}</span>'
+    )
+
+
 def render_compact_array(item, show_indexes=False):
     cache_key = "with_indexes" if show_indexes else "plain"
     if item["state"]["search_complete"] and cache_key in item["html_cache"]:
@@ -189,6 +204,7 @@ def render_compact_array(item, show_indexes=False):
     state_nodes = item["state"]["arr"]
     indexes = render_index_row(state_nodes) if show_indexes else ""
     nodes = "".join(render_compact_node(node, role_styles) for node in state_nodes)
+    result = render_result_symbol(item)
     html = f"""
     <div class="comparison-row">
       <div class="comparison-name">{escape(item["title"])}</div>
@@ -197,6 +213,7 @@ def render_compact_array(item, show_indexes=False):
         {indexes}
         <div class="comparison-array">{nodes}</div>
       </div>
+      <div class="comparison-result">{result}</div>
     </div>
     """
     if item["state"]["search_complete"]:
@@ -209,6 +226,7 @@ def render_comparison_html(state):
         render_compact_array(item, show_indexes=index == 0)
         for index, item in enumerate(state["algorithms"])
     )
+    array_width = len(state["values"]) * COMPARISON_NODE_WIDTH
     return f"""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
@@ -233,7 +251,7 @@ def render_comparison_html(state):
       .comparison-header,
       .comparison-row {{
         display: grid;
-        grid-template-columns: minmax(180px, 240px) 96px 1fr;
+        grid-template-columns: minmax(180px, 240px) 96px {array_width}px 42px;
         gap: 12px;
         width: 100%;
         box-sizing: border-box;
@@ -254,6 +272,9 @@ def render_comparison_html(state):
         text-align: center;
         font-weight: 700;
       }}
+      .comparison-array-head {{
+        text-align: center;
+      }}
       .comparison-name {{
         font-size: 22px;
         line-height: 1.2;
@@ -267,7 +288,8 @@ def render_comparison_html(state):
         white-space: nowrap;
       }}
       .comparison-array-wrap {{
-        min-width: 0;
+        width: {array_width}px;
+        min-width: {array_width}px;
         overflow-x: auto;
         scrollbar-width: none;
         padding-top: 2px;
@@ -296,6 +318,27 @@ def render_comparison_html(state):
         gap: 0;
         min-height: 58px;
         padding: 2px 0 6px;
+      }}
+      .comparison-result {{
+        min-width: 34px;
+        height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        font-weight: 700;
+        color: #111111;
+      }}
+      .comparison-result-symbol {{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        font-family: '{FONT_FAMILY}', serif;
+        font-size: 28px;
+        line-height: 1;
+        font-weight: 700;
       }}
       .comparison-node {{
         width: 54px;
@@ -328,7 +371,13 @@ def render_comparison_html(state):
           font-size: 18px;
         }}
         .comparison-array-wrap {{
+          width: 100%;
+          min-width: 0;
           overflow-x: auto;
+        }}
+        .comparison-result {{
+          justify-content: flex-start;
+          height: 32px;
         }}
       }}
       @media (min-width: 761px) {{
@@ -343,7 +392,8 @@ def render_comparison_html(state):
         <div class="comparison-header">
           <div class="comparison-head-cell">Algoritmo</div>
           <div class="comparison-head-cell">Pasos</div>
-          <div class="comparison-head-cell">Arreglo</div>
+          <div class="comparison-head-cell comparison-array-head">Arreglo</div>
+          <div class="comparison-head-cell"></div>
         </div>
         {rows}
       </div>

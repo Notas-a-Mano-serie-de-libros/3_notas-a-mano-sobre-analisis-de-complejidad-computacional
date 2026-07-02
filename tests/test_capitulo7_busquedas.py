@@ -918,9 +918,20 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("Arreglo", html)
         self.assertIn("font-weight: 700;", html)
         self.assertIn("background: #ffffff;", html)
+        self.assertIn("comparison-array-head", html)
+        self.assertIn("comparison-result", html)
+        self.assertIn("COMPARISON_NODE_WIDTH = 54", source)
+        self.assertIn("array_width = len(state[\"values\"]) * COMPARISON_NODE_WIDTH", source)
+        self.assertIn("grid-template-columns: minmax(180px, 240px) 96px {array_width}px 42px;", source)
+        self.assertIn("comparison-result-symbol", source)
+        self.assertIn('symbol = "✓" if found else "×"', source)
         self.assertIn("border: 2px solid #111111;", source)
         self.assertNotIn("border-color:", html)
         self.assertEqual(html.count('<div class="comparison-index">'), len(values))
+        self.assertNotIn(r"$\checkmark$", html)
+        self.assertNotIn(r"$\times$", html)
+        self.assertIn("grid-template-columns: minmax(180px, 240px) 96px 432px 42px;", html)
+        self.assertIn("width: 432px;", html)
         self.assertNotIn("Arreglo:</strong>", html)
         self.assertNotIn("Objetivo:</strong>", html)
         self.assertNotIn("pasos:", html)
@@ -936,6 +947,30 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
             "Búsqueda ternaria",
         ):
             self.assertIn(title, html)
+
+        while not module.all_searches_complete(state):
+            module.step_all_searches(state)
+        completed_html = module.render_comparison_html(state)
+        self.assertEqual(completed_html.count('comparison-result-symbol found'), len(state["algorithms"]))
+        self.assertEqual(completed_html.count(">✓</span>"), len(state["algorithms"]))
+        self.assertNotIn(r"$\checkmark$", completed_html)
+        self.assertNotIn(r"$\times$", completed_html)
+        self.assertNotIn('comparison-result-symbol missing', completed_html)
+
+        missing_state = module.create_comparison_state(
+            size=len(values),
+            target=99,
+            values=values,
+            target_mode=module.TARGET_MISSING,
+        )
+        while not module.all_searches_complete(missing_state):
+            module.step_all_searches(missing_state)
+        missing_html = module.render_comparison_html(missing_state)
+        self.assertEqual(missing_html.count('comparison-result-symbol missing'), len(missing_state["algorithms"]))
+        self.assertEqual(missing_html.count(">×</span>"), len(missing_state["algorithms"]))
+        self.assertNotIn(r"$\checkmark$", missing_html)
+        self.assertNotIn(r"$\times$", missing_html)
+        self.assertNotIn('comparison-result-symbol found', missing_html)
 
         source = (PROJECT_ROOT / "capitulo7" / "domain" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
         self.assertNotIn("Generar arreglo del libro", source)
