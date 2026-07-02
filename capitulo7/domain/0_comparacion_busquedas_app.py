@@ -238,11 +238,13 @@ def render_compact_array(item, show_indexes=False):
     <div class="comparison-row">
       <div class="comparison-name">{escape(item["title"])}</div>
       <div class="comparison-steps">{item["steps"]}</div>
-      <div class="comparison-array-wrap">
-        {indexes}
-        <div class="comparison-array">{nodes}</div>
+      <div class="comparison-array-result-wrap">
+        <div class="comparison-array-wrap">
+          {indexes}
+          <div class="comparison-array">{nodes}</div>
+        </div>
+        <div class="comparison-result">{result}</div>
       </div>
-      <div class="comparison-result">{result}</div>
     </div>
     """
     if item["state"]["search_complete"]:
@@ -280,7 +282,7 @@ def render_comparison_styles(array_width):
       .comparison-header,
       .comparison-row {{
         display: grid;
-        grid-template-columns: minmax(180px, 240px) 96px {array_width}px 42px;
+        grid-template-columns: minmax(180px, 240px) 96px {array_width + 42}px;
         gap: 12px;
         width: 100%;
         box-sizing: border-box;
@@ -304,6 +306,11 @@ def render_comparison_styles(array_width):
         font-weight: 700;
       }}
       .comparison-array-head {{
+        text-align: left;
+      }}
+      .comparison-array-head-label {{
+        display: inline-block;
+        width: {array_width}px;
         text-align: center;
       }}
       .comparison-name {{
@@ -324,6 +331,14 @@ def render_comparison_styles(array_width):
         overflow-x: auto;
         scrollbar-width: none;
         padding-top: 2px;
+      }}
+      .comparison-array-result-wrap {{
+        width: {array_width + 42}px;
+        min-width: {array_width + 42}px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
       }}
       .comparison-array-wrap::-webkit-scrollbar {{
         display: none;
@@ -351,6 +366,7 @@ def render_comparison_styles(array_width):
         padding: 2px 0 6px;
       }}
       .comparison-result {{
+        width: 34px;
         min-width: 34px;
         height: 58px;
         display: flex;
@@ -406,6 +422,11 @@ def render_comparison_styles(array_width):
           min-width: 0;
           overflow-x: auto;
         }}
+        .comparison-array-result-wrap {{
+          width: 100%;
+          min-width: 0;
+          overflow-x: auto;
+        }}
         .comparison-result {{
           justify-content: flex-start;
           height: 32px;
@@ -426,8 +447,7 @@ def render_comparison_header_html():
     <div class="comparison-header">
       <div class="comparison-head-cell">Algoritmo</div>
       <div class="comparison-head-cell">Pasos</div>
-      <div class="comparison-head-cell comparison-array-head">Arreglo</div>
-      <div class="comparison-head-cell"></div>
+      <div class="comparison-head-cell comparison-array-head"><span class="comparison-array-head-label">Arreglo</span></div>
     </div>
     """
 

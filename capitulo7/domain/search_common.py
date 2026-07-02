@@ -325,13 +325,18 @@ def _build_search_css() -> str:
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
+  }}
+  .search-array-line .search-nodes {{
+    margin: 0;
   }}
   .search-result {{
     width: {SEARCH_RESULT_WIDTH}px;
     min-width: {SEARCH_RESULT_WIDTH}px;
-    height: 58px;
+    height: 54px;
+    align-self: flex-start;
+    margin-top: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
