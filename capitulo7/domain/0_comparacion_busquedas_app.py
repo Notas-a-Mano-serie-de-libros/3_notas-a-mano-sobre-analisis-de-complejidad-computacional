@@ -196,6 +196,34 @@ def all_searches_complete(state):
     return all(item["state"]["search_complete"] for item in state["algorithms"])
 
 
+def copy_algorithm_state(item):
+    search_state = dict(item["state"])
+    search_state["arr"] = [dict(node) for node in item["state"]["arr"]]
+    search_state.pop("_node_html_cache", None)
+    return {
+        **item,
+        "state": search_state,
+        "html_cache": dict(item.get("html_cache", {})),
+    }
+
+
+def copy_comparison_state(state):
+    return {
+        **state,
+        "values": list(state["values"]),
+        "algorithms": [copy_algorithm_state(item) for item in state["algorithms"]],
+    }
+
+
+def build_comparison_trace(state):
+    probe = copy_comparison_state(state)
+    trace = []
+    while not all_searches_complete(probe):
+        step_all_searches(probe)
+        trace.append(copy_comparison_state(probe))
+    return trace
+
+
 def render_compact_node(node, role_styles):
     fill, border, text = resolve_node_style(node, role_styles)
     return f"""
@@ -597,8 +625,10 @@ def run_app():
         finish_button.disabled = False
 
     def finish_all_searches():
-        while not all_searches_complete(state):
-            step_all_searches(state)
+        nonlocal state
+        trace = build_comparison_trace(state)
+        if trace:
+            state = trace[-1]
 
     def reset_comparison(*_args):
         nonlocal state
@@ -624,12 +654,14 @@ def run_app():
         redraw(force_static=True)
 
     def run_auto(*_args):
+        nonlocal state
         set_running_buttons()
-        while not all_searches_complete(state):
+        trace = build_comparison_trace(state)
+        for snapshot in trace:
             if execution_state["finish_requested"]:
                 finish_all_searches()
                 break
-            step_all_searches(state)
+            state = snapshot
             redraw()
             colab_pause(0.45)
         redraw()

@@ -77,6 +77,11 @@ class OutputCache:
         self.html = html
         return True
 
+    def update_outputs(self, formula_widget, html_widget, formula, html, reserved_height=None):
+        formula_changed = self.update_formula(formula_widget, formula, reserved_height)
+        html_changed = self.update_html(html_widget, html)
+        return formula_changed or html_changed
+
 
 __all__ = [
     "OutputCache",

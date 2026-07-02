@@ -5,7 +5,7 @@ from html import escape
 from IPython.display import display
 import ipywidgets as widgets
 
-from sort_common import colab_pause, create_state as create_sort_state, generate_values, step_sort
+from sort_common import colab_pause, copy_sort_state, create_state as create_sort_state, generate_values, step_sort
 from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES
 
 try:
@@ -77,6 +77,32 @@ def step_all_sorts(state):
 
 def all_sorts_complete(state):
     return all(item["state"]["sorting_complete"] for item in state["algorithms"])
+
+
+def copy_sort_item(item):
+    return {
+        **item,
+        "state": copy_sort_state(item["state"]),
+        "html_cache": dict(item.get("html_cache", {})),
+    }
+
+
+def copy_comparison_state(state):
+    return {
+        **state,
+        "values": list(state["values"]),
+        "selected_algorithms": tuple(state["selected_algorithms"]),
+        "algorithms": [copy_sort_item(item) for item in state["algorithms"]],
+    }
+
+
+def build_comparison_trace(state):
+    probe = copy_comparison_state(state)
+    trace = []
+    while not all_sorts_complete(probe):
+        step_all_sorts(probe)
+        trace.append(copy_comparison_state(probe))
+    return trace
 
 
 def selected_from_checks(algorithm_checks):
@@ -417,8 +443,10 @@ def run_app():
         finish_button.disabled = False
 
     def finish_all_sorts():
-        while not all_sorts_complete(state):
-            step_all_sorts(state)
+        nonlocal state
+        trace = build_comparison_trace(state)
+        if trace:
+            state = trace[-1]
 
     def reset_comparison(*_args):
         nonlocal state
@@ -435,12 +463,14 @@ def run_app():
         redraw(force_static=True)
 
     def run_auto(*_args):
+        nonlocal state
         set_running_buttons()
-        while not all_sorts_complete(state):
+        trace = build_comparison_trace(state)
+        for snapshot in trace:
             if execution_state["finish_requested"]:
                 finish_all_sorts()
                 break
-            step_all_sorts(state)
+            state = snapshot
             redraw()
             colab_pause()
         redraw()

@@ -79,6 +79,10 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("visibility:hidden", widget.value)
         self.assertGreaterEqual(int(widget.layout.min_height.removesuffix("px")), int(first_height.removesuffix("px")))
         self.assertFalse(cache.update_formula(widget, tall_formula))
+        html_widget = Widget()
+        self.assertTrue(cache.update_outputs(widget, html_widget, r"z = 3", "<div>dos</div>", 420))
+        self.assertEqual(html_widget.value, "<div>dos</div>")
+        self.assertFalse(cache.update_outputs(widget, html_widget, r"z = 3", "<div>dos</div>", 420))
 
     def test_runtime_uses_original_synchronous_pause_for_colab(self):
         source = (PROJECT_ROOT / "common" / "animation_runtime.py").read_text(encoding="utf-8")
@@ -87,6 +91,7 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("colab_output.eval_js", source)
         self.assertIn("time.sleep(seconds)", source)
         self.assertIn("def update_formula(self, widget, formula, reserved_height=None):", source)
+        self.assertIn("def update_outputs(self, formula_widget, html_widget, formula, html, reserved_height=None):", source)
         self.assertIn("def render_formula_html(self, formula, height):", source)
         self.assertIn("def render_formula_iframe(self, formula, height, hidden=False):", source)
         self.assertIn("def mathjax_srcdoc(formula):", source)

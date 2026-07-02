@@ -143,6 +143,17 @@ def copy_event(event):
     return copied
 
 
+def copy_sort_state(state):
+    copied = dict(state)
+    for key in LIST_EVENT_KEYS:
+        if key in copied:
+            copied[key] = list(copied[key])
+    for key in TREE_EVENT_KEYS:
+        if key in copied:
+            copied[key] = [copy_tree_node(node) for node in copied[key]]
+    return copied
+
+
 def step_sort(state):
     if state["sorting_complete"]:
         return
@@ -769,10 +780,22 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
 
     state = build_state()
 
+    def build_sort_trace():
+        probe = copy_sort_state(state)
+        trace = []
+        while not probe["sorting_complete"]:
+            step_sort(probe)
+            trace.append(copy_sort_state(probe))
+        return trace
+
     def redraw():
         formula = state["formula"]
-        render_cache.update_formula(formula_output, formula)
-        render_cache.update_html(html_output, render_state_html(state, include_styles=False))
+        render_cache.update_outputs(
+            formula_output,
+            html_output,
+            formula,
+            render_state_html(state, include_styles=False),
+        )
 
     def reset_algorithm(*_args):
         nonlocal state
@@ -796,19 +819,23 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
         redraw()
 
     def run_auto(*_args):
+        nonlocal state
         execution_controls = (controls["step"], controls["auto"], controls["finish"])
 
         set_disabled(execution_controls, True)
-        while not state["sorting_complete"]:
-            step_sort(state)
+        trace = build_sort_trace()
+        for snapshot in trace:
+            state = snapshot
             redraw()
             colab_pause()
         set_disabled(execution_controls, False)
 
     def finish_without_animation(*_args):
+        nonlocal state
         set_disabled((controls["step"], controls["auto"], controls["finish"]), True)
-        while not state["sorting_complete"]:
-            step_sort(state)
+        trace = build_sort_trace()
+        if trace:
+            state = trace[-1]
         redraw()
         set_disabled((controls["step"], controls["auto"], controls["finish"]), False)
 
@@ -855,6 +882,7 @@ __all__ = [
     "create_state",
     "step_sort",
     "copy_event",
+    "copy_sort_state",
     "render_state_html",
     "run_sort_app",
 ]

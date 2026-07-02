@@ -477,6 +477,15 @@ def calculate_formula_reserved_height(state, step_search):
     return max_height
 
 
+def build_search_trace(state, step_search):
+    probe = deepcopy(state)
+    trace = []
+    while not probe.get("search_complete"):
+        step_search(probe)
+        trace.append(deepcopy(probe))
+    return trace
+
+
 def run_search_app(
     *,
     create_state,
@@ -602,8 +611,13 @@ def run_search_app(
 
     def redraw():
         formula = state.get("formula")
-        render_cache.update_formula(formula_output, formula, state.get("formula_reserved_height"))
-        render_cache.update_html(html_output, render_html(state))
+        render_cache.update_outputs(
+            formula_output,
+            html_output,
+            formula,
+            render_html(state),
+            state.get("formula_reserved_height"),
+        )
 
     def sync_execution_buttons():
         complete = state["search_complete"]
@@ -659,11 +673,13 @@ def run_search_app(
         sync_execution_buttons()
 
     def run_auto(*_args):
+        nonlocal state
         controls = (auto_button, finish_button, step_button, reset_button, book_button)
 
         set_disabled(controls, True)
-        while not state["search_complete"]:
-            step_search(state)
+        trace = build_search_trace(state, step_search)
+        for snapshot in trace:
+            state = snapshot
             redraw()
             colab_pause(0.45)
         reset_button.disabled = False
@@ -671,9 +687,11 @@ def run_search_app(
         sync_execution_buttons()
 
     def finish_without_animation(*_args):
+        nonlocal state
         set_disabled((auto_button, finish_button, step_button, reset_button, book_button), True)
-        while not state["search_complete"]:
-            step_search(state)
+        trace = build_search_trace(state, step_search)
+        if trace:
+            state = trace[-1]
         redraw()
         reset_button.disabled = False
         book_button.disabled = False
@@ -747,6 +765,7 @@ __all__ = [
     "message_html",
     "calculate_search_dimensions",
     "calculate_formula_reserved_height",
+    "build_search_trace",
     "_SEARCH_CSS",
     "render_result_symbol",
     "render_state_html",
