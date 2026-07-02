@@ -66,13 +66,13 @@ def range_formula_row(state=None):
 
 def mid_formula_row(state=None):
     if state is None or state.get("low") is None or state.get("high") is None or state.get("mid") is None:
-        return r"m &= \left\lfloor\frac{a + b}{2}\right\rfloor"
+        return r"m &= a + \left\lfloor\frac{b - a}{2}\right\rfloor"
 
-    numerator = state["low"] + state["high"]
-    raw_middle = numerator / 2
-    raw_middle_text = str(int(raw_middle)) if raw_middle.is_integer() else f"{raw_middle:.1f}"
+    difference = state["high"] - state["low"]
+    raw_offset = difference / 2
+    raw_offset_text = str(int(raw_offset)) if raw_offset.is_integer() else f"{raw_offset:.1f}"
 
-    return rf"m &= \left\lfloor\frac{{a + b}}{{2}}\right\rfloor = \left\lfloor\frac{{{state['low']} + {state['high']}}}{{2}}\right\rfloor = \left\lfloor\frac{{{numerator}}}{{2}}\right\rfloor = \left\lfloor {raw_middle_text} \right\rfloor = {state['mid']}"
+    return rf"m &= a + \left\lfloor\frac{{b - a}}{{2}}\right\rfloor = {state['low']} + \left\lfloor\frac{{{state['high']} - {state['low']}}}{{2}}\right\rfloor = {state['low']} + \left\lfloor\frac{{{difference}}}{{2}}\right\rfloor = {state['low']} + \left\lfloor {raw_offset_text} \right\rfloor = {state['mid']}"
 
 
 def phase_statuses(state=None):
@@ -358,7 +358,7 @@ def step_exponential_search(state):
             finish_not_found(state)
             return
 
-        state["mid"] = (state["low"] + state["high"]) // 2
+        state["mid"] = state["low"] + (state["high"] - state["low"]) // 2
         paint_binary_state(state, show_mid=True)
         state["general_message"] = f"Búsqueda binaria: evalúa m en la posición {state['mid']}."
         state["phase"] = "binary_compare"

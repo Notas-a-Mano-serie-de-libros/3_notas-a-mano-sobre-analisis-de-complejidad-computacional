@@ -31,37 +31,37 @@ def symbolic_formula():
     return r"""
 \displaystyle
 m =
-\left\lfloor
-\frac{a + b}{2}
+a + \left\lfloor
+\frac{b - a}{2}
 \right\rfloor
 """
 
 def build_formula(state):
-    numerator = state["low"] + state["high"]
-    raw_middle = numerator / 2
+    difference = state["high"] - state["low"]
+    raw_offset = difference / 2
 
-    if raw_middle.is_integer():
-        raw_middle_text = str(int(raw_middle))
+    if raw_offset.is_integer():
+        raw_offset_text = str(int(raw_offset))
     else:
-        raw_middle_text = f"{raw_middle:.1f}"
+        raw_offset_text = f"{raw_offset:.1f}"
 
     return rf"""
 \displaystyle
 m =
-\left\lfloor
-\frac{{a + b}}{{2}}
+a + \left\lfloor
+\frac{{b - a}}{{2}}
 \right\rfloor
 =
-\left\lfloor
-\frac{{{state["low"]} + {state["high"]}}}{{2}}
+{state["low"]} + \left\lfloor
+\frac{{{state["high"]} - {state["low"]}}}{{2}}
 \right\rfloor
 =
-\left\lfloor
-\frac{{{numerator}}}{{2}}
+{state["low"]} + \left\lfloor
+\frac{{{difference}}}{{2}}
 \right\rfloor
 =
-\left\lfloor
-{raw_middle_text}
+{state["low"]} + \left\lfloor
+{raw_offset_text}
 \right\rfloor
 =
 {state["mid"]}
@@ -154,7 +154,7 @@ def step_binary_search(state):
         state["arr"][index]["role"] = "default"
 
     if state["phase"] == "select":
-        state["mid"] = (state["low"] + state["high"]) // 2
+        state["mid"] = state["low"] + (state["high"] - state["low"]) // 2
         state["arr"][state["mid"]]["role"] = "current"
         state["formula"] = build_formula(state)
         label_range(state)
