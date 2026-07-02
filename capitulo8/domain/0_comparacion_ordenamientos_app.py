@@ -135,11 +135,7 @@ def render_bars(item, show_indexes=False):
     return html
 
 
-def render_comparison_html(state):
-    rows = "".join(
-        render_bars(item, show_indexes=index == 0)
-        for index, item in enumerate(state["algorithms"])
-    )
+def render_comparison_styles():
     return f"""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
@@ -157,7 +153,7 @@ def render_comparison_html(state):
       .comparison-table {{
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 0;
         width: 100%;
         background: #000000;
       }}
@@ -168,6 +164,8 @@ def render_comparison_html(state):
         gap: 8px;
         width: 100%;
         background: #000000;
+        font-family: '{FONT_FAMILY}', serif;
+        color: #ffffff;
       }}
       .comparison-header {{
         align-items: end;
@@ -276,13 +274,33 @@ def render_comparison_html(state):
         }}
       }}
     </style>
+    """
+
+
+def render_comparison_header_html():
+    return """
+    <div class="comparison-header">
+      <div class="comparison-head-cell">Algoritmo</div>
+      <div class="comparison-head-cell">Pasos</div>
+      <div class="comparison-head-cell">Arreglo</div>
+    </div>
+    """
+
+
+def render_comparison_rows_html(state):
+    return "".join(
+        render_bars(item, show_indexes=index == 0)
+        for index, item in enumerate(state["algorithms"])
+    )
+
+
+def render_comparison_html(state):
+    rows = render_comparison_rows_html(state)
+    return f"""
+    {render_comparison_styles()}
     <div class="comparison-app">
       <div class="comparison-table">
-        <div class="comparison-header">
-          <div class="comparison-head-cell">Algoritmo</div>
-          <div class="comparison-head-cell">Pasos</div>
-          <div class="comparison-head-cell">Arreglo</div>
-        </div>
+        {render_comparison_header_html()}
         {rows}
       </div>
     </div>
@@ -351,7 +369,13 @@ def run_app():
     auto_button = widgets.Button(description="Ordenar", button_style="success", layout=widgets.Layout(width="150px"))
     finish_button = widgets.Button(description="Finalizar", button_style="info", disabled=True, layout=widgets.Layout(width="150px"))
     reset_button = widgets.Button(description="Generar nuevo arreglo", button_style="warning", layout=widgets.Layout(width="190px"))
-    html_output = widgets.HTML(layout=widgets.Layout(width="100%"))
+    style_output = widgets.HTML(value=render_comparison_styles(), layout=widgets.Layout(width="100%"))
+    header_output = widgets.HTML(value=render_comparison_header_html(), layout=widgets.Layout(width="100%"))
+    rows_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
+    html_output = widgets.VBox(
+        [style_output, widgets.VBox([header_output, rows_output], layout=widgets.Layout(width="100%", gap="0"))],
+        layout=widgets.Layout(width="100%"),
+    )
     control_state = {"updating": False}
     execution_state = {"running": False, "finish_requested": False}
 
@@ -366,8 +390,13 @@ def run_app():
 
     state = build_state()
 
-    def redraw():
-        html_output.value = render_comparison_html(state)
+    def redraw(force_static=False):
+        if force_static:
+            style_output.value = render_comparison_styles()
+            header_output.value = render_comparison_header_html()
+        rows = render_comparison_rows_html(state)
+        if rows_output.value != rows:
+            rows_output.value = rows
 
     def set_idle_buttons():
         execution_state["running"] = False
@@ -393,13 +422,13 @@ def run_app():
             return
         state = build_state()
         set_idle_buttons()
-        redraw()
+        redraw(force_static=True)
 
     def generate_new(*_args):
         nonlocal state
         state = build_state(values=generate_values(size_input.value))
         set_idle_buttons()
-        redraw()
+        redraw(force_static=True)
 
     def run_auto(*_args):
         set_running_buttons()
@@ -436,7 +465,7 @@ def run_app():
         layout=widgets.Layout(width="100%", gap="10px"),
     )
     display(layout)
-    redraw()
+    redraw(force_static=True)
 
 
 __all__ = [

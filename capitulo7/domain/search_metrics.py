@@ -29,9 +29,8 @@ def count_ternary(values, target):
     left, right = 0, len(values) - 1
     steps = 0
     while left <= right:
-        third = (right - left) // 3
-        m1 = left + third
-        m2 = right - third
+        m1 = math.floor(left + (right - left) / 3)
+        m2 = math.floor(right - (right - left) / 3)
         steps += 1
         if values[m1] == target:
             return steps
@@ -56,8 +55,10 @@ def count_jump(values, target):
     previous = 0
     current = min(jump, n)
     steps = 0
-    while previous < n and values[min(current, n) - 1] < target:
+    while previous < n:
         steps += 1
+        if target <= values[min(current, n) - 1]:
+            break
         previous = current
         current = min(current + jump, n)
         if previous >= n:
@@ -82,7 +83,7 @@ def count_exponential(values, target):
         if values[bound] == target:
             return steps
         bound *= 2
-    low = bound // 2 + 1
+    low = bound // 2
     high = min(bound, n - 1)
     return steps + count_binary(values[low:high + 1], target)
 

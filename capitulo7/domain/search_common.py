@@ -36,6 +36,7 @@ SEARCH_NODE_GAP = 0
 SEARCH_LABEL_HEIGHT = 28
 SEARCH_MESSAGE_HEIGHT = 44
 SEARCH_VERTICAL_PADDING = 16
+SEARCH_RESULT_WIDTH = 42
 _SEARCH_DIMENSION_CACHE = {}
 TARGET_EXISTS = "exists"
 TARGET_MISSING = "missing"
@@ -283,6 +284,7 @@ def calculate_search_dimensions(state):
         "nodes_height": nodes_height,
         "app_height": app_height,
         "nodes_width": SEARCH_NODES_PER_ROW * SEARCH_NODE_WIDTH + (SEARCH_NODES_PER_ROW - 1) * SEARCH_NODE_GAP,
+        "result_width": SEARCH_RESULT_WIDTH,
     }
     _SEARCH_DIMENSION_CACHE[node_count] = dimensions
     return dimensions
@@ -318,6 +320,33 @@ def _build_search_css() -> str:
     gap: {SEARCH_NODE_GAP}px;
     margin: 0 auto;
     padding: 8px 0;
+  }}
+  .search-array-line {{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+  }}
+  .search-result {{
+    width: {SEARCH_RESULT_WIDTH}px;
+    min-width: {SEARCH_RESULT_WIDTH}px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }}
+  .search-result-symbol {{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    font-family: '{FONT_FAMILY}', serif;
+    font-size: 30px;
+    line-height: 1;
+    font-weight: 700;
+    color: #111111;
   }}
   .node-wrap {{
     width: {SEARCH_NODE_WIDTH}px;
@@ -386,6 +415,20 @@ def _build_search_css() -> str:
 _SEARCH_CSS = _build_search_css()
 
 
+def render_result_symbol(state):
+    if not state.get("search_complete"):
+        return ""
+
+    found = any(node["role"] == "found" for node in state.get("arr", []))
+    symbol = "✓" if found else "×"
+    label = "Encontrado" if found else "No encontrado"
+    class_name = "found" if found else "missing"
+    return (
+        f'<span class="search-result-symbol {class_name}" '
+        f'aria-label="{label}" title="{label}">{symbol}</span>'
+    )
+
+
 def render_state_html(state, role_styles, label_map):
     message = message_html(state["general_message"] or f"Elemento de interés: {state['target']}")
     node_cache = state.setdefault("_node_html_cache", {})
@@ -403,10 +446,14 @@ def render_state_html(state, role_styles, label_map):
         node_markup.append(node_cache[key])
     nodes = "".join(node_markup)
     dimensions = calculate_search_dimensions(state)
+    result = render_result_symbol(state)
     return (
         f'<div class="search-app" style="min-height: {dimensions["app_height"]}px;">'
         f'<div class="search-message">{message}</div>'
+        f'<div class="search-array-line">'
         f'<div class="search-nodes" style="width: min(100%, {dimensions["nodes_width"]}px); min-height: {dimensions["nodes_height"]}px;">{nodes}</div>'
+        f'<div class="search-result">{result}</div>'
+        f'</div>'
         f'</div>'
     )
 
@@ -675,6 +722,7 @@ __all__ = [
     "PHASE_DONE",
     "PHASE_INACTIVE",
     "MAX_FORMULA_PROBE_STEPS",
+    "SEARCH_RESULT_WIDTH",
     "TARGET_ROLE",
     "TARGET_ROLE_STYLE",
     "_SEARCH_DIMENSION_CACHE",
@@ -695,6 +743,7 @@ __all__ = [
     "calculate_search_dimensions",
     "calculate_formula_reserved_height",
     "_SEARCH_CSS",
+    "render_result_symbol",
     "render_state_html",
     "run_search_app",
 ]

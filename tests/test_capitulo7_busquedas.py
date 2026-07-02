@@ -731,10 +731,14 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("SEARCH_NODE_GAP = 0", common_source)
         self.assertIn("SEARCH_LABEL_HEIGHT = 28", common_source)
         self.assertIn("SEARCH_MESSAGE_HEIGHT = 44", common_source)
+        self.assertIn("SEARCH_RESULT_WIDTH = 42", common_source)
         self.assertIn("def calculate_search_dimensions(state):", common_source)
         self.assertIn('min-height: {dimensions["app_height"]}px;', common_source)
         self.assertIn('min-height: {dimensions["nodes_height"]}px;', common_source)
         self.assertIn('height: {SEARCH_MESSAGE_HEIGHT}px;', common_source)
+        self.assertIn("search-array-line", common_source)
+        self.assertIn("search-result-symbol", common_source)
+        self.assertIn("def render_result_symbol(state):", common_source)
         self.assertIn('width: min(100%, {dimensions["nodes_width"]}px);', common_source)
         self.assertIn("height: {SEARCH_NODE_HEIGHT}px;", common_source)
         self.assertIn("flex: 0 0 {SEARCH_NODE_WIDTH}px;", common_source)
@@ -785,6 +789,27 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertIn("_node_html_cache", state)
 
+    def test_search_result_symbol_appears_only_after_completion(self):
+        module = self.modules["binaria"]
+        state = module.create_state(size=8, target=6, values=[1, 2, 3, 4, 5, 6, 7, 8])
+
+        self.assertIn("search-result", module.render_state_html(state))
+        self.assertNotIn("search-result-symbol", module.render_state_html(state))
+        while not state["search_complete"]:
+            module.step_binary_search(state)
+        found_html = module.render_state_html(state)
+        self.assertIn('search-result-symbol found', found_html)
+        self.assertIn(">✓</span>", found_html)
+        self.assertNotIn(r"$\checkmark$", found_html)
+
+        missing = module.create_state(size=8, target=99, values=[1, 2, 3, 4, 5, 6, 7, 8])
+        while not missing["search_complete"]:
+            module.step_binary_search(missing)
+        missing_html = module.render_state_html(missing)
+        self.assertIn('search-result-symbol missing', missing_html)
+        self.assertIn(">×</span>", missing_html)
+        self.assertNotIn(r"$\times$", missing_html)
+
     def test_search_auto_execution_stays_disabled_after_completion(self):
         common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
 
@@ -822,8 +847,14 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
 
         module.step_linear_search(state)
         labels = [node["label"] for node in state["arr"]]
-        self.assertEqual(labels, ["", "i", "", ""])
+        self.assertEqual(labels, ["", "", "", ""])
+        self.assertEqual(state["phase"], "show_current")
         self.assertIn("i &= 1", state["formula"])
+
+        module.step_linear_search(state)
+        labels = [node["label"] for node in state["arr"]]
+        self.assertEqual(labels, ["", "i", "", ""])
+        self.assertEqual(state["phase"], "compare_current")
 
     def test_searches_expose_first_step_before_comparison(self):
         cases = (
@@ -895,6 +926,10 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn('execution_state["finish_requested"] = True', source)
         self.assertIn("def finish_comparison", source)
         self.assertIn("while not all_searches_complete(state):", source)
+        self.assertIn("def comparison_delta(item):", source)
+        self.assertIn('phase == "compare_current"', source)
+        self.assertIn('phase in {"decide_block", "linear_compare"}', source)
+        self.assertIn('phase == "binary_compare"', source)
         self.assertNotIn("AUTO_RENDER_EVERY", source)
         self.assertNotIn("Complejidad temporal", notebook_source)
         self.assertNotIn("Complejidad espacial", notebook_source)
@@ -910,7 +945,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
 
         module.step_all_searches(state)
 
-        self.assertTrue(all(item["steps"] == 1 for item in state["algorithms"]))
+        self.assertTrue(all(item["steps"] == 0 for item in state["algorithms"]))
         html = module.render_comparison_html(state)
         self.assertIn("comparison-table", html)
         self.assertIn("Algoritmo", html)
@@ -923,6 +958,10 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("COMPARISON_NODE_WIDTH = 54", source)
         self.assertIn("array_width = len(state[\"values\"]) * COMPARISON_NODE_WIDTH", source)
         self.assertIn("grid-template-columns: minmax(180px, 240px) 96px {array_width}px 42px;", source)
+        self.assertIn("gap: 0;", source)
+        self.assertIn("rows_output = widgets.HTML", source)
+        self.assertIn("render_comparison_rows_html(state)", source)
+        self.assertNotIn("row_outputs = []", source)
         self.assertIn("comparison-result-symbol", source)
         self.assertIn('symbol = "✓" if found else "×"', source)
         self.assertIn("border: 2px solid #111111;", source)
@@ -951,6 +990,16 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         while not module.all_searches_complete(state):
             module.step_all_searches(state)
         completed_html = module.render_comparison_html(state)
+        metrics = self.launchers._load_module("search_metrics.py", "capitulo7_search_metrics_for_comparison_test")
+        expected_steps = {
+            "Búsqueda binaria": metrics.count_search_steps("Binaria", values, 6),
+            "Búsqueda ternaria": metrics.count_search_steps("Ternaria", values, 6),
+            "Búsqueda exponencial": metrics.count_search_steps("Exponencial", values, 6),
+            "Búsqueda por interpolación": metrics.count_search_steps("Interpolación", values, 6),
+            "Búsqueda por saltos": metrics.count_search_steps("Saltos", values, 6),
+            "Búsqueda secuencial": metrics.count_search_steps("Secuencial", values, 6),
+        }
+        self.assertEqual({item["title"]: item["steps"] for item in state["algorithms"]}, expected_steps)
         self.assertEqual(completed_html.count('comparison-result-symbol found'), len(state["algorithms"]))
         self.assertEqual(completed_html.count(">✓</span>"), len(state["algorithms"]))
         self.assertNotIn(r"$\checkmark$", completed_html)

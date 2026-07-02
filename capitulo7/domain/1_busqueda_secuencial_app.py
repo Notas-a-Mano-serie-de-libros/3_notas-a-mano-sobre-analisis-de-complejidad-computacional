@@ -113,9 +113,7 @@ def step_linear_search(state):
     state["formula"] = build_formula(state)
 
     if state["current_index"] < len(state["arr"]):
-        state["arr"][state["current_index"]]["role"] = "current"
-        state["arr"][state["current_index"]]["label"] = "i"
-        state["phase"] = "compare_current"
+        state["phase"] = "show_current"
     else:
         finish_not_found(state)
 

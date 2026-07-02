@@ -156,11 +156,40 @@ def create_comparison_state(
     }
 
 
+def comparison_delta(item):
+    search_state = item["state"]
+    phase = search_state.get("phase")
+    key = item["key"]
+
+    if key == "secuencial":
+        return 1 if phase == "compare_current" else 0
+
+    if key in {"binaria", "interpolacion"}:
+        return 1 if phase == "compare" else 0
+
+    if key == "ternaria" and phase == "compare":
+        first_value = search_state["arr"][search_state["m1"]]["value"]
+        if search_state["target"] == first_value:
+            return 1
+        return 2
+
+    if key == "saltos":
+        return 1 if phase in {"decide_block", "linear_compare"} else 0
+
+    if key == "exponencial":
+        if phase == "exponential_compare":
+            return 1 if search_state["current_index"] < len(search_state["arr"]) else 0
+        return 1 if phase == "binary_compare" else 0
+
+    return 0
+
+
 def step_all_searches(state):
     for item in state["algorithms"]:
         if not item["state"]["search_complete"]:
+            delta = comparison_delta(item)
             item["step"](item["state"])
-            item["steps"] += 1
+            item["steps"] += delta
 
 
 def all_searches_complete(state):
@@ -221,12 +250,12 @@ def render_compact_array(item, show_indexes=False):
     return html
 
 
-def render_comparison_html(state):
-    rows = "".join(
-        render_compact_array(item, show_indexes=index == 0)
-        for index, item in enumerate(state["algorithms"])
-    )
+def comparison_array_width(state):
     array_width = len(state["values"]) * COMPARISON_NODE_WIDTH
+    return array_width
+
+
+def render_comparison_styles(array_width):
     return f"""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
@@ -244,7 +273,7 @@ def render_comparison_html(state):
       .comparison-table {{
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 0;
         width: 100%;
         background: #ffffff;
       }}
@@ -256,6 +285,8 @@ def render_comparison_html(state):
         width: 100%;
         box-sizing: border-box;
         background: #ffffff;
+        font-family: '{FONT_FAMILY}', serif;
+        color: #111111;
       }}
       .comparison-header {{
         align-items: end;
@@ -387,14 +418,35 @@ def render_comparison_html(state):
         }}
       }}
     </style>
+    """
+
+
+def render_comparison_header_html():
+    return """
+    <div class="comparison-header">
+      <div class="comparison-head-cell">Algoritmo</div>
+      <div class="comparison-head-cell">Pasos</div>
+      <div class="comparison-head-cell comparison-array-head">Arreglo</div>
+      <div class="comparison-head-cell"></div>
+    </div>
+    """
+
+
+def render_comparison_rows_html(state):
+    return "".join(
+        render_compact_array(item, show_indexes=index == 0)
+        for index, item in enumerate(state["algorithms"])
+    )
+
+
+def render_comparison_html(state):
+    array_width = comparison_array_width(state)
+    rows = render_comparison_rows_html(state)
+    return f"""
+    {render_comparison_styles(array_width)}
     <div class="comparison-app">
       <div class="comparison-table">
-        <div class="comparison-header">
-          <div class="comparison-head-cell">Algoritmo</div>
-          <div class="comparison-head-cell">Pasos</div>
-          <div class="comparison-head-cell comparison-array-head">Arreglo</div>
-          <div class="comparison-head-cell"></div>
-        </div>
+        {render_comparison_header_html()}
         {rows}
       </div>
     </div>
@@ -448,10 +500,16 @@ def run_app():
     auto_button = widgets.Button(description="Buscar", button_style="success", layout=widgets.Layout(width="150px"))
     finish_button = widgets.Button(description="Finalizar", button_style="info", disabled=True, layout=widgets.Layout(width="150px"))
     reset_button = widgets.Button(description="Generar nuevo arreglo", button_style="warning", layout=widgets.Layout(width="190px"))
-    html_output = widgets.HTML(layout=widgets.Layout(width="100%"))
+    style_output = widgets.HTML(layout=widgets.Layout(width="100%"))
+    header_output = widgets.HTML(layout=widgets.Layout(width="100%"))
+    rows_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
+    html_output = widgets.VBox(
+        [style_output, widgets.VBox([header_output, rows_output], layout=widgets.Layout(width="100%", gap="0"))],
+        layout=widgets.Layout(width="100%"),
+    )
     control_state = {"updating": False}
     execution_state = {"running": False, "finish_requested": False}
-    ui_state = {"first_row": None}
+    ui_state = {"first_row": None, "array_width": None}
     state = None
 
     def first_row_controls():
@@ -487,8 +545,18 @@ def run_app():
     def current_values():
         return list(state["values"])
 
-    def redraw():
-        html_output.value = render_comparison_html(state)
+    def refresh_static_html(force=False):
+        array_width = comparison_array_width(state)
+        if force or ui_state["array_width"] != array_width:
+            style_output.value = render_comparison_styles(array_width)
+            header_output.value = render_comparison_header_html()
+            ui_state["array_width"] = array_width
+
+    def redraw(force_static=False):
+        refresh_static_html(force_static)
+        rows = render_comparison_rows_html(state)
+        if rows_output.value != rows:
+            rows_output.value = rows
 
     def set_idle_buttons():
         execution_state["running"] = False
@@ -514,14 +582,14 @@ def run_app():
             return
         state = build_state()
         set_idle_buttons()
-        redraw()
+        redraw(force_static=True)
 
     def on_target_mode_change(*_args):
         nonlocal state
         update_target_position_visibility()
         state = build_state(values=current_values())
         set_idle_buttons()
-        redraw()
+        redraw(force_static=True)
 
     def on_target_position_change(*_args):
         nonlocal state
@@ -529,7 +597,7 @@ def run_app():
             return
         state = build_state(values=current_values())
         set_idle_buttons()
-        redraw()
+        redraw(force_static=True)
 
     def run_auto(*_args):
         set_running_buttons()
@@ -569,7 +637,7 @@ def run_app():
     )
     display(controls)
     state = build_state()
-    redraw()
+    redraw(force_static=True)
 
 
 __all__ = [
