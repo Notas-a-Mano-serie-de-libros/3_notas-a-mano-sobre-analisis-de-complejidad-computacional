@@ -169,7 +169,7 @@ def render_comparison_styles():
       }}
       .comparison-header {{
         align-items: end;
-        padding-bottom: 4px;
+        padding-bottom: 0;
       }}
       .comparison-row {{
         align-items: center;
@@ -294,16 +294,22 @@ def render_comparison_rows_html(state):
     )
 
 
-def render_comparison_html(state):
+def render_comparison_body_html(state):
     rows = render_comparison_rows_html(state)
     return f"""
-    {render_comparison_styles()}
     <div class="comparison-app">
       <div class="comparison-table">
         {render_comparison_header_html()}
         {rows}
       </div>
     </div>
+    """
+
+
+def render_comparison_html(state):
+    return f"""
+    {render_comparison_styles()}
+    {render_comparison_body_html(state)}
     """
 
 
@@ -370,10 +376,9 @@ def run_app():
     finish_button = widgets.Button(description="Finalizar", button_style="info", disabled=True, layout=widgets.Layout(width="150px"))
     reset_button = widgets.Button(description="Generar nuevo arreglo", button_style="warning", layout=widgets.Layout(width="190px"))
     style_output = widgets.HTML(value=render_comparison_styles(), layout=widgets.Layout(width="100%"))
-    header_output = widgets.HTML(value=render_comparison_header_html(), layout=widgets.Layout(width="100%"))
-    rows_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
+    body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
     html_output = widgets.VBox(
-        [style_output, widgets.VBox([header_output, rows_output], layout=widgets.Layout(width="100%", gap="0"))],
+        [style_output, body_output],
         layout=widgets.Layout(width="100%"),
     )
     control_state = {"updating": False}
@@ -393,10 +398,9 @@ def run_app():
     def redraw(force_static=False):
         if force_static:
             style_output.value = render_comparison_styles()
-            header_output.value = render_comparison_header_html()
-        rows = render_comparison_rows_html(state)
-        if rows_output.value != rows:
-            rows_output.value = rows
+        body = render_comparison_body_html(state)
+        if body_output.value != body:
+            body_output.value = body
 
     def set_idle_buttons():
         execution_state["running"] = False
