@@ -65,6 +65,7 @@ def benchmark_search(repeats):
     values = list(range(0, 128, 2))
     target = values[len(values) // 2]
     results = []
+    common = load_module("benchmark_cap7_search_common", CAP7_DOMAIN / "search_common.py", extra_paths=(ROOT, CAP7_DOMAIN))
     for name, filename, step_name in SEARCH_CASES:
         module = load_module(f"benchmark_cap7_{name}", CAP7_DOMAIN / filename, extra_paths=(ROOT, CAP7_DOMAIN))
 
@@ -82,9 +83,19 @@ def benchmark_search(repeats):
                 steps += 1
             return steps
 
+        def lazy_render_steps(module=module, step_name=step_name):
+            state = module.create_state(size=len(values), target=target, values=values)
+            step = getattr(module, step_name)
+            rendered = 0
+            for snapshot in common.build_search_trace(state, step):
+                module.render_state_html(snapshot)
+                rendered += 1
+            return rendered
+
         results.extend([
             measure(f"capitulo7.{name}.render", create_and_render, repeats),
             measure(f"capitulo7.{name}.steps", step_to_end, repeats),
+            measure(f"capitulo7.{name}.lazy_render_steps", lazy_render_steps, repeats),
         ])
     return results
 
@@ -118,7 +129,18 @@ def benchmark_sort(repeats):
                 steps += 1
             return steps
 
+        def lazy_render_steps(module=module, step_name=step_name):
+            state = module.create_state(size=len(values), values=values, view="barras")
+            step = getattr(module, step_name)
+            rendered = 0
+            while not state["sorting_complete"]:
+                step(state)
+                module.render_state_html(state, include_styles=False)
+                rendered += 1
+            return rendered
+
         results.append(measure(f"capitulo8.{name}.steps", step_to_end, repeats))
+        results.append(measure(f"capitulo8.{name}.lazy_render_steps", lazy_render_steps, repeats))
     return results
 
 

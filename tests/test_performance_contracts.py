@@ -22,12 +22,14 @@ class TestPerformanceContracts(unittest.TestCase):
         labels = {item["label"] for item in payload["benchmarks"]}
 
         self.assertEqual(payload["repeats"], 1)
-        self.assertGreaterEqual(len(payload["benchmarks"]), 34)
+        self.assertGreaterEqual(len(payload["benchmarks"]), 45)
         self.assertTrue(all(item["avg_ms"] >= 0 for item in payload["benchmarks"]))
         self.assertIn("capitulo7.ternaria.steps", labels)
+        self.assertIn("capitulo7.ternaria.lazy_render_steps", labels)
         self.assertIn("capitulo7.interpolacion.render", labels)
         self.assertIn("capitulo8.mezcla.arbol.render", labels)
         self.assertIn("capitulo8.rapido.steps", labels)
+        self.assertIn("capitulo8.rapido.lazy_render_steps", labels)
 
     def test_clean_notebooks_check_mode_passes_on_clean_tree(self):
         script = PROJECT_ROOT / "scripts" / "clean_notebooks.py"

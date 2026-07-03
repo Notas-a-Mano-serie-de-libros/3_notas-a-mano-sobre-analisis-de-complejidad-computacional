@@ -11,6 +11,7 @@ REQUIRED_FILES = (
     "common/__init__.py",
     "common/animation_runtime.py",
     "common/plot_style.py",
+    "common/widget_controls.py",
     "capitulo7/notebooks/launchers.py",
     "capitulo7/domain/search_common.py",
     "capitulo7/domain/0_comparacion_busquedas_app.py",

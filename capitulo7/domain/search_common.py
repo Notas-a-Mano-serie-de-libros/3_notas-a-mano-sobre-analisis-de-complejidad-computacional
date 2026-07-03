@@ -9,6 +9,7 @@ from IPython.display import display
 import ipywidgets as widgets
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
+from common.widget_controls import bounded_int_control, button_control, dropdown_control
 
 try:
     import nest_asyncio
@@ -498,11 +499,62 @@ def calculate_formula_reserved_height(state, step_search):
 
 def build_search_trace(state, step_search):
     probe = copy_search_state(state)
-    trace = []
     while not probe.get("search_complete"):
         step_search(probe)
-        trace.append(copy_search_state(probe))
-    return trace
+        yield copy_search_state(probe)
+
+
+def create_search_controls(default_size=DEFAULT_SIZE, max_size=MAX_SIZE, default_target=DEFAULT_TARGET):
+    target_readout = bounded_int_control(
+        value=default_target,
+        min_value=-100,
+        max_value=200,
+        step=1,
+        description="Objetivo",
+        disabled=True,
+        width="180px",
+    )
+    size_input = bounded_int_control(
+        value=default_size,
+        min_value=2,
+        max_value=max_size,
+        step=1,
+        description="Tamaño",
+        width="180px",
+    )
+    target_mode_input = dropdown_control(
+        options=(("Existe", TARGET_EXISTS), ("No existe", TARGET_MISSING)),
+        value=TARGET_EXISTS,
+        description="Elemento",
+        width="190px",
+    )
+    target_position_input = dropdown_control(
+        options=(
+            ("Inicio", TARGET_POSITION_START),
+            ("Fin", TARGET_POSITION_END),
+            ("Mitad", TARGET_POSITION_MIDDLE),
+            ("Aleatorio", TARGET_POSITION_RANDOM),
+        ),
+        value=TARGET_POSITION_RANDOM,
+        description="Posición",
+        width="190px",
+    )
+    step_button = button_control(description="Paso siguiente", button_style="info", width="150px")
+    auto_button = button_control(description="Ejecución automática", button_style="success", width="190px")
+    finish_button = button_control(description="Finalizar", button_style="", width="120px")
+    reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
+    book_button = button_control(description="Generar arreglo del libro", button_style="primary", width="210px")
+    return {
+        "size": size_input,
+        "target_mode": target_mode_input,
+        "target_position": target_position_input,
+        "target_readout": target_readout,
+        "step": step_button,
+        "auto": auto_button,
+        "finish": finish_button,
+        "reset": reset_button,
+        "book": book_button,
+    }
 
 
 def run_search_app(
@@ -526,49 +578,16 @@ def run_search_app(
     extra_controls = extra_controls or {}
     state_kwargs = state_kwargs or {}
 
-    size_input = widgets.BoundedIntText(
-        value=default_size,
-        min=2,
-        max=max_size,
-        step=1,
-        description="Tamaño",
-        style={"description_width": "70px"},
-        layout=widgets.Layout(width="180px"),
-    )
-    target_mode_input = widgets.Dropdown(
-        options=(("Existe", TARGET_EXISTS), ("No existe", TARGET_MISSING)),
-        value=TARGET_EXISTS,
-        description="Elemento",
-        style={"description_width": "70px"},
-        layout=widgets.Layout(width="190px"),
-    )
-    target_position_input = widgets.Dropdown(
-        options=(
-            ("Inicio", TARGET_POSITION_START),
-            ("Fin", TARGET_POSITION_END),
-            ("Mitad", TARGET_POSITION_MIDDLE),
-            ("Aleatorio", TARGET_POSITION_RANDOM),
-        ),
-        value=TARGET_POSITION_RANDOM,
-        description="Posición",
-        style={"description_width": "70px"},
-        layout=widgets.Layout(width="190px"),
-    )
-    target_readout = widgets.BoundedIntText(
-        value=default_target,
-        min=-100,
-        max=200,
-        step=1,
-        description="Objetivo",
-        disabled=True,
-        style={"description_width": "70px"},
-        layout=widgets.Layout(width="180px"),
-    )
-    step_button = widgets.Button(description="Paso siguiente", button_style="info", layout=widgets.Layout(width="150px"))
-    auto_button = widgets.Button(description="Ejecución automática", button_style="success", layout=widgets.Layout(width="190px"))
-    finish_button = widgets.Button(description="Finalizar", button_style="", layout=widgets.Layout(width="120px"))
-    reset_button = widgets.Button(description="Generar nuevo arreglo", button_style="warning", layout=widgets.Layout(width="190px"))
-    book_button = widgets.Button(description="Generar arreglo del libro", button_style="primary", layout=widgets.Layout(width="210px"))
+    controls = create_search_controls(default_size, max_size, default_target)
+    size_input = controls["size"]
+    target_mode_input = controls["target_mode"]
+    target_position_input = controls["target_position"]
+    target_readout = controls["target_readout"]
+    step_button = controls["step"]
+    auto_button = controls["auto"]
+    finish_button = controls["finish"]
+    reset_button = controls["reset"]
+    book_button = controls["book"]
     formula_output = widgets.HTML(
         value="",
         layout=widgets.Layout(
@@ -693,11 +712,10 @@ def run_search_app(
 
     def run_auto(*_args):
         nonlocal state
-        controls = (auto_button, finish_button, step_button, reset_button, book_button)
+        execution_controls = (auto_button, finish_button, step_button, reset_button, book_button)
 
-        set_disabled(controls, True)
-        trace = build_search_trace(state, step_search)
-        for snapshot in trace:
+        set_disabled(execution_controls, True)
+        for snapshot in build_search_trace(state, step_search):
             state = snapshot
             redraw()
             colab_pause(0.45)
@@ -708,9 +726,11 @@ def run_search_app(
     def finish_without_animation(*_args):
         nonlocal state
         set_disabled((auto_button, finish_button, step_button, reset_button, book_button), True)
-        trace = build_search_trace(state, step_search)
-        if trace:
-            state = trace[-1]
+        final_state = None
+        for snapshot in build_search_trace(state, step_search):
+            final_state = snapshot
+        if final_state is not None:
+            state = final_state
         redraw()
         reset_button.disabled = False
         book_button.disabled = False

@@ -5,6 +5,7 @@ from html import escape
 from IPython.display import display
 import ipywidgets as widgets
 
+from common.widget_controls import bounded_int_control, button_control, dropdown_control
 from sort_common import colab_pause, copy_sort_state, create_state as create_sort_state, generate_values, step_sort
 from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES
 
@@ -98,11 +99,9 @@ def copy_comparison_state(state):
 
 def build_comparison_trace(state):
     probe = copy_comparison_state(state)
-    trace = []
     while not all_sorts_complete(probe):
         step_all_sorts(probe)
-        trace.append(copy_comparison_state(probe))
-    return trace
+        yield copy_comparison_state(probe)
 
 
 def selected_from_checks(algorithm_checks):
@@ -343,19 +342,21 @@ def run_app():
     if colab_output is not None:
         colab_output.enable_custom_widget_manager()
 
-    size_input = widgets.BoundedIntText(
+    size_input = bounded_int_control(
         value=DEFAULT_BAR_SIZE,
-        min=2,
-        max=MAX_SIZE,
+        min_value=2,
+        max_value=MAX_SIZE,
         step=1,
         description="Tamaño",
-        layout=widgets.Layout(width="180px"),
+        width="180px",
+        description_style={},
     )
-    order_dropdown = widgets.Dropdown(
+    order_dropdown = dropdown_control(
         options=ORDER_OPTIONS,
         value=False,
         description="Orden",
-        layout=widgets.Layout(width="210px"),
+        width="210px",
+        description_style={},
     )
     algorithm_checks = {
         value: widgets.Checkbox(value=True, description=label, indent=False, layout=widgets.Layout(width="100%"))
@@ -398,9 +399,9 @@ def run_app():
             overflow="visible",
         ),
     )
-    auto_button = widgets.Button(description="Ordenar", button_style="success", layout=widgets.Layout(width="150px"))
-    finish_button = widgets.Button(description="Finalizar", button_style="info", disabled=True, layout=widgets.Layout(width="150px"))
-    reset_button = widgets.Button(description="Generar nuevo arreglo", button_style="warning", layout=widgets.Layout(width="190px"))
+    auto_button = button_control(description="Ordenar", button_style="success", width="150px")
+    finish_button = button_control(description="Finalizar", button_style="info", width="150px", disabled=True)
+    reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
     style_output = widgets.HTML(value=render_comparison_styles(), layout=widgets.Layout(width="100%"))
     body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
     html_output = widgets.VBox(
@@ -444,9 +445,11 @@ def run_app():
 
     def finish_all_sorts():
         nonlocal state
-        trace = build_comparison_trace(state)
-        if trace:
-            state = trace[-1]
+        final_state = None
+        for snapshot in build_comparison_trace(state):
+            final_state = snapshot
+        if final_state is not None:
+            state = final_state
 
     def reset_comparison(*_args):
         nonlocal state
@@ -465,8 +468,7 @@ def run_app():
     def run_auto(*_args):
         nonlocal state
         set_running_buttons()
-        trace = build_comparison_trace(state)
-        for snapshot in trace:
+        for snapshot in build_comparison_trace(state):
             if execution_state["finish_requested"]:
                 finish_all_sorts()
                 break

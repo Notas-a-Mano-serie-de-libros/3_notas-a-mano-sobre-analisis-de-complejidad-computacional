@@ -7,6 +7,7 @@ from IPython.display import display
 import ipywidgets as widgets
 
 from common.animation_runtime import OutputCache, pause, set_disabled
+from common.widget_controls import bounded_int_control, button_control, dropdown_control
 
 try:
     from google.colab import output as colab_output
@@ -700,37 +701,41 @@ def render_state_html(state, include_styles=True):
 
 
 def build_controls(has_pivot=False, has_tree=False):
-    size_input = widgets.BoundedIntText(
+    size_input = bounded_int_control(
         value=default_size_for_view("barras"),
-        min=2,
-        max=MAX_SIZE,
+        min_value=2,
+        max_value=MAX_SIZE,
         step=1,
         description="Tamaño",
-        layout=widgets.Layout(width="180px"),
+        width="180px",
+        description_style={},
     )
-    view_dropdown = widgets.Dropdown(
+    view_dropdown = dropdown_control(
         options=TREE_VIEW_OPTIONS if has_tree else VIEW_OPTIONS,
         value="barras",
         description="Vista",
-        layout=widgets.Layout(width="180px"),
+        width="180px",
+        description_style={},
     )
-    order_dropdown = widgets.Dropdown(
+    order_dropdown = dropdown_control(
         options=ORDER_OPTIONS,
         value=False,
         description="Orden",
-        layout=widgets.Layout(width="210px"),
+        width="210px",
+        description_style={},
     )
-    pivot_dropdown = widgets.Dropdown(
+    pivot_dropdown = dropdown_control(
         options=PIVOT_OPTIONS,
         value="end",
         description="Pivote",
-        layout=widgets.Layout(width="180px"),
+        width="180px",
+        description_style={},
     )
-    step_button = widgets.Button(description="Paso siguiente", button_style="info", layout=widgets.Layout(width="150px"))
-    auto_button = widgets.Button(description="Ejecución automática", button_style="success", layout=widgets.Layout(width="190px"))
-    finish_button = widgets.Button(description="Finalizar", button_style="", layout=widgets.Layout(width="120px"))
-    reset_button = widgets.Button(description="Generar nuevo arreglo", button_style="warning", layout=widgets.Layout(width="190px"))
-    book_button = widgets.Button(description="Generar arreglo del libro", button_style="primary", layout=widgets.Layout(width="210px"))
+    step_button = button_control(description="Paso siguiente", button_style="info", width="150px")
+    auto_button = button_control(description="Ejecución automática", button_style="success", width="190px")
+    finish_button = button_control(description="Finalizar", button_style="", width="120px")
+    reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
+    book_button = button_control(description="Generar arreglo del libro", button_style="primary", width="210px")
     controls = {
         "size": size_input,
         "view": view_dropdown,
@@ -782,11 +787,9 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
 
     def build_sort_trace():
         probe = copy_sort_state(state)
-        trace = []
         while not probe["sorting_complete"]:
             step_sort(probe)
-            trace.append(copy_sort_state(probe))
-        return trace
+            yield copy_sort_state(probe)
 
     def redraw():
         formula = state["formula"]
@@ -823,8 +826,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
         execution_controls = (controls["step"], controls["auto"], controls["finish"])
 
         set_disabled(execution_controls, True)
-        trace = build_sort_trace()
-        for snapshot in trace:
+        for snapshot in build_sort_trace():
             state = snapshot
             redraw()
             colab_pause()
@@ -833,9 +835,11 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
     def finish_without_animation(*_args):
         nonlocal state
         set_disabled((controls["step"], controls["auto"], controls["finish"]), True)
-        trace = build_sort_trace()
-        if trace:
-            state = trace[-1]
+        final_state = None
+        for snapshot in build_sort_trace():
+            final_state = snapshot
+        if final_state is not None:
+            state = final_state
         redraw()
         set_disabled((controls["step"], controls["auto"], controls["finish"]), False)
 

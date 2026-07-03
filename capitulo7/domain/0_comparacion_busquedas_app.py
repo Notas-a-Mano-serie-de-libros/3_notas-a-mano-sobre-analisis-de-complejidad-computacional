@@ -22,6 +22,7 @@ from search_common import (
     generate_sorted_values,
     resolve_node_style,
 )
+from common.widget_controls import bounded_int_control, button_control, dropdown_control
 
 try:
     import nest_asyncio
@@ -513,23 +514,30 @@ def run_app():
     if colab_output is not None:
         colab_output.enable_custom_widget_manager()
 
-    size_input = widgets.BoundedIntText(
+    target_readout = bounded_int_control(
+        value=BOOK_TARGET,
+        min_value=-100,
+        max_value=200,
+        step=1,
+        description="Objetivo",
+        disabled=True,
+        width="180px",
+    )
+    size_input = bounded_int_control(
         value=DEFAULT_SIZE,
-        min=2,
-        max=MAX_SIZE,
+        min_value=2,
+        max_value=MAX_SIZE,
         step=1,
         description="Tamaño",
-        style={"description_width": "70px"},
-        layout=widgets.Layout(width="180px"),
+        width="180px",
     )
-    target_mode_input = widgets.Dropdown(
+    target_mode_input = dropdown_control(
         options=(("Existe", TARGET_EXISTS), ("No existe", TARGET_MISSING)),
         value=TARGET_EXISTS,
         description="Elemento",
-        style={"description_width": "70px"},
-        layout=widgets.Layout(width="190px"),
+        width="190px",
     )
-    target_position_input = widgets.Dropdown(
+    target_position_input = dropdown_control(
         options=(
             ("Inicio", TARGET_POSITION_START),
             ("Fin", TARGET_POSITION_END),
@@ -538,22 +546,11 @@ def run_app():
         ),
         value=TARGET_POSITION_RANDOM,
         description="Posición",
-        style={"description_width": "70px"},
-        layout=widgets.Layout(width="190px"),
+        width="190px",
     )
-    target_readout = widgets.BoundedIntText(
-        value=BOOK_TARGET,
-        min=-100,
-        max=200,
-        step=1,
-        description="Objetivo",
-        disabled=True,
-        style={"description_width": "70px"},
-        layout=widgets.Layout(width="180px"),
-    )
-    auto_button = widgets.Button(description="Buscar", button_style="success", layout=widgets.Layout(width="150px"))
-    finish_button = widgets.Button(description="Finalizar", button_style="info", disabled=True, layout=widgets.Layout(width="150px"))
-    reset_button = widgets.Button(description="Generar nuevo arreglo", button_style="warning", layout=widgets.Layout(width="190px"))
+    auto_button = button_control(description="Buscar", button_style="success", width="150px")
+    finish_button = button_control(description="Finalizar", button_style="info", width="150px", disabled=True)
+    reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
     style_output = widgets.HTML(layout=widgets.Layout(width="100%"))
     body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
     html_output = widgets.VBox(
