@@ -22,6 +22,16 @@ class TestNotebooksAreClean(unittest.TestCase):
                         continue
                     self.assertEqual(cell.get("outputs", []), [], f"celda {index}")
                     self.assertIsNone(cell.get("execution_count"), f"celda {index}")
+                    metadata = cell.get("metadata", {})
+                    self.assertNotIn("ExecuteTime", metadata, f"celda {index}")
+                    self.assertNotIn("execution", metadata, f"celda {index}")
+
+    def test_notebooks_are_protected_by_git_filter(self):
+        attributes = (PROJECT_ROOT / ".gitattributes").read_text(encoding="utf-8")
+        filter_script = PROJECT_ROOT / "scripts" / "clean_notebook_filter.py"
+
+        self.assertIn("*.ipynb filter=strip-notebook-output", attributes)
+        self.assertTrue(filter_script.exists())
 
 
 if __name__ == "__main__":

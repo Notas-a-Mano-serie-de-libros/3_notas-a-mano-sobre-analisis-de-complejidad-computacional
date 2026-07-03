@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shutil
 import stat
+import subprocess
 from pathlib import Path
 
 
@@ -21,9 +22,18 @@ def install_hook(name: str) -> Path:
     return target
 
 
+def install_notebook_filter() -> None:
+    clean_command = "python3 scripts/clean_notebook_filter.py"
+    subprocess.run(["git", "config", "--local", "filter.strip-notebook-output.clean", clean_command], cwd=PROJECT_ROOT, check=True)
+    subprocess.run(["git", "config", "--local", "filter.strip-notebook-output.smudge", "cat"], cwd=PROJECT_ROOT, check=True)
+    subprocess.run(["git", "config", "--local", "filter.strip-notebook-output.required", "false"], cwd=PROJECT_ROOT, check=True)
+
+
 def main() -> None:
     installed = install_hook("pre-commit")
+    install_notebook_filter()
     print(f"Hook instalado: {installed.relative_to(PROJECT_ROOT)}")
+    print("Filtro de notebooks instalado: strip-notebook-output")
 
 
 if __name__ == "__main__":

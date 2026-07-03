@@ -7,21 +7,36 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+TRANSIENT_CELL_METADATA = {
+    "ExecuteTime",
+    "execution",
+}
 
 
-def clean_notebook(path: Path, check=False) -> bool:
-    notebook = json.loads(path.read_text(encoding="utf-8"))
+def clean_notebook_data(notebook: dict) -> bool:
     changed = False
 
     for cell in notebook.get("cells", []):
         if cell.get("cell_type") != "code":
             continue
+        metadata = cell.get("metadata", {})
+        for key in TRANSIENT_CELL_METADATA:
+            if key in metadata:
+                metadata.pop(key, None)
+                changed = True
         if cell.get("outputs") != []:
             cell["outputs"] = []
             changed = True
         if cell.get("execution_count") is not None:
             cell["execution_count"] = None
             changed = True
+
+    return changed
+
+
+def clean_notebook(path: Path, check=False) -> bool:
+    notebook = json.loads(path.read_text(encoding="utf-8"))
+    changed = clean_notebook_data(notebook)
 
     if changed and not check:
         path.write_text(json.dumps(notebook, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
