@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 import random
 import re
-from copy import deepcopy
 from html import escape
 
 from IPython.display import display
@@ -463,8 +462,28 @@ def render_state_html(state, role_styles, label_map):
     )
 
 
+def copy_search_node(node):
+    return dict(node)
+
+
+def copy_search_state(state):
+    copied = {}
+    for key, value in state.items():
+        if key.startswith("_"):
+            continue
+        if key == "arr":
+            copied[key] = [copy_search_node(node) for node in value]
+        elif isinstance(value, list):
+            copied[key] = list(value)
+        elif isinstance(value, dict):
+            copied[key] = dict(value)
+        else:
+            copied[key] = value
+    return copied
+
+
 def calculate_formula_reserved_height(state, step_search):
-    probe = deepcopy(state)
+    probe = copy_search_state(state)
     max_height = formula_iframe_height(probe.get("formula", ""))
     max_steps = min(MAX_FORMULA_PROBE_STEPS, max(16, len(probe.get("arr", [])) * 8 + 16))
 
@@ -478,11 +497,11 @@ def calculate_formula_reserved_height(state, step_search):
 
 
 def build_search_trace(state, step_search):
-    probe = deepcopy(state)
+    probe = copy_search_state(state)
     trace = []
     while not probe.get("search_complete"):
         step_search(probe)
-        trace.append(deepcopy(probe))
+        trace.append(copy_search_state(probe))
     return trace
 
 
@@ -764,6 +783,8 @@ __all__ = [
     "math_inline",
     "message_html",
     "calculate_search_dimensions",
+    "copy_search_node",
+    "copy_search_state",
     "calculate_formula_reserved_height",
     "build_search_trace",
     "_SEARCH_CSS",

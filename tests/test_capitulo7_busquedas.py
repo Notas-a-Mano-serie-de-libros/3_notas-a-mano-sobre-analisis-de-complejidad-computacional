@@ -141,6 +141,28 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         self.assertIn("font-size: 20px;", common_source)
         self.assertIn("margin-top: 8px;", common_source)
 
+    def test_search_states_are_copied_without_deepcopy(self):
+        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
+        state = {
+            "arr": [
+                {"index": 0, "value": 3, "role": "default", "label": ""},
+                {"index": 1, "value": 7, "role": "current", "label": "i"},
+            ],
+            "phase": "compare_current",
+            "labels": ["i"],
+            "_node_html_cache": {"cached": "html"},
+        }
+
+        common = self.launchers._load_module("search_common.py", "capitulo7_search_common_copy_test")
+        copied = common.copy_search_state(state)
+        copied["arr"][0]["value"] = 99
+        copied["labels"].append("extra")
+
+        self.assertNotIn("deepcopy", common_source)
+        self.assertEqual(state["arr"][0]["value"], 3)
+        self.assertEqual(state["labels"], ["i"])
+        self.assertNotIn("_node_html_cache", copied)
+
     def test_array_labels_render_as_math_html(self):
         state = self.module.create_state(size=8, target=8, values=[1, 2, 3, 4, 5, 6, 7, 8])
         self.module.step_ternary_search(state)
