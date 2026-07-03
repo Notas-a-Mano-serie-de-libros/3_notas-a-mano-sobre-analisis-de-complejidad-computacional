@@ -1,6 +1,6 @@
 
 from search_common import (
-    TARGET_ROLE_STYLE,
+    SEQUENTIAL_ROLE_STYLES,
     create_search_base_state,
     message_html,
     render_state_html as render_search_state_html,
@@ -17,15 +17,7 @@ FONT_FAMILY = "Scheherazade New"
 BOOK_ARRAY = [0, 1, 2, 3, 4, 5, 6, 7]
 BOOK_TARGET = 6
 
-ROLE_STYLES = {
-    "default": ("#ffffff", "#111111", "#111111"),
-    "target": TARGET_ROLE_STYLE,
-    "current": ("#dae8fc", "#6c8ebf", "#111111"),
-    "found": ("#e8fce9", "#97d077", "#111111"),
-    "excluded": ("#f2f6f7", "#d3d9db", "#8a8f94"),
-    "range": ("#fff2cc", "#d6b656", "#111111"),
-    "probe": ("#f8cecc", "#b85450", "#111111"),
-}
+ROLE_STYLES = SEQUENTIAL_ROLE_STYLES
 
 def build_formula(state):
     if state["current_index"] < len(state["arr"]):

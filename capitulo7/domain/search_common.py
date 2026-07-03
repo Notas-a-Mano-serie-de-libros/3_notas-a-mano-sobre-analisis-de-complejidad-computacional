@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import math
 import random
 import re
@@ -9,6 +10,7 @@ from IPython.display import display
 import ipywidgets as widgets
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
+from common.visual_roles import SEARCH_EXPONENTIAL_STYLES, SEARCH_RANGE_HIGHLIGHT_STYLES, SEARCH_ROLE_STYLES, SEARCH_SEQUENTIAL_STYLES, SEARCH_TERNARY_STYLES, TARGET
 from common.widget_controls import bounded_int_control, button_control, dropdown_control
 
 try:
@@ -49,27 +51,12 @@ PHASE_DONE = "terminado"
 PHASE_INACTIVE = "inactiva"
 MAX_FORMULA_PROBE_STEPS = 512
 TARGET_ROLE = "target"
-TARGET_ROLE_STYLE = ("#fff2cc", "#d6b656", "#111111")
-
-BASE_ROLE_STYLES = {
-    "default": ("#ffffff", "#111111", "#111111"),
-    TARGET_ROLE: TARGET_ROLE_STYLE,
-    "current": ("#dae8fc", "#6c8ebf", "#111111"),
-    "found": ("#e8fce9", "#97d077", "#111111"),
-    "excluded": ("#f2f6f7", "#d3d9db", "#8a8f94"),
-    "range": ("#ffffff", "#111111", "#111111"),
-    "probe": ("#f8cecc", "#b85450", "#111111"),
-}
-
-HIGHLIGHT_RANGE_ROLE_STYLES = {
-    **BASE_ROLE_STYLES,
-    "range": ("#dae8fc", "#6c8ebf", "#111111"),
-}
-
-SEQUENTIAL_ROLE_STYLES = {
-    **BASE_ROLE_STYLES,
-    "range": ("#fff2cc", "#d6b656", "#111111"),
-}
+TARGET_ROLE_STYLE = TARGET
+BASE_ROLE_STYLES = SEARCH_ROLE_STYLES
+HIGHLIGHT_RANGE_ROLE_STYLES = SEARCH_RANGE_HIGHLIGHT_STYLES
+SEQUENTIAL_ROLE_STYLES = SEARCH_SEQUENTIAL_STYLES
+EXPONENTIAL_ROLE_STYLES = SEARCH_EXPONENTIAL_STYLES
+TERNARY_ROLE_STYLES = SEARCH_TERNARY_STYLES
 
 
 def colab_pause(seconds=0.45):
@@ -602,7 +589,16 @@ def run_search_app(
     control_state = {"updating": False}
     render_cache = OutputCache()
     ui_state = {"first_row": None}
+    execution_state = {"run_id": 0}
     state = None
+
+    def schedule_task(coro):
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(coro)
+            return None
+        return loop.create_task(coro)
 
     def current_kwargs():
         values = {name: control.value for name, control in extra_controls.items()}
@@ -710,21 +706,32 @@ def run_search_app(
         redraw()
         sync_execution_buttons()
 
-    def run_auto(*_args):
+    async def run_auto_async(run_id):
         nonlocal state
-        execution_controls = (auto_button, finish_button, step_button, reset_button, book_button)
-
-        set_disabled(execution_controls, True)
+        set_disabled((auto_button, step_button, reset_button, book_button), True)
+        finish_button.disabled = False
         for snapshot in build_search_trace(state, step_search):
+            if execution_state["run_id"] != run_id:
+                return
             state = snapshot
             redraw()
-            colab_pause(0.45)
-        reset_button.disabled = False
-        book_button.disabled = False
-        sync_execution_buttons()
+            await asyncio.sleep(0.45)
+        if execution_state["run_id"] == run_id:
+            reset_button.disabled = False
+            book_button.disabled = False
+            sync_execution_buttons()
+
+    def run_auto(*_args):
+        if state["search_complete"]:
+            return
+        execution_state["run_id"] += 1
+        schedule_task(run_auto_async(execution_state["run_id"]))
 
     def finish_without_animation(*_args):
         nonlocal state
+        if state["search_complete"]:
+            return
+        execution_state["run_id"] += 1
         set_disabled((auto_button, finish_button, step_button, reset_button, book_button), True)
         final_state = None
         for snapshot in build_search_trace(state, step_search):

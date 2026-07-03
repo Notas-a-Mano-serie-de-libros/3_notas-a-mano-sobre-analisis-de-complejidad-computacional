@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from html import escape
 
 from IPython.display import display
@@ -437,7 +438,7 @@ def run_app():
         layout=widgets.Layout(width="100%"),
     )
     control_state = {"updating": False}
-    execution_state = {"running": False, "finish_requested": False}
+    execution_state = {"running": False, "finish_requested": False, "run_id": 0}
 
     def build_state(values=None):
         size = len(values) if values is not None else size_input.value
@@ -452,7 +453,9 @@ def run_app():
 
     def redraw(force_static=False):
         if force_static:
-            style_output.value = render_comparison_styles()
+            styles = render_comparison_styles()
+            if style_output.value != styles:
+                style_output.value = styles
         body = render_comparison_body_html(state)
         if body_output.value != body:
             body_output.value = body
@@ -470,6 +473,14 @@ def run_app():
         auto_button.disabled = True
         reset_button.disabled = True
         finish_button.disabled = False
+
+    def schedule_task(coro):
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(coro)
+            return None
+        return loop.create_task(coro)
 
     def finish_all_sorts():
         nonlocal state
@@ -493,24 +504,37 @@ def run_app():
         set_idle_buttons()
         redraw(force_static=True)
 
-    def run_auto(*_args):
+    async def run_auto_async(run_id):
         nonlocal state
         set_running_buttons()
         for snapshot in build_comparison_trace(state):
+            if execution_state["run_id"] != run_id:
+                return
             if execution_state["finish_requested"]:
                 finish_all_sorts()
                 break
             state = snapshot
             redraw()
-            colab_pause()
-        redraw()
-        set_idle_buttons()
+            await asyncio.sleep(0.08)
+        if execution_state["run_id"] == run_id:
+            redraw()
+            set_idle_buttons()
+
+    def run_auto(*_args):
+        if execution_state["running"]:
+            return
+        execution_state["run_id"] += 1
+        schedule_task(run_auto_async(execution_state["run_id"]))
 
     def finish_comparison(*_args):
-        if not execution_state["running"]:
+        nonlocal state
+        if all_sorts_complete(state):
             return
+        execution_state["run_id"] += 1
         execution_state["finish_requested"] = True
-        finish_button.disabled = True
+        finish_all_sorts()
+        redraw()
+        set_idle_buttons()
 
     auto_button.on_click(run_auto)
     finish_button.on_click(finish_comparison)

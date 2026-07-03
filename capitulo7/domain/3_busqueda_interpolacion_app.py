@@ -3,7 +3,7 @@ import random
 
 import ipywidgets as widgets
 from search_common import (
-    TARGET_ROLE_STYLE,
+    BASE_ROLE_STYLES,
     create_search_base_state,
     message_html,
     render_state_html as render_search_state_html,
@@ -20,15 +20,7 @@ FONT_FAMILY = "Scheherazade New"
 BOOK_ARRAY = [0, 10, 20, 30, 40, 60, 80, 90]
 
 
-ROLE_STYLES = {
-    "default": ("#ffffff", "#111111", "#111111"),
-    "target": TARGET_ROLE_STYLE,
-    "current": ("#dae8fc", "#6c8ebf", "#111111"),
-    "found": ("#e8fce9", "#97d077", "#111111"),
-    "excluded": ("#f2f6f7", "#d3d9db", "#8a8f94"),
-    "range": ("#ffffff", "#111111", "#111111"),
-    "probe": ("#f8cecc", "#b85450", "#111111"),
-}
+ROLE_STYLES = BASE_ROLE_STYLES
 
 def generate_sorted_values(size=DEFAULT_SIZE, uniform=False):
     if uniform:

@@ -231,6 +231,12 @@ class TestPerformanceContracts(unittest.TestCase):
     def test_visual_contracts_keep_stable_dimensions_and_separated_css(self):
         search_common = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
         sort_common = (PROJECT_ROOT / "capitulo8" / "domain" / "sort_common.py").read_text(encoding="utf-8")
+        visual_roles = (PROJECT_ROOT / "common" / "visual_roles.py").read_text(encoding="utf-8")
+        sort_config = (PROJECT_ROOT / "capitulo8" / "domain" / "sort_config.py").read_text(encoding="utf-8")
+        cap7_bootstrap = (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        cap8_bootstrap = (PROJECT_ROOT / "capitulo8" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        search_comparison = (PROJECT_ROOT / "capitulo7" / "domain" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
+        sort_comparison = (PROJECT_ROOT / "capitulo8" / "domain" / "0_comparacion_ordenamientos_app.py").read_text(encoding="utf-8")
 
         self.assertIn("_SEARCH_CSS = _build_search_css()", search_common)
         self.assertIn("css_widget = widgets.HTML(_SEARCH_CSS)", search_common)
@@ -239,6 +245,22 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("_tree_html_cache", sort_common)
         self.assertIn("_item_html_cache", sort_common)
         self.assertTrue((PROJECT_ROOT / "common" / "plot_style.py").exists())
+        self.assertIn("SEARCH_ROLE_STYLES", visual_roles)
+        self.assertIn("SEARCH_TERNARY_STYLES", visual_roles)
+        self.assertIn("SORT_ROLE_STYLES", visual_roles)
+        self.assertIn("from common.visual_roles import SORT_ROLE_STYLES", sort_config)
+        self.assertIn('"common/visual_roles.py"', cap7_bootstrap)
+        self.assertIn('"common/visual_roles.py"', cap8_bootstrap)
+        self.assertIn("import asyncio", search_common)
+        self.assertIn("import asyncio", sort_common)
+        self.assertIn("async def run_auto_async(run_id):", search_common)
+        self.assertIn("async def run_auto_async(run_id):", sort_common)
+        self.assertIn("execution_state = {\"run_id\": 0}", search_common)
+        self.assertIn("execution_state = {\"run_id\": 0}", sort_common)
+        self.assertIn("execution_state = {\"running\": False, \"finish_requested\": False, \"run_id\": 0}", search_comparison)
+        self.assertIn("execution_state = {\"running\": False, \"finish_requested\": False, \"run_id\": 0}", sort_comparison)
+        self.assertIn("loop.create_task(coro)", search_comparison)
+        self.assertIn("loop.create_task(coro)", sort_comparison)
 
 
 if __name__ == "__main__":

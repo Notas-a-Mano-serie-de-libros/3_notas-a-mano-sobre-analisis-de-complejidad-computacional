@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import importlib.util
 from html import escape
 from pathlib import Path
@@ -596,7 +597,7 @@ def run_app():
         layout=widgets.Layout(width="100%"),
     )
     control_state = {"updating": False}
-    execution_state = {"running": False, "finish_requested": False}
+    execution_state = {"running": False, "finish_requested": False, "run_id": 0}
     ui_state = {"first_row": None, "array_width": None}
     state = None
 
@@ -659,6 +660,14 @@ def run_app():
         reset_button.disabled = True
         finish_button.disabled = False
 
+    def schedule_task(coro):
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(coro)
+            return None
+        return loop.create_task(coro)
+
     def finish_all_searches():
         nonlocal state
         trace = build_comparison_trace(state)
@@ -688,25 +697,38 @@ def run_app():
         set_idle_buttons()
         redraw(force_static=True)
 
-    def run_auto(*_args):
+    async def run_auto_async(run_id):
         nonlocal state
         set_running_buttons()
         trace = build_comparison_trace(state)
         for snapshot in trace:
+            if execution_state["run_id"] != run_id:
+                return
             if execution_state["finish_requested"]:
                 finish_all_searches()
                 break
             state = snapshot
             redraw()
-            colab_pause(0.45)
-        redraw()
-        set_idle_buttons()
+            await asyncio.sleep(0.45)
+        if execution_state["run_id"] == run_id:
+            redraw()
+            set_idle_buttons()
+
+    def run_auto(*_args):
+        if execution_state["running"]:
+            return
+        execution_state["run_id"] += 1
+        schedule_task(run_auto_async(execution_state["run_id"]))
 
     def finish_comparison(*_args):
-        if not execution_state["running"]:
+        nonlocal state
+        if all_searches_complete(state):
             return
+        execution_state["run_id"] += 1
         execution_state["finish_requested"] = True
-        finish_button.disabled = True
+        finish_all_searches()
+        redraw()
+        set_idle_buttons()
 
     auto_button.on_click(run_auto)
     finish_button.on_click(finish_comparison)

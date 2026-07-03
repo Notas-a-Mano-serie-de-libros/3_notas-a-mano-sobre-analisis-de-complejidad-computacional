@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import random
 from html import escape
 
@@ -772,6 +773,15 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
     html_output = widgets.HTML()
     control_state = {"updating": False}
     render_cache = OutputCache()
+    execution_state = {"run_id": 0}
+
+    def schedule_task(coro):
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(coro)
+            return None
+        return loop.create_task(coro)
 
     def build_state(values=None):
         return create_state(
@@ -800,12 +810,21 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
             render_state_html(state, include_styles=False),
         )
 
+    def sync_execution_buttons():
+        complete = state["sorting_complete"]
+        controls["step"].disabled = complete
+        controls["auto"].disabled = complete
+        controls["finish"].disabled = complete
+        controls["reset"].disabled = False
+        controls["book"].disabled = False
+
     def reset_algorithm(*_args):
         nonlocal state
         if control_state["updating"]:
             return
         state = build_state()
         redraw()
+        sync_execution_buttons()
 
     def reset_for_view(change):
         nonlocal state
@@ -816,24 +835,38 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
         control_state["updating"] = False
         state = build_state()
         redraw()
+        sync_execution_buttons()
 
     def step_once(*_args):
-        step_sort(state)
+        if not state["sorting_complete"]:
+            step_sort(state)
         redraw()
+        sync_execution_buttons()
 
-    def run_auto(*_args):
+    async def run_auto_async(run_id):
         nonlocal state
-        execution_controls = (controls["step"], controls["auto"], controls["finish"])
-
-        set_disabled(execution_controls, True)
+        set_disabled((controls["step"], controls["auto"], controls["reset"], controls["book"]), True)
+        controls["finish"].disabled = False
         for snapshot in build_sort_trace():
+            if execution_state["run_id"] != run_id:
+                return
             state = snapshot
             redraw()
-            colab_pause()
-        set_disabled(execution_controls, False)
+            await asyncio.sleep(0.08)
+        if execution_state["run_id"] == run_id:
+            sync_execution_buttons()
+
+    def run_auto(*_args):
+        if state["sorting_complete"]:
+            return
+        execution_state["run_id"] += 1
+        schedule_task(run_auto_async(execution_state["run_id"]))
 
     def finish_without_animation(*_args):
         nonlocal state
+        if state["sorting_complete"]:
+            return
+        execution_state["run_id"] += 1
         set_disabled((controls["step"], controls["auto"], controls["finish"]), True)
         final_state = None
         for snapshot in build_sort_trace():
@@ -841,12 +874,13 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
         if final_state is not None:
             state = final_state
         redraw()
-        set_disabled((controls["step"], controls["auto"], controls["finish"]), False)
+        sync_execution_buttons()
 
     def generate_new(*_args):
         nonlocal state
         state = build_state(values=generate_values(controls["size"].value))
         redraw()
+        sync_execution_buttons()
 
     def generate_book(*_args):
         nonlocal state
@@ -855,6 +889,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
         control_state["updating"] = False
         state = build_state(values=book_array)
         redraw()
+        sync_execution_buttons()
 
     controls["step"].on_click(step_once)
     controls["auto"].on_click(run_auto)

@@ -12,6 +12,7 @@ REQUIRED_FILES = (
     "common/animation_runtime.py",
     "common/chart_runtime.py",
     "common/plot_style.py",
+    "common/visual_roles.py",
     "common/widget_controls.py",
     "capitulo8/notebooks/launchers.py",
     "capitulo8/domain/sort_config.py",
