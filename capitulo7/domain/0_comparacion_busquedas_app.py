@@ -714,11 +714,32 @@ def run_app():
             redraw()
             set_idle_buttons()
 
+    def run_auto_sync(run_id):
+        nonlocal state
+        set_running_buttons()
+        trace = build_comparison_trace(state)
+        for snapshot in trace:
+            if execution_state["run_id"] != run_id:
+                return
+            if execution_state["finish_requested"]:
+                finish_all_searches()
+                break
+            state = snapshot
+            redraw()
+            colab_pause(0.45)
+        if execution_state["run_id"] == run_id:
+            redraw()
+            set_idle_buttons()
+
     def run_auto(*_args):
         if execution_state["running"]:
             return
         execution_state["run_id"] += 1
-        schedule_task(run_auto_async(execution_state["run_id"]))
+        run_id = execution_state["run_id"]
+        if colab_output is not None:
+            run_auto_sync(run_id)
+            return
+        schedule_task(run_auto_async(run_id))
 
     def finish_comparison(*_args):
         nonlocal state

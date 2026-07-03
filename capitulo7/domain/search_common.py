@@ -721,11 +721,30 @@ def run_search_app(
             book_button.disabled = False
             sync_execution_buttons()
 
+    def run_auto_sync(run_id):
+        nonlocal state
+        set_disabled((auto_button, step_button, reset_button, book_button), True)
+        finish_button.disabled = False
+        for snapshot in build_search_trace(state, step_search):
+            if execution_state["run_id"] != run_id:
+                return
+            state = snapshot
+            redraw()
+            colab_pause(0.45)
+        if execution_state["run_id"] == run_id:
+            reset_button.disabled = False
+            book_button.disabled = False
+            sync_execution_buttons()
+
     def run_auto(*_args):
         if state["search_complete"]:
             return
         execution_state["run_id"] += 1
-        schedule_task(run_auto_async(execution_state["run_id"]))
+        run_id = execution_state["run_id"]
+        if colab_output is not None:
+            run_auto_sync(run_id)
+            return
+        schedule_task(run_auto_async(run_id))
 
     def finish_without_animation(*_args):
         nonlocal state

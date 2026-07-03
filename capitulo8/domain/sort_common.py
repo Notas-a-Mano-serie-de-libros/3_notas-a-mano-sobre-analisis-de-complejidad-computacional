@@ -856,11 +856,28 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
         if execution_state["run_id"] == run_id:
             sync_execution_buttons()
 
+    def run_auto_sync(run_id):
+        nonlocal state
+        set_disabled((controls["step"], controls["auto"], controls["reset"], controls["book"]), True)
+        controls["finish"].disabled = False
+        for snapshot in build_sort_trace():
+            if execution_state["run_id"] != run_id:
+                return
+            state = snapshot
+            redraw()
+            colab_pause()
+        if execution_state["run_id"] == run_id:
+            sync_execution_buttons()
+
     def run_auto(*_args):
         if state["sorting_complete"]:
             return
         execution_state["run_id"] += 1
-        schedule_task(run_auto_async(execution_state["run_id"]))
+        run_id = execution_state["run_id"]
+        if colab_output is not None:
+            run_auto_sync(run_id)
+            return
+        schedule_task(run_auto_async(run_id))
 
     def finish_without_animation(*_args):
         nonlocal state
