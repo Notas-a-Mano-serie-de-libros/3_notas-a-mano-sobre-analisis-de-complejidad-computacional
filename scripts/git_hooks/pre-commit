@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+python3 scripts/clean_notebooks.py
+
+if ! git diff --quiet -- '*.ipynb'; then
+  echo "Se limpiaron outputs de notebooks. Agrega esos cambios y vuelve a hacer commit."
+  git diff --name-only -- '*.ipynb'
+  exit 1
+fi
+
+python3 scripts/clean_notebooks.py --check
