@@ -40,6 +40,8 @@ ALGORITHM_FIELD_WIDTH = sum(ALGORITHM_COLUMN_WIDTHS) + (len(ALGORITHM_COLUMN_WID
 ALGORITHM_FIELD_HEIGHT = 2 * ALGORITHM_ROW_HEIGHT + ALGORITHM_ROW_GAP + 2 * ALGORITHM_FIELD_PADDING_Y + 2
 ALGORITHM_GROUP_GAP = 2
 ALGORITHM_GROUP_WIDTH = ALGORITHM_FIELD_WIDTH
+ROW_HTML_CACHE_LIMIT = 512
+_ROW_HTML_CACHE = {}
 
 
 def create_algorithm_state(key, title, values, descending):
@@ -157,6 +159,32 @@ def render_bars(item, show_indexes=False):
     """
     if item["state"]["sorting_complete"]:
         item["html_cache"][cache_key] = html
+    return html
+
+
+def comparison_row_key(item, show_indexes=False):
+    sort_state = item["state"]
+    return (
+        item["key"],
+        item["title"],
+        item["steps"],
+        show_indexes,
+        sort_state.get("sorting_complete"),
+        tuple(sort_state["arr"]),
+        tuple(sort_state["roles"]),
+    )
+
+
+def render_cached_comparison_row(item, show_indexes=False):
+    key = comparison_row_key(item, show_indexes)
+    cached = _ROW_HTML_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    html = render_bars(item, show_indexes=show_indexes)
+    if len(_ROW_HTML_CACHE) >= ROW_HTML_CACHE_LIMIT:
+        _ROW_HTML_CACHE.clear()
+    _ROW_HTML_CACHE[key] = html
     return html
 
 
@@ -314,7 +342,7 @@ def render_comparison_header_html():
 
 def render_comparison_rows_html(state):
     return "".join(
-        render_bars(item, show_indexes=index == 0)
+        render_cached_comparison_row(item, show_indexes=index == 0)
         for index, item in enumerate(state["algorithms"])
     )
 

@@ -1013,6 +1013,10 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("body_output = widgets.HTML", source)
         self.assertIn("render_comparison_body_html(state)", source)
         self.assertIn("render_comparison_rows_html(state)", source)
+        self.assertIn("ROW_HTML_CACHE_LIMIT = 512", source)
+        self.assertIn("def comparison_row_key(item, show_indexes=False):", source)
+        self.assertIn("def render_cached_comparison_row(item, show_indexes=False):", source)
+        self.assertIn("render_cached_comparison_row(item, show_indexes=index == 0)", source)
         self.assertNotIn("header_output = widgets.HTML", source)
         self.assertNotIn("rows_output = widgets.HTML", source)
         self.assertNotIn("row_outputs = []", source)
@@ -1032,6 +1036,14 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn("comparison-card", html)
         self.assertNotIn("search-message", html)
         self.assertNotIn("node-label", html)
+        module._ROW_HTML_CACHE.clear()
+        cached_row = module.render_cached_comparison_row(state["algorithms"][0], show_indexes=True)
+        cache_size = len(module._ROW_HTML_CACHE)
+        self.assertEqual(
+            module.render_cached_comparison_row(state["algorithms"][0], show_indexes=True),
+            cached_row,
+        )
+        self.assertEqual(len(module._ROW_HTML_CACHE), cache_size)
         for title in (
             "Búsqueda secuencial",
             "Búsqueda binaria",

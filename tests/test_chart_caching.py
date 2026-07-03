@@ -40,6 +40,8 @@ class TestChartCaching(unittest.TestCase):
 
         self.assertIn("from search_metrics import count_search_steps", source)
         self.assertIn("from common.plot_style import apply_plot_style", source)
+        self.assertIn("from common.chart_runtime import", source)
+        self.assertIn("render_multi_chart(", source)
         self.assertIn("apply_plot_style(matplotlib)", source)
         self.assertNotIn("def _count_binary", source)
         module._CACHE.clear()
@@ -96,6 +98,8 @@ class TestChartCaching(unittest.TestCase):
 
         self.assertIn("from sort_metrics import count_sort_operations", source)
         self.assertIn("from common.plot_style import apply_plot_style", source)
+        self.assertIn("from common.chart_runtime import", source)
+        self.assertIn("render_multi_chart(", source)
         self.assertIn("apply_plot_style(matplotlib)", source)
         self.assertNotIn("def _count_bubble", source)
         calls = []
@@ -137,6 +141,13 @@ class TestChartCaching(unittest.TestCase):
 
             self.assertTrue((runtime_dir / "sort_metrics.py").exists())
             self.assertGreater(module.count_sort_operations("burbuja", [3, 2, 1]), 0)
+
+    def test_colab_bootstraps_include_common_chart_runtime(self):
+        cap7_bootstrap = (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        cap8_bootstrap = (PROJECT_ROOT / "capitulo8" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+
+        self.assertIn('"common/chart_runtime.py"', cap7_bootstrap)
+        self.assertIn('"common/chart_runtime.py"', cap8_bootstrap)
 
 
 if __name__ == "__main__":

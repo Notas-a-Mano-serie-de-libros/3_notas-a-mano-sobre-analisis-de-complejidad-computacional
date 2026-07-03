@@ -15,11 +15,20 @@ from pathlib import Path
 
 import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
 
 from IPython.display import clear_output, display
 import ipywidgets as widgets
+from common.chart_runtime import (
+    calibrate_t0,
+    create_algorithm_controls,
+    create_theory_checkbox,
+    display_table,
+    extrapolate,
+    make_single_table,
+    render_multi_chart,
+    render_single_chart,
+    theory_curves,
+)
 
 try:
     from common.plot_style import apply_plot_style
@@ -123,23 +132,11 @@ def _simulate(algorithms: list, emp_n: list[int], trials: int) -> dict[str, list
 
 # ── Curvas analíticas ────────────────────────────────────────────────────────
 def _extrapolate(emp_avg: dict, an_n, max_emp: int) -> dict[str, list[float]]:
-    an_avg: dict[str, list[float]] = {}
-    for name in emp_avg:
-        f = _FORMULAS[name]
-        raw = [f(n) for n in an_n]
-        scale = emp_avg[name][-1] / f(max_emp) if f(max_emp) > 0 else 1.0
-        an_avg[name] = [v * scale for v in raw]
-    return an_avg
+    return extrapolate(emp_avg, an_n, max_emp, _FORMULAS)
 
 
 def _theory_curves(emp_avg: dict, emp_n: list[int]) -> dict[str, list[float]]:
-    curves: dict[str, list[float]] = {}
-    for name in emp_avg:
-        f = _FORMULAS[name]
-        raw = [f(n) for n in emp_n]
-        scale = emp_avg[name][0] / raw[0] if raw[0] > 0 else 1.0
-        curves[name] = [v * scale for v in raw]
-    return curves
+    return theory_curves(emp_avg, emp_n, _FORMULAS)
 
 
 def _compute_series(algorithms: list, fast=False):
@@ -171,51 +168,21 @@ def _render(
     show_theory: bool,
     out: widgets.Output,
 ) -> None:
-    with out:
-        clear_output(wait=True)
-        fig, ax = plt.subplots(figsize=(13, 7))
-
-        for name, _, _, _, color in algorithms:
-            if name not in selected:
-                continue
-            ax.plot(emp_n, emp_avg[name], color=color, linewidth=2.4, label=name)
-            ax.plot(an_n,  an_avg[name],  color=color, linewidth=1.6,
-                    linestyle="--", alpha=0.6)
-            if show_theory:
-                ax.plot(emp_n, theory[name], color=color, linewidth=1.3,
-                        linestyle=":", alpha=0.9,
-                        label=f"{name} · {_THEORY_LABELS[name]}")
-
-        ax.axvline(max_emp, color="#aaaaaa", linewidth=1.1, linestyle=":", zorder=0)
-
-        subtitle = "empírico (sólido)  ·  extrapolación analítica (punteado)"
-        if show_theory:
-            subtitle += "  ·  función teórica normalizada (punteado fino)"
-
-        ax.set_xscale("log")
-        ax.set_yscale("log")
-        ax.set_xlabel("Tamaño del arreglo (n)", fontsize=13)
-        ax.set_ylabel("Operaciones promedio", fontsize=13)
-        ax.set_title(
-            f"Operaciones promedio por tamaño de arreglo · target siempre presente\n{subtitle}",
-            fontsize=12,
-        )
-        ax.legend(
-            fontsize=9 if show_theory else 11,
-            loc="upper left",
-            ncol=2 if show_theory else 1,
-        )
-        ax.grid(True, which="both", linestyle="--", alpha=0.3)
-        ax.set_xlim(2, 1e7)
-        ax.xaxis.set_major_formatter(mticker.FuncFormatter(
-            lambda x, _: (
-                f"{x / 1e6:.0f}M" if x >= 1e6
-                else f"{int(x / 1e3)}k" if x >= 1e3
-                else str(int(x))
-            )
-        ))
-        plt.tight_layout()
-        plt.show()
+    render_multi_chart(
+        configs=algorithms,
+        theory_labels=_THEORY_LABELS,
+        emp_n=emp_n,
+        an_n=an_n,
+        max_emp=max_emp,
+        emp_avg=emp_avg,
+        an_avg=an_avg,
+        theory=theory,
+        selected=selected,
+        show_theory=show_theory,
+        out=out,
+        title_prefix="Operaciones promedio por tamaño de arreglo · target siempre presente",
+        x_limit=1e7,
+    )
 
 
 # ── Punto de entrada ─────────────────────────────────────────────────────────
@@ -225,32 +192,10 @@ def run_chart(fast=False) -> None:
     series = _compute_series(algorithms, fast=fast)
     clear_output(wait=True)
 
-    # Controles
-    theory_check = widgets.Checkbox(
-        value=False,
-        description="Superponer funciones teóricas",
-        indent=False,
-        layout=widgets.Layout(width="280px"),
-    )
-    algo_checks = {
-        name: widgets.Checkbox(
-            value=True,
-            description=name,
-            indent=False,
-            layout=widgets.Layout(width="170px"),
-        )
-        for name, *_ in algorithms
-    }
-    algo_label = widgets.HTML(
-        "<b style='font-size:13px'>Algoritmos activos</b>",
-        layout=widgets.Layout(margin="8px 0 2px 0"),
-    )
-    algo_grid = widgets.GridBox(
-        list(algo_checks.values()),
-        layout=widgets.Layout(
-            grid_template_columns="repeat(3, 180px)",
-            gap="2px 0px",
-        ),
+    theory_check, algo_checks, algo_label, algo_grid = create_algorithm_controls(
+        algorithms,
+        checkbox_width="170px",
+        grid_template_columns="repeat(3, 180px)",
     )
     out = widgets.Output()
 
@@ -288,28 +233,6 @@ _SINGLE_PROFILES: dict[str, dict] = {
 }
 
 _SINGLE_CACHE: dict[str, dict] = {}
-_T0_CACHE: float | None = None
-
-
-def _calibrate_t0(n_iters: int = 1_000_000) -> float:
-    """
-    Estima el tiempo promedio de una operación básica (comparación entera)
-    en la máquina que ejecuta la simulación.
-
-    Se ejecuta una sola vez por sesión; el resultado queda en caché.
-    """
-    global _T0_CACHE
-    if _T0_CACHE is not None:
-        return _T0_CACHE
-    # Bucle con comparación simple para medir overhead por operación básica
-    x = 0
-    t = _time.perf_counter()
-    for i in range(n_iters):
-        x = i < n_iters
-    _T0_CACHE = (_time.perf_counter() - t) / n_iters
-    return _T0_CACHE
-
-
 def _simulate_single(
     display_name: str,
     emp_n: list[int], trials: int,
@@ -334,114 +257,6 @@ def _simulate_single(
         if idx % 10 == 0 or idx == len(emp_n):
             print(f"    {idx}/{len(emp_n)} completados…")
     return ops_avg, time_avg
-
-
-def _make_single_table(
-    emp_n: list[int],
-    theory_raw: list[float],
-    ops_avg: list[float],
-    t0: float,
-    time_avg: list[float],
-):
-    """
-    Crea un DataFrame con:
-      - Operaciones teóricas: f(n) cruda (fórmula teórica del algoritmo)
-      - Operaciones obtenidas: promedio empírico medido
-      - Tiempo teórico (s): T₀ × f(n), con T₀ calibrado en esta máquina
-      - Tiempo (s): tiempo real de la simulación Python
-    """
-    import pandas as pd
-    return pd.DataFrame({
-        "n": emp_n,
-        "Operaciones teóricas": [int(round(v)) for v in theory_raw],
-        "Operaciones obtenidas": [int(round(v)) for v in ops_avg],
-        "Tiempo teórico (s)": [f"{t0 * v:.2e}" for v in theory_raw],
-        "Tiempo (s)": [f"{v:.6f}" for v in time_avg],
-    })
-
-
-def _display_table(df) -> None:
-    """Muestra las primeras 5 filas con botón para ver el resto."""
-    n_total = len(df)
-    out_short = widgets.Output()
-    out_full  = widgets.Output()
-    with out_short:
-        display(df.head(5))
-    with out_full:
-        display(df)
-    out_full.layout.display = "none"
-
-    toggle = widgets.ToggleButton(
-        value=False,
-        description=f"Mostrar todos ({n_total} registros)",
-        button_style="",
-        layout=widgets.Layout(width="260px", margin="4px 0 8px 0"),
-    )
-
-    def on_toggle(change):
-        if change["new"]:
-            out_short.layout.display = "none"
-            out_full.layout.display  = ""
-            toggle.description = "Mostrar menos"
-        else:
-            out_short.layout.display = ""
-            out_full.layout.display  = "none"
-            toggle.description = f"Mostrar todos ({n_total} registros)"
-
-    toggle.observe(on_toggle, names="value")
-    display(widgets.VBox([out_short, toggle, out_full]))
-
-
-def _render_single(
-    name: str,
-    color: str,
-    emp_n: list[int],
-    an_n,
-    max_emp: int,
-    ops_avg: list[float],
-    an_avg: list[float],
-    theory: list[float],
-    show_theory: bool,
-    an_max: float,
-    out: widgets.Output,
-) -> None:
-    with out:
-        clear_output(wait=True)
-        fig, ax = plt.subplots(figsize=(13, 7))
-
-        ax.plot(emp_n, ops_avg, color=color, linewidth=2.4, label=f"{name} (empírico)")
-        ax.plot(an_n, an_avg,   color=color, linewidth=1.6, linestyle="--", alpha=0.6,
-                label="Extrapolación analítica")
-        if show_theory:
-            ax.plot(emp_n, theory, color=color, linewidth=1.3, linestyle=":", alpha=0.9,
-                    label=f"Teórico · {_THEORY_LABELS[name]}")
-
-        ax.axvline(max_emp, color="#aaaaaa", linewidth=1.1, linestyle=":", zorder=0)
-
-        subtitle = "empírico (sólido)  ·  extrapolación analítica (discontinuo)"
-        if show_theory:
-            subtitle += f"  ·  {_THEORY_LABELS[name]} normalizado (punteado fino)"
-
-        ax.set_xscale("log")
-        ax.set_yscale("log")
-        ax.set_xlabel("Tamaño del arreglo (n)", fontsize=13)
-        ax.set_ylabel("Operaciones promedio", fontsize=13)
-        ax.set_title(
-            f"Búsqueda {name} — operaciones promedio por tamaño de arreglo\n{subtitle}",
-            fontsize=12,
-        )
-        ax.legend(fontsize=11, loc="upper left")
-        ax.grid(True, which="both", linestyle="--", alpha=0.3)
-        ax.set_xlim(2, an_max)
-        ax.xaxis.set_major_formatter(mticker.FuncFormatter(
-            lambda x, _: (
-                f"{x / 1e6:.0f}M" if x >= 1e6
-                else f"{int(x / 1e3)}k" if x >= 1e3
-                else str(int(x))
-            )
-        ))
-        plt.tight_layout()
-        plt.show()
 
 
 def run_single_chart(name: str) -> None:
@@ -495,31 +310,38 @@ def run_single_chart(name: str) -> None:
         print("  ✓ Simulación completa.\n")
 
     cache = _SINGLE_CACHE[name]
-    t0 = _calibrate_t0()
+    t0 = calibrate_t0()
     clear_output(wait=True)
 
     # Tabla pandas
-    df = _make_single_table(
+    df = make_single_table(
         cache["emp_n"], cache["theory_raw"], cache["ops_avg"],
         t0, cache["time_avg"],
     )
-    _display_table(df)
+    display_table(df)
 
     # Controles
-    theory_check = widgets.Checkbox(
-        value=False,
-        description=f"Superponer función teórica ({_THEORY_LABELS[name]})",
-        indent=False,
-        layout=widgets.Layout(width="360px"),
+    theory_check = create_theory_checkbox(
+        f"Superponer función teórica ({_THEORY_LABELS[name]})",
+        "360px",
     )
     out = widgets.Output()
 
     def redraw(*_):
-        _render_single(
-            name, color,
-            cache["emp_n"], cache["an_n"], max_emp,
-            cache["ops_avg"], cache["an_avg"], cache["theory"],
-            theory_check.value, an_max, out,
+        render_single_chart(
+            name=name,
+            color=color,
+            theory_label=_THEORY_LABELS[name],
+            emp_n=cache["emp_n"],
+            an_n=cache["an_n"],
+            max_emp=max_emp,
+            ops_avg=cache["ops_avg"],
+            an_avg=cache["an_avg"],
+            theory=cache["theory"],
+            show_theory=theory_check.value,
+            an_max=an_max,
+            out=out,
+            title_prefix=f"Búsqueda {name} — operaciones promedio por tamaño de arreglo",
         )
 
     theory_check.observe(redraw, names="value")

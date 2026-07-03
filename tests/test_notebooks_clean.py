@@ -4,7 +4,7 @@ import json
 import unittest
 from pathlib import Path
 
-from tests.helpers import PROJECT_ROOT
+from tests.helpers import PROJECT_ROOT, load_module_from_path
 
 
 class TestNotebooksAreClean(unittest.TestCase):
@@ -32,6 +32,40 @@ class TestNotebooksAreClean(unittest.TestCase):
 
         self.assertIn("*.ipynb filter=strip-notebook-output", attributes)
         self.assertTrue(filter_script.exists())
+
+    def test_clean_notebooks_reports_diagnostic_issues(self):
+        cleaner = load_module_from_path(
+            "clean_notebooks_diagnostic_test",
+            PROJECT_ROOT / "scripts" / "clean_notebooks.py",
+        )
+        notebook = {
+            "cells": [
+                {"cell_type": "markdown", "source": ["texto"]},
+                {
+                    "cell_type": "code",
+                    "metadata": {"ExecuteTime": {}, "execution": {}},
+                    "outputs": [{"name": "stdout", "text": "hola"}],
+                    "execution_count": 3,
+                    "source": ["print('hola')"],
+                },
+            ]
+        }
+
+        self.assertEqual(
+            cleaner.notebook_issues(notebook),
+            [
+                "celda 2: metadata.ExecuteTime",
+                "celda 2: metadata.execution",
+                "celda 2: outputs",
+                "celda 2: execution_count",
+            ],
+        )
+        self.assertTrue(cleaner.clean_notebook_data(notebook))
+        cell = notebook["cells"][1]
+        self.assertEqual(cell["outputs"], [])
+        self.assertIsNone(cell["execution_count"])
+        self.assertNotIn("ExecuteTime", cell["metadata"])
+        self.assertNotIn("execution", cell["metadata"])
 
 
 if __name__ == "__main__":

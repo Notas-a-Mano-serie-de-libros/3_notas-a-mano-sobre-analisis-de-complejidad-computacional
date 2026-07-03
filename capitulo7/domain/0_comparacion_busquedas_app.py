@@ -40,7 +40,9 @@ BOOK_ARRAY = [0, 1, 2, 3, 4, 5, 6, 7]
 BOOK_TARGET = 6
 FONT_FAMILY = "Scheherazade New"
 COMPARISON_NODE_WIDTH = 54
+ROW_HTML_CACHE_LIMIT = 512
 _MODULE_CACHE = {}
+_ROW_HTML_CACHE = {}
 
 ALGORITHMS = (
     {
@@ -251,6 +253,42 @@ def render_result_symbol(item):
         f'<span class="comparison-result-symbol {class_name}" '
         f'aria-label="{label}" title="{label}">{symbol}</span>'
     )
+
+
+def comparison_row_key(item, show_indexes=False):
+    search_state = item["state"]
+    nodes = tuple(
+        (
+            node.get("index"),
+            node.get("value"),
+            node.get("role"),
+            node.get("label"),
+            bool(node.get("is_target")),
+        )
+        for node in search_state["arr"]
+    )
+    return (
+        item["key"],
+        item["title"],
+        item["steps"],
+        show_indexes,
+        search_state.get("search_complete"),
+        search_state.get("found_index"),
+        nodes,
+    )
+
+
+def render_cached_comparison_row(item, show_indexes=False):
+    key = comparison_row_key(item, show_indexes)
+    cached = _ROW_HTML_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    html = render_compact_array(item, show_indexes=show_indexes)
+    if len(_ROW_HTML_CACHE) >= ROW_HTML_CACHE_LIMIT:
+        _ROW_HTML_CACHE.clear()
+    _ROW_HTML_CACHE[key] = html
+    return html
 
 
 def render_compact_array(item, show_indexes=False):
@@ -483,7 +521,7 @@ def render_comparison_header_html():
 
 def render_comparison_rows_html(state):
     return "".join(
-        render_compact_array(item, show_indexes=index == 0)
+        render_cached_comparison_row(item, show_indexes=index == 0)
         for index, item in enumerate(state["algorithms"])
     )
 
