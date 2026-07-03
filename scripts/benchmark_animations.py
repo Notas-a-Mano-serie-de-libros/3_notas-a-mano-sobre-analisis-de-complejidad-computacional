@@ -151,17 +151,40 @@ def run(repeats=3):
     }
 
 
+def benchmark_failures(result, max_ms=None):
+    if max_ms is None:
+        return []
+    return [
+        item
+        for item in result["benchmarks"]
+        if item["avg_ms"] > max_ms
+    ]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Benchmarks rápidos de animaciones de los capítulos 7 y 8.")
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--output", type=Path, help="Guarda el resultado completo en formato JSON.")
+    parser.add_argument("--max-ms", type=float, help="Falla si algún benchmark supera este promedio en milisegundos.")
     args = parser.parse_args()
     result = run(repeats=max(1, args.repeats))
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    failures = benchmark_failures(result, max_ms=args.max_ms)
     if args.json:
         print(json.dumps(result, indent=2, ensure_ascii=False))
-        return
-    for item in result["benchmarks"]:
-        print(f"{item['label']}: min={item['min_ms']:.3f} ms avg={item['avg_ms']:.3f} ms result={item['last_result']}")
+    else:
+        for item in result["benchmarks"]:
+            print(f"{item['label']}: min={item['min_ms']:.3f} ms avg={item['avg_ms']:.3f} ms result={item['last_result']}")
+
+    if failures:
+        print(f"\nBenchmarks por encima de {args.max_ms:.3f} ms:", file=sys.stderr)
+        for item in failures:
+            print(f"- {item['label']}: avg={item['avg_ms']:.3f} ms", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

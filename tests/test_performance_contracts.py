@@ -31,6 +31,21 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("capitulo8.rapido.steps", labels)
         self.assertIn("capitulo8.rapido.lazy_render_steps", labels)
 
+    def test_benchmark_supports_thresholds_and_json_output_file(self):
+        module = load_module_from_path(
+            "benchmark_animations_threshold_test",
+            PROJECT_ROOT / "scripts" / "benchmark_animations.py",
+        )
+        payload = {
+            "benchmarks": [
+                {"label": "fast", "avg_ms": 1.0},
+                {"label": "slow", "avg_ms": 20.0},
+            ]
+        }
+
+        self.assertEqual(module.benchmark_failures(payload, max_ms=None), [])
+        self.assertEqual([item["label"] for item in module.benchmark_failures(payload, max_ms=5)], ["slow"])
+
     def test_clean_notebooks_check_mode_passes_on_clean_tree(self):
         script = PROJECT_ROOT / "scripts" / "clean_notebooks.py"
         result = subprocess.run(
@@ -42,6 +57,37 @@ class TestPerformanceContracts(unittest.TestCase):
         )
 
         self.assertEqual(result.stdout.strip(), "")
+
+    def test_colab_validation_scripts_pass(self):
+        for script_name in ("validate_colab_bootstrap.py", "validate_colab_links.py"):
+            with self.subTest(script=script_name):
+                result = subprocess.run(
+                    [sys.executable, str(PROJECT_ROOT / "scripts" / script_name)],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    cwd=PROJECT_ROOT,
+                )
+
+                self.assertNotEqual(result.stdout.strip(), "")
+
+    def test_ci_workflow_has_robust_update_checks(self):
+        workflow = (PROJECT_ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+
+        self.assertIn("permissions:", workflow)
+        self.assertIn("contents: read", workflow)
+        self.assertIn("concurrency:", workflow)
+        for job in ("notebooks-clean:", "lint-python:", "colab-sanity:", "tests:", "benchmark:", "security:"):
+            self.assertIn(job, workflow)
+        for version in ('"3.10"', '"3.11"', '"3.12"'):
+            self.assertIn(version, workflow)
+        self.assertIn("python scripts/clean_notebooks.py --check --diagnose", workflow)
+        self.assertIn("ruff check capitulo7 capitulo8 common scripts tests", workflow)
+        self.assertIn("python scripts/validate_colab_bootstrap.py", workflow)
+        self.assertIn("python scripts/validate_colab_links.py", workflow)
+        self.assertIn("python scripts/benchmark_animations.py --repeats 3 --max-ms 1500", workflow)
+        self.assertIn("pip-audit --local --progress-spinner off --format json", workflow)
+        self.assertIn("actions/upload-artifact@v4", workflow)
 
     def test_runtime_output_cache_skips_repeated_html_assignments(self):
         runtime = load_module_from_path(
