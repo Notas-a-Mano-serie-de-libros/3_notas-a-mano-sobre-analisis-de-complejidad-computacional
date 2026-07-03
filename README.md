@@ -3,6 +3,15 @@
   <strong>Teoría, estructuras y análisis de algoritmos</strong>
 </h1>
 
+<p style="text-align:center;">
+  <a href="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/ci.yml">
+    <img alt="CI" src="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/ci.yml/badge.svg"/>
+  </a>
+  <a href="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/codeql.yml">
+    <img alt="CodeQL" src="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/codeql.yml/badge.svg"/>
+  </a>
+</p>
+
 <p style="text-align:justify;">
 Este repositorio reúne los <b>notebooks interactivos</b>, <b>ejemplos prácticos</b> y <b>demostraciones</b> que acompañan la obra  
 <i><b>Notas a mano sobre análisis de complejidad computacional</b></i> (segunda edición, 2026), escrita por <strong>Carlos Eduardo Orozco Garcés</strong>, <strong>César Jesús Pardo Calvache</strong> y <strong>Mauro Callejas Cuervo</strong>.  

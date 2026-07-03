@@ -1,0 +1,46 @@
+repos:
+  - repo: local
+    hooks:
+      - id: clean-notebooks
+        name: Check notebooks are clean
+        entry: python scripts/clean_notebooks.py --check --diagnose
+        language: system
+        pass_filenames: false
+        types_or: [jupyter]
+      - id: ruff
+        name: Ruff lint
+        entry: ruff check capitulo7 capitulo8 common scripts tests
+        language: system
+        pass_filenames: false
+        types_or: [python]
+      - id: compile-python
+        name: Compile Python files
+        entry: python -m compileall -q capitulo7/domain capitulo8/domain common scripts tests
+        language: system
+        pass_filenames: false
+        types_or: [python]
+      - id: validate-colab-bootstrap
+        name: Validate Colab bootstrap files
+        entry: python scripts/validate_colab_bootstrap.py
+        language: system
+        pass_filenames: false
+      - id: validate-colab-links
+        name: Validate GitHubColab links
+        entry: python scripts/validate_colab_links.py
+        language: system
+        pass_filenames: false
+      - id: validate-notebook-launchers
+        name: Validate notebook launchers
+        entry: python scripts/validate_notebook_launchers.py
+        language: system
+        pass_filenames: false
+      - id: validate-size-budgets
+        name: Validate size budgets
+        entry: python scripts/validate_size_budgets.py
+        language: system
+        pass_filenames: false
+      - id: validate-html-snapshots
+        name: Validate HTML snapshots
+        entry: python scripts/validate_html_snapshots.py
+        language: system
+        pass_filenames: false

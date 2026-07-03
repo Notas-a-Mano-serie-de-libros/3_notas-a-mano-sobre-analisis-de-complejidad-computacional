@@ -1,0 +1,58 @@
+{
+  "capitulo7.binaria.initial": {
+    "bytes": 2275,
+    "sha256": "2c8a302bd942b61e5b7b5e38fe1259b7bcaf30d5a66516050a877567864450b1"
+  },
+  "capitulo7.comparacion.initial": {
+    "bytes": 12358,
+    "sha256": "16874ab4bac148959fdc455d66a5645ce5ae259de712e6c271613f154f8860ef"
+  },
+  "capitulo7.exponencial.initial": {
+    "bytes": 2292,
+    "sha256": "4feeb1d63446ae38de33f8c69392f390be5cc1721679fb7c59218037b210dc1d"
+  },
+  "capitulo7.interpolacion.initial": {
+    "bytes": 2286,
+    "sha256": "fbc7ec4a60258fb11ebeba9db466149403be84ec3ee6f1f85df1e1e77356a43d"
+  },
+  "capitulo7.saltos.initial": {
+    "bytes": 2287,
+    "sha256": "ff1449241cd5bcb4c8c3ac4e6568cab76d4bb90a7e598874fc23f20cd6dde419"
+  },
+  "capitulo7.secuencial.initial": {
+    "bytes": 2278,
+    "sha256": "fa1572fb1acb05f6613b8258f65beba122c2b24235bee05ba21729d27ad81aa1"
+  },
+  "capitulo7.ternaria.initial": {
+    "bytes": 2278,
+    "sha256": "ecf7e7a6f44aea71600067bc047743c07ccdb2b08e3614a48fe9d0d374ac14e2"
+  },
+  "capitulo8.burbuja.barras.initial": {
+    "bytes": 8061,
+    "sha256": "56321e85b55ea2a6c5b15d1178b2d46e4b43e289c845a5f3e77c87ce167cb5c3"
+  },
+  "capitulo8.comparacion.initial": {
+    "bytes": 18643,
+    "sha256": "fb92bc86c40877a3718de26ce309b4472f67bb948ac371b8ab0cc5d7647df871"
+  },
+  "capitulo8.insercion.barras.initial": {
+    "bytes": 8068,
+    "sha256": "472d3dcfa236e5c77fb52d267c5c8769430d5ed52ef52a9320271f166ad4e753"
+  },
+  "capitulo8.mezcla.arbol.initial": {
+    "bytes": 6020,
+    "sha256": "332aa2fe31fa17a82073a6819ae3bcf6beecb9d1d0d9a377c9162fb381744671"
+  },
+  "capitulo8.radix.barras.initial": {
+    "bytes": 8059,
+    "sha256": "ecd247f943af6b14cdbf5278d2fd96866f76440fe35f023f29e6b724398a186e"
+  },
+  "capitulo8.rapido.arbol.initial": {
+    "bytes": 10294,
+    "sha256": "a1854172b074ce1d83cdefe0c4eab4aaea097d0fa32a66edbad46eb97bf1c229"
+  },
+  "capitulo8.seleccion.barras.initial": {
+    "bytes": 8068,
+    "sha256": "116a9489d264d065dc2825467e21fe949f2d9c411ce6a7a5b6e206752df16a00"
+  }
+}
