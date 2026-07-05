@@ -36,6 +36,8 @@ SIMULATION_LAUNCHERS = {
     "burbuja": "run_burbuja",
     "seleccion": "run_seleccion",
     "insercion": "run_insercion",
+    "insercion_binaria": "run_insercion_binaria",
+    "insercion_comparacion": "run_insercion_comparacion",
     "shell": "run_shell",
     "shell_comparacion": "run_shell_comparacion",
     "mezcla": "run_mezcla",

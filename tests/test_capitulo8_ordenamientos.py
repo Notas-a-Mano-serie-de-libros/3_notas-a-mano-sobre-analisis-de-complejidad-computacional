@@ -91,6 +91,36 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertEqual(module.BOOK_ARRAY, SORT_MODULES[name][2])
 
+    def test_binary_insertion_variant_sorts_and_compares_with_classic(self):
+        module = self.modules["insercion"]
+        values = [5, 2, 4, 6, 1, 3]
+        state = module.create_binary_state(size=len(values), values=values, view="barras")
+        self.run_until_complete(module, "step_binary_insertion_sort", state)
+
+        self.assertEqual(state["arr"], sorted(values))
+        self.assertTrue(state["sorting_complete"])
+
+        comparison_state = module.create_comparison_state(size=len(values), values=values)
+        self.assertEqual([item["key"] for item in comparison_state["algorithms"]], ["insercion", "insercion_binaria"])
+        module.step_all_variants(comparison_state)
+        self.assertTrue(all(item["steps"] == 1 for item in comparison_state["algorithms"]))
+        html = module.render_comparison_html(comparison_state)
+        self.assertIn("Inserción", html)
+        self.assertIn("Inserción<br>binaria", html)
+
+        probe = module.create_binary_state(size=len(values), values=values, view="barras")
+        while not probe["sorting_complete"] and "m" not in probe["labels"]:
+            module.step_binary_insertion_sort(probe)
+        self.assertIn("m", probe["labels"])
+        self.assertEqual(probe["roles"][probe["labels"].index("m")], "boundary")
+
+        shift_state = module.create_binary_state(size=len(values), values=values, view="barras")
+        while not shift_state["sorting_complete"] and "Desplaza" not in shift_state["message"]:
+            module.step_binary_insertion_sort(shift_state)
+        self.assertIn("Desplaza", shift_state["message"])
+        self.assertIn("m", shift_state["labels"])
+        self.assertEqual(shift_state["roles"][shift_state["labels"].index("m")], "boundary")
+
     def test_shell_uses_selected_gap_sequence_in_individual_and_comparison(self):
         module = self.modules["shell"]
         state = module.create_state(
@@ -516,6 +546,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             "run_burbuja": "1_ordenamiento_burbuja_app.py",
             "run_seleccion": "2_ordenamiento_seleccion_app.py",
             "run_insercion": "3_ordenamiento_insercion_app.py",
+            "run_insercion_binaria": "3_ordenamiento_insercion_app.py",
+            "run_insercion_comparacion": "3_ordenamiento_insercion_app.py",
             "run_shell": "4_ordenamiento_shell_app.py",
             "run_mezcla": "5_ordenamiento_mezcla_app.py",
             "run_rapido": "6_ordenamiento_rapido_app.py",
@@ -566,6 +598,24 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("def run_shell_comparacion", launchers)
         self.assertIn("run_gap_comparison_app", app_source)
         self.assertIn("create_gap_comparison_state", app_source)
+
+    def test_insertion_notebook_includes_binary_variant_and_comparison(self):
+        notebook = NOTEBOOK_DIR / "3_ordenamiento_insercion.ipynb"
+        nb = json.loads(notebook.read_text(encoding="utf-8"))
+        code_cells = [cell for cell in nb["cells"] if cell["cell_type"] == "code"]
+        bootstrap = (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
+        launchers = (NOTEBOOK_DIR / "launchers.py").read_text(encoding="utf-8")
+        app_source = (DOMAIN_DIR / "3_ordenamiento_insercion_app.py").read_text(encoding="utf-8")
+
+        self.assertEqual(len(code_cells), 4)
+        self.assertIn('SIMULATION_NAME = "insercion_binaria"', "".join(code_cells[1]["source"]))
+        self.assertIn('SIMULATION_NAME = "insercion_comparacion"', "".join(code_cells[2]["source"]))
+        self.assertIn('"insercion_binaria": "run_insercion_binaria"', bootstrap)
+        self.assertIn('"insercion_comparacion": "run_insercion_comparacion"', bootstrap)
+        self.assertIn("def run_insercion_binaria", launchers)
+        self.assertIn("def run_insercion_comparacion", launchers)
+        self.assertIn("run_binary_app", app_source)
+        self.assertIn("run_comparison_app", app_source)
 
     def test_notebooks_are_clean_invocations(self):
         comparison_notebook = NOTEBOOK_DIR / "0_comparacion_ordenamientos.ipynb"
@@ -744,7 +794,12 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
             with self.subTest(notebook=notebook_name):
                 notebook = json.loads((NOTEBOOK_DIR / notebook_name).read_text())
                 code_cells = [cell for cell in notebook["cells"] if cell["cell_type"] == "code"]
-                expected_code_cells = 3 if notebook_name == "4_ordenamiento_shell.ipynb" else 2
+                if notebook_name == "3_ordenamiento_insercion.ipynb":
+                    expected_code_cells = 4
+                elif notebook_name == "4_ordenamiento_shell.ipynb":
+                    expected_code_cells = 3
+                else:
+                    expected_code_cells = 2
                 self.assertEqual(len(code_cells), expected_code_cells)
 
                 # Cell 0: simulation bootstrap
@@ -762,8 +817,8 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
                 self.assertEqual(code_cells[0].get("outputs"), [])
                 self.assertIsNone(code_cells[0].get("execution_count"))
 
-                # Cell 1: run_single_chart invocation
-                chart_source = "".join(code_cells[1]["source"])
+                # run_single_chart invocation
+                chart_source = next("".join(cell["source"]) for cell in code_cells if "run_single_chart" in "".join(cell["source"]))
                 self.assertIn("run_single_chart", chart_source)
                 self.assertIn("ordenamientos_chart", chart_source)
                 self.assertNotIn("from ordenamientos_chart import", chart_source)

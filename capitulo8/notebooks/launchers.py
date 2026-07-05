@@ -60,6 +60,16 @@ def run_insercion():
     _run("3_ordenamiento_insercion_app.py", "cap8_insercion_app")
 
 
+def run_insercion_binaria():
+    module = _load_module("3_ordenamiento_insercion_app.py", "cap8_insercion_binaria_app")
+    module.run_binary_app()
+
+
+def run_insercion_comparacion():
+    module = _load_module("3_ordenamiento_insercion_app.py", "cap8_insercion_comparacion_app")
+    module.run_comparison_app()
+
+
 def run_shell():
     _run("4_ordenamiento_shell_app.py", "cap8_shell_app")
 

@@ -29,6 +29,7 @@ INITIAL_MESSAGES = {
     "burbuja": ("Presiona Paso siguiente para iniciar el ordenamiento burbuja.", r"\text{estado inicial}"),
     "seleccion": ("Presiona Paso siguiente para iniciar el ordenamiento por selección.", r"\text{estado inicial}"),
     "insercion": ("Presiona Paso siguiente para iniciar el ordenamiento por inserción.", r"\text{estado inicial}"),
+    "insercion_binaria": ("Presiona Paso siguiente para iniciar la inserción binaria.", r"\text{estado inicial}"),
     "shell": ("Presiona Paso siguiente para iniciar el ordenamiento Shell.", r"\text{estado inicial}"),
     "mezcla": ("Presiona Paso siguiente para iniciar el ordenamiento por mezcla.", r"\text{estado inicial}"),
     "rapido": ("Presiona Paso siguiente para iniciar el ordenamiento rápido.", r"\text{estado inicial}"),

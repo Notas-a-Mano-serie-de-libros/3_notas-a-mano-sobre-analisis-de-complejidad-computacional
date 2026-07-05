@@ -239,6 +239,102 @@ def insertion_trace(values, descending=False):
     return trace
 
 
+def binary_insertion_trace(values, descending=False):
+    arr = list(values)
+    n = len(arr)
+    trace = [make_event(arr, "Presiona Paso siguiente para iniciar la inserción binaria.", r"\text{estado inicial}")]
+
+    def base_roles(limit):
+        return ["current" if index < limit else "default" for index in range(n)]
+
+    for i in range(1, n):
+        value = arr[i]
+        a = 0
+        b = i
+        last_m = None
+        roles = base_roles(i)
+        labels = [""] * n
+        mark(roles, labels, i, "compare", "i")
+        trace.append(
+            make_event(
+                arr,
+                f"Busca con búsqueda binaria la posición de inserción de {value}.",
+                rf"i = {i},\quad x = {value},\quad a = {a},\quad b = {b}",
+                roles,
+                labels,
+            )
+        )
+
+        while a < b:
+            m = a + (b - a) // 2
+            last_m = m
+            roles = base_roles(i)
+            labels = [""] * n
+            mark(roles, labels, i, "compare", "i")
+            mark(roles, labels, a, "boundary", "a")
+            mark(roles, labels, min(b, i - 1), "boundary", "b")
+            mark(roles, labels, m, "boundary", "m")
+            trace.append(
+                make_event(
+                    arr,
+                    f"Compara {value} con {arr[m]} en la posición media.",
+                    rf"m = a + \left\lfloor \frac{{b-a}}{{2}} \right\rfloor = {m},\quad x = {value},\quad a_m = {arr[m]}",
+                    roles,
+                    labels,
+                )
+            )
+            goes_right = arr[m] >= value if descending else arr[m] <= value
+            if goes_right:
+                a = m + 1
+                interval = rf"a = m + 1 = {a},\quad b = {b}"
+            else:
+                b = m
+                interval = rf"a = {a},\quad b = m = {b}"
+            roles = base_roles(i)
+            labels = [""] * n
+            mark(roles, labels, i, "compare", "i")
+            if a < i:
+                mark(roles, labels, a, "boundary", "a")
+            if b > 0:
+                mark(roles, labels, min(b, i - 1), "boundary", "b")
+            if last_m is not None:
+                mark(roles, labels, last_m, "boundary", "m")
+            trace.append(make_event(arr, "Actualiza el rango de búsqueda.", interval, roles, labels))
+
+        insert_at = a
+        roles = base_roles(i)
+        labels = [""] * n
+        mark(roles, labels, insert_at, "sorted", "pos")
+        if last_m is not None:
+            mark(roles, labels, last_m, "boundary", "m")
+        mark(roles, labels, i, "compare", "i")
+        m_formula = rf"m = {last_m},\quad " if last_m is not None else ""
+        trace.append(make_event(arr, f"La posición de inserción es {insert_at}.", rf"{m_formula}pos = {insert_at},\quad x = {value}", roles, labels))
+
+        j = i
+        while j > insert_at:
+            arr[j] = arr[j - 1]
+            roles = base_roles(i)
+            labels = [""] * n
+            mark(roles, labels, j - 1, "current", "j - 1")
+            mark(roles, labels, j, "compare", "j")
+            if last_m is not None:
+                mark(roles, labels, last_m, "boundary", "m")
+            trace.append(make_event(arr, f"Desplaza {arr[j]} una posición a la derecha.", rf"j = {j},\quad a_j = a_{{j-1}}", roles, labels))
+            j -= 1
+
+        arr[insert_at] = value
+        roles = base_roles(i + 1)
+        labels = [""] * n
+        mark(roles, labels, insert_at, "sorted", "insertado")
+        if last_m is not None:
+            mark(roles, labels, last_m, "boundary", "m")
+        trace.append(make_event(arr, f"Inserta {value} en la posición {insert_at}.", rf"i = {i},\quad insertado = {insert_at}", roles, labels))
+
+    trace.append(make_event(arr, "Finaliza la inserción binaria.", r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    return trace
+
+
 def shell_gaps(n, sequence="shell"):
     if n <= 1:
         return [1]
@@ -1033,6 +1129,7 @@ TRACE_BUILDERS = {
     "burbuja": bubble_trace,
     "seleccion": selection_trace,
     "insercion": insertion_trace,
+    "insercion_binaria": binary_insertion_trace,
     "shell": shell_trace,
     "mezcla": merge_trace,
     "rapido": quick_trace,
@@ -1045,6 +1142,7 @@ __all__ = [
     "bubble_trace",
     "selection_trace",
     "insertion_trace",
+    "binary_insertion_trace",
     "shell_gaps",
     "shell_trace",
     "merge_trace",
