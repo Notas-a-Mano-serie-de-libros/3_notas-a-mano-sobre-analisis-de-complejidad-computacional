@@ -80,6 +80,7 @@ _CONFIGS = [
     ("Selección", "seleccion", "#37474F"),
 ]
 _SINGLE_CONFIGS = _CONFIGS + [
+    ("Shell", "shell", "#00897B"),
     ("Radix", "radix", "#E65100"),
 ]
 
@@ -87,6 +88,7 @@ _FORMULAS = {
     "Mezcla":    lambda n: n * math.log2(max(n, 2)),
     "Rápido":    lambda n: n * math.log2(max(n, 2)),
     "Inserción": lambda n: n * n / 4,
+    "Shell":     lambda n: n * n / 2,
     "Burbuja":   lambda n: n * n / 2,
     "Selección": lambda n: n * (n - 1) / 2,
     "Radix":      lambda n: n * max(1, math.log10(max(n, 10))),
@@ -96,6 +98,7 @@ _THEORY_LABELS = {
     "Mezcla":    r"$n\,\log_2 n$",
     "Rápido":    r"$n\,\log_2 n$",
     "Inserción": r"$n^2/4$",
+    "Shell":     r"$n^2/2$",
     "Burbuja":   r"$n^2/2$",
     "Selección": r"$n^2/2$",
     "Radix":      r"$n\,d$",
@@ -228,6 +231,7 @@ _SINGLE_PROFILES: dict[str, dict] = {
     "Mezcla":    {"max_emp": 2_000, "n_pts": 45, "trials": 5,  "an_max": 1e6},
     "Rápido":    {"max_emp": 2_000, "n_pts": 45, "trials": 5,  "an_max": 1e6},
     "Inserción": {"max_emp":   400, "n_pts": 30, "trials": 5,  "an_max": 5e4},
+    "Shell":     {"max_emp":   500, "n_pts": 30, "trials": 5,  "an_max": 5e4},
     "Burbuja":   {"max_emp":   400, "n_pts": 30, "trials": 5,  "an_max": 5e4},
     "Selección": {"max_emp":   400, "n_pts": 30, "trials": 5,  "an_max": 5e4},
     "Radix":     {"max_emp":   600, "n_pts": 30, "trials": 3,  "an_max": 1e5},

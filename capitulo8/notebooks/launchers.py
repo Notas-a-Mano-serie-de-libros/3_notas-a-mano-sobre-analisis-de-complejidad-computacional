@@ -60,13 +60,17 @@ def run_insercion():
     _run("3_ordenamiento_insercion_app.py", "cap8_insercion_app")
 
 
+def run_shell():
+    _run("4_ordenamiento_shell_app.py", "cap8_shell_app")
+
+
 def run_mezcla():
-    _run("4_ordenamiento_mezcla_app.py", "cap8_mezcla_app")
+    _run("5_ordenamiento_mezcla_app.py", "cap8_mezcla_app")
 
 
 def run_rapido():
-    _run("5_ordenamiento_rapido_app.py", "cap8_rapido_app")
+    _run("6_ordenamiento_rapido_app.py", "cap8_rapido_app")
 
 
 def run_radix():
-    _run("6_ordenamiento_radix_app.py", "cap8_radix_app")
+    _run("7_ordenamiento_radix_app.py", "cap8_radix_app")

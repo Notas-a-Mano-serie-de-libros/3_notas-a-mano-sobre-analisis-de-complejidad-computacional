@@ -54,5 +54,9 @@
   "capitulo8.seleccion.barras.initial": {
     "bytes": 8068,
     "sha256": "116a9489d264d065dc2825467e21fe949f2d9c411ce6a7a5b6e206752df16a00"
+  },
+  "capitulo8.shell.barras.initial": {
+    "bytes": 8059,
+    "sha256": "775111a627a7ebeb2798a6c9d71ee64a4e4683bda7fa6774673d73865f67f03e"
   }
 }

@@ -56,8 +56,9 @@ SORT_CASES = (
     ("burbuja", "1_ordenamiento_burbuja_app.py", "step_bubble_sort", ("barras", "cajas")),
     ("seleccion", "2_ordenamiento_seleccion_app.py", "step_selection_sort", ("barras", "cajas")),
     ("insercion", "3_ordenamiento_insercion_app.py", "step_insertion_sort", ("barras", "cajas")),
-    ("mezcla", "4_ordenamiento_mezcla_app.py", "step_merge_sort", ("barras", "cajas", "arbol")),
-    ("rapido", "5_ordenamiento_rapido_app.py", "step_quick_sort", ("barras", "cajas", "arbol")),
+    ("shell", "4_ordenamiento_shell_app.py", "step_shell_sort", ("barras", "cajas")),
+    ("mezcla", "5_ordenamiento_mezcla_app.py", "step_merge_sort", ("barras", "cajas", "arbol")),
+    ("rapido", "6_ordenamiento_rapido_app.py", "step_quick_sort", ("barras", "cajas", "arbol")),
 )
 
 

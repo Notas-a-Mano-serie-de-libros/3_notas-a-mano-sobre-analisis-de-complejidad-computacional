@@ -59,9 +59,10 @@ def build_snapshots() -> dict[str, dict[str, int | str]]:
         ("burbuja", "1_ordenamiento_burbuja_app.py", "barras"),
         ("seleccion", "2_ordenamiento_seleccion_app.py", "barras"),
         ("insercion", "3_ordenamiento_insercion_app.py", "barras"),
-        ("mezcla", "4_ordenamiento_mezcla_app.py", "arbol"),
-        ("rapido", "5_ordenamiento_rapido_app.py", "arbol"),
-        ("radix", "6_ordenamiento_radix_app.py", "barras"),
+        ("shell", "4_ordenamiento_shell_app.py", "barras"),
+        ("mezcla", "5_ordenamiento_mezcla_app.py", "arbol"),
+        ("rapido", "6_ordenamiento_rapido_app.py", "arbol"),
+        ("radix", "7_ordenamiento_radix_app.py", "barras"),
     ):
         module = load_module(f"snapshot_cap8_{name}", CAP8_DOMAIN / filename, extra_paths=(CAP8_DOMAIN,))
         state = module.create_state(size=len(sort_values), values=sort_values, view=view)

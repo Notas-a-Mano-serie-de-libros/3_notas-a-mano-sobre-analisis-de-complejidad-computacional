@@ -63,6 +63,67 @@ def count_insertion(values, descending=False):
     return steps + 1
 
 
+def shell_gaps(n, sequence="shell"):
+    if n <= 1:
+        return [1]
+    if sequence == "hibbard":
+        gaps = []
+        value = 1
+        while value < n:
+            gaps.append(value)
+            value = value * 2 + 1
+        return sorted(gaps, reverse=True)
+    if sequence == "sedgewick":
+        gaps = [1]
+        k = 1
+        while True:
+            if k % 2 == 0:
+                value = 9 * (2 ** k - 2 ** (k // 2)) + 1
+            else:
+                value = 8 * 2 ** k - 6 * 2 ** ((k + 1) // 2) + 1
+            if value >= n:
+                break
+            gaps.append(value)
+            k += 1
+        return sorted(set(gaps), reverse=True)
+    if sequence == "pratt":
+        gaps = set()
+        two = 1
+        while two < n:
+            value = two
+            while value < n:
+                gaps.add(value)
+                value *= 3
+            two *= 2
+        return sorted(gaps or {1}, reverse=True)
+
+    gaps = []
+    gap = n // 2
+    while gap > 0:
+        gaps.append(gap)
+        gap //= 2
+    return gaps or [1]
+
+
+def count_shell(values, descending=False, gap_sequence="shell"):
+    arr = list(values)
+    steps = 0
+    for gap in shell_gaps(len(arr), gap_sequence):
+        steps += 1
+        for i in range(gap, len(arr)):
+            j = i
+            steps += 1
+            while j >= gap:
+                steps += 1
+                if ordered(arr[j - gap], arr[j], descending):
+                    break
+                arr[j], arr[j - gap] = arr[j - gap], arr[j]
+                j -= gap
+                steps += 1
+            steps += 1
+    return steps + 1
+
+
 def count_merge(values, descending=False):
     arr = list(values)
     steps = 0
@@ -153,6 +214,7 @@ OPERATION_COUNTERS = {
     "burbuja": count_bubble,
     "seleccion": count_selection,
     "insercion": count_insertion,
+    "shell": count_shell,
     "mezcla": count_merge,
     "rapido": count_quick,
     "radix": count_radix,
@@ -171,7 +233,9 @@ __all__ = [
     "count_quick",
     "count_radix",
     "count_selection",
+    "count_shell",
     "count_sort_operations",
     "ordered",
     "pivot_index",
+    "shell_gaps",
 ]

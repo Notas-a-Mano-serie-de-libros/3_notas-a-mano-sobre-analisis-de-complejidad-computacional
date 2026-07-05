@@ -23,9 +23,10 @@ SORT_MODULES = {
     "burbuja": ("1_ordenamiento_burbuja_app.py", "step_bubble_sort", [5, 1, 4, 2, 8]),
     "seleccion": ("2_ordenamiento_seleccion_app.py", "step_selection_sort", [64, 25, 12, 22, 11]),
     "insercion": ("3_ordenamiento_insercion_app.py", "step_insertion_sort", [5, 2, 4, 6, 1, 3]),
-    "mezcla": ("4_ordenamiento_mezcla_app.py", "step_merge_sort", [38, 27, 43, 3, 9, 82, 10]),
-    "rapido": ("5_ordenamiento_rapido_app.py", "step_quick_sort", [10, 7, 8, 9, 1, 5]),
-    "radix": ("6_ordenamiento_radix_app.py", "step_radix_sort", [170, 45, 75, 90, 802, 24, 2, 66]),
+    "shell": ("4_ordenamiento_shell_app.py", "step_shell_sort", [35, 12, 48, 7, 26, 19, 41, 3, 30, 14]),
+    "mezcla": ("5_ordenamiento_mezcla_app.py", "step_merge_sort", [38, 27, 43, 3, 9, 82, 10]),
+    "rapido": ("6_ordenamiento_rapido_app.py", "step_quick_sort", [10, 7, 8, 9, 1, 5]),
+    "radix": ("7_ordenamiento_radix_app.py", "step_radix_sort", [170, 45, 75, 90, 802, 24, 2, 66]),
 }
 
 
@@ -89,6 +90,24 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         for name, module in self.modules.items():
             with self.subTest(name=name):
                 self.assertEqual(module.BOOK_ARRAY, SORT_MODULES[name][2])
+
+    def test_shell_uses_selected_gap_sequence_without_joining_comparison(self):
+        module = self.modules["shell"]
+        state = module.create_state(
+            size=8,
+            values=[35, 12, 48, 7, 26, 19, 41, 3],
+            view="barras",
+            gap_sequence="hibbard",
+        )
+        self.assertEqual(state["algorithm"], "shell")
+        self.assertEqual(state["gap_sequence"], "hibbard")
+        self.assertEqual(state["trace"].kwargs["gap_sequence"], "hibbard")
+
+        module.step_shell_sort(state)
+        self.assertIn("salto", state["formula"])
+
+        comparison_source = (DOMAIN_DIR / "0_comparacion_ordenamientos_app.py").read_text(encoding="utf-8")
+        self.assertNotIn('"shell"', comparison_source)
 
     def test_common_generates_random_values(self):
         values = self.common.generate_values(8)
@@ -412,17 +431,19 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                 self.assertIn("#fff2cc", html)
         self.assertGreater(highlighted_modules, 0)
 
-    def test_bubble_marks_pass_limit_i_as_yellow_boundary(self):
+    def test_bubble_uses_i_as_outer_pass_and_marks_boundary(self):
         module = self.modules["burbuja"]
         state = module.create_state(size=5, values=[5, 1, 4, 2, 8], view="barras")
         module.step_bubble_sort(state)
 
         self.assertEqual(state["roles"][4], "boundary")
-        self.assertEqual(state["labels"][4], "i")
+        self.assertEqual(state["labels"][4], "b")
         self.assertEqual(state["roles"][0], "current")
         self.assertEqual(state["roles"][1], "compare")
         self.assertEqual(state["labels"][0], "j")
         self.assertEqual(state["labels"][1], "j + 1")
+        self.assertIn("i = 0", state["formula"])
+        self.assertIn("b = n - 1 - i = 4", state["formula"])
         html = module.render_state_html(state)
         self.assertIn("#fff2cc", html)
 
@@ -486,9 +507,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             "run_burbuja": "1_ordenamiento_burbuja_app.py",
             "run_seleccion": "2_ordenamiento_seleccion_app.py",
             "run_insercion": "3_ordenamiento_insercion_app.py",
-            "run_mezcla": "4_ordenamiento_mezcla_app.py",
-            "run_rapido": "5_ordenamiento_rapido_app.py",
-            "run_radix": "6_ordenamiento_radix_app.py",
+            "run_shell": "4_ordenamiento_shell_app.py",
+            "run_mezcla": "5_ordenamiento_mezcla_app.py",
+            "run_rapido": "6_ordenamiento_rapido_app.py",
+            "run_radix": "7_ordenamiento_radix_app.py",
         }
         for launcher_name, relative_path in expected.items():
             with self.subTest(launcher_name=launcher_name):
@@ -497,7 +519,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                 self.assertTrue(hasattr(module, "run_app"))
 
     def test_radix_notebook_is_individual_only(self):
-        notebook = NOTEBOOK_DIR / "6_ordenamiento_radix.ipynb"
+        notebook = NOTEBOOK_DIR / "7_ordenamiento_radix.ipynb"
         nb = json.loads(notebook.read_text(encoding="utf-8"))
         code_cells = [cell for cell in nb["cells"] if cell["cell_type"] == "code"]
         bootstrap = (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
@@ -513,7 +535,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             self.assertIsNone(cell.get("execution_count"))
             self.assertTrue(cell["metadata"]["jupyter"]["source_hidden"])
 
-        self.assertIn("6_ordenamiento_radix_app.py", bootstrap)
+        self.assertIn("7_ordenamiento_radix_app.py", bootstrap)
         self.assertIn('"radix": "run_radix"', bootstrap)
         self.assertIn("def run_radix", launchers)
         self.assertNotIn("Ordenamiento radix", comparison)
@@ -529,7 +551,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIsNone(comparison_nb["cells"][1]["execution_count"])
         self.assertTrue(comparison_nb["cells"][1]["metadata"]["jupyter"]["source_hidden"])
 
-        for index, name in enumerate(("burbuja", "seleccion", "insercion", "mezcla", "rapido"), start=1):
+        for index, name in enumerate(("burbuja", "seleccion", "insercion", "shell", "mezcla", "rapido", "radix"), start=1):
             with self.subTest(name=name):
                 notebook = NOTEBOOK_DIR / f"{index}_ordenamiento_{name}.ipynb"
                 nb = json.loads(notebook.read_text(encoding="utf-8"))
@@ -671,16 +693,18 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
             "1_ordenamiento_burbuja.ipynb": "burbuja",
             "2_ordenamiento_seleccion.ipynb": "seleccion",
             "3_ordenamiento_insercion.ipynb": "insercion",
-            "4_ordenamiento_mezcla.ipynb": "mezcla",
-            "5_ordenamiento_rapido.ipynb": "rapido",
+            "4_ordenamiento_shell.ipynb": "shell",
+            "5_ordenamiento_mezcla.ipynb": "mezcla",
+            "6_ordenamiento_rapido.ipynb": "rapido",
         }
 
         chart_names = {
             "1_ordenamiento_burbuja.ipynb": "Burbuja",
             "2_ordenamiento_seleccion.ipynb": "Selección",
             "3_ordenamiento_insercion.ipynb": "Inserción",
-            "4_ordenamiento_mezcla.ipynb": "Mezcla",
-            "5_ordenamiento_rapido.ipynb": "Rápido",
+            "4_ordenamiento_shell.ipynb": "Shell",
+            "5_ordenamiento_mezcla.ipynb": "Mezcla",
+            "6_ordenamiento_rapido.ipynb": "Rápido",
         }
 
         for notebook_name, simulation_name in expected.items():

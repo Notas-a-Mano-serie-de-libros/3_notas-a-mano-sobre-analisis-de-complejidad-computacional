@@ -106,8 +106,10 @@ NOTEBOOKS: dict[str, str] = {
     "8/burbuja":        "capitulo8/notebooks/1_ordenamiento_burbuja.ipynb",
     "8/seleccion":      "capitulo8/notebooks/2_ordenamiento_seleccion.ipynb",
     "8/insercion":      "capitulo8/notebooks/3_ordenamiento_insercion.ipynb",
-    "8/mezcla":         "capitulo8/notebooks/4_ordenamiento_mezcla.ipynb",
-    "8/rapido":         "capitulo8/notebooks/5_ordenamiento_rapido.ipynb",
+    "8/shell":          "capitulo8/notebooks/4_ordenamiento_shell.ipynb",
+    "8/mezcla":         "capitulo8/notebooks/5_ordenamiento_mezcla.ipynb",
+    "8/rapido":         "capitulo8/notebooks/6_ordenamiento_rapido.ipynb",
+    "8/radix":          "capitulo8/notebooks/7_ordenamiento_radix.ipynb",
 }
 
 # ---------------------------------------------------------------------------

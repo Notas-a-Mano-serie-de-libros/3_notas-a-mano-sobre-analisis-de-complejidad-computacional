@@ -25,12 +25,12 @@
   </li>
   <li><a href="#8-5">8.5 Ordenamiento por mezcla</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/4_ordenamiento_mezcla.ipynb">Animación interactiva – Ordenamiento por mezcla</a></li>
+      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb">Animación interactiva – Ordenamiento por mezcla</a></li>
     </ul>
   </li>
   <li><a href="#8-6">8.6 Ordenamiento rápido</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/5_ordenamiento_rapido.ipynb">Animación interactiva – Ordenamiento rápido</a></li>
+      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/6_ordenamiento_rapido.ipynb">Animación interactiva – Ordenamiento rápido</a></li>
     </ul>
   </li>
   <li><a href="#8-comp">📊 Comparación de todos los algoritmos</a>
@@ -270,7 +270,7 @@ En el mejor caso (arreglo ya ordenado), cada elemento solo requiere una comparac
 <h2 id="8-5">🔀 8.5 Ordenamiento por mezcla</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/4_ordenamiento_mezcla.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
 </p>
 
 <p align="justify">
@@ -335,7 +335,7 @@ Aplicando el <b>teorema maestro básico</b> con <code>a=2, b=2, f(n)∈O(n¹)</c
 <h2 id="8-6">⚡ 8.6 Ordenamiento rápido</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/5_ordenamiento_rapido.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/6_ordenamiento_rapido.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
 </p>
 
 <p align="justify">

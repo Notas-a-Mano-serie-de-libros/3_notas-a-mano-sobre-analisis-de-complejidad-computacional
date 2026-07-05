@@ -16,8 +16,8 @@ except ImportError:
     colab_output = None
 
 
-from sort_algorithms import TRACE_BUILDERS
-from sort_config import DEFAULT_BAR_SIZE, DEFAULT_SIZE, FONT_FAMILY, FORMULA_OUTPUT_HEIGHT, MAX_SIZE, ORDER_OPTIONS, PIVOT_OPTIONS, ROLE_STYLES, TREE_VIEW_OPTIONS, VIEW_OPTIONS
+from sort_algorithms import TRACE_BUILDERS, shell_initial_formula
+from sort_config import DEFAULT_BAR_SIZE, DEFAULT_SIZE, FONT_FAMILY, FORMULA_OUTPUT_HEIGHT, GAP_SEQUENCE_OPTIONS, MAX_SIZE, ORDER_OPTIONS, PIVOT_OPTIONS, ROLE_STYLES, TREE_VIEW_OPTIONS, VIEW_OPTIONS
 from sort_tree import flatten_tree, merge_active_ranges, quick_tree, range_key, split_tree, tree_depth, tree_max_depth_for_state
 
 
@@ -29,6 +29,7 @@ INITIAL_MESSAGES = {
     "burbuja": ("Presiona Paso siguiente para iniciar el ordenamiento burbuja.", r"\text{estado inicial}"),
     "seleccion": ("Presiona Paso siguiente para iniciar el ordenamiento por selección.", r"\text{estado inicial}"),
     "insercion": ("Presiona Paso siguiente para iniciar el ordenamiento por inserción.", r"\text{estado inicial}"),
+    "shell": ("Presiona Paso siguiente para iniciar el ordenamiento Shell.", r"\text{estado inicial}"),
     "mezcla": ("Presiona Paso siguiente para iniciar el ordenamiento por mezcla.", r"\text{estado inicial}"),
     "rapido": ("Presiona Paso siguiente para iniciar el ordenamiento rápido.", r"\text{estado inicial}"),
     "radix": ("Presiona Paso siguiente para iniciar el ordenamiento radix.", r"\text{estado inicial}"),
@@ -84,14 +85,18 @@ def generate_values(size=DEFAULT_SIZE):
     return random.sample(range(10, upper), size)
 
 
-def create_state(algorithm, size=None, descending=False, values=None, view="barras", pivot_strategy="end"):
+def create_state(algorithm, size=None, descending=False, values=None, view="barras", pivot_strategy="end", gap_sequence="shell"):
     size = default_size_for_view(view) if size is None else size
     values = list(values) if values is not None else generate_values(size)
     builder = TRACE_BUILDERS[algorithm]
     trace_kwargs = {"descending": descending}
     if algorithm == "rapido":
         trace_kwargs["pivot_strategy"] = pivot_strategy
+    if algorithm == "shell":
+        trace_kwargs["gap_sequence"] = gap_sequence
     initial_message, initial_formula = INITIAL_MESSAGES[algorithm]
+    if algorithm == "shell":
+        initial_formula = shell_initial_formula(len(values), gap_sequence)
     initial_event = {
         "arr": list(values),
         "message": initial_message,
@@ -117,6 +122,7 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
         "descending": descending,
         "view": view,
         "pivot_strategy": pivot_strategy,
+        "gap_sequence": gap_sequence,
         "sorting_active": False,
     }
 
@@ -180,6 +186,9 @@ def label_html(label):
         "i": "i",
         "j": "j",
         "j + 1": "j + 1",
+        "b": "b",
+        "salto": "salto",
+        "j - salto": "j - salto",
         "k": "k",
         "pos": "pos",
         "sel": "sel",
@@ -701,7 +710,7 @@ def render_state_html(state, include_styles=True):
     """
 
 
-def build_controls(has_pivot=False, has_tree=False):
+def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False):
     size_input = bounded_int_control(
         value=default_size_for_view("barras"),
         min_value=2,
@@ -732,6 +741,13 @@ def build_controls(has_pivot=False, has_tree=False):
         width="180px",
         description_style={},
     )
+    gap_dropdown = dropdown_control(
+        options=GAP_SEQUENCE_OPTIONS,
+        value="shell",
+        description="Saltos",
+        width="210px",
+        description_style={},
+    )
     step_button = button_control(description="Paso siguiente", button_style="info", width="150px")
     auto_button = button_control(description="Ejecución automática", button_style="success", width="190px")
     finish_button = button_control(description="Finalizar", button_style="", width="120px")
@@ -742,6 +758,7 @@ def build_controls(has_pivot=False, has_tree=False):
         "view": view_dropdown,
         "order": order_dropdown,
         "pivot": pivot_dropdown,
+        "gap_sequence": gap_dropdown,
         "step": step_button,
         "auto": auto_button,
         "finish": finish_button,
@@ -751,6 +768,8 @@ def build_controls(has_pivot=False, has_tree=False):
     first_row = [size_input, view_dropdown, order_dropdown]
     if has_pivot:
         first_row.append(pivot_dropdown)
+    if has_gap_sequence:
+        first_row.append(gap_dropdown)
     layout = widgets.VBox(
         [
             widgets.HBox(first_row, layout=widgets.Layout(width="100%", gap="12px")),
@@ -761,11 +780,11 @@ def build_controls(has_pivot=False, has_tree=False):
     return controls, layout
 
 
-def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
+def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap_sequence=False):
     if colab_output is not None:
         colab_output.enable_custom_widget_manager()
 
-    controls, controls_layout = build_controls(has_pivot=has_pivot, has_tree=has_tree)
+    controls, controls_layout = build_controls(has_pivot=has_pivot, has_tree=has_tree, has_gap_sequence=has_gap_sequence)
     formula_output = widgets.HTML(
         value="",
         layout=widgets.Layout(width="100%", padding="14px 0 10px 0", min_height=FORMULA_OUTPUT_HEIGHT),
@@ -791,6 +810,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
             values=values,
             view=controls["view"].value,
             pivot_strategy=controls["pivot"].value,
+            gap_sequence=controls["gap_sequence"].value,
         )
 
     state = build_state()
@@ -917,6 +937,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False):
     controls["view"].observe(reset_for_view, names="value")
     controls["order"].observe(reset_algorithm, names="value")
     controls["pivot"].observe(reset_algorithm, names="value")
+    controls["gap_sequence"].observe(reset_algorithm, names="value")
 
     css_widget = widgets.HTML(sort_styles())
     layout = widgets.VBox([controls_layout, formula_output, css_widget, html_output], layout=widgets.Layout(width="100%"))
@@ -933,6 +954,7 @@ __all__ = [
     "VIEW_OPTIONS",
     "ORDER_OPTIONS",
     "PIVOT_OPTIONS",
+    "GAP_SEQUENCE_OPTIONS",
     "_SIMULATION_HEIGHT_CACHE",
     "LazyTrace",
     "create_state",

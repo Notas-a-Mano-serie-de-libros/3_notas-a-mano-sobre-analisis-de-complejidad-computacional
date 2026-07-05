@@ -65,19 +65,20 @@ def bubble_trace(values, descending=False):
     arr = list(values)
     n = len(arr)
     trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento burbuja.", r"\text{estado inicial}")]
-    for i in range(n):
+    for i in range(n - 1):
         swapped = False
-        for j in range(0, n - i - 1):
-            roles = ["sorted" if index >= n - i else "default" for index in range(n)]
+        boundary = n - 1 - i
+        for j in range(0, boundary):
+            roles = ["sorted" if index > boundary else "default" for index in range(n)]
             labels = [""] * n
-            mark(roles, labels, n - i - 1, "boundary", "i")
+            mark(roles, labels, boundary, "boundary", "b")
             mark(roles, labels, j, "current", "j")
             mark(roles, labels, j + 1, "compare", "j + 1")
             trace.append(
                 make_event(
                     arr,
                     f"Compara las posiciones {j} y {j + 1}.",
-                    rf"j = {j},\quad a_j = {arr[j]},\quad a_{{j+1}} = {arr[j + 1]},\quad {arr[j]} {relation_symbol(descending)} {arr[j + 1]}",
+                    rf"i = {i},\quad b = n - 1 - i = {boundary},\quad j = {j},\quad a_j = {arr[j]},\quad a_{{j+1}} = {arr[j + 1]},\quad {arr[j]} {relation_symbol(descending)} {arr[j + 1]}",
                     roles,
                     labels,
                 )
@@ -85,24 +86,24 @@ def bubble_trace(values, descending=False):
             if not ordered(arr[j], arr[j + 1], descending):
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
                 swapped = True
-                roles = ["sorted" if index >= n - i else "default" for index in range(n)]
+                roles = ["sorted" if index > boundary else "default" for index in range(n)]
                 labels = [""] * n
-                mark(roles, labels, n - i - 1, "boundary", "i")
+                mark(roles, labels, boundary, "boundary", "b")
                 mark(roles, labels, j, "current", "j")
                 mark(roles, labels, j + 1, "compare", "j + 1")
                 trace.append(
                     make_event(
                         arr,
                         f"Intercambia las posiciones {j} y {j + 1}.",
-                        rf"a_j \leftrightarrow a_{{j+1}},\quad a_j = {arr[j]},\quad a_{{j+1}} = {arr[j + 1]}",
+                        rf"i = {i},\quad b = {boundary},\quad a_j \leftrightarrow a_{{j+1}},\quad a_j = {arr[j]},\quad a_{{j+1}} = {arr[j + 1]}",
                         roles,
                         labels,
                     )
                 )
-        roles = ["sorted" if index >= n - i - 1 else "default" for index in range(n)]
+        roles = ["sorted" if index >= boundary else "default" for index in range(n)]
         labels = [""] * n
-        mark(roles, labels, n - i - 1, "sorted", "ordenado")
-        trace.append(make_event(arr, f"Fija la posición {n - i - 1}.", rf"i = {i},\quad b = {n - i - 1}", roles, labels))
+        mark(roles, labels, boundary, "sorted", "ordenado")
+        trace.append(make_event(arr, f"Fija la posición {boundary}.", rf"i = {i},\quad b = n - 1 - i = {boundary}", roles, labels))
         if not swapped:
             break
     trace.append(make_event(arr, "Finaliza el ordenamiento burbuja.", r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
@@ -235,6 +236,227 @@ def insertion_trace(values, descending=False):
         mark(roles, labels, inserted_index, "sorted", "insertado")
         trace.append(make_event(arr, f"El elemento quedó insertado; actualiza i a la posición {i + 1}.", rf"i = {i + 1},\quad insertado = {inserted_index}", roles, labels))
     trace.append(make_event(arr, "Finaliza el ordenamiento por inserción.", r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    return trace
+
+
+def shell_gaps(n, sequence="shell"):
+    if n <= 1:
+        return [1]
+
+    if sequence == "hibbard":
+        gaps = []
+        value = 1
+        while value < n:
+            gaps.append(value)
+            value = 2 * value + 1
+        return sorted(set(gaps), reverse=True)
+
+    if sequence == "sedgewick":
+        gaps = [1]
+        k = 1
+        while True:
+            even_gap = 9 * (4 ** k) - 9 * (2 ** k) + 1
+            odd_gap = (4 ** (k + 1)) - 3 * (2 ** (k + 1)) + 1
+            added = False
+            for gap in (even_gap, odd_gap):
+                if 0 < gap < n:
+                    gaps.append(gap)
+                    added = True
+            if min(even_gap, odd_gap) >= n and not added:
+                break
+            k += 1
+        return sorted(set(gaps), reverse=True)
+
+    if sequence == "pratt":
+        gaps = set()
+        value_2 = 1
+        while value_2 < n:
+            value = value_2
+            while value < n:
+                gaps.add(value)
+                value *= 3
+            value_2 *= 2
+        return sorted(gaps, reverse=True)
+
+    gaps = []
+    gap = n // 2
+    while gap > 0:
+        gaps.append(gap)
+        gap //= 2
+    return gaps or [1]
+
+
+def shell_gap_formula_terms(n, sequence, gap, order):
+    if sequence == "hibbard":
+        k = max(1, (gap + 1).bit_length() - 1)
+        return (
+            rf"salto = 2^k - 1 = 2^{k} - 1 = {gap}",
+            rf"k = {k}",
+        )
+
+    if sequence == "sedgewick":
+        for k in range(1, max(2, n + 2)):
+            even_gap = 9 * (4 ** k) - 9 * (2 ** k) + 1
+            if even_gap == gap:
+                return (
+                    rf"salto = 9\cdot4^k - 9\cdot2^k + 1 = 9\cdot4^{k} - 9\cdot2^{k} + 1 = {gap}",
+                    rf"k = {k}",
+                )
+            odd_gap = (4 ** (k + 1)) - 3 * (2 ** (k + 1)) + 1
+            if odd_gap == gap:
+                return (
+                    rf"salto = 4^{{k+1}} - 3\cdot2^{{k+1}} + 1 = 4^{{{k + 1}}} - 3\cdot2^{{{k + 1}}} + 1 = {gap}",
+                    rf"k = {k}",
+                )
+        return rf"salto = Sedgewick(k) = {gap}", r"k \geq 1"
+
+    if sequence == "pratt":
+        power_two = 1
+        p = 0
+        while power_two <= gap:
+            power_three = 1
+            q = 0
+            while power_two * power_three <= gap:
+                if power_two * power_three == gap:
+                    return (
+                        rf"salto = 2^p3^q = 2^{p}3^{q} = {gap}",
+                        rf"p = {p},\quad q = {q}",
+                    )
+                power_three *= 3
+                q += 1
+            power_two *= 2
+            p += 1
+        return rf"salto = 2^p3^q = {gap}", r"p,q \geq 0"
+
+    k = order + 1
+    return (
+        rf"salto = \left\lfloor \frac{{n}}{{2^k}} \right\rfloor = \left\lfloor \frac{{{n}}}{{2^{k}}} \right\rfloor = {gap}",
+        rf"n = {n},\quad k = {k}",
+    )
+
+
+def shell_gap_formula(n, sequence, gap, order):
+    formula, _terms = shell_gap_formula_terms(n, sequence, gap, order)
+    return formula
+
+
+def shell_formula(first_line, *lines):
+    body = r"\\[8pt] ".join((first_line, *[line for line in lines if line]))
+    return rf"\begin{{array}}{{l}} {body} \end{{array}}"
+
+
+def shell_initial_formula(n, sequence="shell"):
+    gaps = shell_gaps(n, sequence)
+    first_gap = gaps[0] if gaps else 1
+    first_line, terms = shell_gap_formula_terms(n, sequence, first_gap, 0)
+    gap_values = ", ".join(str(gap) for gap in gaps)
+    return shell_formula(first_line, terms, rf"\text{{saltos}} = [{gap_values}]")
+
+
+def shell_trace(values, descending=False, gap_sequence="shell"):
+    arr = list(values)
+    n = len(arr)
+    gaps = shell_gaps(n, gap_sequence)
+    trace = [
+        make_event(
+            arr,
+            "Presiona Paso siguiente para iniciar el ordenamiento Shell.",
+            r"\text{estado inicial}",
+            gap_sequence=gap_sequence,
+            gap_values=list(gaps),
+        )
+    ]
+
+    def gap_label():
+        return ", ".join(str(gap) for gap in gaps)
+
+    for order, gap in enumerate(gaps):
+        gap_line, gap_terms = shell_gap_formula_terms(n, gap_sequence, gap, order)
+        roles = ["default"] * n
+        labels = [""] * n
+        for index in range(0, n, gap):
+            mark(roles, labels, index, "boundary", "salto")
+        trace.append(
+            make_event(
+                arr,
+                f"Inicia la pasada con salto {gap}.",
+                shell_formula(gap_line, gap_terms, rf"\text{{saltos}} = [{gap_label()}]"),
+                roles,
+                labels,
+                gap_sequence=gap_sequence,
+                gap_values=list(gaps),
+            )
+        )
+
+        for i in range(gap, n):
+            j = i
+            roles = ["default"] * n
+            labels = [""] * n
+            mark(roles, labels, i, "compare", "i")
+            mark(roles, labels, i - gap, "current", "j - salto")
+            trace.append(
+                make_event(
+                    arr,
+                    f"Compara la posición {i} con la posición {i - gap} usando salto {gap}.",
+                    shell_formula(
+                        gap_line,
+                        gap_terms,
+                        rf"i = {i},\quad j = {j}",
+                        rf"a_j = {arr[j]},\quad a_{{j-salto}} = {arr[j - gap]}",
+                    ),
+                    roles,
+                    labels,
+                    gap_sequence=gap_sequence,
+                    gap_values=list(gaps),
+                )
+            )
+
+            while j >= gap and not ordered(arr[j - gap], arr[j], descending):
+                arr[j - gap], arr[j] = arr[j], arr[j - gap]
+                roles = ["default"] * n
+                labels = [""] * n
+                mark(roles, labels, j - gap, "compare", "j - salto")
+                mark(roles, labels, j, "current", "j")
+                trace.append(
+                    make_event(
+                        arr,
+                        f"Intercambia las posiciones {j - gap} y {j}.",
+                        shell_formula(gap_line, gap_terms, rf"j = {j}", rf"a_{{j-salto}} \leftrightarrow a_j"),
+                        roles,
+                        labels,
+                        gap_sequence=gap_sequence,
+                        gap_values=list(gaps),
+                    )
+                )
+                j -= gap
+
+            roles = ["default"] * n
+            labels = [""] * n
+            mark(roles, labels, j, "sorted", "insertado")
+            trace.append(
+                make_event(
+                    arr,
+                    f"El elemento queda ubicado dentro de su subarreglo de salto {gap}.",
+                    shell_formula(gap_line, gap_terms, rf"i = {i},\quad j = {j}"),
+                    roles,
+                    labels,
+                    gap_sequence=gap_sequence,
+                    gap_values=list(gaps),
+                )
+            )
+
+    trace.append(
+        make_event(
+            arr,
+            "Finaliza el ordenamiento Shell.",
+            r"\text{arreglo ordenado}",
+            ["sorted"] * n,
+            [""] * n,
+            True,
+            gap_sequence=gap_sequence,
+            gap_values=list(gaps),
+        )
+    )
     return trace
 
 
@@ -811,6 +1033,7 @@ TRACE_BUILDERS = {
     "burbuja": bubble_trace,
     "seleccion": selection_trace,
     "insercion": insertion_trace,
+    "shell": shell_trace,
     "mezcla": merge_trace,
     "rapido": quick_trace,
     "radix": radix_trace,
@@ -822,6 +1045,8 @@ __all__ = [
     "bubble_trace",
     "selection_trace",
     "insertion_trace",
+    "shell_gaps",
+    "shell_trace",
     "merge_trace",
     "quick_trace",
     "radix_trace",
