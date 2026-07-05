@@ -37,6 +37,7 @@ SIMULATION_LAUNCHERS = {
     "seleccion": "run_seleccion",
     "insercion": "run_insercion",
     "shell": "run_shell",
+    "shell_comparacion": "run_shell_comparacion",
     "mezcla": "run_mezcla",
     "rapido": "run_rapido",
     "radix": "run_radix",

@@ -91,7 +91,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertEqual(module.BOOK_ARRAY, SORT_MODULES[name][2])
 
-    def test_shell_uses_selected_gap_sequence_without_joining_comparison(self):
+    def test_shell_uses_selected_gap_sequence_in_individual_and_comparison(self):
         module = self.modules["shell"]
         state = module.create_state(
             size=8,
@@ -106,8 +106,17 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         module.step_shell_sort(state)
         self.assertIn("salto", state["formula"])
 
-        comparison_source = (DOMAIN_DIR / "0_comparacion_ordenamientos_app.py").read_text(encoding="utf-8")
-        self.assertNotIn('"shell"', comparison_source)
+        comparison = self.launchers._load_module(
+            "0_comparacion_ordenamientos_app.py",
+            "capitulo8_comparacion_shell_gap_test_app",
+        )
+        comparison_state = comparison.create_comparison_state(
+            size=8,
+            values=[35, 12, 48, 7, 26, 19, 41, 3],
+            gap_sequence="hibbard",
+        )
+        shell_item = next(item for item in comparison_state["algorithms"] if item["key"] == "shell")
+        self.assertEqual(shell_item["state"]["gap_sequence"], "hibbard")
 
     def test_common_generates_random_values(self):
         values = self.common.generate_values(8)
@@ -538,9 +547,25 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("7_ordenamiento_radix_app.py", bootstrap)
         self.assertIn('"radix": "run_radix"', bootstrap)
         self.assertIn("def run_radix", launchers)
-        self.assertNotIn("Ordenamiento radix", comparison)
-        self.assertIn('("Radix", "radix"', chart_source)
-        self.assertNotIn('("Radix", "radix"', chart_source.split("_SINGLE_CONFIGS", 1)[0])
+        self.assertIn("Ordenamiento radix", comparison)
+        self.assertIn('"Radix"', chart_source)
+        self.assertIn('"radix"', chart_source)
+        self.assertIn('("Radix",     "radix"', chart_source.split("_SINGLE_CONFIGS", 1)[0])
+
+    def test_shell_notebook_includes_gap_sequence_comparison(self):
+        notebook = NOTEBOOK_DIR / "4_ordenamiento_shell.ipynb"
+        nb = json.loads(notebook.read_text(encoding="utf-8"))
+        code_cells = [cell for cell in nb["cells"] if cell["cell_type"] == "code"]
+        bootstrap = (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
+        launchers = (NOTEBOOK_DIR / "launchers.py").read_text(encoding="utf-8")
+        app_source = (DOMAIN_DIR / "4_ordenamiento_shell_app.py").read_text(encoding="utf-8")
+
+        self.assertEqual(len(code_cells), 3)
+        self.assertIn('SIMULATION_NAME = "shell_comparacion"', "".join(code_cells[-1]["source"]))
+        self.assertIn('"shell_comparacion": "run_shell_comparacion"', bootstrap)
+        self.assertIn("def run_shell_comparacion", launchers)
+        self.assertIn("run_gap_comparison_app", app_source)
+        self.assertIn("create_gap_comparison_state", app_source)
 
     def test_notebooks_are_clean_invocations(self):
         comparison_notebook = NOTEBOOK_DIR / "0_comparacion_ordenamientos.ipynb"
@@ -597,7 +622,11 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertEqual(notebook_source.count("Peor caso"), 1)
         self.assertNotIn('description="Paso siguiente"', source)
         self.assertNotIn('description="Ejecución automática"', source)
-        self.assertEqual(len(state["algorithms"]), 5)
+        self.assertEqual(len(state["algorithms"]), 7)
+        self.assertEqual(
+            [item["key"] for item in state["algorithms"]],
+            ["burbuja", "seleccion", "insercion", "shell", "mezcla", "rapido", "radix"],
+        )
         for item in state["algorithms"]:
             self.assertEqual(item["state"]["initial_values"], values)
             self.assertEqual(item["state"]["view"], "barras")
@@ -624,6 +653,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertNotIn("rows_output = widgets.HTML", source)
         self.assertNotIn("row_outputs = []", source)
         self.assertIn("Ordenamiento<br>burbuja", html)
+        self.assertIn("Ordenamiento<br>Shell", html)
+        self.assertIn("Ordenamiento<br>radix", html)
         self.assertIn("font-weight: 700;", html)
         self.assertEqual(html.count('<div class="comparison-index">'), len(values))
         module._ROW_HTML_CACHE.clear()
@@ -639,7 +670,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('value="Algoritmos activos"', source)
         self.assertIn("widgets.Checkbox", source)
         self.assertIn("widgets.GridBox", source)
-        self.assertIn("ALGORITHM_COLUMN_WIDTHS = (118, 138, 122)", source)
+        self.assertIn("ALGORITHM_COLUMN_WIDTHS = (116, 128, 118, 82)", source)
+        self.assertIn("GAP_SEQUENCE_OPTIONS", source)
+        self.assertIn('description="Saltos"', source)
         self.assertIn("ALGORITHM_GROUP_GAP = 2", source)
         self.assertIn("ALGORITHM_FIELD_WIDTH = sum(ALGORITHM_COLUMN_WIDTHS)", source)
         self.assertIn('grid_template_columns=" ".join', source)
@@ -663,7 +696,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         )
         html = module.render_comparison_html(state)
 
-        self.assertEqual([item["key"] for item in state["algorithms"]], ["rapido", "burbuja"])
+        self.assertEqual([item["key"] for item in state["algorithms"]], ["burbuja", "rapido"])
         self.assertIn("Ordenamiento<br>burbuja", html)
         self.assertIn("Ordenamiento<br>rápido", html)
         self.assertNotIn("Ordenamiento<br>selección", html)
@@ -711,7 +744,8 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
             with self.subTest(notebook=notebook_name):
                 notebook = json.loads((NOTEBOOK_DIR / notebook_name).read_text())
                 code_cells = [cell for cell in notebook["cells"] if cell["cell_type"] == "code"]
-                self.assertEqual(len(code_cells), 2)
+                expected_code_cells = 3 if notebook_name == "4_ordenamiento_shell.ipynb" else 2
+                self.assertEqual(len(code_cells), expected_code_cells)
 
                 # Cell 0: simulation bootstrap
                 source = "".join(code_cells[0]["source"])

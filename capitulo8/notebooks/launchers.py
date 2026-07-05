@@ -64,6 +64,11 @@ def run_shell():
     _run("4_ordenamiento_shell_app.py", "cap8_shell_app")
 
 
+def run_shell_comparacion():
+    module = _load_module("4_ordenamiento_shell_app.py", "cap8_shell_comparacion_app")
+    module.run_gap_comparison_app()
+
+
 def run_mezcla():
     _run("5_ordenamiento_mezcla_app.py", "cap8_mezcla_app")
 

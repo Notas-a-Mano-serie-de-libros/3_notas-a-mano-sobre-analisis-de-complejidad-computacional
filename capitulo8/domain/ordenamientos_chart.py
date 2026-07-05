@@ -73,16 +73,15 @@ _CACHE = {}
 
 # ── Configuración de algoritmos ──────────────────────────────────────────────
 _CONFIGS = [
-    ("Mezcla",    "mezcla",    "#1565C0"),
-    ("Rápido",    "rapido",    "#6A1B9A"),
-    ("Inserción", "insercion", "#2E7D32"),
     ("Burbuja",   "burbuja",   "#C62828"),
     ("Selección", "seleccion", "#37474F"),
+    ("Inserción", "insercion", "#2E7D32"),
+    ("Shell",     "shell",     "#00897B"),
+    ("Mezcla",    "mezcla",    "#1565C0"),
+    ("Rápido",    "rapido",    "#6A1B9A"),
+    ("Radix",     "radix",     "#E65100"),
 ]
-_SINGLE_CONFIGS = _CONFIGS + [
-    ("Shell", "shell", "#00897B"),
-    ("Radix", "radix", "#E65100"),
-]
+_SINGLE_CONFIGS = _CONFIGS
 
 _FORMULAS = {
     "Mezcla":    lambda n: n * math.log2(max(n, 2)),

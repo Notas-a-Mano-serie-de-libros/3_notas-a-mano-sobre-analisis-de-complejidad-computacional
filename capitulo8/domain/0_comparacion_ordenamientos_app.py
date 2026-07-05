@@ -8,7 +8,7 @@ import ipywidgets as widgets
 
 from common.widget_controls import bounded_int_control, button_control, dropdown_control
 from sort_common import colab_pause, copy_sort_state, create_state as create_sort_state, generate_values, step_sort
-from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES
+from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, GAP_SEQUENCE_OPTIONS, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES
 
 try:
     from google.colab import output as colab_output
@@ -17,21 +17,25 @@ except ImportError:
 
 
 ALGORITHMS = (
-    ("mezcla", "Ordenamiento<br>mezcla"),
-    ("rapido", "Ordenamiento<br>rápido"),
-    ("insercion", "Ordenamiento<br>inserción"),
     ("burbuja", "Ordenamiento<br>burbuja"),
     ("seleccion", "Ordenamiento<br>selección"),
+    ("insercion", "Ordenamiento<br>inserción"),
+    ("shell", "Ordenamiento<br>Shell"),
+    ("mezcla", "Ordenamiento<br>mezcla"),
+    ("rapido", "Ordenamiento<br>rápido"),
+    ("radix", "Ordenamiento<br>radix"),
 )
 ALGORITHM_OPTIONS = (
-    ("Mezcla", "mezcla"),
-    ("Rápido", "rapido"),
-    ("Inserción", "insercion"),
     ("Burbuja", "burbuja"),
     ("Selección", "seleccion"),
+    ("Inserción", "insercion"),
+    ("Shell", "shell"),
+    ("Mezcla", "mezcla"),
+    ("Rápido", "rapido"),
+    ("Radix", "radix"),
 )
 DEFAULT_ALGORITHMS = tuple(value for _label, value in ALGORITHM_OPTIONS)
-ALGORITHM_COLUMN_WIDTHS = (118, 138, 122)
+ALGORITHM_COLUMN_WIDTHS = (116, 128, 118, 82)
 ALGORITHM_COLUMN_GAP = 8
 ALGORITHM_ROW_HEIGHT = 34
 ALGORITHM_ROW_GAP = 2
@@ -45,27 +49,35 @@ ROW_HTML_CACHE_LIMIT = 512
 _ROW_HTML_CACHE = {}
 
 
-def create_algorithm_state(key, title, values, descending):
+def create_algorithm_state(key, title, values, descending, gap_sequence="shell"):
     return {
         "key": key,
         "title": title,
-        "state": create_sort_state(key, size=len(values), descending=descending, values=values, view="barras"),
+        "state": create_sort_state(
+            key,
+            size=len(values),
+            descending=descending,
+            values=values,
+            view="barras",
+            gap_sequence=gap_sequence,
+        ),
         "steps": 0,
         "html_cache": {},
     }
 
 
-def create_comparison_state(size=DEFAULT_BAR_SIZE, values=None, descending=False, selected_algorithms=None):
+def create_comparison_state(size=DEFAULT_BAR_SIZE, values=None, descending=False, selected_algorithms=None, gap_sequence="shell"):
     values = list(values) if values is not None else generate_values(size)
     selected = set(selected_algorithms if selected_algorithms is not None else DEFAULT_ALGORITHMS)
     algorithms = [
-        create_algorithm_state(key, title, values, descending)
+        create_algorithm_state(key, title, values, descending, gap_sequence=gap_sequence)
         for key, title in ALGORITHMS
         if key in selected
     ]
     return {
         "values": values,
         "descending": descending,
+        "gap_sequence": gap_sequence,
         "selected_algorithms": tuple(key for key, _title in ALGORITHMS if key in selected),
         "algorithms": algorithms,
     }
@@ -95,6 +107,7 @@ def copy_comparison_state(state):
     return {
         **state,
         "values": list(state["values"]),
+        "gap_sequence": state["gap_sequence"],
         "selected_algorithms": tuple(state["selected_algorithms"]),
         "algorithms": [copy_sort_item(item) for item in state["algorithms"]],
     }
@@ -387,6 +400,13 @@ def run_app():
         width="210px",
         description_style={},
     )
+    gap_dropdown = dropdown_control(
+        options=GAP_SEQUENCE_OPTIONS,
+        value="shell",
+        description="Saltos",
+        width="210px",
+        description_style={},
+    )
     algorithm_checks = {
         value: widgets.Checkbox(value=True, description=label, indent=False, layout=widgets.Layout(width="100%"))
         for label, value in ALGORITHM_OPTIONS
@@ -447,6 +467,7 @@ def run_app():
             values=values,
             descending=order_dropdown.value,
             selected_algorithms=selected_from_checks(algorithm_checks),
+            gap_sequence=gap_dropdown.value,
         )
 
     state = build_state()
@@ -561,12 +582,13 @@ def run_app():
     reset_button.on_click(generate_new)
     size_input.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
     order_dropdown.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
+    gap_dropdown.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
     for checkbox in algorithm_checks.values():
         checkbox.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
 
     layout = widgets.VBox(
         [
-            widgets.HBox([size_input, order_dropdown, algorithms_group], layout=widgets.Layout(width="100%", gap="12px")),
+            widgets.HBox([size_input, order_dropdown, gap_dropdown, algorithms_group], layout=widgets.Layout(width="100%", gap="12px")),
             widgets.HBox([auto_button, finish_button, reset_button], layout=widgets.Layout(width="100%", gap="10px", margin="12px 0 0 0")),
             html_output,
         ],
