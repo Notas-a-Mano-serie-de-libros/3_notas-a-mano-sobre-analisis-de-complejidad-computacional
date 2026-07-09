@@ -14,6 +14,7 @@ VIEW_OPTIONS = (("Barras", "barras"), ("Cajas", "cajas"))
 TREE_VIEW_OPTIONS = (("Barras", "barras"), ("Cajas", "cajas"), ("Árbol", "arbol"))
 ORDER_OPTIONS = (("Ascendente", False), ("Descendente", True))
 PIVOT_OPTIONS = (("Fin", "end"), ("Inicio", "start"), ("Medio", "middle"), ("Aleatorio", "random"))
+PARTITION_OPTIONS = (("Hoare", "hoare"), ("Lomuto", "lomuto"))
 GAP_SEQUENCE_OPTIONS = (
     ("Shell", "shell"),
     ("Hibbard", "hibbard"),

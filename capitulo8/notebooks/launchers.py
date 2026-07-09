@@ -87,5 +87,10 @@ def run_rapido():
     _run("6_ordenamiento_rapido_app.py", "cap8_rapido_app")
 
 
+def run_rapido_comparacion():
+    module = _load_module("6_ordenamiento_rapido_app.py", "cap8_rapido_comparacion_app")
+    module.run_comparison_app()
+
+
 def run_radix():
     _run("7_ordenamiento_radix_app.py", "cap8_radix_app")

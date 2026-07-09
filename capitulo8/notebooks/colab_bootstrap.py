@@ -19,6 +19,7 @@ REQUIRED_FILES = (
     "capitulo8/domain/sort_algorithms.py",
     "capitulo8/domain/sort_tree.py",
     "capitulo8/domain/sort_common.py",
+    "capitulo8/domain/variant_comparison.py",
     "capitulo8/domain/0_comparacion_ordenamientos_app.py",
     "capitulo8/domain/1_ordenamiento_burbuja_app.py",
     "capitulo8/domain/2_ordenamiento_seleccion_app.py",
@@ -42,6 +43,7 @@ SIMULATION_LAUNCHERS = {
     "shell_comparacion": "run_shell_comparacion",
     "mezcla": "run_mezcla",
     "rapido": "run_rapido",
+    "rapido_comparacion": "run_rapido_comparacion",
     "radix": "run_radix",
 }
 

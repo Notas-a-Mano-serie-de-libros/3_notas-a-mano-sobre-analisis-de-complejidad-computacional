@@ -323,7 +323,7 @@ def render_gap_comparison_styles():
 def render_gap_comparison_header_html():
     return """
     <div class="shell-comparison-header">
-      <div class="shell-comparison-head-cell">Saltos</div>
+      <div class="shell-comparison-head-cell">h</div>
       <div class="shell-comparison-head-cell">Pasos</div>
       <div class="shell-comparison-head-cell">Arreglo</div>
     </div>

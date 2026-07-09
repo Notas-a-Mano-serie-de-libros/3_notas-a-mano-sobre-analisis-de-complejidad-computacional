@@ -17,7 +17,7 @@ except ImportError:
 
 
 from sort_algorithms import TRACE_BUILDERS, shell_initial_formula
-from sort_config import DEFAULT_BAR_SIZE, DEFAULT_SIZE, FONT_FAMILY, FORMULA_OUTPUT_HEIGHT, GAP_SEQUENCE_OPTIONS, MAX_SIZE, ORDER_OPTIONS, PIVOT_OPTIONS, ROLE_STYLES, TREE_VIEW_OPTIONS, VIEW_OPTIONS
+from sort_config import DEFAULT_BAR_SIZE, DEFAULT_SIZE, FONT_FAMILY, FORMULA_OUTPUT_HEIGHT, GAP_SEQUENCE_OPTIONS, MAX_SIZE, ORDER_OPTIONS, PARTITION_OPTIONS, PIVOT_OPTIONS, ROLE_STYLES, TREE_VIEW_OPTIONS, VIEW_OPTIONS
 from sort_tree import flatten_tree, merge_active_ranges, quick_tree, range_key, split_tree, tree_depth, tree_max_depth_for_state
 
 
@@ -86,13 +86,14 @@ def generate_values(size=DEFAULT_SIZE):
     return random.sample(range(10, upper), size)
 
 
-def create_state(algorithm, size=None, descending=False, values=None, view="barras", pivot_strategy="end", gap_sequence="shell"):
+def create_state(algorithm, size=None, descending=False, values=None, view="barras", pivot_strategy="middle", gap_sequence="shell", partition_scheme="hoare"):
     size = default_size_for_view(view) if size is None else size
     values = list(values) if values is not None else generate_values(size)
     builder = TRACE_BUILDERS[algorithm]
     trace_kwargs = {"descending": descending}
     if algorithm == "rapido":
         trace_kwargs["pivot_strategy"] = pivot_strategy
+        trace_kwargs["partition_scheme"] = partition_scheme
     if algorithm == "shell":
         trace_kwargs["gap_sequence"] = gap_sequence
     initial_message, initial_formula = INITIAL_MESSAGES[algorithm]
@@ -112,6 +113,15 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
         )
     elif algorithm == "rapido":
         initial_event["quick_tree_max_depth"] = max(1, len(values) - 1)
+        initial_event["quick_tree_nodes"] = [{
+            "start": 0,
+            "end": len(values) - 1,
+            "depth": 0,
+            "values": list(values),
+            "roles": ["default"] * len(values),
+            "labels": [[] for _ in values],
+            "active": True,
+        }]
     trace = LazyTrace(builder, values, trace_kwargs, initial_event)
     event = copy_event(trace[0])
     return {
@@ -123,6 +133,7 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
         "descending": descending,
         "view": view,
         "pivot_strategy": pivot_strategy,
+        "partition_scheme": partition_scheme,
         "gap_sequence": gap_sequence,
         "sorting_active": False,
     }
@@ -188,8 +199,8 @@ def label_html(label):
         "j": "j",
         "j + 1": "j + 1",
         "b": "b",
-        "salto": "salto",
-        "j - salto": "j - salto",
+        "h": "h",
+        "j - h": "j - h",
         "k": "k",
         "pos": "pos",
         "sel": "sel",
@@ -711,7 +722,7 @@ def render_state_html(state, include_styles=True):
     """
 
 
-def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False):
+def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_partition=False):
     size_input = bounded_int_control(
         value=default_size_for_view("barras"),
         min_value=2,
@@ -737,15 +748,22 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False):
     )
     pivot_dropdown = dropdown_control(
         options=PIVOT_OPTIONS,
-        value="end",
+        value="middle",
         description="Pivote",
         width="180px",
+        description_style={},
+    )
+    partition_dropdown = dropdown_control(
+        options=PARTITION_OPTIONS,
+        value="hoare",
+        description="Partición",
+        width="190px",
         description_style={},
     )
     gap_dropdown = dropdown_control(
         options=GAP_SEQUENCE_OPTIONS,
         value="shell",
-        description="Saltos",
+        description="h",
         width="210px",
         description_style={},
     )
@@ -759,6 +777,7 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False):
         "view": view_dropdown,
         "order": order_dropdown,
         "pivot": pivot_dropdown,
+        "partition": partition_dropdown,
         "gap_sequence": gap_dropdown,
         "step": step_button,
         "auto": auto_button,
@@ -769,6 +788,8 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False):
     first_row = [size_input, view_dropdown, order_dropdown]
     if has_pivot:
         first_row.append(pivot_dropdown)
+    if has_partition:
+        first_row.append(partition_dropdown)
     if has_gap_sequence:
         first_row.append(gap_dropdown)
     layout = widgets.VBox(
@@ -781,11 +802,16 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False):
     return controls, layout
 
 
-def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap_sequence=False):
+def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap_sequence=False, has_partition=False):
     if colab_output is not None:
         colab_output.enable_custom_widget_manager()
 
-    controls, controls_layout = build_controls(has_pivot=has_pivot, has_tree=has_tree, has_gap_sequence=has_gap_sequence)
+    controls, controls_layout = build_controls(
+        has_pivot=has_pivot,
+        has_tree=has_tree,
+        has_gap_sequence=has_gap_sequence,
+        has_partition=has_partition,
+    )
     formula_output = widgets.HTML(
         value="",
         layout=widgets.Layout(width="100%", padding="14px 0 10px 0", min_height=FORMULA_OUTPUT_HEIGHT),
@@ -811,6 +837,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             values=values,
             view=controls["view"].value,
             pivot_strategy=controls["pivot"].value,
+            partition_scheme=controls["partition"].value,
             gap_sequence=controls["gap_sequence"].value,
         )
 
@@ -938,6 +965,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     controls["view"].observe(reset_for_view, names="value")
     controls["order"].observe(reset_algorithm, names="value")
     controls["pivot"].observe(reset_algorithm, names="value")
+    controls["partition"].observe(reset_algorithm, names="value")
     controls["gap_sequence"].observe(reset_algorithm, names="value")
 
     css_widget = widgets.HTML(sort_styles())
@@ -955,6 +983,7 @@ __all__ = [
     "VIEW_OPTIONS",
     "ORDER_OPTIONS",
     "PIVOT_OPTIONS",
+    "PARTITION_OPTIONS",
     "GAP_SEQUENCE_OPTIONS",
     "_SIMULATION_HEIGHT_CACHE",
     "LazyTrace",

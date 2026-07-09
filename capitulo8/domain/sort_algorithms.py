@@ -386,7 +386,7 @@ def shell_gap_formula_terms(n, sequence, gap, order):
     if sequence == "hibbard":
         k = max(1, (gap + 1).bit_length() - 1)
         return (
-            rf"salto = 2^k - 1 = 2^{k} - 1 = {gap}",
+            rf"h = 2^k - 1 = 2^{k} - 1 = {gap}",
             rf"k = {k}",
         )
 
@@ -395,16 +395,16 @@ def shell_gap_formula_terms(n, sequence, gap, order):
             even_gap = 9 * (4 ** k) - 9 * (2 ** k) + 1
             if even_gap == gap:
                 return (
-                    rf"salto = 9\cdot4^k - 9\cdot2^k + 1 = 9\cdot4^{k} - 9\cdot2^{k} + 1 = {gap}",
+                    rf"h = 9\cdot4^k - 9\cdot2^k + 1 = 9\cdot4^{k} - 9\cdot2^{k} + 1 = {gap}",
                     rf"k = {k}",
                 )
             odd_gap = (4 ** (k + 1)) - 3 * (2 ** (k + 1)) + 1
             if odd_gap == gap:
                 return (
-                    rf"salto = 4^{{k+1}} - 3\cdot2^{{k+1}} + 1 = 4^{{{k + 1}}} - 3\cdot2^{{{k + 1}}} + 1 = {gap}",
+                    rf"h = 4^{{k+1}} - 3\cdot2^{{k+1}} + 1 = 4^{{{k + 1}}} - 3\cdot2^{{{k + 1}}} + 1 = {gap}",
                     rf"k = {k}",
                 )
-        return rf"salto = Sedgewick(k) = {gap}", r"k \geq 1"
+        return rf"h = Sedgewick(k) = {gap}", r"k \geq 1"
 
     if sequence == "pratt":
         power_two = 1
@@ -415,18 +415,18 @@ def shell_gap_formula_terms(n, sequence, gap, order):
             while power_two * power_three <= gap:
                 if power_two * power_three == gap:
                     return (
-                        rf"salto = 2^p3^q = 2^{p}3^{q} = {gap}",
+                        rf"h = 2^p3^q = 2^{p}3^{q} = {gap}",
                         rf"p = {p},\quad q = {q}",
                     )
                 power_three *= 3
                 q += 1
             power_two *= 2
             p += 1
-        return rf"salto = 2^p3^q = {gap}", r"p,q \geq 0"
+        return rf"h = 2^p3^q = {gap}", r"p,q \geq 0"
 
     k = order + 1
     return (
-        rf"salto = \left\lfloor \frac{{n}}{{2^k}} \right\rfloor = \left\lfloor \frac{{{n}}}{{2^{k}}} \right\rfloor = {gap}",
+        rf"h = \left\lfloor \frac{{n}}{{2^k}} \right\rfloor = \left\lfloor \frac{{{n}}}{{2^{k}}} \right\rfloor = {gap}",
         rf"n = {n},\quad k = {k}",
     )
 
@@ -446,7 +446,7 @@ def shell_initial_formula(n, sequence="shell"):
     first_gap = gaps[0] if gaps else 1
     first_line, terms = shell_gap_formula_terms(n, sequence, first_gap, 0)
     gap_values = ", ".join(str(gap) for gap in gaps)
-    return shell_formula(first_line, terms, rf"\text{{saltos}} = [{gap_values}]")
+    return shell_formula(first_line, terms, rf"\text{{valores de }} h = [{gap_values}]")
 
 
 def shell_trace(values, descending=False, gap_sequence="shell"):
@@ -471,12 +471,12 @@ def shell_trace(values, descending=False, gap_sequence="shell"):
         roles = ["default"] * n
         labels = [""] * n
         for index in range(0, n, gap):
-            mark(roles, labels, index, "boundary", "salto")
+            mark(roles, labels, index, "boundary", "h")
         trace.append(
             make_event(
                 arr,
-                f"Inicia la pasada con salto {gap}.",
-                shell_formula(gap_line, gap_terms, rf"\text{{saltos}} = [{gap_label()}]"),
+                f"Inicia la pasada con h = {gap}.",
+                shell_formula(gap_line, gap_terms, rf"\text{{valores de }} h = [{gap_label()}]"),
                 roles,
                 labels,
                 gap_sequence=gap_sequence,
@@ -484,40 +484,42 @@ def shell_trace(values, descending=False, gap_sequence="shell"):
             )
         )
 
-        for i in range(gap, n):
-            j = i
-            roles = ["default"] * n
-            labels = [""] * n
-            mark(roles, labels, i, "compare", "i")
-            mark(roles, labels, i - gap, "current", "j - salto")
-            trace.append(
-                make_event(
-                    arr,
-                    f"Compara la posición {i} con la posición {i - gap} usando salto {gap}.",
-                    shell_formula(
-                        gap_line,
-                        gap_terms,
-                        rf"i = {i},\quad j = {j}",
-                        rf"a_j = {arr[j]},\quad a_{{j-salto}} = {arr[j - gap]}",
-                    ),
-                    roles,
-                    labels,
-                    gap_sequence=gap_sequence,
-                    gap_values=list(gaps),
+        for j in range(gap, n):
+            while j >= gap:
+                roles = ["default"] * n
+                labels = [""] * n
+                mark(roles, labels, j, "current", "j")
+                mark(roles, labels, j - gap, "compare", "j - h")
+                trace.append(
+                    make_event(
+                        arr,
+                        f"Compara la posición {j} con la posición {j - gap} usando h = {gap}.",
+                        shell_formula(
+                            gap_line,
+                            gap_terms,
+                            rf"j = {j}",
+                            rf"a_j = {arr[j]},\quad a_{{j-h}} = {arr[j - gap]}",
+                        ),
+                        roles,
+                        labels,
+                        gap_sequence=gap_sequence,
+                        gap_values=list(gaps),
+                    )
                 )
-            )
 
-            while j >= gap and not ordered(arr[j - gap], arr[j], descending):
+                if ordered(arr[j - gap], arr[j], descending):
+                    break
+
                 arr[j - gap], arr[j] = arr[j], arr[j - gap]
                 roles = ["default"] * n
                 labels = [""] * n
-                mark(roles, labels, j - gap, "compare", "j - salto")
+                mark(roles, labels, j - gap, "compare", "j - h")
                 mark(roles, labels, j, "current", "j")
                 trace.append(
                     make_event(
                         arr,
                         f"Intercambia las posiciones {j - gap} y {j}.",
-                        shell_formula(gap_line, gap_terms, rf"j = {j}", rf"a_{{j-salto}} \leftrightarrow a_j"),
+                        shell_formula(gap_line, gap_terms, rf"j = {j}", rf"a_{{j-h}} \leftrightarrow a_j"),
                         roles,
                         labels,
                         gap_sequence=gap_sequence,
@@ -532,8 +534,8 @@ def shell_trace(values, descending=False, gap_sequence="shell"):
             trace.append(
                 make_event(
                     arr,
-                    f"El elemento queda ubicado dentro de su subarreglo de salto {gap}.",
-                    shell_formula(gap_line, gap_terms, rf"i = {i},\quad j = {j}"),
+                    f"El elemento queda ubicado dentro de su subarreglo definido por h = {gap}.",
+                    shell_formula(gap_line, gap_terms, rf"j = {j}"),
                     roles,
                     labels,
                     gap_sequence=gap_sequence,
@@ -764,7 +766,7 @@ def choose_pivot(low, high, strategy):
     return high
 
 
-def quick_trace(values, descending=False, pivot_strategy="end"):
+def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
     initial = list(values)
     n = len(initial)
     pivot_labels = {"start": "inicio", "middle": "medio", "end": "fin", "random": "aleatorio"}
@@ -1049,6 +1051,192 @@ def quick_trace(values, descending=False, pivot_strategy="end"):
         phase = "select_node"
 
     return trace
+
+
+def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
+    arr = list(values)
+    n = len(arr)
+    pivot_labels = {"start": "inicio", "middle": "medio", "end": "fin", "random": "aleatorio"}
+
+    def node(start, end, depth=0, parent=None):
+        return {
+            "start": start,
+            "end": end,
+            "depth": depth,
+            "values": list(arr[start:end + 1]),
+            "roles": ["default"] * (end - start + 1),
+            "parent": parent,
+            "left": None,
+            "right": None,
+        }
+
+    root = node(0, n - 1)
+    visible_nodes = [root]
+    sorted_mask = [False] * n
+    current = root
+    trace = []
+
+    def refresh_nodes():
+        for item in visible_nodes:
+            item["values"] = list(arr[item["start"]:item["end"] + 1])
+
+    def snapshot(focus=None, complete=False):
+        refresh_nodes()
+        active = active_tree_ids(root, focus=focus, visible_nodes=visible_nodes, complete=complete)
+        nodes = []
+        for item in visible_nodes:
+            roles = list(item["roles"])
+            if id(item) not in active and not complete:
+                roles = ["excluded"] * len(item["values"])
+            nodes.append({
+                "start": item["start"],
+                "end": item["end"],
+                "depth": item["depth"],
+                "values": list(item["values"]),
+                "roles": roles,
+                "labels": [[] for _ in item["values"]],
+                "active": id(item) in active,
+            })
+        return nodes
+
+    def append_event(message, formula, focus=None, roles=None, labels=None, complete=False):
+        refresh_nodes()
+        trace.append(make_event(
+            arr,
+            message,
+            formula,
+            roles or ["sorted" if value else "default" for value in sorted_mask],
+            labels or [""] * n,
+            complete,
+            quick_tree_nodes=snapshot(focus=focus, complete=complete),
+            quick_tree_max_depth=max(1, n - 1),
+        ))
+
+    append_event("Presiona Paso siguiente para iniciar el ordenamiento rápido.", r"\text{estado inicial}", root)
+    append_event("Comienza el ordenamiento con el esquema de Hoare.", r"\text{esquema} = \text{Hoare}", root)
+    pending = [root]
+
+    while pending:
+        current = pending.pop()
+        low, high = current["start"], current["end"]
+        current["roles"] = ["default"] * len(current["values"])
+        if low >= high:
+            sorted_mask[low] = True
+            current["roles"] = ["sorted"]
+            append_event(f"El subarreglo [{arr[low]}] ya está ordenado.", rf"caso\ base = [{arr[low]}]", current)
+            continue
+
+        pivot_global = choose_pivot(low, high, pivot_strategy)
+        pivot_value = arr[pivot_global]
+        roles = ["excluded"] * n
+        labels = [""] * n
+        for index in range(low, high + 1):
+            roles[index] = "default"
+        roles[pivot_global] = "pivot"
+        labels[low] = "a"
+        labels[high] = "b"
+        labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "pivote")))
+        current["roles"] = list(roles[low:high + 1])
+        append_event(
+            f"Selecciona el pivote {pivot_value} tomado del {pivot_labels[pivot_strategy]}.",
+            rf"a = {low},\quad b = {high},\quad pivote = {pivot_value}",
+            current,
+            roles,
+            labels,
+        )
+
+        i, j = low - 1, high + 1
+        while True:
+            while True:
+                i += 1
+                roles = ["excluded"] * n
+                labels = [""] * n
+                for index in range(low, high + 1):
+                    roles[index] = "default"
+                roles[pivot_global] = "pivot"
+                roles[i] = "current"
+                roles[pivot_global] = "pivot"
+                labels[i] = "i"
+                labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "pivote")))
+                current["roles"] = list(roles[low:high + 1])
+                append_event(
+                    f"Avanza i y compara {arr[i]} con el pivote {pivot_value}.",
+                    rf"i = {i},\quad a_i = {arr[i]},\quad pivote = {pivot_value}",
+                    current,
+                    roles,
+                    labels,
+                )
+                if arr[i] <= pivot_value if descending else arr[i] >= pivot_value:
+                    break
+
+            while True:
+                j -= 1
+                roles = ["excluded"] * n
+                labels = [""] * n
+                for index in range(low, high + 1):
+                    roles[index] = "default"
+                roles[pivot_global] = "pivot"
+                roles[i] = "current"
+                roles[j] = "compare"
+                roles[pivot_global] = "pivot"
+                labels[i] = "i"
+                labels[j] = "j"
+                labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "pivote")))
+                current["roles"] = list(roles[low:high + 1])
+                append_event(
+                    f"Retrocede j y compara {arr[j]} con el pivote {pivot_value}.",
+                    rf"i = {i},\quad j = {j},\quad a_j = {arr[j]},\quad pivote = {pivot_value}",
+                    current,
+                    roles,
+                    labels,
+                )
+                if arr[j] >= pivot_value if descending else arr[j] <= pivot_value:
+                    break
+
+            if i >= j:
+                append_event(
+                    f"Los índices se cruzan; la partición termina en {j}.",
+                    rf"i = {i},\quad j = {j},\quad p = {j}",
+                    current,
+                    roles,
+                    labels,
+                )
+                split = j
+                break
+
+            arr[i], arr[j] = arr[j], arr[i]
+            if pivot_global == i:
+                pivot_global = j
+            elif pivot_global == j:
+                pivot_global = i
+            roles[i] = "current"
+            roles[j] = "compare"
+            roles[pivot_global] = "pivot"
+            current["roles"] = list(roles[low:high + 1])
+            append_event(
+                f"Intercambia los elementos en las posiciones {i} y {j}.",
+                rf"i = {i},\quad j = {j},\quad a_i \leftrightarrow a_j",
+                current,
+                roles,
+                labels,
+            )
+
+        left = node(low, split, current["depth"] + 1, current)
+        right = node(split + 1, high, current["depth"] + 1, current)
+        current["left"], current["right"] = left, right
+        visible_nodes.extend((left, right))
+        pending.extend((right, left))
+
+    sorted_mask = [True] * n
+    root["roles"] = ["sorted"] * n
+    append_event("Finaliza el ordenamiento rápido con el esquema de Hoare.", r"\text{arreglo ordenado}", root, complete=True)
+    return trace
+
+
+def quick_trace(values, descending=False, pivot_strategy="middle", partition_scheme="hoare"):
+    if partition_scheme == "lomuto":
+        return _lomuto_quick_trace(values, descending=descending, pivot_strategy=pivot_strategy)
+    return _hoare_quick_trace(values, descending=descending, pivot_strategy=pivot_strategy)
 
 
 def radix_trace(values, descending=False):

@@ -403,7 +403,7 @@ def run_app():
     gap_dropdown = dropdown_control(
         options=GAP_SEQUENCE_OPTIONS,
         value="shell",
-        description="Saltos",
+        description="h",
         width="210px",
         description_style={},
     )

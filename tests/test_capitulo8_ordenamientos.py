@@ -134,7 +134,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertEqual(state["trace"].kwargs["gap_sequence"], "hibbard")
 
         module.step_shell_sort(state)
-        self.assertIn("salto", state["formula"])
+        self.assertIn("h", state["formula"])
+        self.assertNotIn("salto", state["formula"])
 
         comparison = self.launchers._load_module(
             "0_comparacion_ordenamientos_app.py",
@@ -147,6 +148,30 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         )
         shell_item = next(item for item in comparison_state["algorithms"] if item["key"] == "shell")
         self.assertEqual(shell_item["state"]["gap_sequence"], "hibbard")
+
+    def test_shell_shows_intermediate_comparisons_after_each_swap(self):
+        module = self.modules["shell"]
+        state = module.create_state(size=3, values=[9, 6, 3], view="barras", gap_sequence="shell")
+        messages = []
+        labels_by_message = []
+        while not state["sorting_complete"]:
+            module.step_shell_sort(state)
+            messages.append(state["message"])
+            labels_by_message.append(list(state["labels"]))
+
+        second_swap_index = messages.index("Intercambia las posiciones 1 y 2.")
+        self.assertEqual(messages[second_swap_index + 1], "Compara la posición 1 con la posición 0 usando h = 1.")
+        labels = labels_by_message[second_swap_index + 1]
+        state = module.create_state(size=3, values=[9, 6, 3], view="barras", gap_sequence="shell")
+        for _ in range(second_swap_index + 2):
+            module.step_shell_sort(state)
+        self.assertIn("j - h", labels)
+        self.assertIn("j", labels)
+        self.assertNotIn("i", labels)
+        self.assertIn("j = 1", state["formula"])
+        self.assertNotIn("i =", state["formula"])
+        self.assertEqual(state["roles"][state["labels"].index("j - h")], "compare")
+        self.assertEqual(state["roles"][state["labels"].index("j")], "current")
 
     def test_common_generates_random_values(self):
         values = self.common.generate_values(8)
@@ -437,6 +462,35 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn((0, 5), ranges)
         self.assertTrue(any(start > 0 or end < 5 for start, end in ranges))
 
+    def test_quick_supports_hoare_and_lomuto_partition_schemes(self):
+        values = [10, 7, 8, 9, 1, 5, 8]
+        for scheme in ("hoare", "lomuto"):
+            for descending in (False, True):
+                with self.subTest(scheme=scheme, descending=descending):
+                    state = self.modules["rapido"].create_state(
+                        size=len(values),
+                        values=values,
+                        descending=descending,
+                        partition_scheme=scheme,
+                    )
+                    while not state["sorting_complete"]:
+                        self.modules["rapido"].step_quick_sort(state)
+                    self.assertEqual(state["arr"], sorted(values, reverse=descending))
+                    self.assertEqual(state["partition_scheme"], scheme)
+
+    def test_quick_partition_comparison_uses_the_same_array(self):
+        module = self.modules["rapido"]
+        values = [10, 7, 8, 9, 1, 5]
+        state = module.create_comparison_state(size=len(values), values=values)
+
+        self.assertEqual([item["key"] for item in state["algorithms"]], ["hoare", "lomuto"])
+        self.assertTrue(all(item["state"]["initial_values"] == values for item in state["algorithms"]))
+        module.step_all_variants(state)
+        self.assertTrue(all(item["steps"] == 1 for item in state["algorithms"]))
+        html = module.render_comparison_html(state)
+        self.assertIn("Hoare", html)
+        self.assertIn("Lomuto", html)
+
     def test_bar_view_preserves_original_visual_style(self):
         module = self.modules["seleccion"]
         state = module.create_state(size=5, values=[64, 25, 12, 22, 11], view="barras")
@@ -722,7 +776,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("widgets.GridBox", source)
         self.assertIn("ALGORITHM_COLUMN_WIDTHS = (116, 128, 118, 82)", source)
         self.assertIn("GAP_SEQUENCE_OPTIONS", source)
-        self.assertIn('description="Saltos"', source)
+        self.assertIn('description="h"', source)
         self.assertIn("ALGORITHM_GROUP_GAP = 2", source)
         self.assertIn("ALGORITHM_FIELD_WIDTH = sum(ALGORITHM_COLUMN_WIDTHS)", source)
         self.assertIn('grid_template_columns=" ".join', source)
@@ -797,6 +851,8 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
                 if notebook_name == "3_ordenamiento_insercion.ipynb":
                     expected_code_cells = 4
                 elif notebook_name == "4_ordenamiento_shell.ipynb":
+                    expected_code_cells = 3
+                elif notebook_name == "6_ordenamiento_rapido.ipynb":
                     expected_code_cells = 3
                 else:
                     expected_code_cells = 2
