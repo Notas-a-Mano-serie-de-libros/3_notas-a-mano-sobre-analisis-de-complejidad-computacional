@@ -478,6 +478,16 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                     self.assertEqual(state["arr"], sorted(values, reverse=descending))
                     self.assertEqual(state["partition_scheme"], scheme)
 
+    def test_hoare_keeps_pivot_fixed_until_indices_cross(self):
+        trace = self.algorithms.quick_trace([3, 1, 2], pivot_strategy="start", partition_scheme="hoare")
+        cross_index = next(index for index, event in enumerate(trace) if "índices se cruzan" in event["message"])
+        first_compare = next(event for event in trace if event["message"].startswith("Avanza i"))
+
+        self.assertIn("i = 1", first_compare["formula"])
+        self.assertNotIn("a_i = 3", first_compare["formula"])
+        self.assertTrue(all(event["arr"][0] == 3 for event in trace[:cross_index]))
+        self.assertEqual(trace[cross_index + 1]["arr"], [2, 1, 3])
+
     def test_quick_partition_comparison_uses_the_same_array(self):
         module = self.modules["rapido"]
         values = [10, 7, 8, 9, 1, 5]

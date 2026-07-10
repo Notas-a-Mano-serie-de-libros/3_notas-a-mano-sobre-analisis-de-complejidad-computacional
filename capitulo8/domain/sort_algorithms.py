@@ -1116,6 +1116,27 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
     append_event("Comienza el ordenamiento con el esquema de Hoare.", r"\text{esquema} = \text{Hoare}", root)
     pending = [root]
 
+    def build_partition_roles(low, high, pivot_global, i=None, j=None, pivot_role="pivot"):
+        roles = ["excluded"] * n
+        labels = [""] * n
+        for index in range(low, high + 1):
+            roles[index] = "default"
+        if i is not None and low <= i <= high and i != pivot_global:
+            roles[i] = "current"
+            labels[i] = "i"
+        if j is not None and low <= j <= high and j != pivot_global:
+            roles[j] = "compare"
+            labels[j] = "j"
+        roles[pivot_global] = pivot_role
+        labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "pivote")))
+        return roles, labels
+
+    def left_side(value, pivot_value):
+        return value >= pivot_value if descending else value <= pivot_value
+
+    def right_side(value, pivot_value):
+        return value <= pivot_value if descending else value >= pivot_value
+
     while pending:
         current = pending.pop()
         low, high = current["start"], current["end"]
@@ -1128,14 +1149,12 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
 
         pivot_global = choose_pivot(low, high, pivot_strategy)
         pivot_value = arr[pivot_global]
-        roles = ["excluded"] * n
-        labels = [""] * n
-        for index in range(low, high + 1):
-            roles[index] = "default"
-        roles[pivot_global] = "pivot"
+        roles, labels = build_partition_roles(low, high, pivot_global)
         labels[low] = "a"
         labels[high] = "b"
-        labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "pivote")))
+        if pivot_global in (low, high):
+            edge_label = "a" if pivot_global == low else "b"
+            labels[pivot_global] = f"{edge_label}\npivote"
         current["roles"] = list(roles[low:high + 1])
         append_event(
             f"Selecciona el pivote {pivot_value} tomado del {pivot_labels[pivot_strategy]}.",
@@ -1145,19 +1164,13 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
             labels,
         )
 
-        i, j = low - 1, high + 1
+        i, j = low, high
         while True:
-            while True:
-                i += 1
-                roles = ["excluded"] * n
-                labels = [""] * n
-                for index in range(low, high + 1):
-                    roles[index] = "default"
-                roles[pivot_global] = "pivot"
-                roles[i] = "current"
-                roles[pivot_global] = "pivot"
-                labels[i] = "i"
-                labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "pivote")))
+            while i <= high:
+                if i == pivot_global:
+                    i += 1
+                    continue
+                roles, labels = build_partition_roles(low, high, pivot_global, i=i, j=j)
                 current["roles"] = list(roles[low:high + 1])
                 append_event(
                     f"Avanza i y compara {arr[i]} con el pivote {pivot_value}.",
@@ -1166,22 +1179,15 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
                     roles,
                     labels,
                 )
-                if arr[i] <= pivot_value if descending else arr[i] >= pivot_value:
+                if not left_side(arr[i], pivot_value):
                     break
+                i += 1
 
-            while True:
-                j -= 1
-                roles = ["excluded"] * n
-                labels = [""] * n
-                for index in range(low, high + 1):
-                    roles[index] = "default"
-                roles[pivot_global] = "pivot"
-                roles[i] = "current"
-                roles[j] = "compare"
-                roles[pivot_global] = "pivot"
-                labels[i] = "i"
-                labels[j] = "j"
-                labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "pivote")))
+            while j >= low:
+                if j == pivot_global:
+                    j -= 1
+                    continue
+                roles, labels = build_partition_roles(low, high, pivot_global, i=i, j=j)
                 current["roles"] = list(roles[low:high + 1])
                 append_event(
                     f"Retrocede j y compara {arr[j]} con el pivote {pivot_value}.",
@@ -1190,28 +1196,40 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
                     roles,
                     labels,
                 )
-                if arr[j] >= pivot_value if descending else arr[j] <= pivot_value:
+                if not right_side(arr[j], pivot_value):
                     break
+                j -= 1
 
             if i >= j:
+                pivot_final = i - 1 if pivot_global < i else i
+                pivot_final = max(low, min(high, pivot_final))
+                roles, labels = build_partition_roles(low, high, pivot_global, i=i, j=j)
                 append_event(
-                    f"Los índices se cruzan; la partición termina en {j}.",
-                    rf"i = {i},\quad j = {j},\quad p = {j}",
+                    f"Los índices se cruzan; el pivote se ubica en la posición {pivot_final}.",
+                    rf"i = {i},\quad j = {j},\quad p = {pivot_final}",
                     current,
                     roles,
                     labels,
                 )
-                split = j
+                if pivot_global != pivot_final:
+                    arr[pivot_global], arr[pivot_final] = arr[pivot_final], arr[pivot_global]
+                roles, labels = build_partition_roles(low, high, pivot_final, pivot_role="sorted")
+                labels[pivot_final] = "\n".join(filter(None, (labels[pivot_final], "p")))
+                current["roles"] = list(roles[low:high + 1])
+                append_event(
+                    f"Intercambia el pivote con la posición {pivot_final}.",
+                    rf"p = {pivot_final},\quad pivote = {pivot_value}",
+                    current,
+                    roles,
+                    labels,
+                )
+                sorted_mask[pivot_final] = True
                 break
 
             arr[i], arr[j] = arr[j], arr[i]
-            if pivot_global == i:
-                pivot_global = j
-            elif pivot_global == j:
-                pivot_global = i
+            roles, labels = build_partition_roles(low, high, pivot_global, i=i, j=j)
             roles[i] = "current"
             roles[j] = "compare"
-            roles[pivot_global] = "pivot"
             current["roles"] = list(roles[low:high + 1])
             append_event(
                 f"Intercambia los elementos en las posiciones {i} y {j}.",
@@ -1220,12 +1238,20 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
                 roles,
                 labels,
             )
+            i += 1
+            j -= 1
 
-        left = node(low, split, current["depth"] + 1, current)
-        right = node(split + 1, high, current["depth"] + 1, current)
-        current["left"], current["right"] = left, right
-        visible_nodes.extend((left, right))
-        pending.extend((right, left))
+        children = []
+        if low < pivot_final:
+            left = node(low, pivot_final - 1, current["depth"] + 1, current)
+            current["left"] = left
+            children.append(left)
+        if pivot_final < high:
+            right = node(pivot_final + 1, high, current["depth"] + 1, current)
+            current["right"] = right
+            children.append(right)
+        visible_nodes.extend(children)
+        pending.extend(reversed(children))
 
     sorted_mask = [True] * n
     root["roles"] = ["sorted"] * n
