@@ -1131,6 +1131,21 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
         labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "pivote")))
         return roles, labels
 
+    def build_cross_roles(low, high, pivot_global, i, j):
+        roles, labels = build_partition_roles(low, high, pivot_global)
+        markers = (
+            (max(low, min(high, i)), "current", "i"),
+            (max(low, min(high, j)), "compare", "j"),
+        )
+        for index, role, label in markers:
+            if index != pivot_global:
+                roles[index] = role
+            parts = [part.strip() for part in labels[index].split(",") if part.strip()]
+            if label not in parts:
+                parts.append(label)
+            labels[index] = ", ".join(parts)
+        return roles, labels
+
     def left_side(value, pivot_value):
         return value >= pivot_value if descending else value <= pivot_value
 
@@ -1203,7 +1218,7 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
             if i >= j:
                 pivot_final = i - 1 if pivot_global < i else i
                 pivot_final = max(low, min(high, pivot_final))
-                roles, labels = build_partition_roles(low, high, pivot_global, i=i, j=j)
+                roles, labels = build_cross_roles(low, high, pivot_global, i, j)
                 append_event(
                     f"Los índices se cruzan; el pivote se ubica en la posición {pivot_final}.",
                     rf"i = {i},\quad j = {j},\quad p = {pivot_final}",

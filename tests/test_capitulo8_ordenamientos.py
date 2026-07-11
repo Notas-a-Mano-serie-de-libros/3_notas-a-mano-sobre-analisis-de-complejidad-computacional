@@ -482,10 +482,13 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         trace = self.algorithms.quick_trace([3, 1, 2], pivot_strategy="start", partition_scheme="hoare")
         cross_index = next(index for index, event in enumerate(trace) if "índices se cruzan" in event["message"])
         first_compare = next(event for event in trace if event["message"].startswith("Avanza i"))
+        cross_labels = "\n".join(trace[cross_index]["labels"])
 
         self.assertIn("i = 1", first_compare["formula"])
         self.assertNotIn("a_i = 3", first_compare["formula"])
         self.assertTrue(all(event["arr"][0] == 3 for event in trace[:cross_index]))
+        self.assertIn("i", cross_labels)
+        self.assertIn("j", cross_labels)
         self.assertEqual(trace[cross_index + 1]["arr"], [2, 1, 3])
 
     def test_quick_partition_comparison_uses_the_same_array(self):
