@@ -520,6 +520,39 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertLess(value_position, bar_position)
         self.assertLess(bar_position, index_position)
 
+    def test_box_and_tree_views_use_contiguous_square_cells(self):
+        box_state = self.modules["burbuja"].create_state(size=5, values=[64, 25, 12, 22, 11], view="cajas")
+        merge_state = self.modules["mezcla"].create_state(size=4, values=[64, 25, 12, 22], view="arbol")
+        quick_state = self.modules["rapido"].create_state(size=4, values=[64, 25, 12, 22], view="arbol")
+
+        for state, renderer in (
+            (box_state, self.modules["burbuja"].render_state_html),
+            (merge_state, self.modules["mezcla"].render_state_html),
+            (quick_state, self.modules["rapido"].render_state_html),
+        ):
+            with self.subTest(view=state["view"], algorithm=state["algorithm"]):
+                html = renderer(state)
+                self.assertIn("gap: 0;", html)
+                self.assertIn("border-radius: 0;", html)
+                self.assertIn("box-shadow: none;", html)
+                self.assertIn("border-left-width: 0;", html)
+                self.assertIn("border-color:#111111", html)
+
+    def test_tree_view_centers_root_and_keeps_space_between_subarrays(self):
+        state = self.modules["mezcla"].create_state(
+            size=8,
+            values=[95, 131, 111, 57, 158, 16, 25, 98],
+            view="arbol",
+        )
+        for _ in range(4):
+            self.modules["mezcla"].step_merge_sort(state)
+        html = self.modules["mezcla"].render_state_html(state)
+
+        self.assertIn('style="left:108px; width:544px;"', html)
+        self.assertIn('style="left:108px; width:272px;"', html)
+        self.assertIn('style="left:380px; width:272px;"', html)
+        self.assertIn("gap: 0;", html)
+
     def test_bar_view_keeps_yellow_highlight_roles(self):
         highlighted_modules = 0
         for name, module in self.modules.items():

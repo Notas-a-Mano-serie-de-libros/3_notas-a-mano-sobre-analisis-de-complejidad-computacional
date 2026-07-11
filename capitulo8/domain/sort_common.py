@@ -241,10 +241,10 @@ def tree_box(value, role="default", cache=None):
     cache_key = ("tree_box", value, role)
     if cache is not None and cache_key in cache:
         return cache[cache_key]
-    fill, border, text = ROLE_STYLES[role]
+    fill, _border, text = ROLE_STYLES[role]
     display_value = "" if value is None else escape(str(value))
     html = f"""
-    <div class="tree-box" style="background:{fill}; border-color:{border}; color:{text};">
+    <div class="tree-box" style="background:{fill}; border-color:#111111; color:{text};">
       {display_value}
     </div>
     """
@@ -269,8 +269,8 @@ def tree_item(value, role="default", labels=None, cache=None):
     return html
 
 
-def render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes, inactive_class=""):
-    left_px = node["start"] * slot_width
+def render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes, inactive_class="", left_offset=0):
+    left_px = left_offset + node["start"] * slot_width
     width_px = max(slot_width, len(node["values"]) * slot_width)
     cache_key = (
         "tree_block",
@@ -282,6 +282,7 @@ def render_tree_block(cache, block_class, range_class, values_class, node, slot_
         left_px,
         width_px,
         inactive_class,
+        left_offset,
         boxes,
     )
     if cache_key in cache:
@@ -321,6 +322,7 @@ def render_merge_snapshot_tree(state):
     slot_width = 68
     row_height = 104
     tree_width = max(760, total * slot_width)
+    left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
     rows = {}
     for node in nodes:
@@ -332,7 +334,7 @@ def render_merge_snapshot_tree(state):
         for node in sorted(rows.get(depth, []), key=lambda item: item["start"]):
             inactive_class = "" if node.get("active", True) else " merge-block-inactive"
             boxes = cached_tree_node_boxes(cache, node)
-            row_blocks += render_tree_block(cache, "merge-block", "merge-range", "merge-values", node, slot_width, boxes, inactive_class)
+            row_blocks += render_tree_block(cache, "merge-block", "merge-range", "merge-values", node, slot_width, boxes, inactive_class, left_offset)
         html_rows += f'<div class="merge-row-tree">{row_blocks}</div>'
 
     return f"""
@@ -354,6 +356,7 @@ def render_quick_snapshot_tree(state):
     slot_width = 74
     row_height = 104
     tree_width = max(760, total * slot_width)
+    left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
     rows = {}
     for node in nodes:
@@ -365,7 +368,7 @@ def render_quick_snapshot_tree(state):
         for node in sorted(rows.get(depth, []), key=lambda item: item["start"]):
             inactive_class = "" if node.get("active", True) else " quick-block-inactive"
             boxes = cached_quick_node_items(cache, node)
-            row_blocks += render_tree_block(cache, "quick-block", "quick-range", "quick-values", node, slot_width, boxes, inactive_class)
+            row_blocks += render_tree_block(cache, "quick-block", "quick-range", "quick-values", node, slot_width, boxes, inactive_class, left_offset)
         html_rows += f'<div class="quick-row">{row_blocks}</div>'
 
     return f"""
@@ -418,6 +421,7 @@ def render_tree_html(state):
     slot_width = 74 if algorithm == "rapido" else 68
     row_height = 104
     tree_width = max(760, total * slot_width)
+    left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
     rows = {}
     for node in nodes:
@@ -449,7 +453,7 @@ def render_tree_html(state):
                 roles = ["default"] * len(node["values"])
             node_with_roles = {**node, "roles": roles}
             boxes = cached_tree_node_boxes(cache, node_with_roles)
-            row_blocks += render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes)
+            row_blocks += render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes, left_offset=left_offset)
         html_rows += f'<div class="{row_class}">{row_blocks}</div>'
 
     return f"""
@@ -462,7 +466,7 @@ def render_tree_html(state):
 
 
 def item_html(value, index, role, label, max_value, view, item_width=None):
-    fill, border, text = ROLE_STYLES[role]
+    fill, _border, text = ROLE_STYLES[role]
     label_markup = label_html(label) if label else "&nbsp;"
     if view == "barras":
         height = 18 + (value / max_value) * 250 if max_value else 18
@@ -482,7 +486,7 @@ def item_html(value, index, role, label, max_value, view, item_width=None):
     return f"""
     <div class="sort-item box-wrap">
       <div class="box-index">{index}</div>
-      <div class="box" style="background:{fill}; border-color:{border}; color:{text};">
+      <div class="box" style="background:{fill}; border-color:#111111; color:{text};">
         <div class="box-value">{value}</div>
       </div>
       <div class="item-label">{label_markup}</div>
@@ -523,19 +527,21 @@ def sort_styles():
       }}
       .sort-items {{
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: flex-end;
         justify-content: center;
-        gap: 10px;
+        gap: 0;
         min-height: 260px;
         padding: 8px 0;
+        overflow-x: auto;
       }}
       .sort-items.boxes {{
         align-items: flex-start;
         min-height: 150px;
       }}
       .sort-item {{
-        width: 72px;
+        width: 54px;
+        flex: 0 0 54px;
         text-align: center;
       }}
       .box-index, .bar-index {{
@@ -546,11 +552,16 @@ def sort_styles():
       .box {{
         height: 54px;
         border: 2px solid #111111;
-        border-radius: 8px;
+        border-left-width: 0;
+        border-radius: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.12);
+        box-shadow: none;
+        box-sizing: border-box;
+      }}
+      .sort-item:first-child .box {{
+        border-left-width: 2px;
       }}
       .box-value {{
         font-size: 26px;
@@ -644,23 +655,30 @@ def sort_styles():
       }}
       .merge-values, .quick-values {{
         display: flex;
-        gap: 4px;
+        gap: 0;
         justify-content: center;
       }}
       .tree-item {{
-        width: 58px;
+        width: 54px;
         text-align: center;
+        flex: 0 0 54px;
       }}
       .tree-box {{
         width: 54px;
         height: 50px;
         border: 2px solid #111111;
-        border-radius: 8px;
+        border-left-width: 0;
+        border-radius: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 24px;
-        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.12);
+        box-shadow: none;
+        box-sizing: border-box;
+      }}
+      .merge-values .tree-box:first-child,
+      .quick-values .tree-item:first-child .tree-box {{
+        border-left-width: 2px;
       }}
       .tree-label {{
         margin-top: 6px;
