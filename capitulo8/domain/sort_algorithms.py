@@ -64,7 +64,7 @@ def active_tree_ids(root, focus=None, visible_nodes=None, complete=False, includ
 def bubble_trace(values, descending=False):
     arr = list(values)
     n = len(arr)
-    trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento burbuja.", r"\text{estado inicial}")]
+    trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento burbuja.", "")]
     for i in range(n - 1):
         swapped = False
         boundary = n - 1 - i
@@ -114,7 +114,7 @@ def selection_trace(values, descending=False):
     arr = list(values)
     n = len(arr)
     candidate_label = "mínimo" if descending else "máximo"
-    trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento por selección.", r"\text{estado inicial}")]
+    trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento por selección.", "")]
 
     def should_replace(candidate, current):
         return current < candidate if descending else current > candidate
@@ -194,7 +194,7 @@ def selection_trace(values, descending=False):
 def insertion_trace(values, descending=False):
     arr = list(values)
     n = len(arr)
-    trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento por inserción.", r"\text{estado inicial}")]
+    trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento por inserción.", "")]
 
     def base_roles(limit):
         return ["current" if index < limit else "default" for index in range(n)]
@@ -242,7 +242,7 @@ def insertion_trace(values, descending=False):
 def binary_insertion_trace(values, descending=False):
     arr = list(values)
     n = len(arr)
-    trace = [make_event(arr, "Presiona Paso siguiente para iniciar la inserción binaria.", r"\text{estado inicial}")]
+    trace = [make_event(arr, "Presiona Paso siguiente para iniciar la inserción binaria.", "")]
 
     def base_roles(limit):
         return ["current" if index < limit else "default" for index in range(n)]
@@ -457,7 +457,7 @@ def shell_trace(values, descending=False, gap_sequence="shell"):
         make_event(
             arr,
             "Presiona Paso siguiente para iniciar el ordenamiento Shell.",
-            r"\text{estado inicial}",
+            "",
             gap_sequence=gap_sequence,
             gap_values=list(gaps),
         )
@@ -617,7 +617,7 @@ def merge_trace(values, descending=False):
         make_event(
             flat_values,
             "Presiona Paso siguiente para iniciar el ordenamiento por mezcla.",
-            r"\text{estado inicial}",
+            "",
             flat_roles,
             [""] * n,
             **tree_meta(),
@@ -756,20 +756,91 @@ def merge_trace(values, descending=False):
     return trace
 
 
-def choose_pivot(low, high, strategy):
-    if strategy == "start":
-        return low
+def median_index_by_value(values, indexes):
+    ordered_indexes = sorted(indexes, key=lambda index: (values[index], index))
+    return ordered_indexes[len(ordered_indexes) // 2]
+
+
+def median_of_medians_value(items):
+    if len(items) <= 5:
+        return sorted(items)[len(items) // 2]
+    medians = []
+    for start in range(0, len(items), 5):
+        group = sorted(items[start:start + 5])
+        medians.append(group[len(group) // 2])
+    return median_of_medians_value(medians)
+
+
+def pivot_formula(values, low, high, strategy, pivot_index):
     if strategy == "middle":
-        return (low + high) // 2
+        return rf"p = \left\lfloor \frac{{a+b}}{{2}} \right\rfloor = \left\lfloor \frac{{{low}+{high}}}{{2}} \right\rfloor = {pivot_index}"
+    if strategy == "median_three":
+        middle = (low + high) // 2
+        return (
+            rf"c = \left\lfloor \frac{{a+b}}{{2}} \right\rfloor = {middle},\quad "
+            rf"p = \operatorname{{mediana}}(a_a,a_c,a_b) = "
+            rf"\operatorname{{mediana}}({values[low]},{values[middle]},{values[high]}) = {values[pivot_index]}"
+        )
+    if strategy == "median_medians":
+        group_medians = []
+        for start in range(low, high + 1, 5):
+            group = sorted(values[start:min(start + 5, high + 1)])
+            group_medians.append(group[len(group) // 2])
+        medians_text = ",".join(str(value) for value in group_medians)
+        return (
+            rf"M = \{{{medians_text}\}},\quad "
+            rf"p = \operatorname{{mediana}}(M) = {values[pivot_index]}"
+        )
+    if strategy == "start":
+        return rf"p = a = {low}"
     if strategy == "random":
-        return random.randint(low, high)
-    return high
+        return rf"p \in [a,b],\quad p = {pivot_index}"
+    return rf"p = b = {high}"
+
+
+def pivot_selection(values, low, high, strategy):
+    if strategy == "start":
+        pivot_index = low
+    elif strategy == "middle":
+        pivot_index = (low + high) // 2
+    elif strategy == "random":
+        pivot_index = random.randint(low, high)
+    elif strategy == "median_three":
+        middle = (low + high) // 2
+        pivot_index = median_index_by_value(values, (low, middle, high))
+    elif strategy == "median_medians":
+        pivot_value = median_of_medians_value(values[low:high + 1])
+        pivot_index = next(index for index in range(low, high + 1) if values[index] == pivot_value)
+    else:
+        pivot_index = high
+    labels = {
+        "start": "inicio",
+        "middle": "medio",
+        "end": "fin",
+        "random": "aleatorio",
+        "median_three": "mediana de tres",
+        "median_medians": "mediana de medianas",
+    }
+    return pivot_index, labels.get(strategy, "fin"), pivot_formula(values, low, high, strategy, pivot_index)
+
+
+def choose_pivot(values, low, high, strategy):
+    return pivot_selection(values, low, high, strategy)[0]
+
+
+def choose_pivot_index(length, strategy):
+    if strategy == "start":
+        return 0
+    if strategy == "middle":
+        return (length - 1) // 2
+    if strategy == "random":
+        return random.randint(0, length - 1)
+    return length - 1
 
 
 def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
     initial = list(values)
     n = len(initial)
-    pivot_labels = {"start": "inicio", "middle": "medio", "end": "fin", "random": "aleatorio"}
 
     def node(start, values, depth=0, parent=None):
         return {
@@ -817,15 +888,6 @@ def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
         for index, value in enumerate(item["values"]):
             parent["values"][offset + index] = value
         sync_with_parent(parent)
-
-    def local_pivot_index(length):
-        if pivot_strategy == "start":
-            return 0
-        if pivot_strategy == "middle":
-            return (length - 1) // 2
-        if pivot_strategy == "random":
-            return random.randint(0, length - 1)
-        return length - 1
 
     def before_pivot(value, pivot_value):
         return value >= pivot_value if descending else value <= pivot_value
@@ -911,7 +973,7 @@ def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
         )
 
     trace = []
-    append_event("Presiona Paso siguiente para iniciar el ordenamiento rápido.", r"\text{estado inicial}")
+    append_event("Presiona Paso siguiente para iniciar el ordenamiento rápido.", "")
 
     phase = "select_node"
     append_event("Comienza el ordenamiento.", r"fase = \text{inicio}")
@@ -946,12 +1008,19 @@ def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
             continue
 
         if phase == "prepare_partition":
-            selected_pivot_index = local_pivot_index(len(current["values"]))
+            selected_pivot_index, pivot_label, pivot_formula_text = pivot_selection(
+                current["values"],
+                0,
+                len(current["values"]) - 1,
+                pivot_strategy,
+            )
             reset_roles(current)
             current["roles"][selected_pivot_index] = "pivot"
             pivot_value = current["values"][selected_pivot_index]
-            pivot_label = pivot_labels[pivot_strategy]
-            append_event(f"Selecciona el pivote {pivot_value} tomado del {pivot_label}.", rf"pivote = {pivot_value}")
+            append_event(
+                f"Selecciona el pivote {pivot_value} tomado de {pivot_label}.",
+                rf"{pivot_formula_text},\quad pivote = {pivot_value}",
+            )
             phase = "move_pivot"
             continue
 
@@ -1056,7 +1125,6 @@ def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
 def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
     arr = list(values)
     n = len(arr)
-    pivot_labels = {"start": "inicio", "middle": "medio", "end": "fin", "random": "aleatorio"}
 
     def node(start, end, depth=0, parent=None):
         return {
@@ -1112,7 +1180,7 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
             quick_tree_max_depth=max(1, n - 1),
         ))
 
-    append_event("Presiona Paso siguiente para iniciar el ordenamiento rápido.", r"\text{estado inicial}", root)
+    append_event("Presiona Paso siguiente para iniciar el ordenamiento rápido.", "", root)
     append_event("Comienza el ordenamiento con el esquema de Hoare.", r"\text{esquema} = \text{Hoare}", root)
     pending = [root]
 
@@ -1162,7 +1230,7 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
             append_event(f"El subarreglo [{arr[low]}] ya está ordenado.", rf"caso\ base = [{arr[low]}]", current)
             continue
 
-        pivot_global = choose_pivot(low, high, pivot_strategy)
+        pivot_global, pivot_label, pivot_formula_text = pivot_selection(arr, low, high, pivot_strategy)
         pivot_value = arr[pivot_global]
         roles, labels = build_partition_roles(low, high, pivot_global)
         labels[low] = "a"
@@ -1172,8 +1240,8 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
             labels[pivot_global] = f"{edge_label}\npivote"
         current["roles"] = list(roles[low:high + 1])
         append_event(
-            f"Selecciona el pivote {pivot_value} tomado del {pivot_labels[pivot_strategy]}.",
-            rf"a = {low},\quad b = {high},\quad pivote = {pivot_value}",
+            f"Selecciona el pivote {pivot_value} tomado de {pivot_label}.",
+            rf"a = {low},\quad b = {high},\quad {pivot_formula_text},\quad pivote = {pivot_value}",
             current,
             roles,
             labels,
@@ -1231,14 +1299,14 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
                 roles, labels = build_partition_roles(low, high, pivot_final, pivot_role="sorted")
                 labels[pivot_final] = "\n".join(filter(None, (labels[pivot_final], "p")))
                 current["roles"] = list(roles[low:high + 1])
+                sorted_mask[pivot_final] = True
                 append_event(
-                    f"Intercambia el pivote con la posición {pivot_final}.",
+                    f"El pivote {pivot_value} queda ordenado en la posición {pivot_final}.",
                     rf"p = {pivot_final},\quad pivote = {pivot_value}",
                     current,
                     roles,
                     labels,
                 )
-                sorted_mask[pivot_final] = True
                 break
 
             arr[i], arr[j] = arr[j], arr[i]
@@ -1283,15 +1351,42 @@ def quick_trace(values, descending=False, pivot_strategy="middle", partition_sch
 def radix_trace(values, descending=False):
     arr = [int(value) for value in values]
     n = len(arr)
+
+    def bucket_event(
+        message,
+        formula,
+        roles=None,
+        labels=None,
+        complete=False,
+        buckets=None,
+        active_bucket=None,
+        phase=None,
+    ):
+        extra = {}
+        if buckets is not None:
+            extra["radix_buckets"] = [list(bucket) for bucket in buckets]
+            extra["radix_active_bucket"] = active_bucket
+            extra["radix_phase"] = phase
+        return make_event(arr, message, formula, roles, labels, complete, **extra)
+
     trace = [
-        make_event(
-            arr,
+        bucket_event(
             "Presiona Paso siguiente para iniciar el ordenamiento radix.",
-            r"\text{estado inicial}",
+            "",
+            buckets=[[] for _ in range(10)],
+            phase="initial",
         )
     ]
     if n == 0:
-        trace.append(make_event(arr, "Finaliza el ordenamiento radix.", r"\text{arreglo ordenado}", complete=True))
+        trace.append(
+            bucket_event(
+                "Finaliza el ordenamiento radix.",
+                r"\text{arreglo ordenado}",
+                complete=True,
+                buckets=[[] for _ in range(10)],
+                phase="complete",
+            )
+        )
         return trace
     if any(value < 0 for value in arr):
         raise ValueError("Radix sort requiere valores enteros no negativos")
@@ -1310,47 +1405,64 @@ def radix_trace(values, descending=False):
             labels = [""] * n
             mark(roles, labels, index, "compare", "d")
             trace.append(
-                make_event(
-                    arr,
-                    f"Lee el dígito {digit} de {value} y lo ubica en el balde {digit}.",
+                bucket_event(
+                    f"Lee el dígito {digit} de {value} y lo ubica en el bucket {digit}.",
                     rf"d = \left\lfloor {value}/{digit_name} \right\rfloor \bmod 10 = {digit}",
                     roles,
                     labels,
+                    buckets=buckets,
+                    active_bucket=digit,
+                    phase="distribution",
                 )
             )
 
-        ordered_values = []
         bucket_order = range(9, -1, -1) if descending else range(10)
-        for bucket in bucket_order:
-            ordered_values.extend(buckets[bucket])
+        writable_buckets = [list(bucket) for bucket in buckets]
 
-        for index, value in enumerate(ordered_values):
-            arr[index] = value
-            roles = ["default"] * n
-            labels = [""] * n
-            mark(roles, labels, index, "write", "k")
-            trace.append(
-                make_event(
-                    arr,
-                    f"Escribe {value} en la posición {index} según el dígito {digit_index}.",
-                    rf"k = {index},\quad 10^{digit_index},\quad a_k = {value}",
-                    roles,
-                    labels,
+        write_index = 0
+        for bucket in bucket_order:
+            while writable_buckets[bucket]:
+                value = writable_buckets[bucket].pop(0)
+                arr[write_index] = value
+                roles = ["default"] * n
+                labels = [""] * n
+                mark(roles, labels, write_index, "write", "k")
+                trace.append(
+                    bucket_event(
+                        f"Escribe {value} en la posición {write_index} según el dígito {digit_index}.",
+                        rf"k = {write_index},\quad 10^{digit_index},\quad a_k = {value}",
+                        roles,
+                        labels,
+                        buckets=writable_buckets,
+                        active_bucket=bucket,
+                        phase="write",
+                    )
                 )
-            )
+                write_index += 1
 
         exp *= 10
         trace.append(
-            make_event(
-                arr,
+            bucket_event(
                 f"Finaliza la pasada del dígito {digit_index}.",
                 rf"10^{digit_index}\ \text{{procesado}}",
                 ["sorted"] * n if digit_index == digit_count - 1 else ["default"] * n,
                 [""] * n,
+                buckets=[[] for _ in range(10)],
+                phase="complete",
             )
         )
 
-    trace.append(make_event(arr, "Finaliza el ordenamiento radix.", r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    trace.append(
+        bucket_event(
+            "Finaliza el ordenamiento radix.",
+            r"\text{arreglo ordenado}",
+            ["sorted"] * n,
+            [""] * n,
+            True,
+            buckets=[[] for _ in range(10)],
+            phase="complete",
+        )
+    )
     return trace
 
 
@@ -1375,6 +1487,7 @@ __all__ = [
     "shell_gaps",
     "shell_trace",
     "merge_trace",
+    "choose_pivot",
     "quick_trace",
     "radix_trace",
     "TRACE_BUILDERS",

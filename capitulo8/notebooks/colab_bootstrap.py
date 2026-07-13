@@ -44,6 +44,7 @@ SIMULATION_LAUNCHERS = {
     "mezcla": "run_mezcla",
     "rapido": "run_rapido",
     "rapido_comparacion": "run_rapido_comparacion",
+    "rapido_pivotes": "run_rapido_pivotes",
     "radix": "run_radix",
 }
 

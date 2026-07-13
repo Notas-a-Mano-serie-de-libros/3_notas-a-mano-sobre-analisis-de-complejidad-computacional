@@ -462,6 +462,22 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn((0, 5), ranges)
         self.assertTrue(any(start > 0 or end < 5 for start, end in ranges))
 
+    def test_quick_tree_aligns_partition_children_to_global_columns(self):
+        module = self.modules["rapido"]
+        state = module.create_state(size=6, values=[10, 7, 8, 9, 1, 5], view="arbol")
+
+        for _ in range(80):
+            if len(state.get("quick_tree_nodes", [])) > 1:
+                break
+            module.step_quick_sort(state)
+
+        html = module.render_state_html(state, include_styles=False)
+        self.assertIn('grid-template-columns:repeat(6, 54px)', html)
+        self.assertIn('style="grid-column:1 / 4;">[0, 2]</div>', html)
+        self.assertIn('style="grid-column:5 / 7;">[4, 5]</div>', html)
+        self.assertIn('class="quick-value-cell quick-value-cell-first" style="grid-column:1;"', html)
+        self.assertIn('class="quick-value-cell quick-value-cell-first" style="grid-column:5;"', html)
+
     def test_quick_supports_hoare_and_lomuto_partition_schemes(self):
         values = [10, 7, 8, 9, 1, 5, 8]
         for scheme in ("hoare", "lomuto"):
@@ -477,6 +493,44 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                         self.modules["rapido"].step_quick_sort(state)
                     self.assertEqual(state["arr"], sorted(values, reverse=descending))
                     self.assertEqual(state["partition_scheme"], scheme)
+
+    def test_quick_supports_extended_pivot_selection_strategies(self):
+        values = [10, 7, 8, 9, 1, 5, 12, 3, 11]
+        for strategy in ("median_three", "median_medians"):
+            for scheme in ("hoare", "lomuto"):
+                with self.subTest(strategy=strategy, scheme=scheme):
+                    state = self.modules["rapido"].create_state(
+                        size=len(values),
+                        values=values,
+                        pivot_strategy=strategy,
+                        partition_scheme=scheme,
+                    )
+                    first_selection = next(
+                        event for event in state["trace"]
+                        if "Selecciona el pivote" in event["message"]
+                    )
+                    while not state["sorting_complete"]:
+                        self.modules["rapido"].step_quick_sort(state)
+
+                    self.assertEqual(state["arr"], sorted(values))
+                    self.assertIn(r"\operatorname{mediana}", first_selection["formula"])
+
+    def test_quick_marks_pivot_green_when_partition_finishes(self):
+        values = [10, 7, 8, 9, 1, 5]
+        for scheme in ("hoare", "lomuto"):
+            with self.subTest(scheme=scheme):
+                state = self.modules["rapido"].create_state(
+                    size=len(values),
+                    values=values,
+                    view="cajas",
+                    partition_scheme=scheme,
+                )
+                while "queda ordenado" not in state["message"]:
+                    self.modules["rapido"].step_quick_sort(state)
+
+                self.assertIn("sorted", state["roles"])
+                html = self.modules["rapido"].render_state_html(state)
+                self.assertIn("#e8fce9", html)
 
     def test_hoare_keeps_pivot_fixed_until_indices_cross(self):
         trace = self.algorithms.quick_trace([3, 1, 2], pivot_strategy="start", partition_scheme="hoare")
@@ -503,6 +557,26 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         html = module.render_comparison_html(state)
         self.assertIn("Hoare", html)
         self.assertIn("Lomuto", html)
+
+    def test_quick_pivot_comparison_uses_selected_partition_scheme(self):
+        module = self.modules["rapido"]
+        values = [10, 7, 8, 9, 1, 5]
+        state = module.create_pivot_comparison_state(
+            size=len(values),
+            values=values,
+            partition_scheme="lomuto",
+        )
+
+        self.assertEqual(
+            [item["key"] for item in state["algorithms"]],
+            ["end", "start", "middle", "random", "median_three", "median_medians"],
+        )
+        self.assertTrue(all(item["state"]["partition_scheme"] == "lomuto" for item in state["algorithms"]))
+        self.assertTrue(all(item["state"]["initial_values"] == values for item in state["algorithms"]))
+        module.step_all_variants(state)
+        html = module.render_pivot_comparison_html(state)
+        self.assertIn("Mediana de tres", html)
+        self.assertIn("Mediana de medianas", html)
 
     def test_bar_view_preserves_original_visual_style(self):
         module = self.modules["seleccion"]
@@ -684,6 +758,37 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('"radix"', chart_source)
         self.assertIn('("Radix",     "radix"', chart_source.split("_SINGLE_CONFIGS", 1)[0])
 
+    def test_radix_renders_bucket_table_during_distribution_and_write(self):
+        module = self.modules["radix"]
+        state = module.create_state(size=4, values=[170, 45, 75, 90], view="barras")
+
+        initial_html = module.render_state_html(state)
+        self.assertIn("Buckets", initial_html)
+        self.assertIn("radix-buckets-panel", initial_html)
+        self.assertGreater(initial_html.rindex("radix-buckets-panel"), initial_html.rindex("bar-panel"))
+        self.assertIn('class="radix-bucket-key radix-bucket-heading">Dígito</div>', initial_html)
+        self.assertIn('class="radix-bucket-chain radix-bucket-heading">Bucket</div>', initial_html)
+
+        module.step_radix_sort(state)
+        html = module.render_state_html(state)
+        self.assertEqual(state["radix_buckets"][0], [170])
+        self.assertIn("Actualización de buckets", html)
+        self.assertIn("170</div>", html)
+        self.assertNotIn("170 -> ---", html)
+
+        while state.get("radix_buckets", [])[5] != [45, 75]:
+            module.step_radix_sort(state)
+        html = module.render_state_html(state)
+        self.assertIn("45 -> 75", html)
+
+        while state.get("radix_phase") != "write":
+            module.step_radix_sort(state)
+        html = module.render_state_html(state)
+        self.assertEqual(state["radix_buckets"][0], [90])
+        self.assertIn("Reconstrucción desde buckets", html)
+        self.assertIn("90</div>", html)
+        self.assertNotIn("90 -> ---", html)
+
     def test_shell_notebook_includes_gap_sequence_comparison(self):
         notebook = NOTEBOOK_DIR / "4_ordenamiento_shell.ipynb"
         nb = json.loads(notebook.read_text(encoding="utf-8"))
@@ -716,6 +821,24 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("def run_insercion_comparacion", launchers)
         self.assertIn("run_binary_app", app_source)
         self.assertIn("run_comparison_app", app_source)
+
+    def test_quick_notebook_includes_partition_and_pivot_comparisons(self):
+        notebook = NOTEBOOK_DIR / "6_ordenamiento_rapido.ipynb"
+        nb = json.loads(notebook.read_text(encoding="utf-8"))
+        code_cells = [cell for cell in nb["cells"] if cell["cell_type"] == "code"]
+        bootstrap = (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
+        launchers = (NOTEBOOK_DIR / "launchers.py").read_text(encoding="utf-8")
+        app_source = (DOMAIN_DIR / "6_ordenamiento_rapido_app.py").read_text(encoding="utf-8")
+
+        self.assertEqual(len(code_cells), 4)
+        self.assertIn('SIMULATION_NAME = "rapido_comparacion"', "".join(code_cells[1]["source"]))
+        self.assertIn('SIMULATION_NAME = "rapido_pivotes"', "".join(code_cells[2]["source"]))
+        self.assertIn('"rapido_comparacion": "run_rapido_comparacion"', bootstrap)
+        self.assertIn('"rapido_pivotes": "run_rapido_pivotes"', bootstrap)
+        self.assertIn("def run_rapido_comparacion", launchers)
+        self.assertIn("def run_rapido_pivotes", launchers)
+        self.assertIn("run_comparison_app", app_source)
+        self.assertIn("run_pivot_comparison_app", app_source)
 
     def test_notebooks_are_clean_invocations(self):
         comparison_notebook = NOTEBOOK_DIR / "0_comparacion_ordenamientos.ipynb"
@@ -899,7 +1022,7 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
                 elif notebook_name == "4_ordenamiento_shell.ipynb":
                     expected_code_cells = 3
                 elif notebook_name == "6_ordenamiento_rapido.ipynb":
-                    expected_code_cells = 3
+                    expected_code_cells = 4
                 else:
                     expected_code_cells = 2
                 self.assertEqual(len(code_cells), expected_code_cells)

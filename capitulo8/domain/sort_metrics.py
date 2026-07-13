@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from sort_algorithms import choose_pivot
+
 
 def ordered(left, right, descending=False):
     return left >= right if descending else left <= right
@@ -164,14 +166,6 @@ def count_merge(values, descending=False):
     return steps + 1
 
 
-def pivot_index(values, strategy):
-    if strategy == "start":
-        return 0
-    if strategy == "middle":
-        return len(values) // 2
-    return len(values) - 1
-
-
 def count_quick(values, descending=False, pivot_strategy="end"):
     arr = list(values)
     steps = 0
@@ -182,7 +176,7 @@ def count_quick(values, descending=False, pivot_strategy="end"):
             steps += 1
             return items
 
-        pivot_pos = pivot_index(items, pivot_strategy)
+        pivot_pos = choose_pivot(items, 0, len(items) - 1, pivot_strategy)
         pivot = items[pivot_pos]
         rest = items[:pivot_pos] + items[pivot_pos + 1:]
         left = []
@@ -236,6 +230,5 @@ __all__ = [
     "count_shell",
     "count_sort_operations",
     "ordered",
-    "pivot_index",
     "shell_gaps",
 ]

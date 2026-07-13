@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sort_algorithms import ordered
+from sort_algorithms import choose_pivot, ordered
 
 
 def split_tree(values, start=0, depth=0):
@@ -14,19 +14,11 @@ def split_tree(values, start=0, depth=0):
     return node
 
 
-def quick_pivot_index(length, strategy):
-    if strategy == "start":
-        return 0
-    if strategy == "middle":
-        return length // 2
-    return length - 1
-
-
 def quick_tree(values, start=0, depth=0, descending=False, pivot_strategy="end"):
     node = {"start": start, "end": start + len(values) - 1, "depth": depth, "values": list(values), "children": []}
     if len(values) <= 1:
         return node
-    pivot_index = quick_pivot_index(len(values), pivot_strategy)
+    pivot_index = choose_pivot(values, 0, len(values) - 1, pivot_strategy)
     pivot_value = values[pivot_index]
     rest = values[:pivot_index] + values[pivot_index + 1:]
     left = [value for value in rest if ordered(value, pivot_value, descending)]

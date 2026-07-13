@@ -13,7 +13,14 @@ ROLE_STYLES = SORT_ROLE_STYLES
 VIEW_OPTIONS = (("Barras", "barras"), ("Cajas", "cajas"))
 TREE_VIEW_OPTIONS = (("Barras", "barras"), ("Cajas", "cajas"), ("Árbol", "arbol"))
 ORDER_OPTIONS = (("Ascendente", False), ("Descendente", True))
-PIVOT_OPTIONS = (("Fin", "end"), ("Inicio", "start"), ("Medio", "middle"), ("Aleatorio", "random"))
+PIVOT_OPTIONS = (
+    ("Fin", "end"),
+    ("Inicio", "start"),
+    ("Medio", "middle"),
+    ("Aleatorio", "random"),
+    ("Mediana de tres", "median_three"),
+    ("Mediana de medianas", "median_medians"),
+)
 PARTITION_OPTIONS = (("Hoare", "hoare"), ("Lomuto", "lomuto"))
 GAP_SEQUENCE_OPTIONS = (
     ("Shell", "shell"),

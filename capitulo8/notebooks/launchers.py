@@ -92,5 +92,10 @@ def run_rapido_comparacion():
     module.run_comparison_app()
 
 
+def run_rapido_pivotes():
+    module = _load_module("6_ordenamiento_rapido_app.py", "cap8_rapido_pivotes_app")
+    module.run_pivot_comparison_app()
+
+
 def run_radix():
     _run("7_ordenamiento_radix_app.py", "cap8_radix_app")

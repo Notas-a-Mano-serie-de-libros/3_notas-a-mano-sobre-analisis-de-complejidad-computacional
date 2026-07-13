@@ -23,17 +23,18 @@ from sort_tree import flatten_tree, merge_active_ranges, quick_tree, range_key, 
 
 LIST_EVENT_KEYS = {"arr", "roles", "labels", "initial_values"}
 TREE_EVENT_KEYS = {"merge_tree_nodes", "quick_tree_nodes"}
+NESTED_LIST_EVENT_KEYS = {"radix_buckets"}
 _SIMULATION_HEIGHT_CACHE = {}
 _SORT_STYLES = None
 INITIAL_MESSAGES = {
-    "burbuja": ("Presiona Paso siguiente para iniciar el ordenamiento burbuja.", r"\text{estado inicial}"),
-    "seleccion": ("Presiona Paso siguiente para iniciar el ordenamiento por selección.", r"\text{estado inicial}"),
-    "insercion": ("Presiona Paso siguiente para iniciar el ordenamiento por inserción.", r"\text{estado inicial}"),
-    "insercion_binaria": ("Presiona Paso siguiente para iniciar la inserción binaria.", r"\text{estado inicial}"),
-    "shell": ("Presiona Paso siguiente para iniciar el ordenamiento Shell.", r"\text{estado inicial}"),
-    "mezcla": ("Presiona Paso siguiente para iniciar el ordenamiento por mezcla.", r"\text{estado inicial}"),
-    "rapido": ("Presiona Paso siguiente para iniciar el ordenamiento rápido.", r"\text{estado inicial}"),
-    "radix": ("Presiona Paso siguiente para iniciar el ordenamiento radix.", r"\text{estado inicial}"),
+    "burbuja": ("Presiona Paso siguiente para iniciar el ordenamiento burbuja.", ""),
+    "seleccion": ("Presiona Paso siguiente para iniciar el ordenamiento por selección.", ""),
+    "insercion": ("Presiona Paso siguiente para iniciar el ordenamiento por inserción.", ""),
+    "insercion_binaria": ("Presiona Paso siguiente para iniciar la inserción binaria.", ""),
+    "shell": ("Presiona Paso siguiente para iniciar el ordenamiento Shell.", ""),
+    "mezcla": ("Presiona Paso siguiente para iniciar el ordenamiento por mezcla.", ""),
+    "rapido": ("Presiona Paso siguiente para iniciar el ordenamiento rápido.", ""),
+    "radix": ("Presiona Paso siguiente para iniciar el ordenamiento radix.", ""),
 }
 
 
@@ -122,6 +123,10 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
             "labels": [[] for _ in values],
             "active": True,
         }]
+    elif algorithm == "radix":
+        initial_event["radix_buckets"] = [[] for _ in range(10)]
+        initial_event["radix_phase"] = "initial"
+        initial_event["radix_active_bucket"] = None
     trace = LazyTrace(builder, values, trace_kwargs, initial_event)
     event = copy_event(trace[0])
     return {
@@ -158,6 +163,8 @@ def copy_event(event):
             copied[key] = list(value)
         elif key in TREE_EVENT_KEYS:
             copied[key] = [copy_tree_node(node) for node in value]
+        elif key in NESTED_LIST_EVENT_KEYS:
+            copied[key] = [list(item) for item in value]
         else:
             copied[key] = value
     return copied
@@ -171,6 +178,9 @@ def copy_sort_state(state):
     for key in TREE_EVENT_KEYS:
         if key in copied:
             copied[key] = [copy_tree_node(node) for node in copied[key]]
+    for key in NESTED_LIST_EVENT_KEYS:
+        if key in copied:
+            copied[key] = [list(item) for item in copied[key]]
     return copied
 
 
@@ -297,6 +307,39 @@ def render_tree_block(cache, block_class, range_class, values_class, node, slot_
     return html
 
 
+def render_quick_aligned_block(cache, node, slot_width, total, boxes, inactive_class="", left_offset=0):
+    tree_width = total * slot_width
+    range_start = node["start"] + 1
+    range_end = node["end"] + 2
+    item_cells = "".join(
+        f'<div class="quick-value-cell{" quick-value-cell-first" if index == 0 else ""}" style="grid-column:{node["start"] + index + 1};">{item}</div>'
+        for index, item in enumerate(boxes)
+    )
+    cache_key = (
+        "quick_aligned_block",
+        node["start"],
+        node["end"],
+        tree_width,
+        range_start,
+        range_end,
+        inactive_class,
+        left_offset,
+        tuple(boxes),
+    )
+    if cache_key in cache:
+        return cache[cache_key]
+    html = f"""
+            <div class="quick-block quick-block-aligned{inactive_class}" style="left:{left_offset}px; width:{tree_width}px; grid-template-columns:repeat({total}, {slot_width}px);">
+              <div class="quick-range quick-range-aligned" style="grid-column:{range_start} / {range_end};">[{node["start"]}, {node["end"]}]</div>
+              <div class="quick-values quick-values-aligned" style="grid-template-columns:repeat({total}, {slot_width}px);">
+                {item_cells}
+              </div>
+            </div>
+            """
+    cache[cache_key] = html
+    return html
+
+
 def tree_cache(state):
     return state.setdefault("_tree_html_cache", {})
 
@@ -307,9 +350,7 @@ def cached_tree_node_boxes(cache, node):
 
 def cached_quick_node_items(cache, node):
     labels = node.get("labels", [[] for _ in node["values"]])
-    return f"""
-    {"".join(tree_item(value, node["roles"][index], labels[index], cache=cache) for index, value in enumerate(node["values"]))}
-    """
+    return [tree_item(value, node["roles"][index], labels[index], cache=cache) for index, value in enumerate(node["values"])]
 
 
 def render_merge_snapshot_tree(state):
@@ -353,7 +394,7 @@ def render_quick_snapshot_tree(state):
     cache = tree_cache(state)
     max_depth = state.get("quick_tree_max_depth", max(node["depth"] for node in nodes))
     total = max(1, len(state.get("initial_values", state["arr"])))
-    slot_width = 74
+    slot_width = 54
     row_height = 104
     tree_width = max(760, total * slot_width)
     left_offset = max(0, (tree_width - total * slot_width) // 2)
@@ -368,7 +409,7 @@ def render_quick_snapshot_tree(state):
         for node in sorted(rows.get(depth, []), key=lambda item: item["start"]):
             inactive_class = "" if node.get("active", True) else " quick-block-inactive"
             boxes = cached_quick_node_items(cache, node)
-            row_blocks += render_tree_block(cache, "quick-block", "quick-range", "quick-values", node, slot_width, boxes, inactive_class, left_offset)
+            row_blocks += render_quick_aligned_block(cache, node, slot_width, total, boxes, inactive_class, left_offset)
         html_rows += f'<div class="quick-row">{row_blocks}</div>'
 
     return f"""
@@ -525,6 +566,53 @@ def sort_styles():
         align-items: center;
         justify-content: center;
       }}
+      .radix-buckets-panel {{
+        width: min(100%, 760px);
+        margin: 12px auto 0;
+        border: 2px solid currentColor;
+        box-sizing: border-box;
+        font-size: 17px;
+        line-height: 20px;
+      }}
+      .radix-buckets-title {{
+        font-weight: 700;
+        text-align: center;
+        padding: 4px 8px;
+        border-bottom: 2px solid currentColor;
+      }}
+      .radix-bucket-header,
+      .radix-bucket-row {{
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr);
+        min-height: 28px;
+      }}
+      .radix-bucket-header {{
+        font-weight: 700;
+        border-bottom: 2px solid currentColor;
+      }}
+      .radix-bucket-header > div,
+      .radix-bucket-row > div {{
+        padding: 4px 8px;
+        box-sizing: border-box;
+      }}
+      .radix-bucket-key {{
+        text-align: center;
+        border-right: 2px solid currentColor;
+      }}
+      .radix-bucket-heading {{
+        text-align: center;
+      }}
+      .radix-bucket-row:not(:last-child) {{
+        border-bottom: 1px solid currentColor;
+      }}
+      .radix-bucket-row-active {{
+        background: rgb(255, 242, 204);
+        color: #111111;
+      }}
+      .radix-bucket-chain {{
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }}
       .sort-items {{
         display: flex;
         flex-wrap: nowrap;
@@ -658,6 +746,18 @@ def sort_styles():
         gap: 0;
         justify-content: center;
       }}
+      .quick-block-aligned {{
+        display: grid;
+      }}
+      .quick-range-aligned {{
+        text-align: center;
+      }}
+      .quick-values-aligned {{
+        grid-column: 1 / -1;
+        display: grid;
+        gap: 0;
+        justify-content: start;
+      }}
       .tree-item {{
         width: 54px;
         text-align: center;
@@ -677,7 +777,8 @@ def sort_styles():
         box-sizing: border-box;
       }}
       .merge-values .tree-box:first-child,
-      .quick-values .tree-item:first-child .tree-box {{
+      .quick-values:not(.quick-values-aligned) .tree-item:first-child .tree-box,
+      .quick-value-cell-first .tree-box {{
         border-left-width: 2px;
       }}
       .tree-label {{
@@ -725,17 +826,55 @@ def render_items_markup(state, view):
     return f'<div class="sort-items boxes">{items}</div>'
 
 
+def render_radix_buckets(state):
+    buckets = state.get("radix_buckets")
+    if state.get("algorithm") != "radix" or buckets is None:
+        return ""
+    active_bucket = state.get("radix_active_bucket")
+    phase = state.get("radix_phase")
+    title = {
+        "distribution": "Actualización de buckets",
+        "write": "Reconstrucción desde buckets",
+        "complete": "Buckets al finalizar la pasada",
+    }.get(phase, "Buckets")
+    rows = []
+    for bucket, values in enumerate(buckets):
+        chain = " -> ".join(escape(str(value)) for value in values)
+        structure = chain if chain else "&nbsp;"
+        active_class = " radix-bucket-row-active" if bucket == active_bucket else ""
+        rows.append(
+            f"""
+            <div class="radix-bucket-row{active_class}">
+              <div class="radix-bucket-key">{bucket}</div>
+              <div class="radix-bucket-chain">{structure}</div>
+            </div>
+            """
+        )
+    return f"""
+    <div class="radix-buckets-panel">
+      <div class="radix-buckets-title">{title}</div>
+      <div class="radix-bucket-header">
+        <div class="radix-bucket-key radix-bucket-heading">Dígito</div>
+        <div class="radix-bucket-chain radix-bucket-heading">Bucket</div>
+      </div>
+      {''.join(rows)}
+    </div>
+    """
+
+
 def render_state_html(state, include_styles=True):
     view = state.get("view", "barras")
     app_class = "sort-app sort-app-bars" if view == "barras" else "sort-app"
     min_height = simulation_min_height(state)
     items_markup = render_items_markup(state, view)
+    radix_buckets = render_radix_buckets(state)
     styles = sort_styles() if include_styles else ""
     return f"""
     {styles}
     <div class="{app_class}" style="min-height:{min_height}px;">
       <div class="sort-message">{message_html(state["message"])}</div>
       {items_markup}
+      {radix_buckets}
     </div>
     """
 
@@ -768,7 +907,7 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         options=PIVOT_OPTIONS,
         value="middle",
         description="Pivote",
-        width="180px",
+        width="260px",
         description_style={},
     )
     partition_dropdown = dropdown_control(
