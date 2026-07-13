@@ -2,6 +2,21 @@ from __future__ import annotations
 
 import random
 
+from common.visual_roles import (
+    SORT_ROLE_DEFAULT as ROLE_DEFAULT,
+    SORT_ROLE_EXCLUDED as ROLE_EXCLUDED,
+    SORT_ROLE_NAMES,
+    SORT_ROLE_SORTED as ROLE_SORTED,
+)
+from sort_messages import (
+    compare_positions_message,
+    compare_values_message,
+    final_message,
+    radix_bucket_message,
+    start_message,
+    swap_positions_message,
+)
+
 
 def ordered(left, right, descending=False):
     return left >= right if descending else left <= right
@@ -12,16 +27,34 @@ def relation_symbol(descending=False):
 
 
 def make_event(values, message, formula, roles=None, labels=None, complete=False, **extra):
+    event_roles = list(roles or [ROLE_DEFAULT] * len(values))
+    validate_event_roles(event_roles, extra)
     event = {
         "arr": list(values),
         "message": message,
         "formula": formula,
-        "roles": list(roles or ["default"] * len(values)),
+        "roles": event_roles,
         "labels": list(labels or [""] * len(values)),
         "sorting_complete": complete,
     }
     event.update(extra)
     return event
+
+
+def validate_event_roles(roles, extra=None):
+    role_groups = [roles]
+    for key in ("merge_tree_nodes", "quick_tree_nodes"):
+        for node in (extra or {}).get(key, []):
+            role_groups.append(node.get("roles", []))
+    unknown = sorted({role for group in role_groups for role in group if role not in SORT_ROLE_NAMES})
+    if unknown:
+        raise ValueError(f"Roles visuales de ordenamiento no registrados: {unknown}")
+
+
+def gray_unsorted_roles_when_complete(roles, complete=False):
+    if not complete:
+        return roles
+    return [ROLE_SORTED if role == ROLE_SORTED else ROLE_EXCLUDED for role in roles]
 
 
 def mark(roles, labels, index, role, label=""):
@@ -64,7 +97,7 @@ def active_tree_ids(root, focus=None, visible_nodes=None, complete=False, includ
 def bubble_trace(values, descending=False):
     arr = list(values)
     n = len(arr)
-    trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento burbuja.", "")]
+    trace = [make_event(arr, start_message("burbuja"), "")]
     for i in range(n - 1):
         swapped = False
         boundary = n - 1 - i
@@ -77,7 +110,7 @@ def bubble_trace(values, descending=False):
             trace.append(
                 make_event(
                     arr,
-                    f"Compara las posiciones {j} y {j + 1}.",
+                    compare_positions_message(j, j + 1),
                     rf"i = {i},\quad b = n - 1 - i = {boundary},\quad j = {j},\quad a_j = {arr[j]},\quad a_{{j+1}} = {arr[j + 1]},\quad {arr[j]} {relation_symbol(descending)} {arr[j + 1]}",
                     roles,
                     labels,
@@ -94,7 +127,7 @@ def bubble_trace(values, descending=False):
                 trace.append(
                     make_event(
                         arr,
-                        f"Intercambia las posiciones {j} y {j + 1}.",
+                        swap_positions_message(j, j + 1),
                         rf"i = {i},\quad b = {boundary},\quad a_j \leftrightarrow a_{{j+1}},\quad a_j = {arr[j]},\quad a_{{j+1}} = {arr[j + 1]}",
                         roles,
                         labels,
@@ -106,7 +139,7 @@ def bubble_trace(values, descending=False):
         trace.append(make_event(arr, f"Fija la posición {boundary}.", rf"i = {i},\quad b = n - 1 - i = {boundary}", roles, labels))
         if not swapped:
             break
-    trace.append(make_event(arr, "Finaliza el ordenamiento burbuja.", r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    trace.append(make_event(arr, final_message("burbuja"), r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
     return trace
 
 
@@ -114,7 +147,7 @@ def selection_trace(values, descending=False):
     arr = list(values)
     n = len(arr)
     candidate_label = "mínimo" if descending else "máximo"
-    trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento por selección.", "")]
+    trace = [make_event(arr, start_message("seleccion"), "")]
 
     def should_replace(candidate, current):
         return current < candidate if descending else current > candidate
@@ -146,7 +179,7 @@ def selection_trace(values, descending=False):
             trace.append(
                 make_event(
                     arr,
-                    f"Compara {candidate_value} con {current_value}.",
+                    compare_values_message(candidate_value, current_value),
                     rf"i = {i},\quad j = {j},\quad \text{{{candidate_label}}} = {candidate_value},\quad a_j = {current_value}",
                     roles,
                     labels,
@@ -187,14 +220,14 @@ def selection_trace(values, descending=False):
             labels = [""] * n
             mark(roles, labels, i, "sorted", "ordenado")
             trace.append(make_event(arr, f"El {candidate_label} ya está en la posición {i}.", rf"i = {i},\quad \text{{{candidate_label}}} = {arr[i]}", roles, labels))
-    trace.append(make_event(arr, "Finaliza el ordenamiento por selección.", r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    trace.append(make_event(arr, final_message("seleccion"), r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
     return trace
 
 
 def insertion_trace(values, descending=False):
     arr = list(values)
     n = len(arr)
-    trace = [make_event(arr, "Presiona Paso siguiente para iniciar el ordenamiento por inserción.", "")]
+    trace = [make_event(arr, start_message("insercion"), "")]
 
     def base_roles(limit):
         return ["current" if index < limit else "default" for index in range(n)]
@@ -217,7 +250,7 @@ def insertion_trace(values, descending=False):
             labels = [""] * n
             mark(roles, labels, j, "current", "j")
             mark(roles, labels, current_index, "compare", "i")
-            trace.append(make_event(arr, f"Compara {previous_value} con {current_value}.", rf"i = {i},\quad j = {j},\quad a_j = {previous_value},\quad a_i = {current_value}", roles, labels))
+            trace.append(make_event(arr, compare_values_message(previous_value, current_value), rf"i = {i},\quad j = {j},\quad a_j = {previous_value},\quad a_i = {current_value}", roles, labels))
 
             if ordered(previous_value, current_value, descending):
                 break
@@ -235,14 +268,14 @@ def insertion_trace(values, descending=False):
         labels = [""] * n
         mark(roles, labels, inserted_index, "sorted", "insertado")
         trace.append(make_event(arr, f"El elemento quedó insertado; actualiza i a la posición {i + 1}.", rf"i = {i + 1},\quad insertado = {inserted_index}", roles, labels))
-    trace.append(make_event(arr, "Finaliza el ordenamiento por inserción.", r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    trace.append(make_event(arr, final_message("insercion"), r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
     return trace
 
 
 def binary_insertion_trace(values, descending=False):
     arr = list(values)
     n = len(arr)
-    trace = [make_event(arr, "Presiona Paso siguiente para iniciar la inserción binaria.", "")]
+    trace = [make_event(arr, start_message("insercion_binaria"), "")]
 
     def base_roles(limit):
         return ["current" if index < limit else "default" for index in range(n)]
@@ -331,7 +364,7 @@ def binary_insertion_trace(values, descending=False):
             mark(roles, labels, last_m, "boundary", "m")
         trace.append(make_event(arr, f"Inserta {value} en la posición {insert_at}.", rf"i = {i},\quad insertado = {insert_at}", roles, labels))
 
-    trace.append(make_event(arr, "Finaliza la inserción binaria.", r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
+    trace.append(make_event(arr, final_message("insercion_binaria"), r"\text{arreglo ordenado}", ["sorted"] * n, [""] * n, True))
     return trace
 
 
@@ -456,7 +489,7 @@ def shell_trace(values, descending=False, gap_sequence="shell"):
     trace = [
         make_event(
             arr,
-            "Presiona Paso siguiente para iniciar el ordenamiento Shell.",
+            start_message("shell"),
             "",
             gap_sequence=gap_sequence,
             gap_values=list(gaps),
@@ -546,7 +579,7 @@ def shell_trace(values, descending=False, gap_sequence="shell"):
     trace.append(
         make_event(
             arr,
-            "Finaliza el ordenamiento Shell.",
+            final_message("shell"),
             r"\text{arreglo ordenado}",
             ["sorted"] * n,
             [""] * n,
@@ -616,7 +649,7 @@ def merge_trace(values, descending=False):
     trace = [
         make_event(
             flat_values,
-            "Presiona Paso siguiente para iniciar el ordenamiento por mezcla.",
+            start_message("mezcla"),
             "",
             flat_roles,
             [""] * n,
@@ -752,7 +785,7 @@ def merge_trace(values, descending=False):
     root["roles"] = ["sorted"] * len(root["values"])
     root["sorted"] = True
     flat_roles = ["sorted"] * n
-    append_event("Finaliza el ordenamiento por mezcla.", r"\text{arreglo ordenado}", focus=root, complete=True)
+    append_event(final_message("mezcla"), r"\text{arreglo ordenado}", focus=root, complete=True)
     return trace
 
 
@@ -900,14 +933,11 @@ def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
         labels = [[] for _ in item["values"]]
         if item is not current:
             return labels
-        if item["values"]:
-            append_label(labels, 0, "inicio")
-            append_label(labels, len(item["values"]) - 1, "fin")
         append_label(labels, partition_index, "i")
         append_label(labels, scan_index, "j")
         pivot_local = pivot_index if pivot_index is not None else selected_pivot_index
-        append_label(labels, pivot_local, "pivote")
-        ordered_labels = ["inicio", "i", "j", "pivote", "fin"]
+        append_label(labels, pivot_local, "p")
+        ordered_labels = ["p", "i", "j"]
         return [[label for label in ordered_labels if label in group] for group in labels]
 
     def flat_roles_and_labels():
@@ -917,21 +947,19 @@ def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
             roles = ["excluded"] * n
             for index in range(current["start"], current["end"] + 1):
                 roles[index] = "default"
-            append_label(label_groups, current["start"], "inicio")
-            append_label(label_groups, current["end"], "fin")
             if partition_index is not None:
                 append_label(label_groups, current["start"] + partition_index, "i")
             if scan_index is not None and scan_index < len(current["values"]):
                 append_label(label_groups, current["start"] + scan_index, "j")
             pivot_local = pivot_index if pivot_index is not None else selected_pivot_index
             if pivot_local is not None:
-                append_label(label_groups, current["start"] + pivot_local, "pivote")
+                append_label(label_groups, current["start"] + pivot_local, "p")
             for local_index, role in enumerate(current["roles"]):
                 roles[current["start"] + local_index] = role
         for index, is_sorted in enumerate(sorted_mask):
             if is_sorted:
                 roles[index] = "sorted"
-        ordered_labels = ["inicio", "i", "j", "pivote", "fin"]
+        ordered_labels = ["p", "i", "j"]
         labels = ["\n".join(label for label in ordered_labels if label in group) for group in label_groups]
         return roles, labels
 
@@ -944,6 +972,7 @@ def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
             if id(item) not in active and not complete:
                 roles = ["excluded"] * len(item["values"])
                 labels = [[] for _ in item["values"]]
+            roles = gray_unsorted_roles_when_complete(roles, complete)
             nodes.append(
                 {
                     "start": item["start"],
@@ -973,7 +1002,7 @@ def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
         )
 
     trace = []
-    append_event("Presiona Paso siguiente para iniciar el ordenamiento rápido.", "")
+    append_event(start_message("rapido"), "")
 
     phase = "select_node"
     append_event("Comienza el ordenamiento.", r"fase = \text{inicio}")
@@ -988,7 +1017,7 @@ def _lomuto_quick_trace(values, descending=False, pivot_strategy="end"):
                 scan_index = None
                 sorted_mask = [True] * n
                 mark_sorted(root)
-                append_event("Finaliza el ordenamiento rápido.", r"\text{arreglo ordenado}", complete=True)
+                append_event(final_message("rapido"), r"\text{arreglo ordenado}", complete=True)
                 break
             current = pending_nodes.pop()
             selected_pivot_index = None
@@ -1148,7 +1177,15 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
         for item in visible_nodes:
             item["values"] = list(arr[item["start"]:item["end"] + 1])
 
-    def snapshot(focus=None, complete=False):
+    def label_groups_for_node(item, global_labels):
+        if global_labels is None:
+            return [[] for _ in item["values"]]
+        groups = []
+        for label in global_labels[item["start"]:item["end"] + 1]:
+            groups.append([part.strip() for part in label.replace(",", "\n").splitlines() if part.strip()])
+        return groups
+
+    def snapshot(focus=None, complete=False, global_labels=None):
         refresh_nodes()
         active = active_tree_ids(root, focus=focus, visible_nodes=visible_nodes, complete=complete)
         nodes = []
@@ -1156,31 +1193,37 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
             roles = list(item["roles"])
             if id(item) not in active and not complete:
                 roles = ["excluded"] * len(item["values"])
+            roles = gray_unsorted_roles_when_complete(roles, complete)
             nodes.append({
                 "start": item["start"],
                 "end": item["end"],
                 "depth": item["depth"],
                 "values": list(item["values"]),
                 "roles": roles,
-                "labels": [[] for _ in item["values"]],
+                "labels": label_groups_for_node(item, global_labels),
                 "active": id(item) in active,
             })
         return nodes
 
     def append_event(message, formula, focus=None, roles=None, labels=None, complete=False):
         refresh_nodes()
+        event_roles = list(roles or ["sorted" if value else "default" for value in sorted_mask])
+        for index, is_sorted in enumerate(sorted_mask):
+            if is_sorted:
+                event_roles[index] = "sorted"
+        event_labels = labels or [""] * n
         trace.append(make_event(
             arr,
             message,
             formula,
-            roles or ["sorted" if value else "default" for value in sorted_mask],
-            labels or [""] * n,
+            event_roles,
+            event_labels,
             complete,
-            quick_tree_nodes=snapshot(focus=focus, complete=complete),
+            quick_tree_nodes=snapshot(focus=focus, complete=complete, global_labels=event_labels),
             quick_tree_max_depth=max(1, n - 1),
         ))
 
-    append_event("Presiona Paso siguiente para iniciar el ordenamiento rápido.", "", root)
+    append_event(start_message("rapido"), "", root)
     append_event("Comienza el ordenamiento con el esquema de Hoare.", r"\text{esquema} = \text{Hoare}", root)
     pending = [root]
 
@@ -1196,7 +1239,7 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
             roles[j] = "compare"
             labels[j] = "j"
         roles[pivot_global] = pivot_role
-        labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "pivote")))
+        labels[pivot_global] = "\n".join(filter(None, (labels[pivot_global], "p")))
         return roles, labels
 
     def build_cross_roles(low, high, pivot_global, i, j):
@@ -1237,7 +1280,7 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
         labels[high] = "b"
         if pivot_global in (low, high):
             edge_label = "a" if pivot_global == low else "b"
-            labels[pivot_global] = f"{edge_label}\npivote"
+            labels[pivot_global] = f"{edge_label}\np"
         current["roles"] = list(roles[low:high + 1])
         append_event(
             f"Selecciona el pivote {pivot_value} tomado de {pivot_label}.",
@@ -1315,7 +1358,7 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
             roles[j] = "compare"
             current["roles"] = list(roles[low:high + 1])
             append_event(
-                f"Intercambia los elementos en las posiciones {i} y {j}.",
+                swap_positions_message(i, j),
                 rf"i = {i},\quad j = {j},\quad a_i \leftrightarrow a_j",
                 current,
                 roles,
@@ -1338,7 +1381,7 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
 
     sorted_mask = [True] * n
     root["roles"] = ["sorted"] * n
-    append_event("Finaliza el ordenamiento rápido con el esquema de Hoare.", r"\text{arreglo ordenado}", root, complete=True)
+    append_event(final_message("rapido_hoare"), r"\text{arreglo ordenado}", root, complete=True)
     return trace
 
 
@@ -1371,7 +1414,7 @@ def radix_trace(values, descending=False):
 
     trace = [
         bucket_event(
-            "Presiona Paso siguiente para iniciar el ordenamiento radix.",
+            start_message("radix"),
             "",
             buckets=[[] for _ in range(10)],
             phase="initial",
@@ -1380,7 +1423,7 @@ def radix_trace(values, descending=False):
     if n == 0:
         trace.append(
             bucket_event(
-                "Finaliza el ordenamiento radix.",
+                final_message("radix"),
                 r"\text{arreglo ordenado}",
                 complete=True,
                 buckets=[[] for _ in range(10)],
@@ -1406,7 +1449,7 @@ def radix_trace(values, descending=False):
             mark(roles, labels, index, "compare", "d")
             trace.append(
                 bucket_event(
-                    f"Lee el dígito {digit} de {value} y lo ubica en el bucket {digit}.",
+                    radix_bucket_message(digit, value),
                     rf"d = \left\lfloor {value}/{digit_name} \right\rfloor \bmod 10 = {digit}",
                     roles,
                     labels,
@@ -1454,7 +1497,7 @@ def radix_trace(values, descending=False):
 
     trace.append(
         bucket_event(
-            "Finaliza el ordenamiento radix.",
+            final_message("radix"),
             r"\text{arreglo ordenado}",
             ["sorted"] * n,
             [""] * n,

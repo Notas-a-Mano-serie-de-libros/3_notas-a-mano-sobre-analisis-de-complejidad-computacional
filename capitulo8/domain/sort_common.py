@@ -17,7 +17,28 @@ except ImportError:
 
 
 from sort_algorithms import TRACE_BUILDERS, shell_initial_formula
-from sort_config import DEFAULT_BAR_SIZE, DEFAULT_SIZE, FONT_FAMILY, FORMULA_OUTPUT_HEIGHT, GAP_SEQUENCE_OPTIONS, MAX_SIZE, ORDER_OPTIONS, PARTITION_OPTIONS, PIVOT_OPTIONS, ROLE_STYLES, TREE_VIEW_OPTIONS, VIEW_OPTIONS
+from sort_config import (
+    DEFAULT_BAR_SIZE,
+    DEFAULT_SIZE,
+    FONT_FAMILY,
+    FORMULA_OUTPUT_HEIGHT,
+    GAP_SEQUENCE_OPTIONS,
+    MAX_SIZE,
+    ORDER_OPTIONS,
+    PARTITION_OPTIONS,
+    PIVOT_OPTIONS,
+    ROLE_ACTIVE,
+    ROLE_CURRENT,
+    ROLE_DEFAULT,
+    ROLE_EXCLUDED,
+    ROLE_PIVOT,
+    ROLE_SORTED,
+    ROLE_STYLES,
+    ROLE_WRITE,
+    TREE_VIEW_OPTIONS,
+    VIEW_OPTIONS,
+)
+from sort_messages import start_message
 from sort_tree import flatten_tree, merge_active_ranges, quick_tree, range_key, split_tree, tree_depth, tree_max_depth_for_state
 
 
@@ -26,15 +47,17 @@ TREE_EVENT_KEYS = {"merge_tree_nodes", "quick_tree_nodes"}
 NESTED_LIST_EVENT_KEYS = {"radix_buckets"}
 _SIMULATION_HEIGHT_CACHE = {}
 _SORT_STYLES = None
+MERGE_TREE_ROW_HEIGHT = 104
+QUICK_TREE_ROW_HEIGHT = 126
 INITIAL_MESSAGES = {
-    "burbuja": ("Presiona Paso siguiente para iniciar el ordenamiento burbuja.", ""),
-    "seleccion": ("Presiona Paso siguiente para iniciar el ordenamiento por selección.", ""),
-    "insercion": ("Presiona Paso siguiente para iniciar el ordenamiento por inserción.", ""),
-    "insercion_binaria": ("Presiona Paso siguiente para iniciar la inserción binaria.", ""),
-    "shell": ("Presiona Paso siguiente para iniciar el ordenamiento Shell.", ""),
-    "mezcla": ("Presiona Paso siguiente para iniciar el ordenamiento por mezcla.", ""),
-    "rapido": ("Presiona Paso siguiente para iniciar el ordenamiento rápido.", ""),
-    "radix": ("Presiona Paso siguiente para iniciar el ordenamiento radix.", ""),
+    "burbuja": (start_message("burbuja"), ""),
+    "seleccion": (start_message("seleccion"), ""),
+    "insercion": (start_message("insercion"), ""),
+    "insercion_binaria": (start_message("insercion_binaria"), ""),
+    "shell": (start_message("shell"), ""),
+    "mezcla": (start_message("mezcla"), ""),
+    "rapido": (start_message("rapido"), ""),
+    "radix": (start_message("radix"), ""),
 }
 
 
@@ -119,7 +142,7 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
             "end": len(values) - 1,
             "depth": 0,
             "values": list(values),
-            "roles": ["default"] * len(values),
+            "roles": [ROLE_DEFAULT] * len(values),
             "labels": [[] for _ in values],
             "active": True,
         }]
@@ -238,7 +261,8 @@ def simulation_min_height(state):
     if view == "barras":
         height = message_height + 360 + vertical_padding
     elif view == "arbol":
-        tree_height = (tree_max_depth_for_state(state) + 1) * 104
+        row_height = QUICK_TREE_ROW_HEIGHT if state.get("algorithm") == "rapido" else MERGE_TREE_ROW_HEIGHT
+        tree_height = (tree_max_depth_for_state(state) + 1) * row_height
         height = message_height + tree_height + vertical_padding
     else:
         rows = max(1, (len(state["arr"]) + 7) // 8)
@@ -309,8 +333,10 @@ def render_tree_block(cache, block_class, range_class, values_class, node, slot_
 
 def render_quick_aligned_block(cache, node, slot_width, total, boxes, inactive_class="", left_offset=0):
     tree_width = total * slot_width
-    range_start = node["start"] + 1
-    range_end = node["end"] + 2
+    index_cells = "".join(
+        f'<div class="quick-index-cell" style="grid-column:{index + 1};">{index}</div>'
+        for index in range(node["start"], node["end"] + 1)
+    )
     item_cells = "".join(
         f'<div class="quick-value-cell{" quick-value-cell-first" if index == 0 else ""}" style="grid-column:{node["start"] + index + 1};">{item}</div>'
         for index, item in enumerate(boxes)
@@ -320,8 +346,7 @@ def render_quick_aligned_block(cache, node, slot_width, total, boxes, inactive_c
         node["start"],
         node["end"],
         tree_width,
-        range_start,
-        range_end,
+        index_cells,
         inactive_class,
         left_offset,
         tuple(boxes),
@@ -330,7 +355,9 @@ def render_quick_aligned_block(cache, node, slot_width, total, boxes, inactive_c
         return cache[cache_key]
     html = f"""
             <div class="quick-block quick-block-aligned{inactive_class}" style="left:{left_offset}px; width:{tree_width}px; grid-template-columns:repeat({total}, {slot_width}px);">
-              <div class="quick-range quick-range-aligned" style="grid-column:{range_start} / {range_end};">[{node["start"]}, {node["end"]}]</div>
+              <div class="quick-index-row" style="grid-template-columns:repeat({total}, {slot_width}px);">
+                {index_cells}
+              </div>
               <div class="quick-values quick-values-aligned" style="grid-template-columns:repeat({total}, {slot_width}px);">
                 {item_cells}
               </div>
@@ -361,7 +388,7 @@ def render_merge_snapshot_tree(state):
     max_depth = state.get("merge_tree_max_depth", max(node["depth"] for node in nodes))
     total = max(1, len(state.get("initial_values", state["arr"])))
     slot_width = 68
-    row_height = 104
+    row_height = MERGE_TREE_ROW_HEIGHT
     tree_width = max(760, total * slot_width)
     left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
@@ -395,7 +422,7 @@ def render_quick_snapshot_tree(state):
     max_depth = state.get("quick_tree_max_depth", max(node["depth"] for node in nodes))
     total = max(1, len(state.get("initial_values", state["arr"])))
     slot_width = 54
-    row_height = 104
+    row_height = QUICK_TREE_ROW_HEIGHT
     tree_width = max(760, total * slot_width)
     left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
@@ -460,7 +487,7 @@ def render_tree_html(state):
     max_depth = tree_depth(root)
     total = max(1, len(values))
     slot_width = 74 if algorithm == "rapido" else 68
-    row_height = 104
+    row_height = QUICK_TREE_ROW_HEIGHT if algorithm == "rapido" else MERGE_TREE_ROW_HEIGHT
     tree_width = max(760, total * slot_width)
     left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
@@ -478,20 +505,20 @@ def render_tree_html(state):
             left_px = node["start"] * slot_width
             width_px = max(slot_width, len(node["values"]) * slot_width)
             if node_range not in active_ranges:
-                roles = ["excluded"] * len(node["values"])
+                roles = [ROLE_EXCLUDED] * len(node["values"])
             elif algorithm == "rapido" and node.get("pivot"):
-                roles = ["pivot"] * len(node["values"])
+                roles = [ROLE_PIVOT] * len(node["values"])
             elif algorithm == "mezcla" and phase == "divide" and node_range == focus:
-                roles = ["current"] * len(node["values"])
+                roles = [ROLE_CURRENT] * len(node["values"])
             elif algorithm == "mezcla" and phase == "merge" and node_range == focus:
-                roles = ["write"] * len(node["values"])
+                roles = [ROLE_WRITE] * len(node["values"])
                 if write_index is not None and node["start"] <= write_index <= node["end"]:
-                    roles = ["active"] * len(node["values"])
-                    roles[write_index - node["start"]] = "write"
+                    roles = [ROLE_ACTIVE] * len(node["values"])
+                    roles[write_index - node["start"]] = ROLE_WRITE
             elif algorithm == "mezcla" and phase == "complete":
-                roles = ["sorted"] * len(node["values"])
+                roles = [ROLE_SORTED] * len(node["values"])
             else:
-                roles = ["default"] * len(node["values"])
+                roles = [ROLE_DEFAULT] * len(node["values"])
             node_with_roles = {**node, "roles": roles}
             boxes = cached_tree_node_boxes(cache, node_with_roles)
             row_blocks += render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes, left_offset=left_offset)
@@ -725,9 +752,14 @@ def sort_styles():
         position: relative;
         margin: 0 auto;
       }}
-      .merge-row-tree, .quick-row {{
+      .merge-row-tree {{
         width: 100%;
         height: 104px;
+        position: relative;
+      }}
+      .quick-row {{
+        width: 100%;
+        height: 126px;
         position: relative;
       }}
       .merge-block, .quick-block {{
@@ -749,7 +781,19 @@ def sort_styles():
       .quick-block-aligned {{
         display: grid;
       }}
-      .quick-range-aligned {{
+      .quick-index-row {{
+        grid-column: 1 / -1;
+        display: grid;
+        gap: 0;
+        justify-content: start;
+        min-height: 24px;
+        margin-bottom: 6px;
+      }}
+      .quick-index-cell {{
+        height: 24px;
+        line-height: 24px;
+        font-size: 20px;
+        color: #555555;
         text-align: center;
       }}
       .quick-values-aligned {{

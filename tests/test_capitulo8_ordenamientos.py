@@ -39,6 +39,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         }
         cls.common = load_module_from_path("capitulo8_sort_common", DOMAIN_DIR / "sort_common.py")
         cls.config = load_module_from_path("capitulo8_sort_config", DOMAIN_DIR / "sort_config.py")
+        cls.messages = load_module_from_path("capitulo8_sort_messages", DOMAIN_DIR / "sort_messages.py")
         cls.algorithms = load_module_from_path("capitulo8_sort_algorithms", DOMAIN_DIR / "sort_algorithms.py")
         cls.launchers = load_module_from_path("capitulo8_launchers", NOTEBOOK_DIR / "launchers.py")
 
@@ -272,12 +273,31 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("def quick_tree", tree_source)
         self.assertIn('"common/animation_runtime.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
         self.assertIn('"capitulo8/domain/sort_tree.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
+        self.assertIn('"capitulo8/domain/sort_messages.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
         self.assertIn("project_root", (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
         self.assertNotIn("def bubble_trace", common_source)
         self.assertNotIn("def quick_trace", common_source)
         self.assertNotIn("def quick_tree", common_source)
         self.assertNotIn('"bubble_trace"', self.common.__all__)
         self.assertIn("copy_event", self.common.__all__)
+
+    def test_sort_messages_and_visual_roles_are_centralized(self):
+        common_source = (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8")
+        algorithms_source = (DOMAIN_DIR / "sort_algorithms.py").read_text(encoding="utf-8")
+        config_source = (DOMAIN_DIR / "sort_config.py").read_text(encoding="utf-8")
+
+        self.assertEqual(self.messages.start_message("radix"), "Presiona Paso siguiente para iniciar el ordenamiento radix.")
+        self.assertEqual(self.messages.final_message("rapido_hoare"), "Finaliza el ordenamiento rápido con el esquema de Hoare.")
+        self.assertIn("from sort_messages import start_message", common_source)
+        self.assertIn("from sort_messages import", algorithms_source)
+        self.assertIn("ROLE_DESCRIPTIONS", config_source)
+        self.assertIn("ROLE_NAMES", config_source)
+        self.assertEqual(set(self.config.ROLE_STYLES), set(self.config.ROLE_NAMES))
+        for role in self.config.ROLE_NAMES:
+            self.assertIn(role, self.config.ROLE_DESCRIPTIONS)
+
+        with self.assertRaises(ValueError):
+            self.algorithms.make_event([1], "evento", "", ["rol_inventado"], [""])
 
     def test_equations_are_rendered_above_animation(self):
         source = (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8")
@@ -336,7 +356,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("[0, 6]", merge_html)
         self.assertIn("quick-tree-shell", quick_html)
         self.assertIn("quick-row", quick_html)
-        self.assertIn("[0, 5]", quick_html)
+        self.assertIn("quick-index-row", quick_html)
+        self.assertIn('class="quick-index-cell" style="grid-column:1;">0</div>', quick_html)
+        self.assertIn('class="quick-index-cell" style="grid-column:6;">5</div>', quick_html)
 
     def test_merge_tree_view_follows_active_division_path(self):
         module = self.modules["mezcla"]
@@ -473,10 +495,85 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
 
         html = module.render_state_html(state, include_styles=False)
         self.assertIn('grid-template-columns:repeat(6, 54px)', html)
-        self.assertIn('style="grid-column:1 / 4;">[0, 2]</div>', html)
-        self.assertIn('style="grid-column:5 / 7;">[4, 5]</div>', html)
+        self.assertNotIn('quick-range quick-range-aligned', html)
+        self.assertIn('class="quick-index-cell" style="grid-column:1;">0</div>', html)
+        self.assertIn('class="quick-index-cell" style="grid-column:3;">2</div>', html)
+        self.assertIn('class="quick-index-cell" style="grid-column:5;">4</div>', html)
+        self.assertIn('class="quick-index-cell" style="grid-column:6;">5</div>', html)
         self.assertIn('class="quick-value-cell quick-value-cell-first" style="grid-column:1;"', html)
         self.assertIn('class="quick-value-cell quick-value-cell-first" style="grid-column:5;"', html)
+
+    def test_quick_tree_grays_remaining_child_elements_when_complete(self):
+        module = self.modules["rapido"]
+        state = module.create_state(size=6, values=[10, 7, 8, 9, 1, 5], view="arbol")
+
+        self.run_until_complete(module, "step_quick_sort", state)
+
+        child_roles = [
+            role
+            for node in state["quick_tree_nodes"]
+            if (node["start"], node["end"]) != (0, 5)
+            for role in node["roles"]
+        ]
+        self.assertIn("excluded", child_roles)
+        self.assertNotIn("default", child_roles)
+
+    def test_quick_boxes_and_tree_show_p_i_j_below_elements(self):
+        module = self.modules["rapido"]
+        values = [10, 7, 8, 9, 1, 5, 3]
+
+        for scheme in ("hoare", "lomuto"):
+            with self.subTest(scheme=scheme):
+                state = module.create_state(
+                    size=len(values),
+                    values=values,
+                    view="arbol",
+                    partition_scheme=scheme,
+                )
+                for _ in range(80):
+                    flat_labels = set("\n".join(state["labels"]).replace(",", "\n").split())
+                    tree_labels = {
+                        label
+                        for node in state.get("quick_tree_nodes", [])
+                        for group in node.get("labels", [])
+                        for label in group
+                    }
+                    if {"p", "i", "j"}.issubset(flat_labels) and {"p", "i", "j"}.issubset(tree_labels):
+                        break
+                    module.step_quick_sort(state)
+
+                flat_labels = set("\n".join(state["labels"]).replace(",", "\n").split())
+                tree_labels = {
+                    label
+                    for node in state.get("quick_tree_nodes", [])
+                    for group in node.get("labels", [])
+                    for label in group
+                }
+                self.assertTrue({"p", "i", "j"}.issubset(flat_labels))
+                self.assertTrue({"p", "i", "j"}.issubset(tree_labels))
+                self.assertNotIn("pivote", flat_labels)
+                self.assertNotIn("pivote", tree_labels)
+
+    def test_quick_bars_keep_partitioned_pivots_green(self):
+        module = self.modules["rapido"]
+        values = [10, 7, 8, 9, 1, 5, 3]
+
+        for scheme in ("hoare", "lomuto"):
+            with self.subTest(scheme=scheme):
+                state = module.create_state(
+                    size=len(values),
+                    values=values,
+                    view="barras",
+                    partition_scheme=scheme,
+                )
+                sorted_indexes = set()
+                for _ in range(120):
+                    sorted_indexes.update(index for index, role in enumerate(state["roles"]) if role == "sorted")
+                    for index in sorted_indexes:
+                        self.assertEqual(state["roles"][index], "sorted")
+                    if state["sorting_complete"]:
+                        break
+                    module.step_quick_sort(state)
 
     def test_quick_supports_hoare_and_lomuto_partition_schemes(self):
         values = [10, 7, 8, 9, 1, 5, 8]
