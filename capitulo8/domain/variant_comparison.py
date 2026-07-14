@@ -109,23 +109,27 @@ def render_html(state):
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
       .variant-app {{ width:100%;background:#000;color:#f7f7f7;padding:8px;box-sizing:border-box;font-family:'{FONT_FAMILY}',serif; }}
-      .variant-header,.variant-row {{ display:grid;grid-template-columns:140px 68px minmax(0,1fr);gap:8px;align-items:center; }}
+      .variant-header,.variant-row {{ display:grid;grid-template-columns:minmax(90px,132px) 58px minmax(0,1fr);gap:8px;align-items:center; }}
       .variant-header {{ font-weight:700;font-size:22px;text-align:center; }}
-      .variant-name {{ font-weight:700;font-size:21px;text-align:center; }}
-      .variant-steps {{ font-size:20px;text-align:center; }}
-      .variant-array {{ min-width:0;overflow-x:hidden; }}
+      .variant-name {{ font-weight:700;font-size:21px;text-align:center;line-height:1.2; }}
+      .variant-steps {{ font-size:19px;text-align:center; }}
+      .variant-array {{ min-width:0;overflow-x:hidden;padding:6px 0 3px; }}
       .variant-bars-result {{ display:flex;align-items:flex-start;justify-content:center;gap:4px;width:100%; }}
-      .variant-bars {{ min-height:220px;display:flex;align-items:flex-end;justify-content:center;gap:clamp(1px,.35vw,3px);width:min(calc(100% - 36px), calc(var(--variant-count) * 37px)); }}
+      .variant-bars {{ min-height:210px;display:flex;align-items:flex-end;justify-content:center;gap:clamp(1px,.35vw,3px);width:min(calc(100% - 36px), calc(var(--variant-count) * 37px)); }}
       .variant-bar-wrap {{ flex:1 1 0;min-width:8px;max-width:34px;text-align:center; }}
       .variant-bar-value {{ height:18px;line-height:16px;font-size:14px;margin-bottom:2px;overflow:hidden;color:#f7f7f7;text-shadow:0 1px 2px rgba(0,0,0,.92); }}
-      .variant-bar {{ width:100%;border:0;border-radius:0; }}
+      .variant-bar {{ width:100%;border:0;border-radius:0;outline:1px solid rgba(255,255,255,.2);outline-offset:-1px; }}
       .variant-indexes {{ display:flex;justify-content:center;gap:clamp(1px,.35vw,3px);padding-top:4px; }}
       .variant-indexes span {{ flex:1 1 0;min-width:8px;max-width:34px;text-align:center;font-size:14px;color:#f7f7f7;text-shadow:0 1px 2px rgba(0,0,0,.92); }}
-      .variant-result {{ width:32px;min-width:32px;height:48px;display:flex;align-items:center;justify-content:center;margin-top:82px; }}
+      .variant-result {{ width:32px;min-width:32px;height:48px;display:flex;align-items:center;justify-content:center;margin-top:81px; }}
       .variant-result-symbol {{ display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;font-size:30px;line-height:1;font-weight:700;color:#7bdc80;text-shadow:0 1px 2px rgba(0,0,0,.95); }}
       @media(max-width:760px) {{
         .variant-header {{ display:none; }}
         .variant-row {{ grid-template-columns:1fr;gap:6px; }}
+        .variant-name {{ text-align:left; }}
+        .variant-bars {{ width:min(calc(100% - 34px), calc(var(--variant-count) * 28px)); }}
+        .variant-bar-value,
+        .variant-indexes span {{ font-size:12px; }}
       }}
     </style>
     <div class="variant-app">

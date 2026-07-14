@@ -754,7 +754,7 @@ def sort_styles():
         color: #111111;
         background: #ffffff;
         box-sizing: border-box;
-        padding: 8px;
+        padding: 8px 8px 10px;
       }}
       .sort-app-bars {{
         color: #f7f7f7;
@@ -767,7 +767,7 @@ def sort_styles():
         text-align: center;
         min-height: 54px;
         line-height: 27px;
-        margin: 6px 0 10px;
+        margin: 6px 0 8px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -791,13 +791,11 @@ def sort_styles():
         justify-content: center;
         gap: 10px 14px;
         min-height: 22px;
-        margin: 0 0 6px;
+        margin: 2px auto 8px;
         font-size: 15px;
         line-height: 18px;
         color: #333333;
         box-sizing: border-box;
-        margin-left: auto;
-        margin-right: auto;
       }}
       .sort-app-bars .sort-legend {{
         color: #f2f2f2;
@@ -820,11 +818,11 @@ def sort_styles():
       }}
       .radix-buckets-panel {{
         width: min(100%, {SORT_VISUAL_WIDTH}px);
-        margin: 10px auto 0;
+        margin: 8px auto 0;
         border: 2px solid currentColor;
         border-left-width: 6px;
         box-sizing: border-box;
-        font-size: 15px;
+        font-size: 16px;
         line-height: 18px;
         transition: border-color 120ms ease;
       }}
@@ -850,7 +848,7 @@ def sort_styles():
       }}
       .radix-bucket-header > div,
       .radix-bucket-row > div {{
-        padding: 4px 8px;
+        padding: 4px 9px;
         box-sizing: border-box;
       }}
       .radix-bucket-key {{
@@ -872,6 +870,13 @@ def sort_styles():
         white-space: nowrap;
         overflow-x: auto;
         overflow-y: hidden;
+        scrollbar-width: thin;
+      }}
+      .radix-bucket-chain::-webkit-scrollbar {{
+        height: 4px;
+      }}
+      .radix-bucket-chain::-webkit-scrollbar-thumb {{
+        background: rgba(17, 17, 17, 0.32);
       }}
       .radix-bucket-active-value {{
         display: inline-block;
@@ -896,13 +901,13 @@ def sort_styles():
         align-items: flex-end;
         justify-content: center;
         gap: 0;
-        min-height: 260px;
-        padding: 8px 0;
+        min-height: 246px;
+        padding: 6px 0;
         overflow-x: auto;
       }}
       .sort-items.boxes {{
         align-items: flex-start;
-        min-height: 150px;
+        min-height: 142px;
         width: fit-content;
         max-width: min(100%, {SORT_VISUAL_WIDTH}px);
         margin: 0 auto;
@@ -985,13 +990,15 @@ def sort_styles():
         box-sizing: border-box;
         border: none;
         border-radius: 0;
+        outline: 1px solid rgba(255, 255, 255, 0.2);
+        outline-offset: -1px;
         transition: background-color 120ms ease, height 120ms ease;
       }}
       .bar-index {{
         color: #f7f7f7;
-        font-size: 15px;
-        line-height: 18px;
-        height: 20px;
+        font-size: 18px;
+        line-height: 20px;
+        height: 22px;
         margin-top: 6px;
         margin-bottom: 0;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);
@@ -1007,7 +1014,7 @@ def sort_styles():
       .merge-tree-shell, .quick-tree-shell {{
         width: 100%;
         overflow-x: auto;
-        padding: 12px 0 6px;
+        padding: 16px 0 4px;
       }}
       .merge-tree, .quick-tree {{
         position: relative;
@@ -1024,7 +1031,7 @@ def sort_styles():
       }}
       .tree-connectors path {{
         fill: none;
-        stroke: #c7cdd1;
+        stroke: #b6bec4;
         stroke-width: 2;
         stroke-linecap: square;
         stroke-linejoin: round;
@@ -1055,9 +1062,9 @@ def sort_styles():
         color: #666666;
       }}
       .merge-range, .quick-range {{
-        font-size: 14px;
+        font-size: 16px;
         color: #444444;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
       }}
       .merge-index-row {{
         display: grid;
@@ -1137,15 +1144,15 @@ def sort_styles():
         border-left-width: 2px;
       }}
       .tree-label {{
-        margin-top: 8px;
-        min-height: 46px;
+        margin-top: 9px;
+        min-height: 42px;
         font-size: 20px;
         line-height: 22px;
         color: #222222;
       }}
       .item-label {{
         margin-top: 10px;
-        min-height: 44px;
+        min-height: 40px;
         font-size: 20px;
         line-height: 22px;
         color: #222222;
@@ -1197,6 +1204,33 @@ def sort_styles():
       .sort-app-bars .sort-result-symbol {{
         color: #7bdc80;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+      }}
+      @media (max-width: 760px) {{
+        .sort-message {{
+          font-size: 22px;
+          line-height: 25px;
+        }}
+        .sort-legend {{
+          justify-content: flex-start;
+          gap: 8px 10px;
+        }}
+        .radix-buckets-panel {{
+          font-size: 15px;
+        }}
+        .radix-bucket-header,
+        .radix-bucket-row {{
+          grid-template-columns: 62px minmax(0, 1fr);
+        }}
+        .sort-result {{
+          width: 34px;
+          min-width: 34px;
+        }}
+        .sort-array-line .sort-items,
+        .sort-array-line .bar-panel,
+        .sort-array-line .merge-tree-shell,
+        .sort-array-line .quick-tree-shell {{
+          max-width: calc(100% - 38px);
+        }}
       }}
       .math-label, .math-inline {{
         font-family: '{FONT_FAMILY}', serif;

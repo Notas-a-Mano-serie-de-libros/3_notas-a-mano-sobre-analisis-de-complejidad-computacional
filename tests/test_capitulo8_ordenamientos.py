@@ -110,7 +110,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("Inserción<br>binaria", html)
         self.assertIn("insertion-comparison-bars-result", html)
         self.assertIn("--insertion-comparison-count:6;", html)
-        self.assertIn("margin-top: 82px;", html)
+        self.assertIn("margin-top: 81px;", html)
         self.assertIn("color: #7bdc80;", html)
         while not module.all_variants_complete(comparison_state):
             module.step_all_variants(comparison_state)
@@ -166,7 +166,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         shell_html = module.render_gap_comparison_html(shell_comparison)
         self.assertIn("shell-comparison-bars-result", shell_html)
         self.assertIn("--shell-comparison-count:8;", shell_html)
-        self.assertIn("margin-top: 82px;", shell_html)
+        self.assertIn("margin-top: 81px;", shell_html)
         self.assertIn("color: #7bdc80;", shell_html)
         while not module.all_sequences_complete(shell_comparison):
             module.step_all_sequences(shell_comparison)
@@ -1149,7 +1149,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("overflow-x: hidden;", html)
         self.assertIn("comparison-bars-result", html)
         self.assertIn("--comparison-count:6;", html)
-        self.assertIn("margin-top: 82px;", html)
+        self.assertIn("margin-top: 81px;", html)
         self.assertIn("comparison-result-symbol", html)
         self.assertIn("color: #7bdc80;", html)
         self.assertIn("gap: 0;", source)

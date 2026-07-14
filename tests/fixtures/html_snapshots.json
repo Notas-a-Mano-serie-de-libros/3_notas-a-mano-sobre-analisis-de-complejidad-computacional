@@ -28,35 +28,35 @@
     "sha256": "79f8bd299eed3186671e26bd44c7d3ff8a41b317a57fc2014c4c4ace4e7d3e77"
   },
   "capitulo8.burbuja.barras.initial": {
-    "bytes": 16268,
-    "sha256": "ea7ee29bfa6bd4969e1c8ef44431157b4dc7b1ed770c1ac906bb70a63c68541c"
+    "bytes": 17236,
+    "sha256": "aa702a5479e004f08118d41b7ad48118cfd641b57b76bdf9fbbf704f4fe07b18"
   },
   "capitulo8.comparacion.initial": {
-    "bytes": 26337,
-    "sha256": "a03e0b2be06df8071c8cbfc3903b7cd879ec5113a44bc71f4b3c60a6e934d01b"
+    "bytes": 26697,
+    "sha256": "3eec7d229f899b6c383b56e99d9dccb936391bc58500fecf36cbfcf3a91c0bd8"
   },
   "capitulo8.insercion.barras.initial": {
-    "bytes": 16140,
-    "sha256": "aa2e499f6396e566585c1632c06320522a155be8d0a7cc557d07c6d0bbd718ca"
+    "bytes": 17108,
+    "sha256": "5ae55ed5a062543703fc760e5745666f1f66c01e81192c93eebfdd5351402c43"
   },
   "capitulo8.mezcla.arbol.initial": {
-    "bytes": 14698,
-    "sha256": "527ed8017f4e5d9aaec6dac7fe224093489595332b2cc86fe53288390e915c9d"
+    "bytes": 15666,
+    "sha256": "c84651ab49255b8afc5f3dfa2573eb40ce859ae86844294329657a2ca82c6906"
   },
   "capitulo8.radix.barras.initial": {
-    "bytes": 18419,
-    "sha256": "430a43cded876ba34dc7890c2328437c82940b5ff7be9dace6be39ad15628317"
+    "bytes": 19387,
+    "sha256": "12a6872fca1818df48de44006f95f7e02395f39d9e89b5e6dbf53b625f6a72af"
   },
   "capitulo8.rapido.arbol.initial": {
-    "bytes": 16567,
-    "sha256": "34a5f11ef0ee9bd22cfb8e4f7105c9633d631dcad57846e39483d4f9832e939e"
+    "bytes": 17535,
+    "sha256": "1aaf963064fd169d5c1b37d00affed467f1bed38df4ca113410bb8492f67fdf3"
   },
   "capitulo8.seleccion.barras.initial": {
-    "bytes": 16275,
-    "sha256": "e96f5b40833ac8c37495dd6fb9276acf9eda786757f041079f9068e70f751574"
+    "bytes": 17243,
+    "sha256": "d21c24e3898cee8be3e6aeea22d51f22b546095c2f1b35036688576cc9e4c09a"
   },
   "capitulo8.shell.barras.initial": {
-    "bytes": 16131,
-    "sha256": "6909f661df9b06ee5cff175860e4ecc3c80aedf15171e8437aaf2a87c6c3f81e"
+    "bytes": 17099,
+    "sha256": "06bb0a35b2cafe13ceb61b174d98a9d055d6fd1ff1b90915556473c442a3a01b"
   }
 }

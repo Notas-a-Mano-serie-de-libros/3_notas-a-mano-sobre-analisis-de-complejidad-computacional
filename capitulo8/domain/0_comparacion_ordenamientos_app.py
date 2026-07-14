@@ -237,7 +237,7 @@ def render_comparison_styles():
       .comparison-header,
       .comparison-row {{
         display: grid;
-        grid-template-columns: minmax(96px, 128px) 62px minmax(0, 1fr);
+        grid-template-columns: minmax(90px, 132px) 58px minmax(0, 1fr);
         gap: 8px;
         width: 100%;
         background: #000000;
@@ -253,14 +253,14 @@ def render_comparison_styles():
       }}
       .comparison-head-cell,
       .comparison-name {{
-        font-size: 22px;
+        font-size: 21px;
         line-height: 1.2;
         color: #f7f7f7;
         text-align: center;
         font-weight: 700;
       }}
       .comparison-steps {{
-        font-size: 20px;
+        font-size: 19px;
         color: #f7f7f7;
         text-align: center;
         white-space: nowrap;
@@ -269,7 +269,7 @@ def render_comparison_styles():
         min-width: 0;
         overflow-x: hidden;
         background: #000000;
-        padding: 8px 0 4px;
+        padding: 6px 0 3px;
       }}
       .comparison-bars-result {{
         display: flex;
@@ -283,7 +283,7 @@ def render_comparison_styles():
         align-items: flex-end;
         justify-content: center;
         gap: clamp(1px, 0.35vw, 3px);
-        min-height: 220px;
+        min-height: 210px;
         width: min(calc(100% - 36px), calc(var(--comparison-count) * 37px));
       }}
       .comparison-bar-wrap {{
@@ -319,6 +319,8 @@ def render_comparison_styles():
         width: 100%;
         border: none;
         border-radius: 0;
+        outline: 1px solid rgba(255, 255, 255, 0.2);
+        outline-offset: -1px;
       }}
       .comparison-index-row {{
         display: flex;
@@ -348,7 +350,7 @@ def render_comparison_styles():
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top: 82px;
+        margin-top: 81px;
       }}
       .comparison-result-symbol {{
         display: inline-flex;
@@ -370,8 +372,18 @@ def render_comparison_styles():
           grid-template-columns: 1fr;
           gap: 6px;
         }}
+        .comparison-name {{
+          text-align: left;
+        }}
         .comparison-steps {{
           font-size: 18px;
+        }}
+        .comparison-bars {{
+          width: min(calc(100% - 34px), calc(var(--comparison-count) * 28px));
+        }}
+        .comparison-bar-value,
+        .comparison-index {{
+          font-size: 12px;
         }}
       }}
       @media (min-width: 761px) {{
