@@ -326,12 +326,15 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         source = (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8")
 
         self.assertIn("formula_output", source)
-        self.assertIn("from common.animation_runtime import OutputCache, pause, set_disabled", source)
+        self.assertIn("from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled", source)
         self.assertIn("render_cache = OutputCache()", source)
         self.assertIn('formula = displaystyle_formula(state["formula"])', source)
         self.assertIn("formula_output = widgets.HTML", source)
         self.assertNotIn("widgets.HTMLMath", source)
         self.assertIn("render_cache.update_outputs(", source)
+        self.assertIn("def calculate_sort_formula_reserved_height(state):", source)
+        self.assertIn('next_state["formula_reserved_height"] = calculate_sort_formula_reserved_height(next_state)', source)
+        self.assertIn('state.get("formula_reserved_height")', source)
         self.assertIn("def build_sort_trace():", source)
         self.assertIn("yield copy_sort_state(probe)", source)
         self.assertIn("for snapshot in build_sort_trace():", source)
@@ -373,12 +376,12 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("bar-nodes", bar_html)
         self.assertIn('class="sort-array-line sort-array-line-cajas"', box_html)
         self.assertIn('class="sort-array-line sort-array-line-barras"', bar_html)
-        self.assertIn('class="sort-result" style="margin-top:30px;" aria-live="polite"', box_html)
+        self.assertIn('class="sort-result" style="margin-top:29px;" aria-live="polite"', box_html)
         self.assertIn('class="sort-result" style="margin-top:134px;" aria-live="polite"', bar_html)
         self.assertIn("min-height:", bar_html)
         self.assertIn("width: fit-content;", box_html)
         self.assertIn("width: fit-content;", bar_html)
-        self.assertIn("gap: 4px;", bar_html)
+        self.assertIn("gap: 2px;", bar_html)
         self.assertIn("contain: layout paint;", bar_html)
         self.assertIn("prefers-reduced-motion: reduce", bar_html)
         self.assertIn(".sort-array-line-cajas .sort-items.boxes", bar_html)
@@ -418,7 +421,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.modules["mezcla"].step_merge_sort(merge)
         merge_html = self.modules["mezcla"].render_state_html(merge)
         self.assertIn('<svg class="tree-connectors"', merge_html)
-        self.assertIn(" V126.0", merge_html)
+        self.assertIn(" V116.0", merge_html)
 
     def test_merge_tree_view_follows_active_division_path(self):
         module = self.modules["mezcla"]
@@ -488,7 +491,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         for _ in range(12):
             module.step_merge_sort(state)
             self.assertEqual(self.common.simulation_min_height(state), initial_height)
-            self.assertIn(f"min-height:{initial_height}px", module.render_state_html(state))
+            html = module.render_state_html(state)
+            self.assertIn(f"min-height:{initial_height}px", html)
+            self.assertIn(f"height:{initial_height}px", html)
 
     def test_simulation_height_is_cached_by_view_algorithm_and_size(self):
         module = self.modules["mezcla"]
@@ -534,7 +539,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             module.step_quick_sort(state)
             self.assertIn("quick_tree_nodes", state)
             self.assertEqual(self.common.simulation_min_height(state), initial_height)
-            self.assertIn(f"min-height:{initial_height}px", module.render_state_html(state))
+            html = module.render_state_html(state)
+            self.assertIn(f"min-height:{initial_height}px", html)
+            self.assertIn(f"height:{initial_height}px", html)
 
         self.assertTrue(any(role == "pivot" for role in state["roles"]))
         self.assertIn("quick-tree-shell", module.render_state_html(state))

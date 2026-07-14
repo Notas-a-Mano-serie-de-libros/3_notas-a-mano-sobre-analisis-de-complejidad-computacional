@@ -8,7 +8,7 @@ from html import escape
 from IPython.display import display
 import ipywidgets as widgets
 
-from common.animation_runtime import OutputCache, pause, set_disabled
+from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
 from common.widget_controls import bounded_int_control, button_control, dropdown_control
 
 try:
@@ -53,15 +53,15 @@ NESTED_LIST_EVENT_KEYS = {"radix_buckets"}
 _SIMULATION_HEIGHT_CACHE = {}
 _SORT_STYLES = None
 SORT_VISUAL_WIDTH = 760
-SORT_RESULT_WIDTH = 44
+SORT_RESULT_WIDTH = 36
 SORT_RESULT_HEIGHT = 54
-SORT_BOX_RESULT_OFFSET = 30
-SORT_TREE_RESULT_OFFSET = 30
+SORT_BOX_RESULT_OFFSET = 29
+SORT_TREE_RESULT_OFFSET = 28
 SORT_BAR_AREA_HEIGHT = 295
 SORT_BAR_MIN_HEIGHT = 18
 SORT_BAR_HEIGHT_RANGE = 250
-MERGE_TREE_ROW_HEIGHT = 144
-QUICK_TREE_ROW_HEIGHT = 144
+MERGE_TREE_ROW_HEIGHT = 156
+QUICK_TREE_ROW_HEIGHT = 156
 SORT_LEGEND_ITEMS = (
     (ROLE_CURRENT, "actual"),
     (ROLE_COMPARE, "comparación"),
@@ -234,6 +234,14 @@ def displaystyle_formula(formula):
     )
 
 
+def calculate_sort_formula_reserved_height(state):
+    formulas = [state.get("formula", "")]
+    trace = state.get("trace")
+    if trace is not None:
+        formulas.extend(event.get("formula", "") for event in trace)
+    return max(formula_iframe_height(displaystyle_formula(formula)) for formula in formulas)
+
+
 def css_token(value):
     return re.sub(r"[^a-z0-9_-]+", "-", str(value or "").lower()).strip("-") or "none"
 
@@ -361,13 +369,14 @@ def simulation_min_height(state):
     cache_key = (view, state.get("algorithm"), size)
     if cache_key in _SIMULATION_HEIGHT_CACHE:
         return _SIMULATION_HEIGHT_CACHE[cache_key]
-    message_height = 64
+    message_height = 72
     phase_height = 28
-    legend_height = 30
+    legend_height = 34
     result_width = SORT_RESULT_WIDTH
-    vertical_padding = 28
+    vertical_padding = 34
+    radix_panel_height = 324 if state.get("algorithm") == "radix" else 0
     if view == "barras":
-        height = message_height + phase_height + legend_height + 360 + vertical_padding
+        height = message_height + phase_height + legend_height + 360 + radix_panel_height + vertical_padding
     elif view == "arbol":
         row_height = QUICK_TREE_ROW_HEIGHT if state.get("algorithm") == "rapido" else MERGE_TREE_ROW_HEIGHT
         tree_height = (tree_max_depth_for_state(state) + 1) * row_height
@@ -765,22 +774,25 @@ def sort_styles():
         font-size: 24px;
         font-weight: 400;
         text-align: center;
-        min-height: 54px;
-        line-height: 27px;
-        margin: 6px 0 8px;
+        height: 64px;
+        line-height: 28px;
+        margin: 4px 0 8px;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
+        box-sizing: border-box;
       }}
       .sort-phase-strip {{
-        min-height: 22px;
-        line-height: 20px;
-        margin: 0 auto 6px;
+        height: 24px;
+        line-height: 22px;
+        margin: 0 auto 8px;
         width: min(100%, {SORT_VISUAL_WIDTH}px);
         text-align: center;
         font-size: 15px;
         color: #555555;
         box-sizing: border-box;
+        overflow: hidden;
       }}
       .sort-app-bars .sort-phase-strip {{
         color: #e8e8e8;
@@ -790,12 +802,13 @@ def sort_styles():
         flex-wrap: wrap;
         justify-content: center;
         gap: 10px 14px;
-        min-height: 22px;
-        margin: 2px auto 8px;
+        min-height: 26px;
+        margin: 0 auto 10px;
         font-size: 15px;
         line-height: 18px;
         color: #333333;
         box-sizing: border-box;
+        align-content: center;
       }}
       .sort-app-bars .sort-legend {{
         color: #f2f2f2;
@@ -818,7 +831,7 @@ def sort_styles():
       }}
       .radix-buckets-panel {{
         width: min(100%, {SORT_VISUAL_WIDTH}px);
-        margin: 8px auto 0;
+        margin: 10px auto 0;
         border: 2px solid currentColor;
         border-left-width: 6px;
         box-sizing: border-box;
@@ -826,6 +839,8 @@ def sort_styles():
         line-height: 18px;
         transition: border-color 120ms ease;
         contain: layout paint;
+        min-height: 310px;
+        overflow: hidden;
       }}
       .radix-phase-distribution {{
         border-left-color: #b85450;
@@ -840,8 +855,8 @@ def sort_styles():
       .radix-bucket-row {{
         display: grid;
         grid-template-columns: 74px minmax(0, 1fr);
-        height: 28px;
-        min-height: 28px;
+        height: 30px;
+        min-height: 30px;
       }}
       .radix-bucket-header {{
         font-weight: 700;
@@ -849,7 +864,7 @@ def sort_styles():
       }}
       .radix-bucket-header > div,
       .radix-bucket-row > div {{
-        padding: 4px 9px;
+        padding: 5px 9px;
         box-sizing: border-box;
       }}
       .radix-bucket-key {{
@@ -872,6 +887,7 @@ def sort_styles():
         overflow-x: auto;
         overflow-y: hidden;
         scrollbar-width: thin;
+        text-align: left;
       }}
       .radix-bucket-chain::-webkit-scrollbar {{
         height: 4px;
@@ -1017,7 +1033,7 @@ def sort_styles():
       .merge-tree-shell, .quick-tree-shell {{
         width: 100%;
         overflow-x: auto;
-        padding: 16px 0 4px;
+        padding: 20px 0 8px;
         contain: layout paint;
       }}
       .merge-tree, .quick-tree {{
@@ -1035,10 +1051,11 @@ def sort_styles():
       }}
       .tree-connectors path {{
         fill: none;
-        stroke: #b6bec4;
+        stroke: #c4ccd1;
         stroke-width: 2;
         stroke-linecap: square;
         stroke-linejoin: round;
+        opacity: 0.9;
       }}
       .merge-row-tree {{
         width: 100%;
@@ -1068,7 +1085,7 @@ def sort_styles():
       .merge-range, .quick-range {{
         font-size: 16px;
         color: #444444;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
       }}
       .merge-index-row {{
         display: grid;
@@ -1076,7 +1093,7 @@ def sort_styles():
         gap: 0;
         justify-content: center;
         min-height: 24px;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
       }}
       .merge-index-cell {{
         height: 24px;
@@ -1099,7 +1116,7 @@ def sort_styles():
         gap: 0;
         justify-content: start;
         min-height: 24px;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
       }}
       .quick-index-cell {{
         height: 24px;
@@ -1148,7 +1165,7 @@ def sort_styles():
         border-left-width: 2px;
       }}
       .tree-label {{
-        margin-top: 9px;
+        margin-top: 10px;
         min-height: 42px;
         font-size: 20px;
         line-height: 22px;
@@ -1165,7 +1182,7 @@ def sort_styles():
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        gap: 4px;
+        gap: 2px;
         width: 100%;
       }}
       .sort-array-line-cajas .sort-items.boxes,
@@ -1178,11 +1195,11 @@ def sort_styles():
       }}
       .sort-array-line .sort-items,
       .sort-array-line .bar-panel {{
-        max-width: calc(100% - {SORT_RESULT_WIDTH + 4}px);
+        max-width: calc(100% - {SORT_RESULT_WIDTH + 2}px);
       }}
       .sort-array-line .merge-tree-shell,
       .sort-array-line .quick-tree-shell {{
-        max-width: calc(100% - {SORT_RESULT_WIDTH + 4}px);
+        max-width: calc(100% - {SORT_RESULT_WIDTH + 2}px);
       }}
       .sort-result {{
         width: {SORT_RESULT_WIDTH}px;
@@ -1335,7 +1352,7 @@ def render_state_html(state, include_styles=True):
     styles = sort_styles() if include_styles else ""
     return f"""
     {styles}
-    <div class="{app_class}" style="min-height:{min_height}px;">
+    <div class="{app_class}" style="min-height:{min_height}px; height:{min_height}px; overflow:hidden;">
       <div class="sort-message">{message_html(state["message"])}</div>
       <div class="sort-phase-strip">{phase}</div>
       {legend}
@@ -1485,7 +1502,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             control_state["updating"] = True
             controls["radix_max"].value = max(state_values)
             control_state["updating"] = False
-        return create_state(
+        next_state = create_state(
             algorithm=algorithm,
             size=len(state_values),
             descending=controls["order"].value,
@@ -1496,6 +1513,8 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             gap_sequence=controls["gap_sequence"].value,
             radix_max=controls["radix_max"].value,
         )
+        next_state["formula_reserved_height"] = calculate_sort_formula_reserved_height(next_state)
+        return next_state
 
     state = build_state(sync_radix_max=True)
 
@@ -1512,6 +1531,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             html_output,
             formula,
             render_state_html(state, include_styles=False),
+            state.get("formula_reserved_height"),
         )
 
     def sync_execution_buttons():
