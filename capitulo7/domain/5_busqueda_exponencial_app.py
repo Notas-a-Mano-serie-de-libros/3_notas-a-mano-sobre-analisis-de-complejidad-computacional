@@ -138,7 +138,7 @@ def build_mid_formula(state):
 
 
 def create_state(size=DEFAULT_SIZE, target=DEFAULT_TARGET, values=None):
-    base = create_search_base_state(size=size, target=target, values=values)
+    base = create_search_base_state(size=size, target=target, values=values, algorithm="exponencial")
     return {
         **base,
         "general_message": "Fase exponencial: presiona Paso siguiente para comparar el primer elemento.",

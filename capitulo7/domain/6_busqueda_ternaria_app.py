@@ -125,7 +125,7 @@ b - \frac{{b - a}}{{3}}
 """
 
 def create_state(size=DEFAULT_SIZE, target=DEFAULT_TARGET, values=None):
-    state = create_search_base_state(size=size, target=target, values=values)
+    state = create_search_base_state(size=size, target=target, values=values, algorithm="ternaria")
     state.update({
         "a": 0,
         "b": len(state["arr"]) - 1,

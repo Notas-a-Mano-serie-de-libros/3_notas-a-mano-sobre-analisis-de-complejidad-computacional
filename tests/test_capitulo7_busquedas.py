@@ -597,6 +597,13 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                 "probe": ("#f8cecc", "#b85450", "#111111"),
             },
         }
+        expected_legends = {
+            "secuencial": ("objetivo", "actual", "encontrado", "descartado"),
+            "binaria": ("objetivo", "actual", "comparación", "encontrado", "descartado", "rango"),
+            "interpolacion": ("objetivo", "comparación", "encontrado", "descartado", "rango"),
+            "saltos": ("objetivo", "actual", "encontrado", "descartado", "rango"),
+        }
+        all_legend_labels = {"objetivo", "actual", "comparación", "encontrado", "descartado", "rango"}
 
         common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
         for name, module in self.modules.items():
@@ -607,6 +614,12 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                 self.assertEqual(module.ROLE_STYLES["target"], ("#fff2cc", "#d6b656", "#111111"))
                 html = module.render_state_html(module.create_state(size=8, target=6, values=[1, 2, 3, 4, 5, 6, 7, 8]))
                 self.assertNotIn("search-status", html)
+                self.assertIn("search-legend", html)
+                legend_html = html.split('<div class="search-legend">', 1)[1].split("</div>", 1)[0]
+                for legend_label in expected_legends[name]:
+                    self.assertIn(legend_label, html)
+                for legend_label in all_legend_labels - set(expected_legends[name]):
+                    self.assertNotIn(legend_label, legend_html)
                 self.assertIn("background:#fff2cc", html)
                 self.assertNotIn("border-color:", html)
                 self.assertIn("font-size: 20px;", common_source)

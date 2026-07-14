@@ -30,12 +30,15 @@ from sort_config import (
     PARTITION_OPTIONS,
     PIVOT_OPTIONS,
     ROLE_ACTIVE,
+    ROLE_BOUNDARY,
+    ROLE_COMPARE,
     ROLE_CURRENT,
     ROLE_DEFAULT,
     ROLE_EXCLUDED,
     ROLE_PIVOT,
     ROLE_SORTED,
     ROLE_STYLES,
+    ROLE_SWAP,
     ROLE_WRITE,
     TREE_VIEW_OPTIONS,
     VIEW_OPTIONS,
@@ -51,6 +54,27 @@ _SIMULATION_HEIGHT_CACHE = {}
 _SORT_STYLES = None
 MERGE_TREE_ROW_HEIGHT = 126
 QUICK_TREE_ROW_HEIGHT = 126
+SORT_LEGEND_ITEMS = (
+    (ROLE_CURRENT, "actual"),
+    (ROLE_COMPARE, "comparación"),
+    (ROLE_SWAP, "intercambio"),
+    (ROLE_BOUNDARY, "límite"),
+    (ROLE_PIVOT, "pivote"),
+    (ROLE_WRITE, "escritura"),
+    (ROLE_SORTED, "ordenado"),
+    (ROLE_EXCLUDED, "inactivo"),
+)
+SORT_LEGEND_LABELS_BY_ROLE = dict(SORT_LEGEND_ITEMS)
+SORT_LEGEND_ROLES_BY_ALGORITHM = {
+    "burbuja": (ROLE_CURRENT, ROLE_COMPARE, ROLE_BOUNDARY, ROLE_SORTED),
+    "seleccion": (ROLE_CURRENT, ROLE_COMPARE, ROLE_BOUNDARY, ROLE_SORTED),
+    "insercion": (ROLE_CURRENT, ROLE_COMPARE, ROLE_SORTED),
+    "insercion_binaria": (ROLE_CURRENT, ROLE_COMPARE, ROLE_BOUNDARY, ROLE_SORTED),
+    "shell": (ROLE_CURRENT, ROLE_COMPARE, ROLE_SORTED),
+    "mezcla": (ROLE_CURRENT, ROLE_COMPARE, ROLE_WRITE, ROLE_SORTED, ROLE_EXCLUDED),
+    "rapido": (ROLE_CURRENT, ROLE_COMPARE, ROLE_SWAP, ROLE_PIVOT, ROLE_SORTED, ROLE_EXCLUDED),
+    "radix": (ROLE_COMPARE, ROLE_WRITE, ROLE_BOUNDARY, ROLE_SORTED),
+}
 INITIAL_MESSAGES = {
     "burbuja": (start_message("burbuja"), ""),
     "seleccion": (start_message("seleccion"), ""),
@@ -206,6 +230,52 @@ def css_token(value):
     return re.sub(r"[^a-z0-9_-]+", "-", str(value or "").lower()).strip("-") or "none"
 
 
+def render_sort_legend(state, view="cajas"):
+    items = []
+    roles = SORT_LEGEND_ROLES_BY_ALGORITHM.get(state.get("algorithm"), tuple(SORT_LEGEND_LABELS_BY_ROLE))
+    for role in roles:
+        label = SORT_LEGEND_LABELS_BY_ROLE[role]
+        fill, border, _text = ROLE_STYLES[role]
+        items.append(
+            f'<span class="sort-legend-item"><span class="sort-legend-swatch" '
+            f'style="background:{fill}; border-color:{border};"></span>{label}</span>'
+        )
+    return f'<div class="sort-legend sort-legend-{css_token(view)}">{"".join(items)}</div>'
+
+
+def node_center(node, slot_width, left_offset=0):
+    return left_offset + (node["start"] * slot_width) + (max(1, len(node["values"])) * slot_width / 2)
+
+
+def render_tree_connectors(nodes, slot_width, row_height, left_offset=0):
+    if len(nodes) <= 1:
+        return ""
+    sorted_nodes = sorted(nodes, key=lambda item: (item["depth"], item["start"], item["end"]))
+    lines = []
+    for child in sorted_nodes:
+        if child["depth"] == 0:
+            continue
+        candidates = [
+            parent
+            for parent in sorted_nodes
+            if parent["depth"] == child["depth"] - 1
+            and parent["start"] <= child["start"]
+            and parent["end"] >= child["end"]
+        ]
+        if not candidates:
+            continue
+        parent = min(candidates, key=lambda item: item["end"] - item["start"])
+        x1 = node_center(parent, slot_width, left_offset)
+        x2 = node_center(child, slot_width, left_offset)
+        y1 = parent["depth"] * row_height + 86
+        y2 = child["depth"] * row_height - 10
+        mid_y = (y1 + y2) / 2
+        lines.append(f'<path d="M{x1:.1f},{y1:.1f} V{mid_y:.1f} H{x2:.1f} V{y2:.1f}" />')
+    if not lines:
+        return ""
+    return f'<svg class="tree-connectors" aria-hidden="true">{"".join(lines)}</svg>'
+
+
 def copy_event(event):
     copied = {}
     for key, value in event.items():
@@ -284,16 +354,17 @@ def simulation_min_height(state):
     if cache_key in _SIMULATION_HEIGHT_CACHE:
         return _SIMULATION_HEIGHT_CACHE[cache_key]
     message_height = 64
+    legend_height = 30
     vertical_padding = 28
     if view == "barras":
-        height = message_height + 360 + vertical_padding
+        height = message_height + legend_height + 360 + vertical_padding
     elif view == "arbol":
         row_height = QUICK_TREE_ROW_HEIGHT if state.get("algorithm") == "rapido" else MERGE_TREE_ROW_HEIGHT
         tree_height = (tree_max_depth_for_state(state) + 1) * row_height
-        height = message_height + tree_height + vertical_padding
+        height = message_height + legend_height + tree_height + vertical_padding
     else:
         rows = max(1, (len(state["arr"]) + 7) // 8)
-        height = message_height + rows * 142 + vertical_padding
+        height = message_height + legend_height + rows * 142 + vertical_padding
     _SIMULATION_HEIGHT_CACHE[cache_key] = height
     return height
 
@@ -303,9 +374,10 @@ def tree_box(value, role="default", cache=None):
     if cache is not None and cache_key in cache:
         return cache[cache_key]
     fill, _border, text = ROLE_STYLES[role]
-    display_value = "" if value is None else escape(str(value))
+    empty_class = " tree-box-empty" if value is None else ""
+    display_value = "&nbsp;" if value is None else escape(str(value))
     html = f"""
-    <div class="tree-box" style="background:{fill}; border-color:#111111; color:{text};">
+    <div class="tree-box{empty_class}" style="background:{fill}; border-color:#111111; color:{text};">
       {display_value}
     </div>
     """
@@ -449,10 +521,12 @@ def render_merge_snapshot_tree(state):
                 show_local_indices=True,
             )
         html_rows += f'<div class="merge-row-tree">{row_blocks}</div>'
+    connectors = render_tree_connectors(nodes, slot_width, row_height, left_offset)
 
     return f"""
     <div class="merge-tree-shell">
       <div class="merge-tree" style="width:{tree_width}px; height:{tree_height}px;">
+        {connectors}
         {html_rows}
       </div>
     </div>
@@ -483,10 +557,12 @@ def render_quick_snapshot_tree(state):
             boxes = cached_quick_node_items(cache, node)
             row_blocks += render_quick_aligned_block(cache, node, slot_width, total, boxes, inactive_class, left_offset)
         html_rows += f'<div class="quick-row">{row_blocks}</div>'
+    connectors = render_tree_connectors(nodes, slot_width, row_height, left_offset)
 
     return f"""
     <div class="quick-tree-shell">
       <div class="quick-tree" style="width:{tree_width}px; height:{tree_height}px;">
+        {connectors}
         {html_rows}
       </div>
     </div>
@@ -537,9 +613,11 @@ def render_tree_html(state):
     left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
     rows = {}
+    visible_nodes = []
     for node in nodes:
         if range_key(node) not in visible_ranges:
             continue
+        visible_nodes.append(node)
         rows.setdefault(node["depth"], []).append(node)
 
     html_rows = ""
@@ -578,10 +656,12 @@ def render_tree_html(state):
                 show_local_indices=algorithm == "mezcla",
             )
         html_rows += f'<div class="{row_class}">{row_blocks}</div>'
+    connectors = render_tree_connectors(visible_nodes, slot_width, row_height, left_offset)
 
     return f"""
     <div class="{shell_class}">
       <div class="{tree_class}" style="width:{tree_width}px; height:{tree_height}px;">
+        {connectors}
         {html_rows}
       </div>
     </div>
@@ -647,6 +727,35 @@ def sort_styles():
         display: flex;
         align-items: center;
         justify-content: center;
+      }}
+      .sort-legend {{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 14px;
+        min-height: 22px;
+        margin: 0 0 6px;
+        font-size: 15px;
+        line-height: 18px;
+        color: #333333;
+      }}
+      .sort-app-bars .sort-legend {{
+        color: #ffffff;
+      }}
+      .sort-legend-item {{
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+      }}
+      .sort-legend-swatch {{
+        width: 14px;
+        height: 14px;
+        border: 2px solid #111111;
+        box-sizing: border-box;
+      }}
+      .sort-app-bars .sort-legend-swatch {{
+        border-color: #ffffff;
       }}
       .radix-buckets-panel {{
         width: min(100%, 760px);
@@ -831,6 +940,22 @@ def sort_styles():
         position: relative;
         margin: 0 auto;
       }}
+      .tree-connectors {{
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: visible;
+        z-index: 0;
+      }}
+      .tree-connectors path {{
+        fill: none;
+        stroke: #c7cdd1;
+        stroke-width: 2;
+        stroke-linecap: square;
+        stroke-linejoin: round;
+      }}
       .merge-row-tree {{
         width: 100%;
         height: 126px;
@@ -846,6 +971,7 @@ def sort_styles():
         top: 0;
         text-align: center;
         box-sizing: border-box;
+        z-index: 1;
       }}
       .merge-range, .quick-range {{
         font-size: 14px;
@@ -914,6 +1040,15 @@ def sort_styles():
         box-shadow: none;
         box-sizing: border-box;
         transition: background-color 120ms ease, color 120ms ease;
+      }}
+      .tree-box-empty {{
+        background-image: repeating-linear-gradient(
+          135deg,
+          rgba(214, 182, 86, 0.18) 0,
+          rgba(214, 182, 86, 0.18) 5px,
+          rgba(255, 255, 255, 0.3) 5px,
+          rgba(255, 255, 255, 0.3) 10px
+        ) !important;
       }}
       .merge-values .tree-box:first-child,
       .quick-values:not(.quick-values-aligned) .tree-item:first-child .tree-box,
@@ -1016,11 +1151,13 @@ def render_state_html(state, include_styles=True):
     min_height = simulation_min_height(state)
     items_markup = render_items_markup(state, view)
     radix_buckets = render_radix_buckets(state)
+    legend = render_sort_legend(state, view)
     styles = sort_styles() if include_styles else ""
     return f"""
     {styles}
     <div class="{app_class}" style="min-height:{min_height}px;">
       <div class="sort-message">{message_html(state["message"])}</div>
+      {legend}
       {items_markup}
       {radix_buckets}
     </div>

@@ -63,7 +63,7 @@ def finish_not_found(state):
     state["search_complete"] = True
 
 def create_state(size=DEFAULT_SIZE, target=DEFAULT_TARGET, values=None):
-    state = create_search_base_state(size=size, target=target, values=values, current_index=0)
+    state = create_search_base_state(size=size, target=target, values=values, current_index=0, algorithm="secuencial")
     state["current_index"] = 0
     state["phase"] = "show_current"
     state["formula"] = build_formula(state)

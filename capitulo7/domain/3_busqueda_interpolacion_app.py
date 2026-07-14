@@ -136,6 +136,7 @@ def create_state(size=DEFAULT_SIZE, target=DEFAULT_TARGET, uniform=False, values
         target=target,
         values=values,
         value_generator=lambda size: generate_sorted_values(size=size, uniform=uniform),
+        algorithm="interpolacion",
     )
     state.update({
         "low": 0,

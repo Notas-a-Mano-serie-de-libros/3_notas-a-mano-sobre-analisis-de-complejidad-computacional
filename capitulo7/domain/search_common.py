@@ -57,6 +57,22 @@ HIGHLIGHT_RANGE_ROLE_STYLES = SEARCH_RANGE_HIGHLIGHT_STYLES
 SEQUENTIAL_ROLE_STYLES = SEARCH_SEQUENTIAL_STYLES
 EXPONENTIAL_ROLE_STYLES = SEARCH_EXPONENTIAL_STYLES
 TERNARY_ROLE_STYLES = SEARCH_TERNARY_STYLES
+SEARCH_LEGEND_LABELS = {
+    "target": "objetivo",
+    "current": "actual",
+    "probe": "comparación",
+    "found": "encontrado",
+    "excluded": "descartado",
+    "range": "rango",
+}
+SEARCH_LEGEND_ROLES_BY_ALGORITHM = {
+    "secuencial": ("target", "current", "found", "excluded"),
+    "binaria": ("target", "current", "probe", "found", "excluded", "range"),
+    "interpolacion": ("target", "probe", "found", "excluded", "range"),
+    "saltos": ("target", "current", "found", "excluded", "range"),
+    "exponencial": ("target", "current", "probe", "found", "excluded", "range"),
+    "ternaria": ("target", "probe", "found", "excluded", "range"),
+}
 
 
 def colab_pause(seconds=0.45):
@@ -172,6 +188,21 @@ def css_token(value):
     return re.sub(r"[^a-z0-9_-]+", "-", str(value or "").lower()).strip("-") or "none"
 
 
+def render_search_legend(state, role_styles):
+    items = []
+    roles = SEARCH_LEGEND_ROLES_BY_ALGORITHM.get(state.get("algorithm"), tuple(SEARCH_LEGEND_LABELS))
+    for role in roles:
+        if role not in role_styles:
+            continue
+        label = SEARCH_LEGEND_LABELS[role]
+        fill, border, _text = role_styles[role]
+        items.append(
+            f'<span class="search-legend-item"><span class="search-legend-swatch" '
+            f'style="background:{fill}; border:2px solid {border};"></span>{label}</span>'
+        )
+    return f'<div class="search-legend">{"".join(items)}</div>'
+
+
 def create_search_base_state(
     size=DEFAULT_SIZE,
     target=DEFAULT_TARGET,
@@ -270,7 +301,8 @@ def calculate_search_dimensions(state):
         return _SEARCH_DIMENSION_CACHE[node_count]
     rows = max(1, math.ceil(node_count / SEARCH_NODES_PER_ROW))
     nodes_height = (rows * SEARCH_NODE_HEIGHT) + ((rows - 1) * SEARCH_NODE_GAP) + SEARCH_VERTICAL_PADDING
-    app_height = SEARCH_MESSAGE_HEIGHT + nodes_height + SEARCH_VERTICAL_PADDING
+    legend_height = 28
+    app_height = SEARCH_MESSAGE_HEIGHT + legend_height + nodes_height + SEARCH_VERTICAL_PADDING
     dimensions = {
         "nodes_height": nodes_height,
         "app_height": app_height,
@@ -301,6 +333,29 @@ def _build_search_css() -> str:
     text-align: center;
     margin: 6px 0 10px;
     overflow: visible;
+  }}
+  .search-legend {{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 14px;
+    margin: 0 0 6px;
+    min-height: 22px;
+    font-size: 15px;
+    line-height: 18px;
+    color: #333333;
+  }}
+  .search-legend-item {{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }}
+  .search-legend-swatch {{
+    width: 14px;
+    height: 14px;
+    border: 2px solid #111111;
+    box-sizing: border-box;
   }}
   .search-nodes {{
     display: flex;
@@ -451,6 +506,7 @@ def render_state_html(state, role_styles, label_map):
     nodes = "".join(node_markup)
     dimensions = calculate_search_dimensions(state)
     result = render_result_symbol(state)
+    legend = render_search_legend(state, role_styles)
     found = any(node["role"] == "found" for node in state.get("arr", []))
     status_class = " search-app-found" if found else " search-app-missing"
     complete_class = f" search-app-complete{status_class}" if state.get("search_complete") else ""
@@ -458,6 +514,7 @@ def render_state_html(state, role_styles, label_map):
     return (
         f'<div class="search-app{complete_class}{phase_class}" style="min-height: {dimensions["app_height"]}px;">'
         f'<div class="search-message">{message}</div>'
+        f"{legend}"
         f'<div class="search-array-line">'
         f'<div class="search-nodes" style="width: min(100%, {dimensions["nodes_width"]}px); min-height: {dimensions["nodes_height"]}px;">{nodes}</div>'
         f'<div class="search-result">{result}</div>'

@@ -361,6 +361,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
 
         self.assertIn("merge-tree-shell", merge_html)
         self.assertIn("merge-row-tree", merge_html)
+        self.assertNotIn('<svg class="tree-connectors"', merge_html)
         self.assertIn("merge-index-row", merge_html)
         self.assertIn('style="--merge-index-count:7;"', merge_html)
         self.assertIn('class="merge-index-cell">0</div>', merge_html)
@@ -368,9 +369,16 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertNotIn("[0, 6]", merge_html)
         self.assertIn("quick-tree-shell", quick_html)
         self.assertIn("quick-row", quick_html)
+        self.assertNotIn('<svg class="tree-connectors"', quick_html)
         self.assertIn("quick-index-row", quick_html)
         self.assertIn('class="quick-index-cell" style="grid-column:1;">0</div>', quick_html)
         self.assertIn('class="quick-index-cell" style="grid-column:6;">5</div>', quick_html)
+
+        self.modules["mezcla"].step_merge_sort(merge)
+        self.modules["mezcla"].step_merge_sort(merge)
+        merge_html = self.modules["mezcla"].render_state_html(merge)
+        self.assertIn('<svg class="tree-connectors"', merge_html)
+        self.assertIn(" V116.0", merge_html)
 
     def test_merge_tree_view_follows_active_division_path(self):
         module = self.modules["mezcla"]
@@ -409,6 +417,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         module.step_merge_sort(state)
         empty_merge_html = module.render_state_html(state)
         self.assertIn('style="--merge-index-count:2;"', empty_merge_html)
+        self.assertIn("tree-box-empty", empty_merge_html)
+        self.assertIn("repeating-linear-gradient", empty_merge_html)
         self.assertIn("#fff2cc", empty_merge_html)
 
         module.step_merge_sort(state)
@@ -562,8 +572,14 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                     for group in node.get("labels", [])
                     for label in group
                 }
+                labelled_nodes = [
+                    node
+                    for node in state.get("quick_tree_nodes", [])
+                    if any(group for group in node.get("labels", []))
+                ]
                 self.assertTrue({"p", "i", "j"}.issubset(flat_labels))
                 self.assertTrue({"p", "i", "j"}.issubset(tree_labels))
+                self.assertEqual(1, len(labelled_nodes))
                 self.assertNotIn("pivote", flat_labels)
                 self.assertNotIn("pivote", tree_labels)
 
@@ -805,13 +821,21 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         module.step_insertion_sort(state)
         self.assertEqual(state["roles"][0], "current")
         self.assertEqual(state["roles"][1], "compare")
+        legend_html = module.render_state_html(state)
+        self.assertIn("sort-legend", legend_html)
+        legend_section = legend_html.split('<div class="sort-legend', 1)[1].split("</div>", 1)[0]
+        for legend_label in ("actual", "comparación", "ordenado"):
+            self.assertIn(legend_label, legend_section)
+        for legend_label in ("intercambio", "límite", "pivote", "escritura", "inactivo"):
+            self.assertNotIn(legend_label, legend_section)
 
         module.step_insertion_sort(state)
         self.assertEqual(state["arr"], [2, 5, 4])
         self.assertEqual(state["roles"][0], "compare")
         self.assertEqual(state["labels"][0], "i")
         self.assertEqual(state["roles"][1], "current")
-        self.assertNotIn("#fff2cc", module.render_state_html(state))
+        bar_panel = module.render_state_html(state).split('<div class="bar-panel"', 1)[1]
+        self.assertNotIn("#fff2cc", bar_panel)
 
     def test_every_trace_step_can_render(self):
         for name, module in self.modules.items():

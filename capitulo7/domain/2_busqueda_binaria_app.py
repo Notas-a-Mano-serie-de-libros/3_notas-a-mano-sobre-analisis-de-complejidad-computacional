@@ -88,7 +88,7 @@ def finish_not_found(state):
     state["search_complete"] = True
 
 def create_state(size=DEFAULT_SIZE, target=DEFAULT_TARGET, values=None):
-    state = create_search_base_state(size=size, target=target, values=values)
+    state = create_search_base_state(size=size, target=target, values=values, algorithm="binaria")
     state.update({
         "low": 0,
         "high": len(state["arr"]) - 1,

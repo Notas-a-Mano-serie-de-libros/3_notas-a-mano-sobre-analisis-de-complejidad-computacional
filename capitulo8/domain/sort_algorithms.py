@@ -1177,8 +1177,8 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
         for item in visible_nodes:
             item["values"] = list(arr[item["start"]:item["end"] + 1])
 
-    def label_groups_for_node(item, global_labels):
-        if global_labels is None:
+    def label_groups_for_node(item, global_labels, focus):
+        if global_labels is None or item is not focus:
             return [[] for _ in item["values"]]
         groups = []
         for label in global_labels[item["start"]:item["end"] + 1]:
@@ -1200,7 +1200,7 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
                 "depth": item["depth"],
                 "values": list(item["values"]),
                 "roles": roles,
-                "labels": label_groups_for_node(item, global_labels),
+                "labels": label_groups_for_node(item, global_labels, focus),
                 "active": id(item) in active,
             })
         return nodes

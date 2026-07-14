@@ -68,7 +68,7 @@ salto =
 """
 
 def create_state(size=DEFAULT_SIZE, target=DEFAULT_TARGET, values=None):
-    base = create_search_base_state(size=size, target=target, values=values)
+    base = create_search_base_state(size=size, target=target, values=values, algorithm="saltos")
     values = [node["value"] for node in base["arr"]]
     jump_size = max(1, int(math.sqrt(len(values))))
 
