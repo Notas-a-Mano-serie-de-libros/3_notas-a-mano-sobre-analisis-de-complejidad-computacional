@@ -335,7 +335,7 @@ def render_comparison_styles(array_width):
         font-family: '{FONT_FAMILY}', serif;
         color: #111111;
         background: #ffffff;
-        padding: 8px;
+        padding: 8px 8px 10px;
       }}
       .comparison-app * {{
         box-sizing: border-box;
@@ -350,8 +350,8 @@ def render_comparison_styles(array_width):
       .comparison-header,
       .comparison-row {{
         display: grid;
-        grid-template-columns: minmax(180px, 240px) 96px {array_width + 42}px;
-        gap: 12px;
+        grid-template-columns: minmax(170px, 232px) 88px {array_width + 38}px;
+        gap: 10px;
         width: 100%;
         box-sizing: border-box;
         background: #ffffff;
@@ -382,14 +382,14 @@ def render_comparison_styles(array_width):
         text-align: center;
       }}
       .comparison-name {{
-        font-size: 22px;
+        font-size: 21px;
         line-height: 1.2;
         text-align: center;
         font-weight: 700;
       }}
       .comparison-steps {{
-        font-size: 20px;
-        color: #555555;
+        font-size: 19px;
+        color: #444444;
         text-align: center;
         white-space: nowrap;
       }}
@@ -401,12 +401,12 @@ def render_comparison_styles(array_width):
         padding-top: 2px;
       }}
       .comparison-array-result-wrap {{
-        width: {array_width + 42}px;
-        min-width: {array_width + 42}px;
+        width: {array_width + 38}px;
+        min-width: {array_width + 38}px;
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        gap: 8px;
+        gap: 4px;
       }}
       .comparison-array-wrap::-webkit-scrollbar {{
         display: none;
@@ -424,7 +424,7 @@ def render_comparison_styles(array_width):
         text-align: center;
         font-size: 20px;
         line-height: 20px;
-        color: #555555;
+        color: #444444;
       }}
       .comparison-array {{
         display: flex;
@@ -504,6 +504,9 @@ def render_comparison_styles(array_width):
         .comparison-result {{
           justify-content: flex-start;
           height: 32px;
+        }}
+        .comparison-name {{
+          text-align: left;
         }}
       }}
       @media (min-width: 761px) {{

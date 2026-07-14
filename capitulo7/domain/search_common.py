@@ -324,7 +324,7 @@ def _build_search_css() -> str:
     color: #111111;
     background: #ffffff;
     box-sizing: border-box;
-    padding: 8px;
+    padding: 8px 8px 10px;
   }}
   .search-message {{
     height: {SEARCH_MESSAGE_HEIGHT}px;
@@ -332,7 +332,7 @@ def _build_search_css() -> str:
     font-size: 24px;
     font-weight: 400;
     text-align: center;
-    margin: 6px 0 10px;
+    margin: 6px 0 8px;
     overflow: visible;
   }}
   .search-legend {{
@@ -340,14 +340,12 @@ def _build_search_css() -> str:
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px 14px;
-    margin: 0 0 6px;
+    margin: 2px auto 8px;
     min-height: 22px;
     font-size: 15px;
     line-height: 18px;
     color: #333333;
     box-sizing: border-box;
-    margin-left: auto;
-    margin-right: auto;
   }}
   .search-legend-item {{
     display: inline-flex;
@@ -369,13 +367,13 @@ def _build_search_css() -> str:
     align-content: flex-start;
     gap: {SEARCH_NODE_GAP}px;
     margin: 0 auto;
-    padding: 8px 0;
+    padding: 6px 0;
   }}
   .search-array-line {{
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 4px;
     width: 100%;
   }}
   .search-array-line .search-nodes {{
@@ -425,7 +423,7 @@ def _build_search_css() -> str:
     overflow: visible;
     font-size: 20px;
     line-height: 24px;
-    color: #333333;
+    color: #222222;
     white-space: nowrap;
   }}
   .label-separator {{
@@ -469,7 +467,24 @@ def _build_search_css() -> str:
     line-height: 24px;
     margin-bottom: 6px;
     font-size: 20px;
-    color: #555555;
+    color: #444444;
+  }}
+  @media (max-width: 760px) {{
+    .search-message {{
+      font-size: 22px;
+      line-height: {SEARCH_MESSAGE_HEIGHT}px;
+    }}
+    .search-legend {{
+      justify-content: flex-start;
+      gap: 8px 10px;
+    }}
+    .search-result {{
+      width: 34px;
+      min-width: 34px;
+    }}
+    .search-array-line .search-nodes {{
+      max-width: calc(100% - 38px);
+    }}
   }}
 </style>"""
 
@@ -510,7 +525,7 @@ def render_state_html(state, role_styles, label_map):
     nodes = "".join(node_markup)
     dimensions = calculate_search_dimensions(state)
     result = render_result_symbol(state)
-    legend_width = dimensions["nodes_width"] + dimensions["result_width"] + 8
+    legend_width = dimensions["nodes_width"] + dimensions["result_width"] + 4
     legend = render_search_legend(state, role_styles, legend_width)
     found = any(node["role"] == "found" for node in state.get("arr", []))
     status_class = " search-app-found" if found else " search-app-missing"
