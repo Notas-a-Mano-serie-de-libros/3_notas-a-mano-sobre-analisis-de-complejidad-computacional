@@ -52,8 +52,10 @@ TREE_EVENT_KEYS = {"merge_tree_nodes", "quick_tree_nodes"}
 NESTED_LIST_EVENT_KEYS = {"radix_buckets"}
 _SIMULATION_HEIGHT_CACHE = {}
 _SORT_STYLES = None
-MERGE_TREE_ROW_HEIGHT = 126
-QUICK_TREE_ROW_HEIGHT = 126
+SORT_VISUAL_WIDTH = 760
+SORT_RESULT_WIDTH = 44
+MERGE_TREE_ROW_HEIGHT = 144
+QUICK_TREE_ROW_HEIGHT = 144
 SORT_LEGEND_ITEMS = (
     (ROLE_CURRENT, "actual"),
     (ROLE_COMPARE, "comparación"),
@@ -230,7 +232,7 @@ def css_token(value):
     return re.sub(r"[^a-z0-9_-]+", "-", str(value or "").lower()).strip("-") or "none"
 
 
-def render_sort_legend(state, view="cajas"):
+def render_sort_legend(state, view="cajas", width=SORT_VISUAL_WIDTH):
     items = []
     roles = SORT_LEGEND_ROLES_BY_ALGORITHM.get(state.get("algorithm"), tuple(SORT_LEGEND_LABELS_BY_ROLE))
     for role in roles:
@@ -240,7 +242,7 @@ def render_sort_legend(state, view="cajas"):
             f'<span class="sort-legend-item"><span class="sort-legend-swatch" '
             f'style="background:{fill}; border-color:{border};"></span>{label}</span>'
         )
-    return f'<div class="sort-legend sort-legend-{css_token(view)}">{"".join(items)}</div>'
+    return f'<div class="sort-legend sort-legend-{css_token(view)}" style="width:min(100%, {width}px);">{"".join(items)}</div>'
 
 
 def node_center(node, slot_width, left_offset=0):
@@ -267,8 +269,8 @@ def render_tree_connectors(nodes, slot_width, row_height, left_offset=0):
         parent = min(candidates, key=lambda item: item["end"] - item["start"])
         x1 = node_center(parent, slot_width, left_offset)
         x2 = node_center(child, slot_width, left_offset)
-        y1 = parent["depth"] * row_height + 86
-        y2 = child["depth"] * row_height - 10
+        y1 = parent["depth"] * row_height + 94
+        y2 = child["depth"] * row_height - 18
         mid_y = (y1 + y2) / 2
         lines.append(f'<path d="M{x1:.1f},{y1:.1f} V{mid_y:.1f} H{x2:.1f} V{y2:.1f}" />')
     if not lines:
@@ -354,17 +356,19 @@ def simulation_min_height(state):
     if cache_key in _SIMULATION_HEIGHT_CACHE:
         return _SIMULATION_HEIGHT_CACHE[cache_key]
     message_height = 64
+    phase_height = 28
     legend_height = 30
+    result_width = SORT_RESULT_WIDTH
     vertical_padding = 28
     if view == "barras":
-        height = message_height + legend_height + 360 + vertical_padding
+        height = message_height + phase_height + legend_height + 360 + vertical_padding
     elif view == "arbol":
         row_height = QUICK_TREE_ROW_HEIGHT if state.get("algorithm") == "rapido" else MERGE_TREE_ROW_HEIGHT
         tree_height = (tree_max_depth_for_state(state) + 1) * row_height
-        height = message_height + legend_height + tree_height + vertical_padding
+        height = message_height + phase_height + legend_height + tree_height + vertical_padding
     else:
         rows = max(1, (len(state["arr"]) + 7) // 8)
-        height = message_height + legend_height + rows * 142 + vertical_padding
+        height = message_height + phase_height + legend_height + rows * 142 + result_width + vertical_padding
     _SIMULATION_HEIGHT_CACHE[cache_key] = height
     return height
 
@@ -387,14 +391,14 @@ def tree_box(value, role="default", cache=None):
 
 
 def tree_item(value, role="default", labels=None, cache=None):
-    label_html = "<br>".join(escape(str(label)) for label in labels or []) if labels else "&nbsp;"
-    cache_key = ("tree_item", value, role, label_html)
+    label_markup = "<br>".join(label_html(str(label)) for label in labels or []) if labels else "&nbsp;"
+    cache_key = ("tree_item", value, role, label_markup)
     if cache is not None and cache_key in cache:
         return cache[cache_key]
     html = f"""
     <div class="tree-item">
       {tree_box(value, role, cache=cache)}
-      <div class="tree-label">{label_html}</div>
+      <div class="tree-label">{label_markup}</div>
     </div>
     """
     if cache is not None:
@@ -495,7 +499,7 @@ def render_merge_snapshot_tree(state):
     total = max(1, len(state.get("initial_values", state["arr"])))
     slot_width = 68
     row_height = MERGE_TREE_ROW_HEIGHT
-    tree_width = max(760, total * slot_width)
+    tree_width = max(SORT_VISUAL_WIDTH, total * slot_width)
     left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
     rows = {}
@@ -542,7 +546,7 @@ def render_quick_snapshot_tree(state):
     total = max(1, len(state.get("initial_values", state["arr"])))
     slot_width = 54
     row_height = QUICK_TREE_ROW_HEIGHT
-    tree_width = max(760, total * slot_width)
+    tree_width = max(SORT_VISUAL_WIDTH, total * slot_width)
     left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
     rows = {}
@@ -567,6 +571,28 @@ def render_quick_snapshot_tree(state):
       </div>
     </div>
     """
+
+
+def sort_phase_label(state):
+    phase = state.get("radix_phase") or state.get("merge_tree_phase") or state.get("phase")
+    if not phase:
+        return "&nbsp;"
+    labels = {
+        "distribution": "Fase: distribución",
+        "write": "Fase: reconstrucción",
+        "complete": "Fase: finalizada",
+        "divide": "Fase: división",
+        "merge": "Fase: mezcla",
+        "start": "Fase: inicio",
+        "initial": "Fase: inicio",
+    }
+    return escape(labels.get(phase, f"Fase: {phase}"))
+
+
+def render_sort_result_symbol(state):
+    if not state.get("sorting_complete"):
+        return ""
+    return '<span class="sort-result-symbol" aria-label="Ordenado" title="Ordenado">✓</span>'
 
 
 def render_tree_html(state):
@@ -609,7 +635,7 @@ def render_tree_html(state):
     total = max(1, len(values))
     slot_width = 74 if algorithm == "rapido" else 68
     row_height = QUICK_TREE_ROW_HEIGHT if algorithm == "rapido" else MERGE_TREE_ROW_HEIGHT
-    tree_width = max(760, total * slot_width)
+    tree_width = max(SORT_VISUAL_WIDTH, total * slot_width)
     left_offset = max(0, (tree_width - total * slot_width) // 2)
     tree_height = (max_depth + 1) * row_height
     rows = {}
@@ -728,6 +754,19 @@ def sort_styles():
         align-items: center;
         justify-content: center;
       }}
+      .sort-phase-strip {{
+        min-height: 22px;
+        line-height: 20px;
+        margin: 0 auto 6px;
+        width: min(100%, {SORT_VISUAL_WIDTH}px);
+        text-align: center;
+        font-size: 15px;
+        color: #555555;
+        box-sizing: border-box;
+      }}
+      .sort-app-bars .sort-phase-strip {{
+        color: #ffffff;
+      }}
       .sort-legend {{
         display: flex;
         flex-wrap: wrap;
@@ -738,6 +777,9 @@ def sort_styles():
         font-size: 15px;
         line-height: 18px;
         color: #333333;
+        box-sizing: border-box;
+        margin-left: auto;
+        margin-right: auto;
       }}
       .sort-app-bars .sort-legend {{
         color: #ffffff;
@@ -758,13 +800,13 @@ def sort_styles():
         border-color: #ffffff;
       }}
       .radix-buckets-panel {{
-        width: min(100%, 760px);
-        margin: 12px auto 0;
+        width: min(100%, {SORT_VISUAL_WIDTH}px);
+        margin: 10px auto 0;
         border: 2px solid currentColor;
         border-left-width: 6px;
         box-sizing: border-box;
-        font-size: 17px;
-        line-height: 20px;
+        font-size: 15px;
+        line-height: 18px;
         transition: border-color 120ms ease;
       }}
       .radix-phase-distribution {{
@@ -779,8 +821,8 @@ def sort_styles():
       .radix-bucket-header,
       .radix-bucket-row {{
         display: grid;
-        grid-template-columns: 92px minmax(0, 1fr);
-        min-height: 28px;
+        grid-template-columns: 74px minmax(0, 1fr);
+        min-height: 24px;
       }}
       .radix-bucket-header {{
         font-weight: 700;
@@ -828,7 +870,7 @@ def sort_styles():
       }}
       .sort-items {{
         display: flex;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
         align-items: flex-end;
         justify-content: center;
         gap: 0;
@@ -839,6 +881,9 @@ def sort_styles():
       .sort-items.boxes {{
         align-items: flex-start;
         min-height: 150px;
+        width: fit-content;
+        max-width: min(100%, {SORT_VISUAL_WIDTH}px);
+        margin: 0 auto;
       }}
       .sort-item {{
         width: 54px;
@@ -865,16 +910,21 @@ def sort_styles():
       .sort-item:first-child .box {{
         border-left-width: 2px;
       }}
+      .sort-item:nth-child(8n + 1) .box {{
+        border-left-width: 2px;
+      }}
       .box-value {{
         font-size: 26px;
         font-weight: 400;
       }}
       .bar-panel {{
-        width: 100%;
+        width: fit-content;
+        max-width: 100%;
         background: #000000;
         box-sizing: border-box;
         padding: 0;
         overflow-x: auto;
+        margin: 0 auto;
       }}
       .bar-nodes {{
         min-height: 360px;
@@ -883,6 +933,7 @@ def sort_styles():
         justify-content: center;
         gap: 0;
         padding: 0 8px;
+        width: max-content;
       }}
       .bar-wrap {{
         text-align: center;
@@ -928,13 +979,13 @@ def sort_styles():
         color: #ffffff;
         margin-top: 4px;
         min-height: 42px;
-        font-size: 15px;
-        line-height: 16px;
+        font-size: 18px;
+        line-height: 20px;
       }}
       .merge-tree-shell, .quick-tree-shell {{
         width: 100%;
         overflow-x: auto;
-        padding: 10px 0 4px;
+        padding: 12px 0 6px;
       }}
       .merge-tree, .quick-tree {{
         position: relative;
@@ -958,12 +1009,12 @@ def sort_styles():
       }}
       .merge-row-tree {{
         width: 100%;
-        height: 126px;
+        height: {MERGE_TREE_ROW_HEIGHT}px;
         position: relative;
       }}
       .quick-row {{
         width: 100%;
-        height: 126px;
+        height: {QUICK_TREE_ROW_HEIGHT}px;
         position: relative;
       }}
       .merge-block, .quick-block {{
@@ -972,6 +1023,10 @@ def sort_styles():
         text-align: center;
         box-sizing: border-box;
         z-index: 1;
+      }}
+      .merge-block-inactive .tree-box,
+      .quick-block-inactive .tree-box {{
+        opacity: 0.62;
       }}
       .merge-range, .quick-range {{
         font-size: 14px;
@@ -1056,10 +1111,10 @@ def sort_styles():
         border-left-width: 2px;
       }}
       .tree-label {{
-        margin-top: 6px;
-        min-height: 42px;
-        font-size: 15px;
-        line-height: 16px;
+        margin-top: 8px;
+        min-height: 46px;
+        font-size: 20px;
+        line-height: 22px;
         color: #333333;
       }}
       .item-label {{
@@ -1068,6 +1123,41 @@ def sort_styles():
         font-size: 20px;
         line-height: 22px;
         color: #333333;
+      }}
+      .sort-array-line {{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: 100%;
+      }}
+      .sort-array-line .sort-items,
+      .sort-array-line .bar-panel {{
+        max-width: calc(100% - {SORT_RESULT_WIDTH + 4}px);
+      }}
+      .sort-array-line .merge-tree-shell,
+      .sort-array-line .quick-tree-shell {{
+        max-width: calc(100% - {SORT_RESULT_WIDTH + 4}px);
+      }}
+      .sort-result {{
+        width: {SORT_RESULT_WIDTH}px;
+        min-width: {SORT_RESULT_WIDTH}px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }}
+      .sort-result-symbol {{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        font-family: '{FONT_FAMILY}', serif;
+        font-size: 30px;
+        line-height: 1;
+        font-weight: 700;
+        color: #2d7d32;
       }}
       .math-label, .math-inline {{
         font-family: '{FONT_FAMILY}', serif;
@@ -1085,7 +1175,7 @@ def render_items_markup(state, view):
 
     values = state["arr"]
     max_value = max(values) if values else 1
-    item_width = max(18, min(48, 760 / max(1, len(values)))) if view == "barras" else None
+    item_width = max(18, min(48, SORT_VISUAL_WIDTH / max(1, len(values)))) if view == "barras" else None
     item_cache = state.setdefault("_item_html_cache", {})
     item_markup = []
     for index, value in enumerate(values):
@@ -1152,13 +1242,19 @@ def render_state_html(state, include_styles=True):
     items_markup = render_items_markup(state, view)
     radix_buckets = render_radix_buckets(state)
     legend = render_sort_legend(state, view)
+    phase = sort_phase_label(state)
+    result = render_sort_result_symbol(state)
     styles = sort_styles() if include_styles else ""
     return f"""
     {styles}
     <div class="{app_class}" style="min-height:{min_height}px;">
       <div class="sort-message">{message_html(state["message"])}</div>
+      <div class="sort-phase-strip">{phase}</div>
       {legend}
-      {items_markup}
+      <div class="sort-array-line sort-array-line-{css_token(view)}">
+        {items_markup}
+        <div class="sort-result">{result}</div>
+      </div>
       {radix_buckets}
     </div>
     """

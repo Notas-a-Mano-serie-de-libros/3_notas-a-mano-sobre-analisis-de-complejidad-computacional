@@ -455,6 +455,12 @@ def render_comparison_styles(array_width):
         line-height: 1;
         font-weight: 700;
       }}
+      .comparison-result-symbol.found {{
+        color: #2d7d32;
+      }}
+      .comparison-result-symbol.missing {{
+        color: #8a6d00;
+      }}
       .comparison-node {{
         width: 54px;
         height: 50px;

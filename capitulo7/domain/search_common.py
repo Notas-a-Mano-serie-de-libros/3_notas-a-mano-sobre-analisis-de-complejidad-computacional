@@ -188,7 +188,7 @@ def css_token(value):
     return re.sub(r"[^a-z0-9_-]+", "-", str(value or "").lower()).strip("-") or "none"
 
 
-def render_search_legend(state, role_styles):
+def render_search_legend(state, role_styles, width=None):
     items = []
     roles = SEARCH_LEGEND_ROLES_BY_ALGORITHM.get(state.get("algorithm"), tuple(SEARCH_LEGEND_LABELS))
     for role in roles:
@@ -200,7 +200,8 @@ def render_search_legend(state, role_styles):
             f'<span class="search-legend-item"><span class="search-legend-swatch" '
             f'style="background:{fill}; border:2px solid {border};"></span>{label}</span>'
         )
-    return f'<div class="search-legend">{"".join(items)}</div>'
+    width_style = f' style="width:min(100%, {width}px);"' if width else ""
+    return f'<div class="search-legend"{width_style}>{"".join(items)}</div>'
 
 
 def create_search_base_state(
@@ -344,6 +345,9 @@ def _build_search_css() -> str:
     font-size: 15px;
     line-height: 18px;
     color: #333333;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
   }}
   .search-legend-item {{
     display: inline-flex;
@@ -506,7 +510,8 @@ def render_state_html(state, role_styles, label_map):
     nodes = "".join(node_markup)
     dimensions = calculate_search_dimensions(state)
     result = render_result_symbol(state)
-    legend = render_search_legend(state, role_styles)
+    legend_width = dimensions["nodes_width"] + dimensions["result_width"] + 8
+    legend = render_search_legend(state, role_styles, legend_width)
     found = any(node["role"] == "found" for node in state.get("arr", []))
     status_class = " search-app-found" if found else " search-app-missing"
     complete_class = f" search-app-complete{status_class}" if state.get("search_complete") else ""

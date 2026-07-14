@@ -349,6 +349,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("bar-panel", bar_html)
         self.assertIn("bar-nodes", bar_html)
         self.assertIn("min-height:", bar_html)
+        self.assertIn("width: fit-content;", box_html)
+        self.assertIn("width: fit-content;", bar_html)
+        self.assertIn("gap: 4px;", bar_html)
         self.assertNotIn("Tipo de orden", box_html)
         self.assertNotIn("Tipo de orden", bar_html)
 
@@ -378,7 +381,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.modules["mezcla"].step_merge_sort(merge)
         merge_html = self.modules["mezcla"].render_state_html(merge)
         self.assertIn('<svg class="tree-connectors"', merge_html)
-        self.assertIn(" V116.0", merge_html)
+        self.assertIn(" V126.0", merge_html)
 
     def test_merge_tree_view_follows_active_division_path(self):
         module = self.modules["mezcla"]

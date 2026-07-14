@@ -615,7 +615,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                 html = module.render_state_html(module.create_state(size=8, target=6, values=[1, 2, 3, 4, 5, 6, 7, 8]))
                 self.assertNotIn("search-status", html)
                 self.assertIn("search-legend", html)
-                legend_html = html.split('<div class="search-legend">', 1)[1].split("</div>", 1)[0]
+                legend_html = html.split('<div class="search-legend"', 1)[1].split("</div>", 1)[0]
                 for legend_label in expected_legends[name]:
                     self.assertIn(legend_label, html)
                 for legend_label in all_legend_labels - set(expected_legends[name]):
@@ -1041,6 +1041,8 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn("row_outputs = []", source)
         self.assertIn("comparison-result-symbol", source)
         self.assertIn('symbol = "✓" if found else "×"', source)
+        self.assertIn(".comparison-result-symbol.found", source)
+        self.assertIn("color: #2d7d32;", source)
         self.assertIn("border: 2px solid #111111;", source)
         self.assertNotIn("border-color:", html)
         self.assertEqual(html.count('<div class="comparison-index">'), len(values))
@@ -1088,6 +1090,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertEqual({item["title"]: item["steps"] for item in state["algorithms"]}, expected_steps)
         self.assertEqual(completed_html.count('comparison-result-symbol found'), len(state["algorithms"]))
         self.assertEqual(completed_html.count(">✓</span>"), len(state["algorithms"]))
+        self.assertIn(".comparison-result-symbol.found", completed_html)
         self.assertNotIn(r"$\checkmark$", completed_html)
         self.assertNotIn(r"$\times$", completed_html)
         self.assertNotIn('comparison-result-symbol missing', completed_html)
