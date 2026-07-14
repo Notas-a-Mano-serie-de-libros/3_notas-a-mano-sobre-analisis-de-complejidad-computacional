@@ -305,7 +305,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("formula_output", source)
         self.assertIn("from common.animation_runtime import OutputCache, pause, set_disabled", source)
         self.assertIn("render_cache = OutputCache()", source)
-        self.assertIn('formula = state["formula"]', source)
+        self.assertIn('formula = displaystyle_formula(state["formula"])', source)
         self.assertIn("formula_output = widgets.HTML", source)
         self.assertNotIn("widgets.HTMLMath", source)
         self.assertIn("render_cache.update_outputs(", source)
@@ -317,8 +317,12 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('controls["auto"].on_click(run_auto)', source)
         self.assertIn("colab_output.enable_custom_widget_manager()", source)
         self.assertNotIn("AUTO_RENDER_EVERY", source)
-        self.assertIn('FORMULA_OUTPUT_HEIGHT = "76px"', (DOMAIN_DIR / "sort_config.py").read_text(encoding="utf-8"))
+        config_source = (DOMAIN_DIR / "sort_config.py").read_text(encoding="utf-8")
+        self.assertIn('FORMULA_OUTPUT_HEIGHT = "0px"', config_source)
+        self.assertIn('FORMULA_OUTPUT_PADDING = "30px 0 0 0"', config_source)
         self.assertIn("min_height=FORMULA_OUTPUT_HEIGHT", source)
+        self.assertIn("padding=FORMULA_OUTPUT_PADDING", source)
+        self.assertIn("displaystyle_formula", source)
         self.assertIn("css_widget = widgets.HTML(sort_styles())", source)
         self.assertIn("render_state_html(state, include_styles=False)", source)
         self.assertIn("widgets.VBox([controls_layout, formula_output, css_widget, html_output]", source)
@@ -327,6 +331,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             getattr(module, SORT_MODULES[state["algorithm"]][1])(state)
             self.assertTrue(state["formula"])
             self.assertIn("=", state["formula"])
+        self.assertIn(
+            r"\displaystyle p",
+            self.common.displaystyle_formula(r"\begin{array}{l} p = 3 \\[8pt] i = 1 \end{array}"),
+        )
 
     def test_render_supports_boxes_and_bars_without_order_label(self):
         module = self.modules["burbuja"]
@@ -353,7 +361,11 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
 
         self.assertIn("merge-tree-shell", merge_html)
         self.assertIn("merge-row-tree", merge_html)
-        self.assertIn("[0, 6]", merge_html)
+        self.assertIn("merge-index-row", merge_html)
+        self.assertIn('style="--merge-index-count:7;"', merge_html)
+        self.assertIn('class="merge-index-cell">0</div>', merge_html)
+        self.assertIn('class="merge-index-cell">6</div>', merge_html)
+        self.assertNotIn("[0, 6]", merge_html)
         self.assertIn("quick-tree-shell", quick_html)
         self.assertIn("quick-row", quick_html)
         self.assertIn("quick-index-row", quick_html)
@@ -367,16 +379,19 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         module.step_merge_sort(state)
         module.step_merge_sort(state)
         first_html = module.render_state_html(state)
-        self.assertIn("[0, 7]", first_html)
-        self.assertIn("[0, 3]", first_html)
-        self.assertIn("[4, 7]", first_html)
-        self.assertNotIn("[0, 1]", first_html)
+        self.assertIn('style="left:108px; width:544px;"', first_html)
+        self.assertIn('style="left:108px; width:272px;"', first_html)
+        self.assertIn('style="left:380px; width:272px;"', first_html)
+        self.assertNotIn('style="left:108px; width:136px;"', first_html)
+        self.assertIn('style="--merge-index-count:8;"', first_html)
+        self.assertIn('style="--merge-index-count:4;"', first_html)
         self.assertIn("#dae8fc", first_html)
 
         module.step_merge_sort(state)
         second_html = module.render_state_html(state)
-        self.assertIn("[0, 1]", second_html)
-        self.assertIn("[2, 3]", second_html)
+        self.assertIn('style="left:108px; width:136px;"', second_html)
+        self.assertIn('style="left:244px; width:136px;"', second_html)
+        self.assertIn('style="--merge-index-count:2;"', second_html)
         self.assertIn("#f2f6f7", second_html)
         self.assertIn("#dae8fc", second_html)
 
@@ -387,13 +402,13 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         for _ in range(5):
             module.step_merge_sort(state)
         base_html = module.render_state_html(state)
-        self.assertIn("[0, 0]", base_html)
+        self.assertIn('style="--merge-index-count:1;"', base_html)
         self.assertIn("#e8fce9", base_html)
 
         module.step_merge_sort(state)
         module.step_merge_sort(state)
         empty_merge_html = module.render_state_html(state)
-        self.assertIn("[0, 1]", empty_merge_html)
+        self.assertIn('style="--merge-index-count:2;"', empty_merge_html)
         self.assertIn("#fff2cc", empty_merge_html)
 
         module.step_merge_sort(state)
@@ -404,9 +419,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         module.step_merge_sort(state)
         module.step_merge_sort(state)
         sorted_parent_html = module.render_state_html(state)
-        self.assertIn("[0, 1]", sorted_parent_html)
-        self.assertNotIn("[0, 0]", sorted_parent_html)
-        self.assertNotIn("[1, 1]", sorted_parent_html)
+        self.assertIn('style="--merge-index-count:2;"', sorted_parent_html)
         self.assertIn("#e8fce9", sorted_parent_html)
 
     def test_merge_tree_does_not_update_parent_when_child_finishes(self):
@@ -850,6 +863,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("7_ordenamiento_radix_app.py", bootstrap)
         self.assertIn('"radix": "run_radix"', bootstrap)
         self.assertIn("def run_radix", launchers)
+        self.assertIn('description="Valor máximo"', (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8"))
+        self.assertIn("has_radix_max=True", (DOMAIN_DIR / "7_ordenamiento_radix_app.py").read_text(encoding="utf-8"))
         self.assertIn("Ordenamiento radix", comparison)
         self.assertIn('"Radix"', chart_source)
         self.assertIn('"radix"', chart_source)
@@ -860,16 +875,22 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         state = module.create_state(size=4, values=[170, 45, 75, 90], view="barras")
 
         initial_html = module.render_state_html(state)
-        self.assertIn("Buckets", initial_html)
         self.assertIn("radix-buckets-panel", initial_html)
+        self.assertNotIn("radix-buckets-title", initial_html)
         self.assertGreater(initial_html.rindex("radix-buckets-panel"), initial_html.rindex("bar-panel"))
         self.assertIn('class="radix-bucket-key radix-bucket-heading">Dígito</div>', initial_html)
         self.assertIn('class="radix-bucket-chain radix-bucket-heading">Bucket</div>', initial_html)
 
         module.step_radix_sort(state)
+        self.assertIn(r"p = \operatorname{digitos}(\max(a))", state["formula"])
+        self.assertIn("= 3", state["formula"])
+
+        module.step_radix_sort(state)
         html = module.render_state_html(state)
         self.assertEqual(state["radix_buckets"][0], [170])
-        self.assertIn("Actualización de buckets", html)
+        self.assertNotIn("Actualización de buckets", html)
+        self.assertIn("i = 1", state["formula"])
+        self.assertIn(r"\frac{170}{10^0}", state["formula"])
         self.assertIn("170</div>", html)
         self.assertNotIn("170 -> ---", html)
 
@@ -882,9 +903,29 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             module.step_radix_sort(state)
         html = module.render_state_html(state)
         self.assertEqual(state["radix_buckets"][0], [90])
-        self.assertIn("Reconstrucción desde buckets", html)
+        self.assertNotIn("Reconstrucción desde buckets", html)
+        self.assertIn("i = 1", state["formula"])
         self.assertIn("90</div>", html)
         self.assertNotIn("90 -> ---", html)
+
+        while not state["sorting_complete"] and "i = 2" not in state["formula"]:
+            module.step_radix_sort(state)
+        self.assertIn("i = 2", state["formula"])
+
+        while not state["sorting_complete"] and "i = 3" not in state["formula"]:
+            module.step_radix_sort(state)
+        self.assertIn("i = 3", state["formula"])
+
+    def test_radix_generates_values_from_configured_maximum(self):
+        module = self.modules["radix"]
+        state = module.create_state(size=12, view="barras", radix_max=999)
+
+        self.assertIn(999, state["arr"])
+        self.assertTrue(all(0 <= value <= 999 for value in state["arr"]))
+        module.step_radix_sort(state)
+
+        self.assertEqual(state["radix_max"], 999)
+        self.assertIn(r"p = \operatorname{digitos}(\max(a)) = \operatorname{digitos}(999) = 3", state["formula"])
 
     def test_shell_notebook_includes_gap_sequence_comparison(self):
         notebook = NOTEBOOK_DIR / "4_ordenamiento_shell.ipynb"

@@ -1434,13 +1434,32 @@ def radix_trace(values, descending=False):
     if any(value < 0 for value in arr):
         raise ValueError("Radix sort requiere valores enteros no negativos")
 
+    def radix_formula(*lines):
+        return r"\begin{array}{l} " + r"\\[8pt] ".join(line for line in lines if line) + r" \end{array}"
+
     max_value = max(arr)
     digit_count = max(1, len(str(max_value)))
+    pass_count_formula = rf"p = \operatorname{{digitos}}(\max(a)) = \operatorname{{digitos}}({max_value}) = {digit_count}"
     exp = 1
+    roles = ["default"] * n
+    labels = [""] * n
+    mark(roles, labels, arr.index(max_value), "boundary", "max")
+
+    trace.append(
+        bucket_event(
+            f"Calcula la cantidad de pasadas a partir del valor máximo {max_value}.",
+            radix_formula(pass_count_formula),
+            roles,
+            labels,
+            buckets=[[] for _ in range(10)],
+            phase="initial",
+        )
+    )
 
     for digit_index in range(digit_count):
         buckets = [[] for _ in range(10)]
         digit_name = f"10^{digit_index}"
+        pass_number = digit_index + 1
         for index, value in enumerate(arr):
             digit = (value // exp) % 10
             buckets[digit].append(value)
@@ -1450,7 +1469,11 @@ def radix_trace(values, descending=False):
             trace.append(
                 bucket_event(
                     radix_bucket_message(digit, value),
-                    rf"d = \left\lfloor {value}/{digit_name} \right\rfloor \bmod 10 = {digit}",
+                    radix_formula(
+                        pass_count_formula,
+                        rf"i = {pass_number}",
+                        rf"d = \left\lfloor \frac{{{value}}}{{{digit_name}}} \right\rfloor \bmod 10 = {digit}",
+                    ),
                     roles,
                     labels,
                     buckets=buckets,
@@ -1473,7 +1496,11 @@ def radix_trace(values, descending=False):
                 trace.append(
                     bucket_event(
                         f"Escribe {value} en la posición {write_index} según el dígito {digit_index}.",
-                        rf"k = {write_index},\quad 10^{digit_index},\quad a_k = {value}",
+                        radix_formula(
+                            pass_count_formula,
+                            rf"i = {pass_number}",
+                            rf"k = {write_index},\quad a_k = {value}",
+                        ),
                         roles,
                         labels,
                         buckets=writable_buckets,
@@ -1487,7 +1514,11 @@ def radix_trace(values, descending=False):
         trace.append(
             bucket_event(
                 f"Finaliza la pasada del dígito {digit_index}.",
-                rf"10^{digit_index}\ \text{{procesado}}",
+                radix_formula(
+                    pass_count_formula,
+                    rf"i = {pass_number}",
+                    rf"10^{digit_index}\ \text{{procesado}}",
+                ),
                 ["sorted"] * n if digit_index == digit_count - 1 else ["default"] * n,
                 [""] * n,
                 buckets=[[] for _ in range(10)],

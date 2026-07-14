@@ -22,6 +22,7 @@ from sort_config import (
     DEFAULT_SIZE,
     FONT_FAMILY,
     FORMULA_OUTPUT_HEIGHT,
+    FORMULA_OUTPUT_PADDING,
     GAP_SEQUENCE_OPTIONS,
     MAX_SIZE,
     ORDER_OPTIONS,
@@ -47,7 +48,7 @@ TREE_EVENT_KEYS = {"merge_tree_nodes", "quick_tree_nodes"}
 NESTED_LIST_EVENT_KEYS = {"radix_buckets"}
 _SIMULATION_HEIGHT_CACHE = {}
 _SORT_STYLES = None
-MERGE_TREE_ROW_HEIGHT = 104
+MERGE_TREE_ROW_HEIGHT = 126
 QUICK_TREE_ROW_HEIGHT = 126
 INITIAL_MESSAGES = {
     "burbuja": (start_message("burbuja"), ""),
@@ -110,9 +111,19 @@ def generate_values(size=DEFAULT_SIZE):
     return random.sample(range(10, upper), size)
 
 
-def create_state(algorithm, size=None, descending=False, values=None, view="barras", pivot_strategy="middle", gap_sequence="shell", partition_scheme="hoare"):
+def generate_radix_values(size=DEFAULT_SIZE, max_value=999):
+    max_value = max(0, int(max_value))
+    if size <= 0:
+        return []
+    values = [max_value]
+    values.extend(random.randint(0, max_value) for _ in range(size - 1))
+    random.shuffle(values)
+    return values
+
+
+def create_state(algorithm, size=None, descending=False, values=None, view="barras", pivot_strategy="middle", gap_sequence="shell", partition_scheme="hoare", radix_max=999):
     size = default_size_for_view(view) if size is None else size
-    values = list(values) if values is not None else generate_values(size)
+    values = list(values) if values is not None else (generate_radix_values(size, radix_max) if algorithm == "radix" else generate_values(size))
     builder = TRACE_BUILDERS[algorithm]
     trace_kwargs = {"descending": descending}
     if algorithm == "rapido":
@@ -163,6 +174,7 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
         "pivot_strategy": pivot_strategy,
         "partition_scheme": partition_scheme,
         "gap_sequence": gap_sequence,
+        "radix_max": radix_max,
         "sorting_active": False,
     }
 
@@ -177,6 +189,15 @@ def copy_tree_node(node):
         if key in copied:
             copied[key] = list(copied[key])
     return copied
+
+
+def displaystyle_formula(formula):
+    if not formula or r"\begin{array}" not in formula:
+        return formula
+    return formula.replace(r"\begin{array}{l} ", r"\begin{array}{l} \displaystyle ").replace(
+        r"\\[8pt] ",
+        r"\\[8pt] \displaystyle ",
+    )
 
 
 def copy_event(event):
@@ -303,9 +324,15 @@ def tree_item(value, role="default", labels=None, cache=None):
     return html
 
 
-def render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes, inactive_class="", left_offset=0):
+def render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes, inactive_class="", left_offset=0, show_local_indices=False):
     left_px = left_offset + node["start"] * slot_width
     width_px = max(slot_width, len(node["values"]) * slot_width)
+    local_indices = "".join(f'<div class="merge-index-cell">{index}</div>' for index in range(len(node["values"])))
+    heading = (
+        f'<div class="merge-index-row" style="--merge-index-count:{len(node["values"])};">{local_indices}</div>'
+        if show_local_indices
+        else f'<div class="{range_class}">[{node["start"]}, {node["end"]}]</div>'
+    )
     cache_key = (
         "tree_block",
         block_class,
@@ -317,13 +344,14 @@ def render_tree_block(cache, block_class, range_class, values_class, node, slot_
         width_px,
         inactive_class,
         left_offset,
+        show_local_indices,
         boxes,
     )
     if cache_key in cache:
         return cache[cache_key]
     html = f"""
             <div class="{block_class}{inactive_class}" style="left:{left_px}px; width:{width_px}px;">
-              <div class="{range_class}">[{node["start"]}, {node["end"]}]</div>
+              {heading}
               <div class="{values_class}">{boxes}</div>
             </div>
             """
@@ -402,7 +430,18 @@ def render_merge_snapshot_tree(state):
         for node in sorted(rows.get(depth, []), key=lambda item: item["start"]):
             inactive_class = "" if node.get("active", True) else " merge-block-inactive"
             boxes = cached_tree_node_boxes(cache, node)
-            row_blocks += render_tree_block(cache, "merge-block", "merge-range", "merge-values", node, slot_width, boxes, inactive_class, left_offset)
+            row_blocks += render_tree_block(
+                cache,
+                "merge-block",
+                "merge-range",
+                "merge-values",
+                node,
+                slot_width,
+                boxes,
+                inactive_class,
+                left_offset,
+                show_local_indices=True,
+            )
         html_rows += f'<div class="merge-row-tree">{row_blocks}</div>'
 
     return f"""
@@ -521,7 +560,17 @@ def render_tree_html(state):
                 roles = [ROLE_DEFAULT] * len(node["values"])
             node_with_roles = {**node, "roles": roles}
             boxes = cached_tree_node_boxes(cache, node_with_roles)
-            row_blocks += render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes, left_offset=left_offset)
+            row_blocks += render_tree_block(
+                cache,
+                block_class,
+                range_class,
+                values_class,
+                node,
+                slot_width,
+                boxes,
+                left_offset=left_offset,
+                show_local_indices=algorithm == "mezcla",
+            )
         html_rows += f'<div class="{row_class}">{row_blocks}</div>'
 
     return f"""
@@ -600,12 +649,6 @@ def sort_styles():
         box-sizing: border-box;
         font-size: 17px;
         line-height: 20px;
-      }}
-      .radix-buckets-title {{
-        font-weight: 700;
-        text-align: center;
-        padding: 4px 8px;
-        border-bottom: 2px solid currentColor;
       }}
       .radix-bucket-header,
       .radix-bucket-row {{
@@ -754,7 +797,7 @@ def sort_styles():
       }}
       .merge-row-tree {{
         width: 100%;
-        height: 104px;
+        height: 126px;
         position: relative;
       }}
       .quick-row {{
@@ -772,6 +815,21 @@ def sort_styles():
         font-size: 14px;
         color: #555555;
         margin-bottom: 4px;
+      }}
+      .merge-index-row {{
+        display: grid;
+        grid-template-columns: repeat(var(--merge-index-count), 54px);
+        gap: 0;
+        justify-content: center;
+        min-height: 24px;
+        margin-bottom: 6px;
+      }}
+      .merge-index-cell {{
+        height: 24px;
+        line-height: 24px;
+        font-size: 20px;
+        color: #555555;
+        text-align: center;
       }}
       .merge-values, .quick-values {{
         display: flex;
@@ -875,12 +933,6 @@ def render_radix_buckets(state):
     if state.get("algorithm") != "radix" or buckets is None:
         return ""
     active_bucket = state.get("radix_active_bucket")
-    phase = state.get("radix_phase")
-    title = {
-        "distribution": "Actualización de buckets",
-        "write": "Reconstrucción desde buckets",
-        "complete": "Buckets al finalizar la pasada",
-    }.get(phase, "Buckets")
     rows = []
     for bucket, values in enumerate(buckets):
         chain = " -> ".join(escape(str(value)) for value in values)
@@ -896,7 +948,6 @@ def render_radix_buckets(state):
         )
     return f"""
     <div class="radix-buckets-panel">
-      <div class="radix-buckets-title">{title}</div>
       <div class="radix-bucket-header">
         <div class="radix-bucket-key radix-bucket-heading">Dígito</div>
         <div class="radix-bucket-chain radix-bucket-heading">Bucket</div>
@@ -923,7 +974,7 @@ def render_state_html(state, include_styles=True):
     """
 
 
-def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_partition=False):
+def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_partition=False, has_radix_max=False):
     size_input = bounded_int_control(
         value=default_size_for_view("barras"),
         min_value=2,
@@ -968,6 +1019,15 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         width="210px",
         description_style={},
     )
+    radix_max_input = bounded_int_control(
+        value=999,
+        min_value=0,
+        max_value=99999,
+        step=1,
+        description="Valor máximo",
+        width="230px",
+        description_style={},
+    )
     step_button = button_control(description="Paso siguiente", button_style="info", width="150px")
     auto_button = button_control(description="Ejecución automática", button_style="success", width="190px")
     finish_button = button_control(description="Finalizar", button_style="", width="120px")
@@ -980,6 +1040,7 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         "pivot": pivot_dropdown,
         "partition": partition_dropdown,
         "gap_sequence": gap_dropdown,
+        "radix_max": radix_max_input,
         "step": step_button,
         "auto": auto_button,
         "finish": finish_button,
@@ -993,6 +1054,8 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         first_row.append(partition_dropdown)
     if has_gap_sequence:
         first_row.append(gap_dropdown)
+    if has_radix_max:
+        first_row.append(radix_max_input)
     layout = widgets.VBox(
         [
             widgets.HBox(first_row, layout=widgets.Layout(width="100%", gap="12px")),
@@ -1003,7 +1066,7 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
     return controls, layout
 
 
-def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap_sequence=False, has_partition=False):
+def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap_sequence=False, has_partition=False, has_radix_max=False):
     if colab_output is not None:
         colab_output.enable_custom_widget_manager()
 
@@ -1012,10 +1075,17 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         has_tree=has_tree,
         has_gap_sequence=has_gap_sequence,
         has_partition=has_partition,
+        has_radix_max=has_radix_max,
     )
     formula_output = widgets.HTML(
         value="",
-        layout=widgets.Layout(width="100%", padding="14px 0 10px 0", min_height=FORMULA_OUTPUT_HEIGHT),
+        layout=widgets.Layout(
+            width="100%",
+            min_height=FORMULA_OUTPUT_HEIGHT,
+            padding=FORMULA_OUTPUT_PADDING,
+            margin="0",
+            overflow="visible",
+        ),
     )
     html_output = widgets.HTML()
     control_state = {"updating": False}
@@ -1030,19 +1100,30 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             return None
         return loop.create_task(coro)
 
-    def build_state(values=None):
+    def build_state(values=None, sync_radix_max=False):
+        if values is not None:
+            state_values = list(values)
+        elif algorithm == "radix":
+            state_values = generate_radix_values(controls["size"].value, controls["radix_max"].value)
+        else:
+            state_values = generate_values(controls["size"].value)
+        if algorithm == "radix" and sync_radix_max and state_values:
+            control_state["updating"] = True
+            controls["radix_max"].value = max(state_values)
+            control_state["updating"] = False
         return create_state(
             algorithm=algorithm,
-            size=len(values) if values is not None else controls["size"].value,
+            size=len(state_values),
             descending=controls["order"].value,
-            values=values,
+            values=state_values,
             view=controls["view"].value,
             pivot_strategy=controls["pivot"].value,
             partition_scheme=controls["partition"].value,
             gap_sequence=controls["gap_sequence"].value,
+            radix_max=controls["radix_max"].value,
         )
 
-    state = build_state()
+    state = build_state(sync_radix_max=True)
 
     def build_sort_trace():
         probe = copy_sort_state(state)
@@ -1051,7 +1132,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             yield copy_sort_state(probe)
 
     def redraw():
-        formula = state["formula"]
+        formula = displaystyle_formula(state["formula"])
         render_cache.update_outputs(
             formula_output,
             html_output,
@@ -1071,7 +1152,9 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         nonlocal state
         if control_state["updating"]:
             return
-        state = build_state()
+        change = _args[0] if _args else {}
+        sync_radix_max = not (isinstance(change, dict) and change.get("owner") is controls["radix_max"])
+        state = build_state(sync_radix_max=sync_radix_max)
         redraw()
         sync_execution_buttons()
 
@@ -1082,7 +1165,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         control_state["updating"] = True
         controls["size"].value = default_size_for_view(change["new"])
         control_state["updating"] = False
-        state = build_state()
+        state = build_state(sync_radix_max=True)
         redraw()
         sync_execution_buttons()
 
@@ -1144,7 +1227,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
 
     def generate_new(*_args):
         nonlocal state
-        state = build_state(values=generate_values(controls["size"].value))
+        state = build_state(sync_radix_max=False)
         redraw()
         sync_execution_buttons()
 
@@ -1153,7 +1236,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         control_state["updating"] = True
         controls["size"].value = len(book_array)
         control_state["updating"] = False
-        state = build_state(values=book_array)
+        state = build_state(values=book_array, sync_radix_max=True)
         redraw()
         sync_execution_buttons()
 
@@ -1168,6 +1251,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     controls["pivot"].observe(reset_algorithm, names="value")
     controls["partition"].observe(reset_algorithm, names="value")
     controls["gap_sequence"].observe(reset_algorithm, names="value")
+    controls["radix_max"].observe(reset_algorithm, names="value")
 
     css_widget = widgets.HTML(sort_styles())
     layout = widgets.VBox([controls_layout, formula_output, css_widget, html_output], layout=widgets.Layout(width="100%"))
@@ -1192,6 +1276,8 @@ __all__ = [
     "step_sort",
     "copy_event",
     "copy_sort_state",
+    "displaystyle_formula",
+    "generate_radix_values",
     "render_state_html",
     "run_sort_app",
 ]
