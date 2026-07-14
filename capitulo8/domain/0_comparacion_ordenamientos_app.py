@@ -148,6 +148,12 @@ def render_bar(value, role, max_value):
     """
 
 
+def render_result_symbol(item):
+    if not item["state"]["sorting_complete"]:
+        return ""
+    return '<span class="comparison-result-symbol" aria-label="Ordenado" title="Ordenado">✓</span>'
+
+
 def render_bars(item, show_indexes=False):
     cache_key = "with_indexes" if show_indexes else "plain"
     if item["state"]["sorting_complete"] and cache_key in item["html_cache"]:
@@ -161,12 +167,16 @@ def render_bars(item, show_indexes=False):
         render_bar(value, sort_state["roles"][index], max_value)
         for index, value in enumerate(values)
     )
+    result = render_result_symbol(item)
     html = f"""
     <div class="comparison-row">
       <div class="comparison-name">{item["title"]}</div>
       <div class="comparison-steps">{item["steps"]}</div>
       <div class="comparison-array-wrap">
-        <div class="comparison-bars">{bars}</div>
+        <div class="comparison-bars-result">
+          <div class="comparison-bars">{bars}</div>
+          <div class="comparison-result">{result}</div>
+        </div>
         {indexes}
       </div>
     </div>
@@ -210,7 +220,7 @@ def render_comparison_styles():
         width: 100%;
         box-sizing: border-box;
         font-family: '{FONT_FAMILY}', serif;
-        color: #ffffff;
+        color: #f7f7f7;
         background: #000000;
         padding: 8px;
       }}
@@ -232,7 +242,7 @@ def render_comparison_styles():
         width: 100%;
         background: #000000;
         font-family: '{FONT_FAMILY}', serif;
-        color: #ffffff;
+        color: #f7f7f7;
       }}
       .comparison-header {{
         align-items: end;
@@ -245,13 +255,13 @@ def render_comparison_styles():
       .comparison-name {{
         font-size: 22px;
         line-height: 1.2;
-        color: #ffffff;
+        color: #f7f7f7;
         text-align: center;
         font-weight: 700;
       }}
       .comparison-steps {{
         font-size: 20px;
-        color: #ffffff;
+        color: #f7f7f7;
         text-align: center;
         white-space: nowrap;
       }}
@@ -261,13 +271,20 @@ def render_comparison_styles():
         background: #000000;
         padding: 8px 0 4px;
       }}
+      .comparison-bars-result {{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: 100%;
+      }}
       .comparison-bars {{
         display: flex;
         align-items: flex-end;
         justify-content: center;
         gap: clamp(1px, 0.35vw, 3px);
         min-height: 220px;
-        width: 100%;
+        width: calc(100% - 36px);
       }}
       .comparison-bar-wrap {{
         width: auto;
@@ -290,12 +307,13 @@ def render_comparison_styles():
         justify-content: flex-end;
       }}
       .comparison-bar-value {{
-        color: #ffffff;
+        color: #f7f7f7;
         font-size: 14px;
         line-height: 16px;
         height: 18px;
         margin-bottom: 2px;
         overflow: hidden;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);
       }}
       .comparison-bar {{
         width: 100%;
@@ -317,10 +335,31 @@ def render_comparison_styles():
         min-width: 8px;
         max-width: 34px;
         text-align: center;
-        color: #ffffff;
+        color: #f7f7f7;
         font-size: 14px;
         line-height: 16px;
         overflow: hidden;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);
+      }}
+      .comparison-result {{
+        width: 32px;
+        min-width: 32px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }}
+      .comparison-result-symbol {{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        font-size: 30px;
+        line-height: 1;
+        font-weight: 700;
+        color: #7bdc80;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
       }}
       @media (max-width: 760px) {{
         .comparison-header {{

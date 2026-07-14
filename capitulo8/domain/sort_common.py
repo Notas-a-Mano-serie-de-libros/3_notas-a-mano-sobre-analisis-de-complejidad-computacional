@@ -54,6 +54,12 @@ _SIMULATION_HEIGHT_CACHE = {}
 _SORT_STYLES = None
 SORT_VISUAL_WIDTH = 760
 SORT_RESULT_WIDTH = 44
+SORT_RESULT_HEIGHT = 54
+SORT_BOX_RESULT_OFFSET = 30
+SORT_TREE_RESULT_OFFSET = 30
+SORT_BAR_AREA_HEIGHT = 295
+SORT_BAR_MIN_HEIGHT = 18
+SORT_BAR_HEIGHT_RANGE = 250
 MERGE_TREE_ROW_HEIGHT = 144
 QUICK_TREE_ROW_HEIGHT = 144
 SORT_LEGEND_ITEMS = (
@@ -595,6 +601,18 @@ def render_sort_result_symbol(state):
     return '<span class="sort-result-symbol" aria-label="Ordenado" title="Ordenado">✓</span>'
 
 
+def sort_result_offset(state, view):
+    if view == "barras":
+        values = state.get("arr", [])
+        max_value = max(values) if values else 0
+        tallest_bar = SORT_BAR_MIN_HEIGHT + SORT_BAR_HEIGHT_RANGE if max_value else SORT_BAR_MIN_HEIGHT
+        bar_center = (SORT_BAR_AREA_HEIGHT - tallest_bar) + tallest_bar / 2
+        return max(0, round(bar_center - SORT_RESULT_HEIGHT / 2))
+    if view == "arbol":
+        return SORT_TREE_RESULT_OFFSET
+    return SORT_BOX_RESULT_OFFSET
+
+
 def render_tree_html(state):
     algorithm = state.get("algorithm")
     if algorithm == "mezcla" and "merge_tree_nodes" in state:
@@ -698,7 +716,7 @@ def item_html(value, index, role, label, max_value, view, item_width=None):
     fill, _border, text = ROLE_STYLES[role]
     label_markup = label_html(label) if label else "&nbsp;"
     if view == "barras":
-        height = 18 + (value / max_value) * 250 if max_value else 18
+        height = SORT_BAR_MIN_HEIGHT + (value / max_value) * SORT_BAR_HEIGHT_RANGE if max_value else SORT_BAR_MIN_HEIGHT
         width_style = f' style="width:{item_width}px; margin: 0 1.5px;"' if item_width else ""
         return f"""
         <div class="bar-wrap"{width_style}>
@@ -894,7 +912,7 @@ def sort_styles():
       .box-index, .bar-index {{
         margin-bottom: 6px;
         font-size: 20px;
-        color: #555555;
+        color: #444444;
       }}
       .box {{
         height: 54px;
@@ -909,9 +927,6 @@ def sort_styles():
         transition: background-color 120ms ease, color 120ms ease;
       }}
       .sort-item:first-child .box {{
-        border-left-width: 2px;
-      }}
-      .sort-item:nth-child(8n + 1) .box {{
         border-left-width: 2px;
       }}
       .box-value {{
@@ -941,7 +956,7 @@ def sort_styles():
         flex: 0 0 auto;
       }}
       .bar-area {{
-        height: 295px;
+        height: {SORT_BAR_AREA_HEIGHT}px;
         display: flex;
         align-items: flex-end;
         justify-content: center;
@@ -1030,11 +1045,15 @@ def sort_styles():
       }}
       .merge-block-inactive .tree-box,
       .quick-block-inactive .tree-box {{
-        opacity: 0.62;
+        opacity: 0.7;
+      }}
+      .merge-block-inactive .tree-label,
+      .quick-block-inactive .tree-label {{
+        color: #666666;
       }}
       .merge-range, .quick-range {{
         font-size: 14px;
-        color: #555555;
+        color: #444444;
         margin-bottom: 4px;
       }}
       .merge-index-row {{
@@ -1049,7 +1068,7 @@ def sort_styles():
         height: 24px;
         line-height: 24px;
         font-size: 20px;
-        color: #555555;
+        color: #444444;
         text-align: center;
       }}
       .merge-values, .quick-values {{
@@ -1072,7 +1091,7 @@ def sort_styles():
         height: 24px;
         line-height: 24px;
         font-size: 20px;
-        color: #555555;
+        color: #444444;
         text-align: center;
       }}
       .quick-values-aligned {{
@@ -1119,21 +1138,28 @@ def sort_styles():
         min-height: 46px;
         font-size: 20px;
         line-height: 22px;
-        color: #333333;
+        color: #222222;
       }}
       .item-label {{
         margin-top: 10px;
         min-height: 44px;
         font-size: 20px;
         line-height: 22px;
-        color: #333333;
+        color: #222222;
       }}
       .sort-array-line {{
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         gap: 4px;
         width: 100%;
+      }}
+      .sort-array-line-cajas .sort-items.boxes,
+      .sort-array-line-barras .bar-panel,
+      .sort-array-line-arbol .merge-tree-shell,
+      .sort-array-line-arbol .quick-tree-shell {{
+        margin-left: 0;
+        margin-right: 0;
       }}
       .sort-array-line .sort-items,
       .sort-array-line .bar-panel {{
@@ -1146,10 +1172,11 @@ def sort_styles():
       .sort-result {{
         width: {SORT_RESULT_WIDTH}px;
         min-width: {SORT_RESULT_WIDTH}px;
-        height: 54px;
+        height: {SORT_RESULT_HEIGHT}px;
         display: flex;
         align-items: center;
         justify-content: center;
+        align-self: flex-start;
       }}
       .sort-result-symbol {{
         display: inline-flex;
@@ -1252,6 +1279,7 @@ def render_state_html(state, include_styles=True):
     legend = render_sort_legend(state, view)
     phase = sort_phase_label(state)
     result = render_sort_result_symbol(state)
+    result_offset = sort_result_offset(state, view)
     styles = sort_styles() if include_styles else ""
     return f"""
     {styles}
@@ -1261,7 +1289,7 @@ def render_state_html(state, include_styles=True):
       {legend}
       <div class="sort-array-line sort-array-line-{css_token(view)}">
         {items_markup}
-        <div class="sort-result">{result}</div>
+        <div class="sort-result" style="margin-top:{result_offset}px;">{result}</div>
       </div>
       {radix_buckets}
     </div>

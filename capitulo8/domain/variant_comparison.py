@@ -73,6 +73,12 @@ def render_bar(value, role, maximum):
     """
 
 
+def render_result_symbol(item):
+    if not item["state"]["sorting_complete"]:
+        return ""
+    return '<span class="variant-result-symbol" aria-label="Ordenado" title="Ordenado">✓</span>'
+
+
 def render_html(state):
     rows = []
     for row_index, item in enumerate(state["algorithms"]):
@@ -85,27 +91,38 @@ def render_html(state):
             indexes = '<div class="variant-indexes">' + "".join(
                 f'<span>{index}</span>' for index in range(len(values))
             ) + "</div>"
+        result = render_result_symbol(item)
         rows.append(f"""
         <div class="variant-row">
           <div class="variant-name">{item["title"]}</div>
           <div class="variant-steps">{item["steps"]}</div>
-          <div class="variant-array"><div class="variant-bars">{bars}</div>{indexes}</div>
+          <div class="variant-array">
+            <div class="variant-bars-result">
+              <div class="variant-bars">{bars}</div>
+              <div class="variant-result">{result}</div>
+            </div>
+            {indexes}
+          </div>
         </div>
         """)
     return f"""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
-      .variant-app {{ width:100%;background:#000;color:#fff;padding:8px;box-sizing:border-box;font-family:'{FONT_FAMILY}',serif; }}
+      .variant-app {{ width:100%;background:#000;color:#f7f7f7;padding:8px;box-sizing:border-box;font-family:'{FONT_FAMILY}',serif; }}
       .variant-header,.variant-row {{ display:grid;grid-template-columns:140px 68px minmax(0,1fr);gap:8px;align-items:center; }}
       .variant-header {{ font-weight:700;font-size:22px;text-align:center; }}
       .variant-name {{ font-weight:700;font-size:21px;text-align:center; }}
       .variant-steps {{ font-size:20px;text-align:center; }}
-      .variant-bars {{ min-height:220px;display:flex;align-items:flex-end;justify-content:center;gap:clamp(1px,.35vw,3px); }}
+      .variant-array {{ min-width:0;overflow-x:hidden; }}
+      .variant-bars-result {{ display:flex;align-items:center;justify-content:center;gap:4px;width:100%; }}
+      .variant-bars {{ min-height:220px;display:flex;align-items:flex-end;justify-content:center;gap:clamp(1px,.35vw,3px);width:calc(100% - 36px); }}
       .variant-bar-wrap {{ flex:1 1 0;min-width:8px;max-width:34px;text-align:center; }}
-      .variant-bar-value {{ height:18px;line-height:16px;font-size:14px;margin-bottom:2px;overflow:hidden; }}
+      .variant-bar-value {{ height:18px;line-height:16px;font-size:14px;margin-bottom:2px;overflow:hidden;color:#f7f7f7;text-shadow:0 1px 2px rgba(0,0,0,.92); }}
       .variant-bar {{ width:100%;border:0;border-radius:0; }}
       .variant-indexes {{ display:flex;justify-content:center;gap:clamp(1px,.35vw,3px);padding-top:4px; }}
-      .variant-indexes span {{ flex:1 1 0;min-width:8px;max-width:34px;text-align:center;font-size:14px; }}
+      .variant-indexes span {{ flex:1 1 0;min-width:8px;max-width:34px;text-align:center;font-size:14px;color:#f7f7f7;text-shadow:0 1px 2px rgba(0,0,0,.92); }}
+      .variant-result {{ width:32px;min-width:32px;height:48px;display:flex;align-items:center;justify-content:center; }}
+      .variant-result-symbol {{ display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;font-size:30px;line-height:1;font-weight:700;color:#7bdc80;text-shadow:0 1px 2px rgba(0,0,0,.95); }}
       @media(max-width:760px) {{
         .variant-header {{ display:none; }}
         .variant-row {{ grid-template-columns:1fr;gap:6px; }}

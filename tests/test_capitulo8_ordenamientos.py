@@ -108,6 +108,12 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         html = module.render_comparison_html(comparison_state)
         self.assertIn("Inserción", html)
         self.assertIn("Inserción<br>binaria", html)
+        self.assertIn("insertion-comparison-bars-result", html)
+        self.assertIn("color: #7bdc80;", html)
+        while not module.all_variants_complete(comparison_state):
+            module.step_all_variants(comparison_state)
+        completed_html = module.render_comparison_html(comparison_state)
+        self.assertEqual(completed_html.count(">✓</span>"), len(comparison_state["algorithms"]))
 
         probe = module.create_binary_state(size=len(values), values=values, view="barras")
         while not probe["sorting_complete"] and "m" not in probe["labels"]:
@@ -149,6 +155,19 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         )
         shell_item = next(item for item in comparison_state["algorithms"] if item["key"] == "shell")
         self.assertEqual(shell_item["state"]["gap_sequence"], "hibbard")
+
+        shell_comparison = module.create_gap_comparison_state(
+            size=8,
+            values=[35, 12, 48, 7, 26, 19, 41, 3],
+            descending=False,
+        )
+        shell_html = module.render_gap_comparison_html(shell_comparison)
+        self.assertIn("shell-comparison-bars-result", shell_html)
+        self.assertIn("color: #7bdc80;", shell_html)
+        while not module.all_sequences_complete(shell_comparison):
+            module.step_all_sequences(shell_comparison)
+        completed_shell_html = module.render_gap_comparison_html(shell_comparison)
+        self.assertEqual(completed_shell_html.count(">✓</span>"), len(shell_comparison["algorithms"]))
 
     def test_shell_shows_intermediate_comparisons_after_each_swap(self):
         module = self.modules["shell"]
@@ -348,10 +367,16 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("sort-app-bars", bar_html)
         self.assertIn("bar-panel", bar_html)
         self.assertIn("bar-nodes", bar_html)
+        self.assertIn('class="sort-array-line sort-array-line-cajas"', box_html)
+        self.assertIn('class="sort-array-line sort-array-line-barras"', bar_html)
+        self.assertIn('class="sort-result" style="margin-top:30px;"', box_html)
+        self.assertIn('class="sort-result" style="margin-top:134px;"', bar_html)
         self.assertIn("min-height:", bar_html)
         self.assertIn("width: fit-content;", box_html)
         self.assertIn("width: fit-content;", bar_html)
         self.assertIn("gap: 4px;", bar_html)
+        self.assertIn(".sort-array-line-cajas .sort-items.boxes", bar_html)
+        self.assertIn("margin-left: 0;", bar_html)
         self.assertIn("color: #f7f7f7;", bar_html)
         self.assertIn("text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);", bar_html)
         self.assertIn("color: #7bdc80;", bar_html)
@@ -689,6 +714,12 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         html = module.render_comparison_html(state)
         self.assertIn("Hoare", html)
         self.assertIn("Lomuto", html)
+        self.assertIn("variant-bars-result", html)
+        self.assertIn("color:#7bdc80", html)
+        while not module.variants_complete(state):
+            module.step_all_variants(state)
+        completed_html = module.render_comparison_html(state)
+        self.assertEqual(completed_html.count(">✓</span>"), len(state["algorithms"]))
 
     def test_quick_pivot_comparison_uses_selected_partition_scheme(self):
         module = self.modules["rapido"]
@@ -728,6 +759,11 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
 
     def test_box_and_tree_views_use_contiguous_square_cells(self):
         box_state = self.modules["burbuja"].create_state(size=5, values=[64, 25, 12, 22, 11], view="cajas")
+        ten_box_state = self.modules["burbuja"].create_state(
+            size=10,
+            values=[161, 141, 182, 74, 166, 189, 79, 111, 18, 192],
+            view="cajas",
+        )
         merge_state = self.modules["mezcla"].create_state(size=4, values=[64, 25, 12, 22], view="arbol")
         quick_state = self.modules["rapido"].create_state(size=4, values=[64, 25, 12, 22], view="arbol")
 
@@ -743,6 +779,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                 self.assertIn("box-shadow: none;", html)
                 self.assertIn("border-left-width: 0;", html)
                 self.assertIn("border-color:#111111", html)
+                self.assertNotIn("nth-child(8n + 1)", html)
+
+        ten_box_html = self.modules["burbuja"].render_state_html(ten_box_state)
+        self.assertEqual(ten_box_html.count(".sort-item:first-child .box"), 1)
 
     def test_tree_view_centers_root_and_keeps_space_between_subarrays(self):
         state = self.modules["mezcla"].create_state(
@@ -1098,6 +1138,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("Arreglo", html)
         self.assertIn("background: #000000;", html)
         self.assertIn("overflow-x: hidden;", html)
+        self.assertIn("comparison-bars-result", html)
+        self.assertIn("comparison-result-symbol", html)
+        self.assertIn("color: #7bdc80;", html)
         self.assertIn("gap: 0;", source)
         self.assertIn("padding-bottom: 0;", source)
         self.assertIn("body_output = widgets.HTML", source)
@@ -1107,6 +1150,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("def comparison_row_key(item, show_indexes=False):", source)
         self.assertIn("def render_cached_comparison_row(item, show_indexes=False):", source)
         self.assertIn("render_cached_comparison_row(item, show_indexes=index == 0)", source)
+        self.assertIn("def render_result_symbol(item):", source)
         self.assertNotIn("header_output = widgets.HTML", source)
         self.assertNotIn("rows_output = widgets.HTML", source)
         self.assertNotIn("row_outputs = []", source)
