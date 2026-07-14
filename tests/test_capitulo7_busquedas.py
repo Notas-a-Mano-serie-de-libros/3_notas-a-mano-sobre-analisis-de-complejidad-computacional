@@ -861,9 +861,10 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn('class="search-result" aria-live="polite"', found_html)
         self.assertIn(">✓</span>", found_html)
         self.assertIn(
-            "transition: background-color 120ms ease",
+            "transition: background-color 100ms ease",
             (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8"),
         )
+        self.assertIn("search-step-strip", found_html)
         self.assertNotIn(r"$\checkmark$", found_html)
 
         missing = module.create_state(size=8, target=99, values=[1, 2, 3, 4, 5, 6, 7, 8])

@@ -302,8 +302,9 @@ def calculate_search_dimensions(state):
         return _SEARCH_DIMENSION_CACHE[node_count]
     rows = max(1, math.ceil(node_count / SEARCH_NODES_PER_ROW))
     nodes_height = (rows * SEARCH_NODE_HEIGHT) + ((rows - 1) * SEARCH_NODE_GAP) + SEARCH_VERTICAL_PADDING
-    legend_height = 28
-    app_height = SEARCH_MESSAGE_HEIGHT + legend_height + nodes_height + SEARCH_VERTICAL_PADDING
+    step_height = 22
+    legend_height = 32
+    app_height = SEARCH_MESSAGE_HEIGHT + step_height + legend_height + nodes_height + SEARCH_VERTICAL_PADDING
     dimensions = {
         "nodes_height": nodes_height,
         "app_height": app_height,
@@ -328,24 +329,39 @@ def _build_search_css() -> str:
   }}
   .search-message {{
     height: {SEARCH_MESSAGE_HEIGHT}px;
-    line-height: {SEARCH_MESSAGE_HEIGHT}px;
+    line-height: 28px;
     font-size: 24px;
     font-weight: 400;
     text-align: center;
-    margin: 6px 0 8px;
-    overflow: visible;
+    margin: 4px 0 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }}
+  .search-step-strip {{
+    height: 22px;
+    line-height: 20px;
+    margin: 0 auto 8px;
+    text-align: center;
+    font-size: 15px;
+    color: #555555;
+    box-sizing: border-box;
+    overflow: hidden;
   }}
   .search-legend {{
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px 14px;
-    margin: 2px auto 8px;
-    min-height: 22px;
+    margin: 0 auto 10px;
+    min-height: 26px;
     font-size: 15px;
     line-height: 18px;
     color: #333333;
     box-sizing: border-box;
+    align-content: center;
   }}
   .search-legend-item {{
     display: inline-flex;
@@ -374,7 +390,7 @@ def _build_search_css() -> str:
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 2px;
     width: 100%;
   }}
   .search-array-line .search-nodes {{
@@ -402,7 +418,7 @@ def _build_search_css() -> str:
     line-height: 1;
     font-weight: 700;
     color: #111111;
-    transition: color 120ms ease, transform 120ms ease;
+    transition: color 100ms ease, transform 100ms ease;
   }}
   .search-result-symbol.found {{
     color: #2d7d32;
@@ -454,7 +470,7 @@ def _build_search_css() -> str:
     align-items: center;
     justify-content: center;
     box-shadow: none;
-    transition: background-color 120ms ease, color 120ms ease;
+    transition: background-color 100ms ease, color 100ms ease;
   }}
   .node-wrap:nth-child({SEARCH_NODES_PER_ROW}n + 1) .node {{
     border-left-width: 2px;
@@ -474,11 +490,14 @@ def _build_search_css() -> str:
   @media (max-width: 760px) {{
     .search-message {{
       font-size: 22px;
-      line-height: {SEARCH_MESSAGE_HEIGHT}px;
+      line-height: 25px;
     }}
     .search-legend {{
       justify-content: flex-start;
       gap: 8px 10px;
+    }}
+    .search-step-strip {{
+      text-align: left;
     }}
     .search-result {{
       width: 34px;
@@ -515,6 +534,14 @@ def render_result_symbol(state):
     )
 
 
+def render_search_step_status(state):
+    total = state.get("step_total", 0)
+    if total <= 0:
+        return "&nbsp;"
+    current = min(state.get("step_index", 0), total)
+    return escape(f"Paso {current} / {total}")
+
+
 def render_state_html(state, role_styles, label_map):
     message = message_html(state["general_message"] or f"Elemento de interés: {state['target']}")
     node_cache = state.setdefault("_node_html_cache", {})
@@ -533,6 +560,7 @@ def render_state_html(state, role_styles, label_map):
     nodes = "".join(node_markup)
     dimensions = calculate_search_dimensions(state)
     result = render_result_symbol(state)
+    step_status = render_search_step_status(state)
     legend_width = dimensions["nodes_width"] + dimensions["result_width"] + 4
     legend = render_search_legend(state, role_styles, legend_width)
     found = any(node["role"] == "found" for node in state.get("arr", []))
@@ -542,6 +570,7 @@ def render_state_html(state, role_styles, label_map):
     return (
         f'<div class="search-app{complete_class}{phase_class}" style="min-height: {dimensions["app_height"]}px;">'
         f'<div class="search-message">{message}</div>'
+        f'<div class="search-step-strip" style="width: min(100%, {legend_width}px);">{step_status}</div>'
         f"{legend}"
         f'<div class="search-array-line">'
         f'<div class="search-nodes" style="width: min(100%, {dimensions["nodes_width"]}px); min-height: {dimensions["nodes_height"]}px;">{nodes}</div>'
@@ -575,20 +604,27 @@ def calculate_formula_reserved_height(state, step_search):
     probe = copy_search_state(state)
     max_height = formula_iframe_height(probe.get("formula", ""))
     max_steps = min(MAX_FORMULA_PROBE_STEPS, max(16, len(probe.get("arr", [])) * 8 + 16))
+    steps = 0
 
     for _ in range(max_steps):
         if probe.get("search_complete"):
             break
         step_search(probe)
+        steps += 1
         max_height = max(max_height, formula_iframe_height(probe.get("formula", "")))
 
+    state["step_total"] = steps
+    state.setdefault("step_index", 0)
     return max_height
 
 
 def build_search_trace(state, step_search):
     probe = copy_search_state(state)
+    step_index = state.get("step_index", 0)
     while not probe.get("search_complete"):
         step_search(probe)
+        step_index += 1
+        probe["step_index"] = step_index
         yield copy_search_state(probe)
 
 
@@ -804,6 +840,7 @@ def run_search_app(
     def run_single_step(*_args):
         if not state["search_complete"]:
             step_search(state)
+            state["step_index"] = min(state.get("step_index", 0) + 1, state.get("step_total", 0))
         redraw()
         sync_execution_buttons()
 
@@ -858,6 +895,7 @@ def run_search_app(
             final_state = snapshot
         if final_state is not None:
             state = final_state
+            state["step_index"] = state.get("step_total", state.get("step_index", 0))
         redraw()
         reset_button.disabled = False
         book_button.disabled = False

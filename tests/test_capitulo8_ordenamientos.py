@@ -915,7 +915,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         state = module.create_state(size=4, values=[4, 3, 2, 1], view="cajas")
         initial_html = module.render_state_html(state)
 
-        self.assertIn("transition: background-color 120ms ease", initial_html)
+        self.assertIn("transition: background-color 100ms ease", initial_html)
+        self.assertIn("sort-step-strip", initial_html)
+        self.assertIn("Paso 0 /", initial_html)
         self.assertIn('<div class="sort-app sort-phase-none"', initial_html)
 
         self.run_until_complete(module, "step_bubble_sort", state)
@@ -979,8 +981,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertGreater(initial_html.rindex("radix-buckets-panel"), initial_html.rindex("bar-panel"))
         self.assertIn('class="radix-bucket-key radix-bucket-heading">Dígito</div>', initial_html)
         self.assertIn('class="radix-bucket-chain radix-bucket-heading">Bucket</div>', initial_html)
-        self.assertIn("height: 28px;", initial_html)
+        self.assertIn("height: 30px;", initial_html)
         self.assertIn("white-space: nowrap;", initial_html)
+        self.assertIn("radix-bucket-empty", initial_html)
+        self.assertIn("vacío", initial_html)
 
         module.step_radix_sort(state)
         self.assertIn(r"p = \operatorname{digitos}(\max(a))", state["formula"])

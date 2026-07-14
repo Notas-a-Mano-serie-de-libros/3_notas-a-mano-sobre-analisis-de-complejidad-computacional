@@ -370,7 +370,7 @@ def simulation_min_height(state):
     if cache_key in _SIMULATION_HEIGHT_CACHE:
         return _SIMULATION_HEIGHT_CACHE[cache_key]
     message_height = 72
-    phase_height = 28
+    phase_height = 52
     legend_height = 34
     result_width = SORT_RESULT_WIDTH
     vertical_padding = 34
@@ -604,6 +604,15 @@ def sort_phase_label(state):
     return escape(labels.get(phase, f"Fase: {phase}"))
 
 
+def render_sort_step_status(state):
+    trace = state.get("trace")
+    total = max(0, len(trace) - 1) if trace is not None else 0
+    if total <= 0:
+        return "&nbsp;"
+    current = min(state.get("step_index", 0), total)
+    return escape(f"Paso {current} / {total}")
+
+
 def render_sort_result_symbol(state):
     if not state.get("sorting_complete"):
         return ""
@@ -786,6 +795,17 @@ def sort_styles():
       .sort-phase-strip {{
         height: 24px;
         line-height: 22px;
+        margin: 0 auto 4px;
+        width: min(100%, {SORT_VISUAL_WIDTH}px);
+        text-align: center;
+        font-size: 15px;
+        color: #555555;
+        box-sizing: border-box;
+        overflow: hidden;
+      }}
+      .sort-step-strip {{
+        height: 22px;
+        line-height: 20px;
         margin: 0 auto 8px;
         width: min(100%, {SORT_VISUAL_WIDTH}px);
         text-align: center;
@@ -796,6 +816,24 @@ def sort_styles():
       }}
       .sort-app-bars .sort-phase-strip {{
         color: #e8e8e8;
+      }}
+      .sort-app-bars .sort-step-strip {{
+        color: #d8d8d8;
+      }}
+      .sort-phase-distribution .sort-phase-strip,
+      .sort-phase-write .sort-phase-strip,
+      .sort-phase-complete .sort-phase-strip {{
+        border-left: 6px solid currentColor;
+        background: rgba(255, 255, 255, 0.08);
+      }}
+      .sort-phase-distribution .sort-phase-strip {{
+        color: #ffd7d4;
+      }}
+      .sort-phase-write .sort-phase-strip {{
+        color: #ffe8a8;
+      }}
+      .sort-phase-complete .sort-phase-strip {{
+        color: #c8f5ca;
       }}
       .sort-legend {{
         display: flex;
@@ -881,6 +919,13 @@ def sort_styles():
         background: rgb(255, 242, 204);
         color: #111111;
       }}
+      .radix-bucket-empty {{
+        color: #777777;
+        font-style: italic;
+      }}
+      .sort-app-bars .radix-bucket-empty {{
+        color: #bdbdbd;
+      }}
       .radix-bucket-chain {{
         min-width: 0;
         white-space: nowrap;
@@ -910,7 +955,7 @@ def sort_styles():
       }}
       .radix-bucket-row,
       .radix-bucket-active-value {{
-        transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+        transition: background-color 100ms ease, border-color 100ms ease, color 100ms ease;
       }}
       .sort-items {{
         display: flex;
@@ -950,7 +995,7 @@ def sort_styles():
         justify-content: center;
         box-shadow: none;
         box-sizing: border-box;
-        transition: background-color 120ms ease, color 120ms ease;
+        transition: background-color 100ms ease, color 100ms ease;
       }}
       .sort-item:first-child .box {{
         border-left-width: 2px;
@@ -1009,9 +1054,10 @@ def sort_styles():
         box-sizing: border-box;
         border: none;
         border-radius: 0;
-        outline: 1px solid rgba(255, 255, 255, 0.2);
+        outline: 1px solid rgba(255, 255, 255, 0.38);
         outline-offset: -1px;
-        transition: background-color 120ms ease, height 120ms ease;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+        transition: background-color 100ms ease, height 100ms ease;
       }}
       .bar-index {{
         color: #f7f7f7;
@@ -1148,7 +1194,7 @@ def sort_styles():
         font-size: 24px;
         box-shadow: none;
         box-sizing: border-box;
-        transition: background-color 120ms ease, color 120ms ease;
+        transition: background-color 100ms ease, color 100ms ease;
       }}
       .tree-box-empty {{
         background-image: repeating-linear-gradient(
@@ -1232,9 +1278,16 @@ def sort_styles():
           font-size: 22px;
           line-height: 25px;
         }}
+        .sort-phase-strip,
+        .sort-step-strip {{
+          text-align: left;
+        }}
         .sort-legend {{
           justify-content: flex-start;
           gap: 8px 10px;
+        }}
+        .sort-legend-item {{
+          font-size: 14px;
         }}
         .radix-buckets-panel {{
           font-size: 15px;
@@ -1246,6 +1299,13 @@ def sort_styles():
         .sort-result {{
           width: 34px;
           min-width: 34px;
+        }}
+        .bar-value {{
+          font-size: 15px;
+        }}
+        .box-value,
+        .tree-box {{
+          font-size: 24px;
         }}
         .sort-array-line .sort-items,
         .sort-array-line .bar-panel,
@@ -1315,7 +1375,7 @@ def render_radix_buckets(state):
         if bucket == active_bucket and active_value is not None and phase == "write" and not highlighted:
             chain_items.append(f'<span class="radix-bucket-active-value radix-bucket-removed">{escape(str(active_value))}</span>')
         chain = " -> ".join(chain_items)
-        structure = chain if chain else "&nbsp;"
+        structure = chain if chain else '<span class="radix-bucket-empty">vacío</span>'
         active_class = " radix-bucket-row-active" if bucket == active_bucket else ""
         rows.append(
             f"""
@@ -1347,6 +1407,7 @@ def render_state_html(state, include_styles=True):
     radix_buckets = render_radix_buckets(state)
     legend = render_sort_legend(state, view)
     phase = sort_phase_label(state)
+    step_status = render_sort_step_status(state)
     result = render_sort_result_symbol(state)
     result_offset = sort_result_offset(state, view)
     styles = sort_styles() if include_styles else ""
@@ -1355,6 +1416,7 @@ def render_state_html(state, include_styles=True):
     <div class="{app_class}" style="min-height:{min_height}px; height:{min_height}px; overflow:hidden;">
       <div class="sort-message">{message_html(state["message"])}</div>
       <div class="sort-phase-strip">{phase}</div>
+      <div class="sort-step-strip">{step_status}</div>
       {legend}
       <div class="sort-array-line sort-array-line-{css_token(view)}">
         {items_markup}
