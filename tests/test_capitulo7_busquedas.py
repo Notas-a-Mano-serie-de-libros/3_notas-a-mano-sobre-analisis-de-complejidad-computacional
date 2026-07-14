@@ -857,6 +857,8 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         found_html = module.render_state_html(state)
         self.assertIn("search-app-complete search-app-found", found_html)
         self.assertIn('search-result-symbol found', found_html)
+        self.assertIn('role="img" aria-label="Encontrado"', found_html)
+        self.assertIn('class="search-result" aria-live="polite"', found_html)
         self.assertIn(">✓</span>", found_html)
         self.assertIn(
             "transition: background-color 120ms ease",
@@ -870,6 +872,11 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         missing_html = module.render_state_html(missing)
         self.assertIn("search-app-complete search-app-missing", missing_html)
         self.assertIn('search-result-symbol missing', missing_html)
+        self.assertIn('role="img" aria-label="No encontrado"', missing_html)
+        self.assertIn(
+            "color: #b85450;",
+            (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8"),
+        )
         self.assertIn(">×</span>", missing_html)
         self.assertNotIn(r"$\times$", missing_html)
 
@@ -1043,6 +1050,11 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn('symbol = "✓" if found else "×"', source)
         self.assertIn(".comparison-result-symbol.found", source)
         self.assertIn("color: #2d7d32;", source)
+        self.assertIn("color: #b85450;", source)
+        self.assertIn('role="img"', source)
+        self.assertIn('aria-live="polite"', source)
+        self.assertIn("contain: layout paint;", source)
+        self.assertIn("prefers-reduced-motion: reduce", source)
         self.assertIn("border: 2px solid #111111;", source)
         self.assertNotIn("border-color:", html)
         self.assertEqual(html.count('<div class="comparison-index">'), len(values))
@@ -1105,6 +1117,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
             module.step_all_searches(missing_state)
         missing_html = module.render_comparison_html(missing_state)
         self.assertEqual(missing_html.count('comparison-result-symbol missing'), len(missing_state["algorithms"]))
+        self.assertIn('role="img" aria-label="No encontrado"', missing_html)
         self.assertEqual(missing_html.count(">×</span>"), len(missing_state["algorithms"]))
         self.assertNotIn(r"$\checkmark$", missing_html)
         self.assertNotIn(r"$\times$", missing_html)

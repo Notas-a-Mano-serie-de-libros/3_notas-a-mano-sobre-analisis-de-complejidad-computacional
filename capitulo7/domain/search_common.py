@@ -368,6 +368,7 @@ def _build_search_css() -> str:
     gap: {SEARCH_NODE_GAP}px;
     margin: 0 auto;
     padding: 6px 0;
+    contain: layout paint;
   }}
   .search-array-line {{
     display: flex;
@@ -388,6 +389,7 @@ def _build_search_css() -> str:
     display: flex;
     align-items: center;
     justify-content: center;
+    contain: layout paint;
   }}
   .search-result-symbol {{
     display: inline-flex;
@@ -406,7 +408,7 @@ def _build_search_css() -> str:
     color: #2d7d32;
   }}
   .search-result-symbol.missing {{
-    color: #8a6d00;
+    color: #b85450;
   }}
   .node-wrap {{
     width: {SEARCH_NODE_WIDTH}px;
@@ -486,6 +488,12 @@ def _build_search_css() -> str:
       max-width: calc(100% - 38px);
     }}
   }}
+  @media (prefers-reduced-motion: reduce) {{
+    .search-result-symbol,
+    .node {{
+      transition: none;
+    }}
+  }}
 </style>"""
 
 
@@ -502,7 +510,7 @@ def render_result_symbol(state):
     label = "Encontrado" if found else "No encontrado"
     class_name = "found" if found else "missing"
     return (
-        f'<span class="search-result-symbol {class_name}" '
+        f'<span class="search-result-symbol {class_name}" role="img" '
         f'aria-label="{label}" title="{label}">{symbol}</span>'
     )
 
@@ -537,7 +545,7 @@ def render_state_html(state, role_styles, label_map):
         f"{legend}"
         f'<div class="search-array-line">'
         f'<div class="search-nodes" style="width: min(100%, {dimensions["nodes_width"]}px); min-height: {dimensions["nodes_height"]}px;">{nodes}</div>'
-        f'<div class="search-result">{result}</div>'
+        f'<div class="search-result" aria-live="polite">{result}</div>'
         f'</div>'
         f'</div>'
     )

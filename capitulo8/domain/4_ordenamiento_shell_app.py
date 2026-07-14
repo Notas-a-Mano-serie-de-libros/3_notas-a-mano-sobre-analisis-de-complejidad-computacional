@@ -128,7 +128,7 @@ def render_bar(value, role, max_value):
 def render_result_symbol(item):
     if not item["state"]["sorting_complete"]:
         return ""
-    return '<span class="shell-comparison-result-symbol" aria-label="Ordenado" title="Ordenado">✓</span>'
+    return '<span class="shell-comparison-result-symbol" role="img" aria-label="Ordenado" title="Ordenado">✓</span>'
 
 
 def render_sequence_bars(item, show_indexes=False):
@@ -152,7 +152,7 @@ def render_sequence_bars(item, show_indexes=False):
       <div class="shell-comparison-array-wrap">
         <div class="shell-comparison-bars-result" style="--shell-comparison-count:{len(values)};">
           <div class="shell-comparison-bars">{bars}</div>
-          <div class="shell-comparison-result">{result}</div>
+          <div class="shell-comparison-result" aria-live="polite">{result}</div>
         </div>
         {indexes}
       </div>
@@ -246,6 +246,7 @@ def render_gap_comparison_styles():
         overflow-x: hidden;
         background: #000000;
         padding: 6px 0 3px;
+        contain: layout paint;
       }}
       .shell-comparison-bars-result {{
         display: flex;
@@ -261,6 +262,7 @@ def render_gap_comparison_styles():
         gap: clamp(1px, 0.35vw, 3px);
         min-height: 210px;
         width: min(calc(100% - 36px), calc(var(--shell-comparison-count) * 37px));
+        contain: layout paint;
       }}
       .shell-comparison-bar-wrap {{
         width: auto;
@@ -360,6 +362,12 @@ def render_gap_comparison_styles():
         .shell-comparison-bar-value,
         .shell-comparison-index {{
           font-size: 12px;
+        }}
+      }}
+      @media (prefers-reduced-motion: reduce) {{
+        .shell-comparison-bar,
+        .shell-comparison-result-symbol {{
+          transition: none;
         }}
       }}
       @media (min-width: 761px) {{

@@ -151,7 +151,7 @@ def render_bar(value, role, max_value):
 def render_result_symbol(item):
     if not item["state"]["sorting_complete"]:
         return ""
-    return '<span class="comparison-result-symbol" aria-label="Ordenado" title="Ordenado">✓</span>'
+    return '<span class="comparison-result-symbol" role="img" aria-label="Ordenado" title="Ordenado">✓</span>'
 
 
 def render_bars(item, show_indexes=False):
@@ -175,7 +175,7 @@ def render_bars(item, show_indexes=False):
       <div class="comparison-array-wrap">
         <div class="comparison-bars-result" style="--comparison-count:{len(values)};">
           <div class="comparison-bars">{bars}</div>
-          <div class="comparison-result">{result}</div>
+          <div class="comparison-result" aria-live="polite">{result}</div>
         </div>
         {indexes}
       </div>
@@ -270,6 +270,7 @@ def render_comparison_styles():
         overflow-x: hidden;
         background: #000000;
         padding: 6px 0 3px;
+        contain: layout paint;
       }}
       .comparison-bars-result {{
         display: flex;
@@ -285,6 +286,7 @@ def render_comparison_styles():
         gap: clamp(1px, 0.35vw, 3px);
         min-height: 210px;
         width: min(calc(100% - 36px), calc(var(--comparison-count) * 37px));
+        contain: layout paint;
       }}
       .comparison-bar-wrap {{
         width: auto;
@@ -384,6 +386,12 @@ def render_comparison_styles():
         .comparison-bar-value,
         .comparison-index {{
           font-size: 12px;
+        }}
+      }}
+      @media (prefers-reduced-motion: reduce) {{
+        .comparison-bar,
+        .comparison-result-symbol {{
+          transition: none;
         }}
       }}
       @media (min-width: 761px) {{

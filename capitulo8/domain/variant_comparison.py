@@ -76,7 +76,7 @@ def render_bar(value, role, maximum):
 def render_result_symbol(item):
     if not item["state"]["sorting_complete"]:
         return ""
-    return '<span class="variant-result-symbol" aria-label="Ordenado" title="Ordenado">✓</span>'
+    return '<span class="variant-result-symbol" role="img" aria-label="Ordenado" title="Ordenado">✓</span>'
 
 
 def render_html(state):
@@ -99,7 +99,7 @@ def render_html(state):
           <div class="variant-array">
             <div class="variant-bars-result" style="--variant-count:{len(values)};">
               <div class="variant-bars">{bars}</div>
-              <div class="variant-result">{result}</div>
+              <div class="variant-result" aria-live="polite">{result}</div>
             </div>
             {indexes}
           </div>
@@ -113,9 +113,9 @@ def render_html(state):
       .variant-header {{ font-weight:700;font-size:22px;text-align:center; }}
       .variant-name {{ font-weight:700;font-size:21px;text-align:center;line-height:1.2; }}
       .variant-steps {{ font-size:19px;text-align:center; }}
-      .variant-array {{ min-width:0;overflow-x:hidden;padding:6px 0 3px; }}
+      .variant-array {{ min-width:0;overflow-x:hidden;padding:6px 0 3px;contain:layout paint; }}
       .variant-bars-result {{ display:flex;align-items:flex-start;justify-content:center;gap:4px;width:100%; }}
-      .variant-bars {{ min-height:210px;display:flex;align-items:flex-end;justify-content:center;gap:clamp(1px,.35vw,3px);width:min(calc(100% - 36px), calc(var(--variant-count) * 37px)); }}
+      .variant-bars {{ min-height:210px;display:flex;align-items:flex-end;justify-content:center;gap:clamp(1px,.35vw,3px);width:min(calc(100% - 36px), calc(var(--variant-count) * 37px));contain:layout paint; }}
       .variant-bar-wrap {{ flex:1 1 0;min-width:8px;max-width:34px;text-align:center; }}
       .variant-bar-value {{ height:18px;line-height:16px;font-size:14px;margin-bottom:2px;overflow:hidden;color:#f7f7f7;text-shadow:0 1px 2px rgba(0,0,0,.92); }}
       .variant-bar {{ width:100%;border:0;border-radius:0;outline:1px solid rgba(255,255,255,.2);outline-offset:-1px; }}
@@ -130,6 +130,10 @@ def render_html(state):
         .variant-bars {{ width:min(calc(100% - 34px), calc(var(--variant-count) * 28px)); }}
         .variant-bar-value,
         .variant-indexes span {{ font-size:12px; }}
+      }}
+      @media(prefers-reduced-motion:reduce) {{
+        .variant-bar,
+        .variant-result-symbol {{ transition:none; }}
       }}
     </style>
     <div class="variant-app">

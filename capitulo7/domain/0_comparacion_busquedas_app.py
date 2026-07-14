@@ -251,7 +251,7 @@ def render_result_symbol(item):
     label = "Encontrado" if found else "No encontrado"
     class_name = "found" if found else "missing"
     return (
-        f'<span class="comparison-result-symbol {class_name}" '
+        f'<span class="comparison-result-symbol {class_name}" role="img" '
         f'aria-label="{label}" title="{label}">{symbol}</span>'
     )
 
@@ -311,7 +311,7 @@ def render_compact_array(item, show_indexes=False):
           {indexes}
           <div class="comparison-array">{nodes}</div>
         </div>
-        <div class="comparison-result">{result}</div>
+        <div class="comparison-result" aria-live="polite">{result}</div>
       </div>
     </div>
     """
@@ -399,6 +399,7 @@ def render_comparison_styles(array_width):
         overflow-x: auto;
         scrollbar-width: none;
         padding-top: 2px;
+        contain: layout paint;
       }}
       .comparison-array-result-wrap {{
         width: {array_width + 38}px;
@@ -407,6 +408,7 @@ def render_comparison_styles(array_width):
         align-items: center;
         justify-content: flex-start;
         gap: 4px;
+        contain: layout paint;
       }}
       .comparison-array-wrap::-webkit-scrollbar {{
         display: none;
@@ -459,7 +461,7 @@ def render_comparison_styles(array_width):
         color: #2d7d32;
       }}
       .comparison-result-symbol.missing {{
-        color: #8a6d00;
+        color: #b85450;
       }}
       .comparison-node {{
         width: 54px;
@@ -478,6 +480,12 @@ def render_comparison_styles(array_width):
       }}
       .comparison-node:first-child {{
         border-left-width: 2px;
+      }}
+      @media (prefers-reduced-motion: reduce) {{
+        .comparison-node,
+        .comparison-result-symbol {{
+          transition: none;
+        }}
       }}
       @media (max-width: 760px) {{
         .comparison-header,

@@ -598,7 +598,7 @@ def sort_phase_label(state):
 def render_sort_result_symbol(state):
     if not state.get("sorting_complete"):
         return ""
-    return '<span class="sort-result-symbol" aria-label="Ordenado" title="Ordenado">✓</span>'
+    return '<span class="sort-result-symbol" role="img" aria-label="Ordenado" title="Ordenado">✓</span>'
 
 
 def sort_result_offset(state, view):
@@ -825,6 +825,7 @@ def sort_styles():
         font-size: 16px;
         line-height: 18px;
         transition: border-color 120ms ease;
+        contain: layout paint;
       }}
       .radix-phase-distribution {{
         border-left-color: #b85450;
@@ -904,6 +905,7 @@ def sort_styles():
         min-height: 246px;
         padding: 6px 0;
         overflow-x: auto;
+        contain: layout paint;
       }}
       .sort-items.boxes {{
         align-items: flex-start;
@@ -949,6 +951,7 @@ def sort_styles():
         padding: 0;
         overflow-x: auto;
         margin: 0 auto;
+        contain: layout paint;
       }}
       .bar-nodes {{
         min-height: 360px;
@@ -1015,6 +1018,7 @@ def sort_styles():
         width: 100%;
         overflow-x: auto;
         padding: 16px 0 4px;
+        contain: layout paint;
       }}
       .merge-tree, .quick-tree {{
         position: relative;
@@ -1188,6 +1192,7 @@ def sort_styles():
         align-items: center;
         justify-content: center;
         align-self: flex-start;
+        contain: layout paint;
       }}
       .sort-result-symbol {{
         display: inline-flex;
@@ -1230,6 +1235,15 @@ def sort_styles():
         .sort-array-line .merge-tree-shell,
         .sort-array-line .quick-tree-shell {{
           max-width: calc(100% - 38px);
+        }}
+      }}
+      @media (prefers-reduced-motion: reduce) {{
+        .bar,
+        .box,
+        .tree-box,
+        .radix-bucket-row,
+        .radix-bucket-active-value {{
+          transition: none;
         }}
       }}
       .math-label, .math-inline {{
@@ -1327,7 +1341,7 @@ def render_state_html(state, include_styles=True):
       {legend}
       <div class="sort-array-line sort-array-line-{css_token(view)}">
         {items_markup}
-        <div class="sort-result" style="margin-top:{result_offset}px;">{result}</div>
+        <div class="sort-result" style="margin-top:{result_offset}px;" aria-live="polite">{result}</div>
       </div>
       {radix_buckets}
     </div>
