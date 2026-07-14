@@ -97,7 +97,7 @@ def render_html(state):
           <div class="variant-name">{item["title"]}</div>
           <div class="variant-steps">{item["steps"]}</div>
           <div class="variant-array">
-            <div class="variant-bars-result">
+            <div class="variant-bars-result" style="--variant-count:{len(values)};">
               <div class="variant-bars">{bars}</div>
               <div class="variant-result">{result}</div>
             </div>
@@ -114,14 +114,14 @@ def render_html(state):
       .variant-name {{ font-weight:700;font-size:21px;text-align:center; }}
       .variant-steps {{ font-size:20px;text-align:center; }}
       .variant-array {{ min-width:0;overflow-x:hidden; }}
-      .variant-bars-result {{ display:flex;align-items:center;justify-content:center;gap:4px;width:100%; }}
-      .variant-bars {{ min-height:220px;display:flex;align-items:flex-end;justify-content:center;gap:clamp(1px,.35vw,3px);width:calc(100% - 36px); }}
+      .variant-bars-result {{ display:flex;align-items:flex-start;justify-content:center;gap:4px;width:100%; }}
+      .variant-bars {{ min-height:220px;display:flex;align-items:flex-end;justify-content:center;gap:clamp(1px,.35vw,3px);width:min(calc(100% - 36px), calc(var(--variant-count) * 37px)); }}
       .variant-bar-wrap {{ flex:1 1 0;min-width:8px;max-width:34px;text-align:center; }}
       .variant-bar-value {{ height:18px;line-height:16px;font-size:14px;margin-bottom:2px;overflow:hidden;color:#f7f7f7;text-shadow:0 1px 2px rgba(0,0,0,.92); }}
       .variant-bar {{ width:100%;border:0;border-radius:0; }}
       .variant-indexes {{ display:flex;justify-content:center;gap:clamp(1px,.35vw,3px);padding-top:4px; }}
       .variant-indexes span {{ flex:1 1 0;min-width:8px;max-width:34px;text-align:center;font-size:14px;color:#f7f7f7;text-shadow:0 1px 2px rgba(0,0,0,.92); }}
-      .variant-result {{ width:32px;min-width:32px;height:48px;display:flex;align-items:center;justify-content:center; }}
+      .variant-result {{ width:32px;min-width:32px;height:48px;display:flex;align-items:center;justify-content:center;margin-top:82px; }}
       .variant-result-symbol {{ display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;font-size:30px;line-height:1;font-weight:700;color:#7bdc80;text-shadow:0 1px 2px rgba(0,0,0,.95); }}
       @media(max-width:760px) {{
         .variant-header {{ display:none; }}

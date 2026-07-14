@@ -841,7 +841,8 @@ def sort_styles():
       .radix-bucket-row {{
         display: grid;
         grid-template-columns: 74px minmax(0, 1fr);
-        min-height: 24px;
+        height: 28px;
+        min-height: 28px;
       }}
       .radix-bucket-header {{
         font-weight: 700;
@@ -867,8 +868,10 @@ def sort_styles():
         color: #111111;
       }}
       .radix-bucket-chain {{
-        white-space: normal;
-        overflow-wrap: anywhere;
+        min-width: 0;
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
       }}
       .radix-bucket-active-value {{
         display: inline-block;
@@ -1158,6 +1161,7 @@ def sort_styles():
       .sort-array-line-barras .bar-panel,
       .sort-array-line-arbol .merge-tree-shell,
       .sort-array-line-arbol .quick-tree-shell {{
+        width: fit-content;
         margin-left: 0;
         margin-right: 0;
       }}

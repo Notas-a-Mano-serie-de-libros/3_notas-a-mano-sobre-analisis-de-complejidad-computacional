@@ -109,6 +109,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("Inserción", html)
         self.assertIn("Inserción<br>binaria", html)
         self.assertIn("insertion-comparison-bars-result", html)
+        self.assertIn("--insertion-comparison-count:6;", html)
+        self.assertIn("margin-top: 82px;", html)
         self.assertIn("color: #7bdc80;", html)
         while not module.all_variants_complete(comparison_state):
             module.step_all_variants(comparison_state)
@@ -163,6 +165,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         )
         shell_html = module.render_gap_comparison_html(shell_comparison)
         self.assertIn("shell-comparison-bars-result", shell_html)
+        self.assertIn("--shell-comparison-count:8;", shell_html)
+        self.assertIn("margin-top: 82px;", shell_html)
         self.assertIn("color: #7bdc80;", shell_html)
         while not module.all_sequences_complete(shell_comparison):
             module.step_all_sequences(shell_comparison)
@@ -391,6 +395,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         quick_html = self.modules["rapido"].render_state_html(quick)
 
         self.assertIn("merge-tree-shell", merge_html)
+        self.assertIn(".sort-array-line-arbol .merge-tree-shell", merge_html)
+        self.assertIn("width: fit-content;", merge_html)
         self.assertIn("merge-row-tree", merge_html)
         self.assertNotIn('<svg class="tree-connectors"', merge_html)
         self.assertIn("merge-index-row", merge_html)
@@ -399,6 +405,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('class="merge-index-cell">6</div>', merge_html)
         self.assertNotIn("[0, 6]", merge_html)
         self.assertIn("quick-tree-shell", quick_html)
+        self.assertIn(".sort-array-line-arbol .quick-tree-shell", quick_html)
         self.assertIn("quick-row", quick_html)
         self.assertNotIn('<svg class="tree-connectors"', quick_html)
         self.assertIn("quick-index-row", quick_html)
@@ -963,6 +970,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertGreater(initial_html.rindex("radix-buckets-panel"), initial_html.rindex("bar-panel"))
         self.assertIn('class="radix-bucket-key radix-bucket-heading">Dígito</div>', initial_html)
         self.assertIn('class="radix-bucket-chain radix-bucket-heading">Bucket</div>', initial_html)
+        self.assertIn("height: 28px;", initial_html)
+        self.assertIn("white-space: nowrap;", initial_html)
 
         module.step_radix_sort(state)
         self.assertIn(r"p = \operatorname{digitos}(\max(a))", state["formula"])
@@ -1139,6 +1148,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("background: #000000;", html)
         self.assertIn("overflow-x: hidden;", html)
         self.assertIn("comparison-bars-result", html)
+        self.assertIn("--comparison-count:6;", html)
+        self.assertIn("margin-top: 82px;", html)
         self.assertIn("comparison-result-symbol", html)
         self.assertIn("color: #7bdc80;", html)
         self.assertIn("gap: 0;", source)

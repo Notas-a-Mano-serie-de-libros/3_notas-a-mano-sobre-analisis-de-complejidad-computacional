@@ -150,7 +150,7 @@ def render_variant_bars(item, show_indexes=False):
       <div class="insertion-comparison-name">{item["title"]}</div>
       <div class="insertion-comparison-steps">{item["steps"]}</div>
       <div class="insertion-comparison-array-wrap">
-        <div class="insertion-comparison-bars-result">
+        <div class="insertion-comparison-bars-result" style="--insertion-comparison-count:{len(values)};">
           <div class="insertion-comparison-bars">{bars}</div>
           <div class="insertion-comparison-result">{result}</div>
         </div>
@@ -241,7 +241,7 @@ def render_comparison_styles():
       }}
       .insertion-comparison-bars-result {{
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         gap: 4px;
         width: 100%;
@@ -252,7 +252,7 @@ def render_comparison_styles():
         justify-content: center;
         gap: clamp(1px, 0.35vw, 3px);
         min-height: 220px;
-        width: calc(100% - 36px);
+        width: min(calc(100% - 36px), calc(var(--insertion-comparison-count) * 37px));
       }}
       .insertion-comparison-bar-wrap {{
         width: auto;
@@ -316,6 +316,7 @@ def render_comparison_styles():
         display: flex;
         align-items: center;
         justify-content: center;
+        margin-top: 82px;
       }}
       .insertion-comparison-result-symbol {{
         display: inline-flex;
