@@ -842,14 +842,20 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         while not state["search_complete"]:
             module.step_binary_search(state)
         found_html = module.render_state_html(state)
+        self.assertIn("search-app-complete search-app-found", found_html)
         self.assertIn('search-result-symbol found', found_html)
         self.assertIn(">✓</span>", found_html)
+        self.assertIn(
+            "transition: background-color 120ms ease",
+            (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8"),
+        )
         self.assertNotIn(r"$\checkmark$", found_html)
 
         missing = module.create_state(size=8, target=99, values=[1, 2, 3, 4, 5, 6, 7, 8])
         while not missing["search_complete"]:
             module.step_binary_search(missing)
         missing_html = module.render_state_html(missing)
+        self.assertIn("search-app-complete search-app-missing", missing_html)
         self.assertIn('search-result-symbol missing', missing_html)
         self.assertIn(">×</span>", missing_html)
         self.assertNotIn(r"$\times$", missing_html)

@@ -168,6 +168,10 @@ def resolve_node_style(node, role_styles):
     return fill, border, text
 
 
+def css_token(value):
+    return re.sub(r"[^a-z0-9_-]+", "-", str(value or "").lower()).strip("-") or "none"
+
+
 def create_search_base_state(
     size=DEFAULT_SIZE,
     target=DEFAULT_TARGET,
@@ -339,6 +343,13 @@ def _build_search_css() -> str:
     line-height: 1;
     font-weight: 700;
     color: #111111;
+    transition: color 120ms ease, transform 120ms ease;
+  }}
+  .search-result-symbol.found {{
+    color: #2d7d32;
+  }}
+  .search-result-symbol.missing {{
+    color: #8a6d00;
   }}
   .node-wrap {{
     width: {SEARCH_NODE_WIDTH}px;
@@ -384,6 +395,7 @@ def _build_search_css() -> str:
     align-items: center;
     justify-content: center;
     box-shadow: none;
+    transition: background-color 120ms ease, color 120ms ease;
   }}
   .node-wrap:nth-child({SEARCH_NODES_PER_ROW}n + 1) .node {{
     border-left-width: 2px;
@@ -439,8 +451,12 @@ def render_state_html(state, role_styles, label_map):
     nodes = "".join(node_markup)
     dimensions = calculate_search_dimensions(state)
     result = render_result_symbol(state)
+    found = any(node["role"] == "found" for node in state.get("arr", []))
+    status_class = " search-app-found" if found else " search-app-missing"
+    complete_class = f" search-app-complete{status_class}" if state.get("search_complete") else ""
+    phase_class = f" search-phase-{css_token(state.get('phase'))}"
     return (
-        f'<div class="search-app" style="min-height: {dimensions["app_height"]}px;">'
+        f'<div class="search-app{complete_class}{phase_class}" style="min-height: {dimensions["app_height"]}px;">'
         f'<div class="search-message">{message}</div>'
         f'<div class="search-array-line">'
         f'<div class="search-nodes" style="width: min(100%, {dimensions["nodes_width"]}px); min-height: {dimensions["nodes_height"]}px;">{nodes}</div>'

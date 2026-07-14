@@ -824,6 +824,19 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                         html = module.render_state_html(state)
                         self.assertIn("sort-app", html)
 
+    def test_sort_visual_states_use_completion_and_transition_classes(self):
+        module = self.modules["burbuja"]
+        state = module.create_state(size=4, values=[4, 3, 2, 1], view="cajas")
+        initial_html = module.render_state_html(state)
+
+        self.assertIn("transition: background-color 120ms ease", initial_html)
+        self.assertIn('<div class="sort-app sort-phase-none"', initial_html)
+
+        self.run_until_complete(module, "step_bubble_sort", state)
+        completed_html = module.render_state_html(state)
+        self.assertIn('<div class="sort-app sort-app-complete sort-phase-none"', completed_html)
+        self.assertIn("#e8fce9", completed_html)
+
     def test_launchers_load_all_modules(self):
         expected = {
             "run_comparacion": "0_comparacion_ordenamientos_app.py",
@@ -892,18 +905,22 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("i = 1", state["formula"])
         self.assertIn(r"\frac{170}{10^0}", state["formula"])
         self.assertIn("170</div>", html)
+        self.assertIn("radix-phase-distribution", html)
+        self.assertIn('<span class="radix-bucket-active-value">170</span>', html)
         self.assertNotIn("170 -> ---", html)
 
         while state.get("radix_buckets", [])[5] != [45, 75]:
             module.step_radix_sort(state)
         html = module.render_state_html(state)
-        self.assertIn("45 -> 75", html)
+        self.assertIn('45 -> <span class="radix-bucket-active-value">75</span>', html)
 
         while state.get("radix_phase") != "write":
             module.step_radix_sort(state)
         html = module.render_state_html(state)
         self.assertEqual(state["radix_buckets"][0], [90])
         self.assertNotIn("Reconstrucción desde buckets", html)
+        self.assertIn("radix-phase-write", html)
+        self.assertIn("radix-bucket-removed", html)
         self.assertIn("i = 1", state["formula"])
         self.assertIn("90</div>", html)
         self.assertNotIn("90 -> ---", html)

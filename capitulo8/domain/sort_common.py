@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import random
+import re
 from html import escape
 
 from IPython.display import display
@@ -161,6 +162,7 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
         initial_event["radix_buckets"] = [[] for _ in range(10)]
         initial_event["radix_phase"] = "initial"
         initial_event["radix_active_bucket"] = None
+        initial_event["radix_active_value"] = None
     trace = LazyTrace(builder, values, trace_kwargs, initial_event)
     event = copy_event(trace[0])
     return {
@@ -198,6 +200,10 @@ def displaystyle_formula(formula):
         r"\\[8pt] ",
         r"\\[8pt] \displaystyle ",
     )
+
+
+def css_token(value):
+    return re.sub(r"[^a-z0-9_-]+", "-", str(value or "").lower()).strip("-") or "none"
 
 
 def copy_event(event):
@@ -646,9 +652,20 @@ def sort_styles():
         width: min(100%, 760px);
         margin: 12px auto 0;
         border: 2px solid currentColor;
+        border-left-width: 6px;
         box-sizing: border-box;
         font-size: 17px;
         line-height: 20px;
+        transition: border-color 120ms ease;
+      }}
+      .radix-phase-distribution {{
+        border-left-color: #b85450;
+      }}
+      .radix-phase-write {{
+        border-left-color: #d6b656;
+      }}
+      .radix-phase-complete {{
+        border-left-color: #97d077;
       }}
       .radix-bucket-header,
       .radix-bucket-row {{
@@ -682,6 +699,23 @@ def sort_styles():
       .radix-bucket-chain {{
         white-space: normal;
         overflow-wrap: anywhere;
+      }}
+      .radix-bucket-active-value {{
+        display: inline-block;
+        background: #dae8fc;
+        color: #111111;
+        border: 1px solid #6c8ebf;
+        padding: 0 5px;
+        margin: 0 2px;
+        line-height: 18px;
+      }}
+      .radix-bucket-removed {{
+        background: rgb(255, 242, 204);
+        border-color: #d6b656;
+      }}
+      .radix-bucket-row,
+      .radix-bucket-active-value {{
+        transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
       }}
       .sort-items {{
         display: flex;
@@ -717,6 +751,7 @@ def sort_styles():
         justify-content: center;
         box-shadow: none;
         box-sizing: border-box;
+        transition: background-color 120ms ease, color 120ms ease;
       }}
       .sort-item:first-child .box {{
         border-left-width: 2px;
@@ -770,6 +805,7 @@ def sort_styles():
         box-sizing: border-box;
         border: none;
         border-radius: 0;
+        transition: background-color 120ms ease, height 120ms ease;
       }}
       .bar-index {{
         color: #ffffff;
@@ -877,6 +913,7 @@ def sort_styles():
         font-size: 24px;
         box-shadow: none;
         box-sizing: border-box;
+        transition: background-color 120ms ease, color 120ms ease;
       }}
       .merge-values .tree-box:first-child,
       .quick-values:not(.quick-values-aligned) .tree-item:first-child .tree-box,
@@ -933,9 +970,22 @@ def render_radix_buckets(state):
     if state.get("algorithm") != "radix" or buckets is None:
         return ""
     active_bucket = state.get("radix_active_bucket")
+    active_value = state.get("radix_active_value")
+    phase = state.get("radix_phase")
     rows = []
     for bucket, values in enumerate(buckets):
-        chain = " -> ".join(escape(str(value)) for value in values)
+        highlighted = False
+        chain_items = []
+        for value in values:
+            value_text = escape(str(value))
+            if bucket == active_bucket and active_value == value and not highlighted:
+                chain_items.append(f'<span class="radix-bucket-active-value">{value_text}</span>')
+                highlighted = True
+            else:
+                chain_items.append(value_text)
+        if bucket == active_bucket and active_value is not None and phase == "write" and not highlighted:
+            chain_items.append(f'<span class="radix-bucket-active-value radix-bucket-removed">{escape(str(active_value))}</span>')
+        chain = " -> ".join(chain_items)
         structure = chain if chain else "&nbsp;"
         active_class = " radix-bucket-row-active" if bucket == active_bucket else ""
         rows.append(
@@ -947,7 +997,7 @@ def render_radix_buckets(state):
             """
         )
     return f"""
-    <div class="radix-buckets-panel">
+    <div class="radix-buckets-panel radix-phase-{css_token(phase)}">
       <div class="radix-bucket-header">
         <div class="radix-bucket-key radix-bucket-heading">Dígito</div>
         <div class="radix-bucket-chain radix-bucket-heading">Bucket</div>
@@ -960,6 +1010,9 @@ def render_radix_buckets(state):
 def render_state_html(state, include_styles=True):
     view = state.get("view", "barras")
     app_class = "sort-app sort-app-bars" if view == "barras" else "sort-app"
+    if state.get("sorting_complete"):
+        app_class += " sort-app-complete"
+    app_class += f" sort-phase-{css_token(state.get('radix_phase') or state.get('merge_tree_phase') or state.get('phase'))}"
     min_height = simulation_min_height(state)
     items_markup = render_items_markup(state, view)
     radix_buckets = render_radix_buckets(state)

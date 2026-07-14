@@ -1403,12 +1403,14 @@ def radix_trace(values, descending=False):
         complete=False,
         buckets=None,
         active_bucket=None,
+        active_value=None,
         phase=None,
     ):
         extra = {}
         if buckets is not None:
             extra["radix_buckets"] = [list(bucket) for bucket in buckets]
             extra["radix_active_bucket"] = active_bucket
+            extra["radix_active_value"] = active_value
             extra["radix_phase"] = phase
         return make_event(arr, message, formula, roles, labels, complete, **extra)
 
@@ -1478,6 +1480,7 @@ def radix_trace(values, descending=False):
                     labels,
                     buckets=buckets,
                     active_bucket=digit,
+                    active_value=value,
                     phase="distribution",
                 )
             )
@@ -1505,6 +1508,7 @@ def radix_trace(values, descending=False):
                         labels,
                         buckets=writable_buckets,
                         active_bucket=bucket,
+                        active_value=value,
                         phase="write",
                     )
                 )
