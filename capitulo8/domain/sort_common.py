@@ -739,7 +739,7 @@ def sort_styles():
         padding: 8px;
       }}
       .sort-app-bars {{
-        color: #ffffff;
+        color: #f7f7f7;
         background: #000000;
         padding: 10px 8px 14px;
       }}
@@ -765,7 +765,7 @@ def sort_styles():
         box-sizing: border-box;
       }}
       .sort-app-bars .sort-phase-strip {{
-        color: #ffffff;
+        color: #e8e8e8;
       }}
       .sort-legend {{
         display: flex;
@@ -782,7 +782,7 @@ def sort_styles():
         margin-right: auto;
       }}
       .sort-app-bars .sort-legend {{
-        color: #ffffff;
+        color: #f2f2f2;
       }}
       .sort-legend-item {{
         display: inline-flex;
@@ -797,7 +797,8 @@ def sort_styles():
         box-sizing: border-box;
       }}
       .sort-app-bars .sort-legend-swatch {{
-        border-color: #ffffff;
+        border-color: #f2f2f2;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28);
       }}
       .radix-buckets-panel {{
         width: min(100%, {SORT_VISUAL_WIDTH}px);
@@ -953,12 +954,13 @@ def sort_styles():
         justify-content: flex-end;
       }}
       .bar-value {{
-        color: #ffffff;
+        color: #f7f7f7;
         font-size: 16px;
         font-weight: 400;
         height: 20px;
         line-height: 18px;
         margin-bottom: 3px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);
       }}
       .bar {{
         width: 100%;
@@ -968,19 +970,21 @@ def sort_styles():
         transition: background-color 120ms ease, height 120ms ease;
       }}
       .bar-index {{
-        color: #ffffff;
+        color: #f7f7f7;
         font-size: 15px;
         line-height: 18px;
         height: 20px;
         margin-top: 6px;
         margin-bottom: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);
       }}
       .bar-label {{
-        color: #ffffff;
+        color: #f7f7f7;
         margin-top: 4px;
         min-height: 42px;
         font-size: 18px;
         line-height: 20px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);
       }}
       .merge-tree-shell, .quick-tree-shell {{
         width: 100%;
@@ -1158,6 +1162,10 @@ def sort_styles():
         line-height: 1;
         font-weight: 700;
         color: #2d7d32;
+      }}
+      .sort-app-bars .sort-result-symbol {{
+        color: #7bdc80;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
       }}
       .math-label, .math-inline {{
         font-family: '{FONT_FAMILY}', serif;

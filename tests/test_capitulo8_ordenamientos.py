@@ -352,6 +352,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("width: fit-content;", box_html)
         self.assertIn("width: fit-content;", bar_html)
         self.assertIn("gap: 4px;", bar_html)
+        self.assertIn("color: #f7f7f7;", bar_html)
+        self.assertIn("text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);", bar_html)
+        self.assertIn("color: #7bdc80;", bar_html)
         self.assertNotIn("Tipo de orden", box_html)
         self.assertNotIn("Tipo de orden", bar_html)
 
