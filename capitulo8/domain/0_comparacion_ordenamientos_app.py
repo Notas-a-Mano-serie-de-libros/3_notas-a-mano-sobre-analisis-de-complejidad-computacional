@@ -8,7 +8,7 @@ import ipywidgets as widgets
 
 from common.widget_controls import bounded_int_control, button_control, compact_labeled_control, dropdown_control
 from sort_common import colab_pause, copy_sort_state, create_state as create_sort_state, generate_values, step_sort
-from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, GAP_SEQUENCE_OPTIONS, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES
+from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES
 
 try:
     from google.colab import output as colab_output
@@ -460,13 +460,6 @@ def run_app():
         width="210px",
         description_style={},
     )
-    gap_dropdown = dropdown_control(
-        options=GAP_SEQUENCE_OPTIONS,
-        value="shell",
-        description="h",
-        width="210px",
-        description_style={},
-    )
     algorithm_checks = {
         value: widgets.Checkbox(value=True, description=label, indent=False, layout=widgets.Layout(width="100%"))
         for label, value in ALGORITHM_OPTIONS
@@ -504,7 +497,7 @@ def run_app():
             width=f"{ALGORITHM_GROUP_WIDTH}px",
             align_items="stretch",
             gap=f"{ALGORITHM_GROUP_GAP}px",
-            margin="0 0 0 32px",
+            margin="0",
             overflow="visible",
         ),
     )
@@ -513,7 +506,10 @@ def run_app():
     reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
     size_group = compact_labeled_control("Tamaño", size_input)
     order_group = compact_labeled_control("Orden", order_dropdown)
-    gap_group = compact_labeled_control("h", gap_dropdown)
+    primary_controls = widgets.VBox(
+        [size_group, order_group],
+        layout=widgets.Layout(width="100%", gap="12px"),
+    )
     style_output = widgets.HTML(value=render_comparison_styles(), layout=widgets.Layout(width="100%"))
     body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
     html_output = widgets.VBox(
@@ -530,7 +526,6 @@ def run_app():
             values=values,
             descending=order_dropdown.value,
             selected_algorithms=selected_from_checks(algorithm_checks),
-            gap_sequence=gap_dropdown.value,
         )
 
     state = build_state()
@@ -645,13 +640,12 @@ def run_app():
     reset_button.on_click(generate_new)
     size_input.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
     order_dropdown.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
-    gap_dropdown.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
     for checkbox in algorithm_checks.values():
         checkbox.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
 
     layout = widgets.VBox(
         [
-            widgets.HBox([size_group, order_group, gap_group, algorithms_group], layout=widgets.Layout(width="100%", gap="42px")),
+            widgets.HBox([primary_controls, algorithms_group], layout=widgets.Layout(width="100%", gap="18px", align_items="flex-start")),
             widgets.HBox([auto_button, finish_button, reset_button], layout=widgets.Layout(width="100%", gap="10px", margin="12px 0 0 0")),
             html_output,
         ],
