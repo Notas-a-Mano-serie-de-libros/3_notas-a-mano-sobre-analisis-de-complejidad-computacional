@@ -1036,6 +1036,51 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertEqual(state["radix_max"], 999)
         self.assertIn(r"p = \operatorname{digitos}(\max(a)) = \operatorname{digitos}(999) = 3", state["formula"])
 
+    def test_radix_supports_data_types_number_modes_and_bases(self):
+        module = self.modules["radix"]
+        cases = (
+            ({"values": [-5, -1, -9, -3], "radix_number_mode": "negative"}, [-9, -5, -3, -1], "k = a + 9"),
+            ({"values": [5, -1, 0, -3], "radix_number_mode": "mixed"}, [-3, -1, 0, 5], "k = a + 3"),
+            ({"values": [1.2, 0.5, 3.4, 2.1], "radix_number_mode": "float"}, [0.5, 1.2, 2.1, 3.4], "k = 100a + 0"),
+            ({"values": list("DBAC"), "radix_data_type": "caracter"}, list("ABCD"), r"k = \operatorname{codigo}(a)"),
+            ({"values": ["be", "al", "do", "ca"], "radix_data_type": "cadena"}, ["al", "be", "ca", "do"], r"\operatorname{codigo}_{257}"),
+            ({"values": ["2024-02-01", "2023-12-02", "2024-01-01"], "radix_data_type": "fecha"}, ["2023-12-02", "2024-01-01", "2024-02-01"], "k = aaaammdd"),
+            ({"values": [170, 45, 75, 90], "radix_base": 16}, [45, 75, 90, 170], r"\operatorname{digitos}_{16}"),
+        )
+
+        for kwargs, expected, formula_fragment in cases:
+            with self.subTest(kwargs=kwargs):
+                state = module.create_state(size=len(kwargs["values"]), view="barras", **kwargs)
+                module.step_radix_sort(state)
+                self.assertIn(formula_fragment, state["formula"])
+
+                while not state["sorting_complete"]:
+                    module.step_radix_sort(state)
+
+                self.assertEqual(state["arr"], expected)
+                self.assertIn("radix-buckets-panel", module.render_state_html(state))
+
+    def test_radix_controls_include_data_type_number_mode_and_base(self):
+        source = (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8")
+        config_source = (DOMAIN_DIR / "sort_config.py").read_text(encoding="utf-8")
+
+        self.assertIn("RADIX_DATA_TYPE_OPTIONS", config_source)
+        self.assertIn("RADIX_NUMBER_MODE_OPTIONS", config_source)
+        self.assertIn("RADIX_BASE_OPTIONS", config_source)
+        self.assertIn('description="Tipo de dato"', source)
+        self.assertIn('description="Números"', source)
+        self.assertIn('description="Base"', source)
+        self.assertIn('controls["radix_data_type"].value == "numero"', source)
+        self.assertIn('controls["radix_base"].observe(reset_algorithm, names="value")', source)
+
+    def test_radix_dates_render_vertical_bar_values(self):
+        module = self.modules["radix"]
+        state = module.create_state(values=["2024-02-01", "2023-12-02"], view="barras", radix_data_type="fecha")
+        html = module.render_state_html(state)
+
+        self.assertIn("bar-panel-date", html)
+        self.assertIn('<div class="bar-value">2024-02-01</div>', html)
+
     def test_shell_notebook_includes_gap_sequence_comparison(self):
         notebook = NOTEBOOK_DIR / "4_ordenamiento_shell.ipynb"
         nb = json.loads(notebook.read_text(encoding="utf-8"))
@@ -1145,7 +1190,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertEqual(len(state["algorithms"]), 7)
         self.assertEqual(
             [item["key"] for item in state["algorithms"]],
-            ["burbuja", "seleccion", "insercion", "shell", "mezcla", "rapido", "radix"],
+            ["radix", "rapido", "mezcla", "shell", "insercion", "seleccion", "burbuja"],
         )
         for item in state["algorithms"]:
             self.assertEqual(item["state"]["initial_values"], values)
@@ -1226,7 +1271,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         )
         html = module.render_comparison_html(state)
 
-        self.assertEqual([item["key"] for item in state["algorithms"]], ["burbuja", "rapido"])
+        self.assertEqual([item["key"] for item in state["algorithms"]], ["rapido", "burbuja"])
         self.assertIn("Ordenamiento<br>burbuja", html)
         self.assertIn("Ordenamiento<br>rápido", html)
         self.assertNotIn("Ordenamiento<br>selección", html)

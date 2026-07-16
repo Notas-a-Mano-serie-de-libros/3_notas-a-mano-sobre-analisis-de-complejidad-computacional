@@ -28,35 +28,35 @@
     "sha256": "60ddace40759557e27a08fdc0b127d6548a7f26b15adba06816dd46f8ccafdd2"
   },
   "capitulo8.burbuja.barras.initial": {
-    "bytes": 19249,
-    "sha256": "e3c6502aef24b6288dd9a56774a452cc4d087e9536e3b5bc9b8b491053379759"
+    "bytes": 19659,
+    "sha256": "643e78ea49bf9fb474d620981165793f1a7a7f85f0ed6cad6ad5a383d392de44"
   },
   "capitulo8.comparacion.initial": {
     "bytes": 27047,
-    "sha256": "e870c8e44c131988e9b43b9e3d7d2e308a886d95cbbe288fd725dfba6c05600b"
+    "sha256": "7fd964e262fd8325912bb6e204ba42d3d5dc6a89cddd154c10defd04fa2806d0"
   },
   "capitulo8.insercion.barras.initial": {
-    "bytes": 19121,
-    "sha256": "032ac784de96de6a6b318fac7ef90b3c8ec32f361265b6de55b0bb4e55f75234"
+    "bytes": 19531,
+    "sha256": "9f4228dccf6678831c8930b990a471eaa817bc0d0fbecb843bea39a76a885f6d"
   },
   "capitulo8.mezcla.arbol.initial": {
-    "bytes": 17679,
-    "sha256": "86d4873b4cafd05d734c4f75aa6bfd11e0d19f72081c74003139f2f47c47cc98"
+    "bytes": 18089,
+    "sha256": "109acaf1a2d1cfcfd13875b18aef7e5aaa5293624f3f692156c3e21b6abeef41"
   },
   "capitulo8.radix.barras.initial": {
-    "bytes": 21800,
-    "sha256": "b071e15ad22e5355ccc6282960c291011589b66278396139a9dca5358441e5b3"
+    "bytes": 22210,
+    "sha256": "e4de027e17cc388196f7795c57092ca7a6c08fd35fc1e0a09206cdda5d63df9e"
   },
   "capitulo8.rapido.arbol.initial": {
-    "bytes": 19549,
-    "sha256": "ea0c47f715929eceed06594180cba90b21f1cb728fbb892f1f0fbc55ed97e2bc"
+    "bytes": 19959,
+    "sha256": "dbeba88d9a2063f2500568063bdf6a56db93267508483d67b8dce114c80eb1f5"
   },
   "capitulo8.seleccion.barras.initial": {
-    "bytes": 19256,
-    "sha256": "6d3d92dd9495e1e5c19217fa2f153a885a7521772b3383fb259d9eadbe720356"
+    "bytes": 19666,
+    "sha256": "3bf92b4aa58059b683c1ae371818c2fbd83268a5c1a8e4055b6f380f5312b25e"
   },
   "capitulo8.shell.barras.initial": {
-    "bytes": 19112,
-    "sha256": "cfc04e9bae9a9ddfd0fe6792f937c5160c8951dbc16c558950139c25ceed688b"
+    "bytes": 19522,
+    "sha256": "326ee7db224a35b8a509959bd98b912c37523cdc8118b02463bd9d292936a437"
   }
 }

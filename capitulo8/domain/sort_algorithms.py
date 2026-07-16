@@ -1391,9 +1391,10 @@ def quick_trace(values, descending=False, pivot_strategy="middle", partition_sch
     return _hoare_quick_trace(values, descending=descending, pivot_strategy=pivot_strategy)
 
 
-def radix_trace(values, descending=False):
-    arr = [int(value) for value in values]
+def radix_trace(values, descending=False, radix_data_type="numero", radix_number_mode="positive", radix_base=10):
+    arr = list(values)
     n = len(arr)
+    radix_base = int(radix_base)
 
     def bucket_event(
         message,
@@ -1412,13 +1413,14 @@ def radix_trace(values, descending=False):
             extra["radix_active_bucket"] = active_bucket
             extra["radix_active_value"] = active_value
             extra["radix_phase"] = phase
+            extra["radix_base"] = radix_base
         return make_event(arr, message, formula, roles, labels, complete, **extra)
 
     trace = [
         bucket_event(
             start_message("radix"),
             "",
-            buckets=[[] for _ in range(10)],
+            buckets=[[] for _ in range(radix_base)],
             phase="initial",
         )
     ]
@@ -1428,53 +1430,60 @@ def radix_trace(values, descending=False):
                 final_message("radix"),
                 r"\text{arreglo ordenado}",
                 complete=True,
-                buckets=[[] for _ in range(10)],
+                buckets=[[] for _ in range(radix_base)],
                 phase="complete",
             )
         )
         return trace
-    if any(value < 0 for value in arr):
-        raise ValueError("Radix sort requiere valores enteros no negativos")
 
     def radix_formula(*lines):
         return r"\begin{array}{l} " + r"\\[8pt] ".join(line for line in lines if line) + r" \end{array}"
 
-    max_value = max(arr)
-    digit_count = max(1, len(str(max_value)))
-    pass_count_formula = rf"p = \operatorname{{digitos}}(\max(a)) = \operatorname{{digitos}}({max_value}) = {digit_count}"
+    keys, key_formula, key_label = radix_keys(arr, radix_data_type, radix_number_mode)
+    max_key = max(keys) if keys else 0
+    digit_count = max(1, digits_in_base(max_key, radix_base))
+    if radix_data_type == "numero" and radix_number_mode == "positive" and radix_base == 10 and all(isinstance(value, int) and value >= 0 for value in arr):
+        max_value = max(arr)
+        pass_count_formula = rf"p = \operatorname{{digitos}}(\max(a)) = \operatorname{{digitos}}({max_value}) = {digit_count}"
+    else:
+        pass_count_formula = rf"p = \operatorname{{digitos}}_{{{radix_base}}}(\max({key_label})) = \operatorname{{digitos}}_{{{radix_base}}}({max_key}) = {digit_count}"
     exp = 1
     roles = ["default"] * n
     labels = [""] * n
-    mark(roles, labels, arr.index(max_value), "boundary", "max")
+    mark(roles, labels, keys.index(max_key), "boundary", "max")
 
     trace.append(
         bucket_event(
-            f"Calcula la cantidad de pasadas a partir del valor máximo {max_value}.",
-            radix_formula(pass_count_formula),
+            f"Calcula la cantidad de pasadas a partir de la clave máxima {max_key}.",
+            radix_formula(key_formula, pass_count_formula),
             roles,
             labels,
-            buckets=[[] for _ in range(10)],
+            buckets=[[] for _ in range(radix_base)],
             phase="initial",
         )
     )
 
     for digit_index in range(digit_count):
-        buckets = [[] for _ in range(10)]
-        digit_name = f"10^{digit_index}"
+        buckets = [[] for _ in range(radix_base)]
+        key_buckets = [[] for _ in range(radix_base)]
+        digit_name = f"{radix_base}^{digit_index}"
         pass_number = digit_index + 1
-        for index, value in enumerate(arr):
-            digit = (value // exp) % 10
+        for index, (value, key) in enumerate(zip(arr, keys)):
+            digit = (key // exp) % radix_base
             buckets[digit].append(value)
+            key_buckets[digit].append(key)
             roles = ["default"] * n
             labels = [""] * n
             mark(roles, labels, index, "compare", "d")
+            dividend = value if key == value else key
             trace.append(
                 bucket_event(
                     radix_bucket_message(digit, value),
                     radix_formula(
+                        key_formula,
                         pass_count_formula,
                         rf"i = {pass_number}",
-                        rf"d = \left\lfloor \frac{{{value}}}{{{digit_name}}} \right\rfloor \bmod 10 = {digit}",
+                        rf"d = \left\lfloor \frac{{{format_formula_value(dividend)}}}{{{digit_name}}} \right\rfloor \bmod {radix_base} = {format_bucket_digit(digit)}",
                     ),
                     roles,
                     labels,
@@ -1485,14 +1494,17 @@ def radix_trace(values, descending=False):
                 )
             )
 
-        bucket_order = range(9, -1, -1) if descending else range(10)
+        bucket_order = range(radix_base - 1, -1, -1) if descending else range(radix_base)
         writable_buckets = [list(bucket) for bucket in buckets]
+        writable_key_buckets = [list(bucket) for bucket in key_buckets]
 
         write_index = 0
         for bucket in bucket_order:
             while writable_buckets[bucket]:
                 value = writable_buckets[bucket].pop(0)
+                key = writable_key_buckets[bucket].pop(0)
                 arr[write_index] = value
+                keys[write_index] = key
                 roles = ["default"] * n
                 labels = [""] * n
                 mark(roles, labels, write_index, "write", "k")
@@ -1500,9 +1512,10 @@ def radix_trace(values, descending=False):
                     bucket_event(
                         f"Escribe {value} en la posición {write_index} según el dígito {digit_index}.",
                         radix_formula(
+                            key_formula,
                             pass_count_formula,
                             rf"i = {pass_number}",
-                            rf"k = {write_index},\quad a_k = {value}",
+                            rf"k = {write_index},\quad a_k = {format_formula_value(value)}",
                         ),
                         roles,
                         labels,
@@ -1514,18 +1527,19 @@ def radix_trace(values, descending=False):
                 )
                 write_index += 1
 
-        exp *= 10
+        exp *= radix_base
         trace.append(
             bucket_event(
                 f"Finaliza la pasada del dígito {digit_index}.",
                 radix_formula(
+                    key_formula,
                     pass_count_formula,
                     rf"i = {pass_number}",
-                    rf"10^{digit_index}\ \text{{procesado}}",
+                    rf"{radix_base}^{digit_index}\ \text{{procesado}}",
                 ),
                 ["sorted"] * n if digit_index == digit_count - 1 else ["default"] * n,
                 [""] * n,
-                buckets=[[] for _ in range(10)],
+                buckets=[[] for _ in range(radix_base)],
                 phase="complete",
             )
         )
@@ -1537,11 +1551,65 @@ def radix_trace(values, descending=False):
             ["sorted"] * n,
             [""] * n,
             True,
-            buckets=[[] for _ in range(10)],
+            buckets=[[] for _ in range(radix_base)],
             phase="complete",
         )
     )
     return trace
+
+
+def digits_in_base(value, base):
+    value = abs(int(value))
+    digits = 1
+    while value >= base:
+        value //= base
+        digits += 1
+    return digits
+
+
+def format_bucket_digit(digit):
+    return str(digit) if digit < 10 else chr(ord("A") + digit - 10)
+
+
+def format_formula_value(value):
+    if isinstance(value, float):
+        return f"{value:.2f}".rstrip("0").rstrip(".")
+    text = str(value)
+    return rf"\text{{{text}}}" if not isinstance(value, (int, float)) else text
+
+
+def radix_keys(values, data_type="numero", number_mode="positive"):
+    if data_type == "caracter":
+        keys = [ord(str(value)[0]) for value in values]
+        return keys, r"k = \operatorname{codigo}(a)", "k"
+    if data_type == "cadena":
+        strings = [str(value) for value in values]
+        width = max(len(value) for value in strings)
+        keys = []
+        for value in strings:
+            key = 0
+            for char in value.ljust(width, "\0"):
+                key = key * 257 + ord(char)
+            keys.append(key)
+        return keys, rf"k = \operatorname{{codigo}}_{{257}}(a),\quad longitud = {width}", "k"
+    if data_type == "fecha":
+        keys = [int(str(value).replace("-", "")) for value in values]
+        return keys, r"k = aaaammdd", "k"
+
+    if number_mode == "float":
+        raw_keys = [int(round(float(value) * 100)) for value in values]
+        min_key = min(raw_keys)
+        offset = -min_key if min_key < 0 else 0
+        keys = [key + offset for key in raw_keys]
+        return keys, rf"k = 100a + {offset}", "k"
+
+    raw_keys = [int(value) for value in values]
+    min_key = min(raw_keys)
+    offset = -min_key if min_key < 0 else 0
+    keys = [key + offset for key in raw_keys]
+    if offset:
+        return keys, rf"k = a + {offset}", "k"
+    return keys, r"k = a", "k"
 
 
 TRACE_BUILDERS = {

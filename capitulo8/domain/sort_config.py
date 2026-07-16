@@ -55,3 +55,21 @@ GAP_SEQUENCE_OPTIONS = (
     ("Sedgewick", "sedgewick"),
     ("Pratt", "pratt"),
 )
+RADIX_DATA_TYPE_OPTIONS = (
+    ("Número", "numero"),
+    ("Carácter", "caracter"),
+    ("Cadena de caracteres", "cadena"),
+    ("Fecha", "fecha"),
+)
+RADIX_NUMBER_MODE_OPTIONS = (
+    ("Positivos", "positive"),
+    ("Negativos", "negative"),
+    ("Mixto", "mixed"),
+    ("Punto flotante", "float"),
+)
+RADIX_BASE_OPTIONS = (
+    ("Binario (2)", 2),
+    ("Octal (8)", 8),
+    ("Decimal (10)", 10),
+    ("Hexadecimal (16)", 16),
+)

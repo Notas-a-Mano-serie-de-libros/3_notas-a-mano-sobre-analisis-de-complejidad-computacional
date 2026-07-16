@@ -17,22 +17,22 @@ except ImportError:
 
 
 ALGORITHMS = (
-    ("burbuja", "Ordenamiento<br>burbuja"),
-    ("seleccion", "Ordenamiento<br>selección"),
-    ("insercion", "Ordenamiento<br>inserción"),
-    ("shell", "Ordenamiento<br>Shell"),
-    ("mezcla", "Ordenamiento<br>mezcla"),
-    ("rapido", "Ordenamiento<br>rápido"),
     ("radix", "Ordenamiento<br>radix"),
+    ("rapido", "Ordenamiento<br>rápido"),
+    ("mezcla", "Ordenamiento<br>mezcla"),
+    ("shell", "Ordenamiento<br>Shell"),
+    ("insercion", "Ordenamiento<br>inserción"),
+    ("seleccion", "Ordenamiento<br>selección"),
+    ("burbuja", "Ordenamiento<br>burbuja"),
 )
 ALGORITHM_OPTIONS = (
-    ("Burbuja", "burbuja"),
-    ("Selección", "seleccion"),
-    ("Inserción", "insercion"),
-    ("Shell", "shell"),
-    ("Mezcla", "mezcla"),
-    ("Rápido", "rapido"),
     ("Radix", "radix"),
+    ("Rápido", "rapido"),
+    ("Mezcla", "mezcla"),
+    ("Shell", "shell"),
+    ("Inserción", "insercion"),
+    ("Selección", "seleccion"),
+    ("Burbuja", "burbuja"),
 )
 DEFAULT_ALGORITHMS = tuple(value for _label, value in ALGORITHM_OPTIONS)
 ALGORITHM_COLUMN_WIDTHS = (116, 128, 118, 82)

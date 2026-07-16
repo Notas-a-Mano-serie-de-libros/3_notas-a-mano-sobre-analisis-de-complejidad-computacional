@@ -29,6 +29,9 @@ from sort_config import (
     ORDER_OPTIONS,
     PARTITION_OPTIONS,
     PIVOT_OPTIONS,
+    RADIX_BASE_OPTIONS,
+    RADIX_DATA_TYPE_OPTIONS,
+    RADIX_NUMBER_MODE_OPTIONS,
     ROLE_ACTIVE,
     ROLE_BOUNDARY,
     ROLE_COMPARE,
@@ -60,6 +63,7 @@ SORT_TREE_RESULT_OFFSET = 28
 SORT_BAR_AREA_HEIGHT = 295
 SORT_BAR_MIN_HEIGHT = 18
 SORT_BAR_HEIGHT_RANGE = 250
+SORT_DATE_BAR_HEIGHT_RANGE = 180
 MERGE_TREE_ROW_HEIGHT = 156
 QUICK_TREE_ROW_HEIGHT = 156
 SORT_LEGEND_ITEMS = (
@@ -144,19 +148,63 @@ def generate_values(size=DEFAULT_SIZE):
     return random.sample(range(10, upper), size)
 
 
-def generate_radix_values(size=DEFAULT_SIZE, max_value=999):
+def generate_radix_values(size=DEFAULT_SIZE, max_value=999, data_type="numero", number_mode="positive"):
     max_value = max(0, int(max_value))
     if size <= 0:
         return []
+    if data_type == "caracter":
+        alphabet = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
+        values = random.sample(list(alphabet), min(size, len(alphabet)))
+        while len(values) < size:
+            values.append(random.choice(alphabet))
+        random.shuffle(values)
+        return values
+    if data_type == "cadena":
+        syllables = ("al", "be", "ca", "do", "el", "fi", "ga", "ha", "io", "ju", "ka", "lu")
+        values = []
+        for index in range(size):
+            first = syllables[index % len(syllables)]
+            second = syllables[(index * 3 + 2) % len(syllables)]
+            values.append(f"{first}{second}")
+        random.shuffle(values)
+        return values
+    if data_type == "fecha":
+        values = []
+        for _ in range(size):
+            year = random.randint(2020, 2026)
+            month = random.randint(1, 12)
+            day = random.randint(1, 28)
+            values.append(f"{year:04d}-{month:02d}-{day:02d}")
+        random.shuffle(values)
+        return values
+    if number_mode == "negative":
+        values = [-max_value]
+        values.extend(random.randint(-max_value, 0) for _ in range(size - 1))
+        random.shuffle(values)
+        return values
+    if number_mode == "mixed":
+        values = [-max_value, max_value] if size > 1 else [max_value]
+        values.extend(random.randint(-max_value, max_value) for _ in range(size - len(values)))
+        random.shuffle(values)
+        return values
+    if number_mode == "float":
+        values = [round(float(max_value), 2)]
+        values.extend(round(random.uniform(0, max_value), 2) for _ in range(size - 1))
+        random.shuffle(values)
+        return values
     values = [max_value]
     values.extend(random.randint(0, max_value) for _ in range(size - 1))
     random.shuffle(values)
     return values
 
 
-def create_state(algorithm, size=None, descending=False, values=None, view="barras", pivot_strategy="middle", gap_sequence="shell", partition_scheme="hoare", radix_max=999):
+def create_state(algorithm, size=None, descending=False, values=None, view="barras", pivot_strategy="middle", gap_sequence="shell", partition_scheme="hoare", radix_max=999, radix_data_type="numero", radix_number_mode="positive", radix_base=10):
     size = default_size_for_view(view) if size is None else size
-    values = list(values) if values is not None else (generate_radix_values(size, radix_max) if algorithm == "radix" else generate_values(size))
+    values = list(values) if values is not None else (
+        generate_radix_values(size, radix_max, radix_data_type, radix_number_mode)
+        if algorithm == "radix"
+        else generate_values(size)
+    )
     builder = TRACE_BUILDERS[algorithm]
     trace_kwargs = {"descending": descending}
     if algorithm == "rapido":
@@ -164,6 +212,10 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
         trace_kwargs["partition_scheme"] = partition_scheme
     if algorithm == "shell":
         trace_kwargs["gap_sequence"] = gap_sequence
+    if algorithm == "radix":
+        trace_kwargs["radix_data_type"] = radix_data_type
+        trace_kwargs["radix_number_mode"] = radix_number_mode
+        trace_kwargs["radix_base"] = radix_base
     initial_message, initial_formula = INITIAL_MESSAGES[algorithm]
     if algorithm == "shell":
         initial_formula = shell_initial_formula(len(values), gap_sequence)
@@ -191,10 +243,11 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
             "active": True,
         }]
     elif algorithm == "radix":
-        initial_event["radix_buckets"] = [[] for _ in range(10)]
+        initial_event["radix_buckets"] = [[] for _ in range(radix_base)]
         initial_event["radix_phase"] = "initial"
         initial_event["radix_active_bucket"] = None
         initial_event["radix_active_value"] = None
+        initial_event["radix_base"] = radix_base
     trace = LazyTrace(builder, values, trace_kwargs, initial_event)
     event = copy_event(trace[0])
     return {
@@ -209,6 +262,9 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
         "partition_scheme": partition_scheme,
         "gap_sequence": gap_sequence,
         "radix_max": radix_max,
+        "radix_data_type": radix_data_type,
+        "radix_number_mode": radix_number_mode,
+        "radix_base": radix_base,
         "sorting_active": False,
     }
 
@@ -366,7 +422,8 @@ def message_html(message):
 def simulation_min_height(state):
     view = state.get("view", "barras")
     size = len(state.get("initial_values", state["arr"]))
-    cache_key = (view, state.get("algorithm"), size)
+    algorithm = state.get("algorithm")
+    cache_key = (view, algorithm, size, state.get("radix_base", 10)) if algorithm == "radix" else (view, algorithm, size)
     if cache_key in _SIMULATION_HEIGHT_CACHE:
         return _SIMULATION_HEIGHT_CACHE[cache_key]
     message_height = 72
@@ -374,11 +431,11 @@ def simulation_min_height(state):
     legend_height = 34
     result_width = SORT_RESULT_WIDTH
     vertical_padding = 34
-    radix_panel_height = 324 if state.get("algorithm") == "radix" else 0
+    radix_panel_height = 52 + int(state.get("radix_base", 10)) * 31 if algorithm == "radix" else 0
     if view == "barras":
         height = message_height + phase_height + legend_height + 360 + radix_panel_height + vertical_padding
     elif view == "arbol":
-        row_height = QUICK_TREE_ROW_HEIGHT if state.get("algorithm") == "rapido" else MERGE_TREE_ROW_HEIGHT
+        row_height = QUICK_TREE_ROW_HEIGHT if algorithm == "rapido" else MERGE_TREE_ROW_HEIGHT
         tree_height = (tree_max_depth_for_state(state) + 1) * row_height
         height = message_height + phase_height + legend_height + tree_height + vertical_padding
     else:
@@ -730,17 +787,27 @@ def render_tree_html(state):
     """
 
 
-def item_html(value, index, role, label, max_value, view, item_width=None):
+def display_metric(value):
+    if isinstance(value, (int, float)):
+        return abs(float(value))
+    text = str(value)
+    return max(1, sum(ord(char) for char in text) / max(1, len(text)))
+
+
+def item_html(value, index, role, label, max_value, view, item_width=None, metric=None, vertical_date=False):
     fill, _border, text = ROLE_STYLES[role]
     label_markup = label_html(label) if label else "&nbsp;"
     if view == "barras":
-        height = SORT_BAR_MIN_HEIGHT + (value / max_value) * SORT_BAR_HEIGHT_RANGE if max_value else SORT_BAR_MIN_HEIGHT
+        metric = display_metric(value) if metric is None else metric
+        height_range = SORT_DATE_BAR_HEIGHT_RANGE if vertical_date else SORT_BAR_HEIGHT_RANGE
+        height = SORT_BAR_MIN_HEIGHT + (metric / max_value) * height_range if max_value else SORT_BAR_MIN_HEIGHT
         width_style = f' style="width:{item_width}px; margin: 0 1.5px;"' if item_width else ""
+        display_value = escape(str(value))
         return f"""
         <div class="bar-wrap"{width_style}>
           <div class="bar-area">
             <div class="bar-stack">
-              <div class="bar-value">{value}</div>
+              <div class="bar-value">{display_value}</div>
               <div class="bar" style="height:{height}px; background:{fill};"></div>
             </div>
           </div>
@@ -752,7 +819,7 @@ def item_html(value, index, role, label, max_value, view, item_width=None):
     <div class="sort-item box-wrap">
       <div class="box-index">{index}</div>
       <div class="box" style="background:{fill}; border-color:#111111; color:{text};">
-        <div class="box-value">{value}</div>
+        <div class="box-value">{escape(str(value))}</div>
       </div>
       <div class="item-label">{label_markup}</div>
     </div>
@@ -1049,6 +1116,21 @@ def sort_styles():
         margin-bottom: 3px;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);
       }}
+      .bar-panel-date .bar-stack {{
+        align-items: center;
+      }}
+      .bar-panel-date .bar-value {{
+        width: 18px;
+        height: 74px;
+        margin: 0 0 6px;
+        color: #f7f7f7;
+        font-size: 13px;
+        line-height: 14px;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92);
+        white-space: nowrap;
+      }}
       .bar {{
         width: 100%;
         box-sizing: border-box;
@@ -1338,19 +1420,32 @@ def render_items_markup(state, view):
         return render_tree_html(state)
 
     values = state["arr"]
-    max_value = max(values) if values else 1
+    metrics = [display_metric(value) for value in values]
+    max_value = max(metrics) if metrics else 1
     item_width = max(18, min(48, SORT_VISUAL_WIDTH / max(1, len(values)))) if view == "barras" else None
     item_cache = state.setdefault("_item_html_cache", {})
     item_markup = []
+    vertical_date = state.get("algorithm") == "radix" and state.get("radix_data_type") == "fecha"
     for index, value in enumerate(values):
-        key = (view, index, value, state["roles"][index], state["labels"][index], max_value, item_width)
+        key = (view, index, value, state["roles"][index], state["labels"][index], metrics[index], max_value, item_width, vertical_date)
         if key not in item_cache:
-            item_cache[key] = item_html(value, index, state["roles"][index], state["labels"][index], max_value, view, item_width)
+            item_cache[key] = item_html(
+                value,
+                index,
+                state["roles"][index],
+                state["labels"][index],
+                max_value,
+                view,
+                item_width,
+                metric=metrics[index],
+                vertical_date=vertical_date,
+            )
         item_markup.append(item_cache[key])
     items = "".join(item_markup)
 
     if view == "barras":
-        return f'<div class="bar-panel"><div class="bar-nodes">{items}</div></div>'
+        date_class = " bar-panel-date" if state.get("algorithm") == "radix" and state.get("radix_data_type") == "fecha" else ""
+        return f'<div class="bar-panel{date_class}"><div class="bar-nodes">{items}</div></div>'
     return f'<div class="sort-items boxes">{items}</div>'
 
 
@@ -1380,7 +1475,7 @@ def render_radix_buckets(state):
         rows.append(
             f"""
             <div class="radix-bucket-row{active_class}">
-              <div class="radix-bucket-key">{bucket}</div>
+              <div class="radix-bucket-key">{radix_bucket_label(bucket)}</div>
               <div class="radix-bucket-chain">{structure}</div>
             </div>
             """
@@ -1394,6 +1489,10 @@ def render_radix_buckets(state):
       {''.join(rows)}
     </div>
     """
+
+
+def radix_bucket_label(bucket):
+    return str(bucket) if bucket < 10 else chr(ord("A") + bucket - 10)
 
 
 def render_state_html(state, include_styles=True):
@@ -1481,6 +1580,27 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         width="230px",
         description_style={},
     )
+    radix_type_dropdown = dropdown_control(
+        options=RADIX_DATA_TYPE_OPTIONS,
+        value="numero",
+        description="Tipo de dato",
+        width="250px",
+        description_style={},
+    )
+    radix_number_mode_dropdown = dropdown_control(
+        options=RADIX_NUMBER_MODE_OPTIONS,
+        value="positive",
+        description="Números",
+        width="230px",
+        description_style={},
+    )
+    radix_base_dropdown = dropdown_control(
+        options=RADIX_BASE_OPTIONS,
+        value=10,
+        description="Base",
+        width="210px",
+        description_style={},
+    )
     step_button = button_control(description="Paso siguiente", button_style="info", width="150px")
     auto_button = button_control(description="Ejecución automática", button_style="success", width="190px")
     finish_button = button_control(description="Finalizar", button_style="", width="120px")
@@ -1494,6 +1614,9 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         "partition": partition_dropdown,
         "gap_sequence": gap_dropdown,
         "radix_max": radix_max_input,
+        "radix_data_type": radix_type_dropdown,
+        "radix_number_mode": radix_number_mode_dropdown,
+        "radix_base": radix_base_dropdown,
         "step": step_button,
         "auto": auto_button,
         "finish": finish_button,
@@ -1501,6 +1624,7 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         "book": book_button,
     }
     first_row = [size_input, view_dropdown, order_dropdown]
+    second_row = []
     if has_pivot:
         first_row.append(pivot_dropdown)
     if has_partition:
@@ -1508,10 +1632,14 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
     if has_gap_sequence:
         first_row.append(gap_dropdown)
     if has_radix_max:
-        first_row.append(radix_max_input)
+        first_row.append(radix_type_dropdown)
+        second_row.extend([radix_max_input, radix_number_mode_dropdown, radix_base_dropdown])
+    control_rows = [widgets.HBox(first_row, layout=widgets.Layout(width="100%", gap="12px"))]
+    if second_row:
+        control_rows.append(widgets.HBox(second_row, layout=widgets.Layout(width="100%", gap="12px")))
     layout = widgets.VBox(
-        [
-            widgets.HBox(first_row, layout=widgets.Layout(width="100%", gap="12px")),
+        control_rows
+        + [
             widgets.HBox([step_button, auto_button, finish_button, reset_button, book_button], layout=widgets.Layout(width="100%", gap="8px", margin="10px 0 0 0")),
         ],
         layout=widgets.Layout(width="100%", gap="12px"),
@@ -1557,12 +1685,17 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         if values is not None:
             state_values = list(values)
         elif algorithm == "radix":
-            state_values = generate_radix_values(controls["size"].value, controls["radix_max"].value)
+            state_values = generate_radix_values(
+                controls["size"].value,
+                controls["radix_max"].value,
+                controls["radix_data_type"].value,
+                controls["radix_number_mode"].value,
+            )
         else:
             state_values = generate_values(controls["size"].value)
-        if algorithm == "radix" and sync_radix_max and state_values:
+        if algorithm == "radix" and sync_radix_max and state_values and controls["radix_data_type"].value == "numero":
             control_state["updating"] = True
-            controls["radix_max"].value = max(state_values)
+            controls["radix_max"].value = int(max(abs(float(value)) for value in state_values))
             control_state["updating"] = False
         next_state = create_state(
             algorithm=algorithm,
@@ -1574,11 +1707,23 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             partition_scheme=controls["partition"].value,
             gap_sequence=controls["gap_sequence"].value,
             radix_max=controls["radix_max"].value,
+            radix_data_type=controls["radix_data_type"].value,
+            radix_number_mode=controls["radix_number_mode"].value,
+            radix_base=controls["radix_base"].value,
         )
         next_state["formula_reserved_height"] = calculate_sort_formula_reserved_height(next_state)
         return next_state
 
     state = build_state(sync_radix_max=True)
+
+    def update_radix_control_visibility():
+        if algorithm != "radix":
+            return
+        is_number = controls["radix_data_type"].value == "numero"
+        display = None if is_number else "none"
+        for key in ("radix_max", "radix_number_mode", "radix_base"):
+            controls[key].layout.display = display
+            controls[key].disabled = not is_number
 
     def build_sort_trace():
         probe = copy_sort_state(state)
@@ -1609,7 +1754,11 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         if control_state["updating"]:
             return
         change = _args[0] if _args else {}
-        sync_radix_max = not (isinstance(change, dict) and change.get("owner") is controls["radix_max"])
+        update_radix_control_visibility()
+        sync_radix_max = not (
+            isinstance(change, dict)
+            and change.get("owner") in {controls["radix_max"], controls["radix_number_mode"], controls["radix_data_type"]}
+        )
         state = build_state(sync_radix_max=sync_radix_max)
         redraw()
         sync_execution_buttons()
@@ -1708,10 +1857,14 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     controls["partition"].observe(reset_algorithm, names="value")
     controls["gap_sequence"].observe(reset_algorithm, names="value")
     controls["radix_max"].observe(reset_algorithm, names="value")
+    controls["radix_data_type"].observe(reset_algorithm, names="value")
+    controls["radix_number_mode"].observe(reset_algorithm, names="value")
+    controls["radix_base"].observe(reset_algorithm, names="value")
 
     css_widget = widgets.HTML(sort_styles())
     layout = widgets.VBox([controls_layout, formula_output, css_widget, html_output], layout=widgets.Layout(width="100%"))
     display(layout)
+    update_radix_control_visibility()
     redraw()
 
 
