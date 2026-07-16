@@ -1667,11 +1667,11 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
     first_row = [size_group, view_group, order_group]
     second_row = []
     if has_pivot:
-        first_row.append(labeled_control("Pivote", pivot_dropdown, 230, group_width=430))
+        first_row.append(labeled_control("Pivote", pivot_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH))
     if has_partition:
-        first_row.append(labeled_control("Partición", partition_dropdown, 180, group_width=380))
+        first_row.append(labeled_control("Partición", partition_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH))
     if has_gap_sequence:
-        first_row.append(labeled_control("h", gap_dropdown, 180, group_width=380))
+        first_row.append(labeled_control("h", gap_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH))
     if has_radix_max:
         radix_type_group = labeled_control("Tipo de dato", radix_type_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
         radix_max_group = labeled_control("Valor máximo", radix_max_input, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
@@ -1689,8 +1689,13 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
     if has_radix_max:
         empty_group = widgets.Box(layout=widgets.Layout(width=f"{SORT_CONTROL_GROUP_WIDTH}px"))
         control_rows = [controls_grid(first_row + second_row + [empty_group], columns=4)]
+    elif len(first_row) > 3:
+        control_rows = [
+            controls_grid(first_row[:3], columns=3),
+            controls_grid(first_row[3:], columns=len(first_row[3:])),
+        ]
     else:
-        control_rows = [widgets.HBox(first_row, layout=widgets.Layout(width="100%", gap="12px"))]
+        control_rows = [controls_grid(first_row, columns=len(first_row))]
     layout = widgets.VBox(
         control_rows
         + [
