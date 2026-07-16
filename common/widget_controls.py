@@ -57,12 +57,19 @@ def button_control(*, description, button_style, width, disabled=False):
     )
 
 
-def compact_labeled_control(label, control, field_width=COMPACT_FIELD_WIDTH, group_width=COMPACT_GROUP_WIDTH):
-    control.description = ""
+def compact_labeled_control(
+    label,
+    control,
+    field_width=COMPACT_FIELD_WIDTH,
+    group_width=COMPACT_GROUP_WIDTH,
+    label_width=COMPACT_LABEL_WIDTH,
+):
+    if hasattr(control, "description"):
+        control.description = ""
     control.layout.width = f"{field_width}px"
     label_widget = widgets.HTML(
         value=f'<span style="font-weight:700;">{escape(label)}</span>',
-        layout=widgets.Layout(width=f"{COMPACT_LABEL_WIDTH}px"),
+        layout=widgets.Layout(width=f"{label_width}px"),
     )
     return widgets.HBox(
         [label_widget, control],

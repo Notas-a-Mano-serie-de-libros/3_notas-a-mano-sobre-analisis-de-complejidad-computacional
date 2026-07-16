@@ -6,7 +6,7 @@ from html import escape
 from IPython.display import display
 import ipywidgets as widgets
 
-from common.widget_controls import bounded_int_control, button_control, compact_labeled_control, dropdown_control
+from common.widget_controls import COMPACT_GROUP_WIDTH, bounded_int_control, button_control, compact_labeled_control, dropdown_control
 from sort_common import colab_pause, copy_sort_state, create_state as create_sort_state, generate_values, step_sort
 from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES
 
@@ -43,8 +43,8 @@ ALGORITHM_FIELD_PADDING_X = 8
 ALGORITHM_FIELD_PADDING_Y = 5
 ALGORITHM_FIELD_WIDTH = sum(ALGORITHM_COLUMN_WIDTHS) + (len(ALGORITHM_COLUMN_WIDTHS) - 1) * ALGORITHM_COLUMN_GAP + 2 * ALGORITHM_FIELD_PADDING_X + 2
 ALGORITHM_FIELD_HEIGHT = 2 * ALGORITHM_ROW_HEIGHT + ALGORITHM_ROW_GAP + 2 * ALGORITHM_FIELD_PADDING_Y + 2
-ALGORITHM_GROUP_GAP = 2
-ALGORITHM_GROUP_WIDTH = ALGORITHM_FIELD_WIDTH
+ALGORITHM_LABEL_WIDTH = 150
+ALGORITHM_GROUP_WIDTH = ALGORITHM_LABEL_WIDTH + ALGORITHM_FIELD_WIDTH + 2
 ROW_HTML_CACHE_LIMIT = 512
 _ROW_HTML_CACHE = {}
 
@@ -464,10 +464,6 @@ def run_app():
         value: widgets.Checkbox(value=True, description=label, indent=False, layout=widgets.Layout(width="100%"))
         for label, value in ALGORITHM_OPTIONS
     }
-    algorithms_label = widgets.HTML(
-        value="Algoritmos activos",
-        layout=widgets.Layout(width=f"{ALGORITHM_FIELD_WIDTH}px", height="24px"),
-    )
     algorithms_checks_box = widgets.GridBox(
         list(algorithm_checks.values()),
         layout=widgets.Layout(
@@ -491,15 +487,12 @@ def run_app():
             overflow="visible",
         ),
     )
-    algorithms_group = widgets.VBox(
-        [algorithms_label, algorithms_checks_frame],
-        layout=widgets.Layout(
-            width=f"{ALGORITHM_GROUP_WIDTH}px",
-            align_items="stretch",
-            gap=f"{ALGORITHM_GROUP_GAP}px",
-            margin="0",
-            overflow="visible",
-        ),
+    algorithms_group = compact_labeled_control(
+        "Algoritmos activos",
+        algorithms_checks_frame,
+        field_width=ALGORITHM_FIELD_WIDTH,
+        group_width=ALGORITHM_GROUP_WIDTH,
+        label_width=ALGORITHM_LABEL_WIDTH,
     )
     auto_button = button_control(description="Ordenar", button_style="success", width="150px")
     finish_button = button_control(description="Finalizar", button_style="info", width="150px", disabled=True)
@@ -508,7 +501,7 @@ def run_app():
     order_group = compact_labeled_control("Orden", order_dropdown)
     primary_controls = widgets.VBox(
         [size_group, order_group],
-        layout=widgets.Layout(width="100%", gap="12px"),
+        layout=widgets.Layout(width=f"{COMPACT_GROUP_WIDTH}px", flex="0 0 auto", gap="18px"),
     )
     style_output = widgets.HTML(value=render_comparison_styles(), layout=widgets.Layout(width="100%"))
     body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
@@ -645,7 +638,10 @@ def run_app():
 
     layout = widgets.VBox(
         [
-            widgets.HBox([primary_controls, algorithms_group], layout=widgets.Layout(width="100%", gap="18px", align_items="flex-start")),
+            widgets.HBox(
+                [primary_controls, algorithms_group],
+                layout=widgets.Layout(width="100%", gap="18px", align_items="flex-start", justify_content="flex-start"),
+            ),
             widgets.HBox([auto_button, finish_button, reset_button], layout=widgets.Layout(width="100%", gap="10px", margin="12px 0 0 0")),
             html_output,
         ],
