@@ -11,7 +11,7 @@ import ipywidgets as widgets
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
 from common.visual_roles import SEARCH_EXPONENTIAL_STYLES, SEARCH_RANGE_HIGHLIGHT_STYLES, SEARCH_ROLE_STYLES, SEARCH_SEQUENTIAL_STYLES, SEARCH_TERNARY_STYLES, TARGET
-from common.widget_controls import bounded_int_control, button_control, dropdown_control
+from common.widget_controls import COMPACT_GROUP_WIDTH, bounded_int_control, button_control, compact_labeled_control, dropdown_control
 
 try:
     import nest_asyncio
@@ -678,6 +678,12 @@ def create_search_controls(default_size=DEFAULT_SIZE, max_size=MAX_SIZE, default
         "finish": finish_button,
         "reset": reset_button,
         "book": book_button,
+        "_groups": {
+            "size": compact_labeled_control("Tamaño", size_input),
+            "target_mode": compact_labeled_control("Elemento", target_mode_input),
+            "target_position": compact_labeled_control("Posición", target_position_input),
+            "target_readout": compact_labeled_control("Objetivo", target_readout),
+        },
     }
 
 
@@ -743,12 +749,13 @@ def run_search_app(
         return values
 
     def first_row_controls():
-        controls = [size_input, target_mode_input]
+        groups = controls["_groups"]
+        row_controls = [groups["size"], groups["target_mode"]]
         if target_mode_input.value == TARGET_EXISTS:
-            controls.append(target_position_input)
-        controls.append(target_readout)
-        controls.extend(extra_controls.values())
-        return controls
+            row_controls.append(groups["target_position"])
+        row_controls.append(groups["target_readout"])
+        row_controls.extend(extra_controls.values())
+        return row_controls
 
     def update_target_readout(target):
         control_state["updating"] = True
@@ -758,7 +765,9 @@ def run_search_app(
     def update_target_position_visibility():
         target_position_input.layout.display = None if target_mode_input.value == TARGET_EXISTS else "none"
         if ui_state["first_row"] is not None:
-            ui_state["first_row"].children = tuple(first_row_controls())
+            row_controls = first_row_controls()
+            ui_state["first_row"].children = tuple(row_controls)
+            ui_state["first_row"].layout.grid_template_columns = " ".join(f"{COMPACT_GROUP_WIDTH}px" for _ in row_controls)
 
     def build_state(values=None, target_override=None):
         size = len(values) if values is not None else size_input.value
@@ -912,7 +921,17 @@ def run_search_app(
     for control in extra_controls.values():
         control.observe(lambda change: reset_algorithm() if change["name"] == "value" else None, names="value")
 
-    first_row_box = widgets.HBox(first_row_controls(), layout=widgets.Layout(width="100%", gap="12px"))
+    initial_row_controls = first_row_controls()
+    first_row_box = widgets.GridBox(
+        initial_row_controls,
+        layout=widgets.Layout(
+            width="100%",
+            grid_template_columns=" ".join(f"{COMPACT_GROUP_WIDTH}px" for _ in initial_row_controls),
+            gap="12px 42px",
+            align_items="center",
+            overflow="visible",
+        ),
+    )
     ui_state["first_row"] = first_row_box
     update_target_position_visibility()
     css_widget = widgets.HTML(_SEARCH_CSS)

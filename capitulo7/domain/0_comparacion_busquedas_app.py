@@ -23,7 +23,7 @@ from search_common import (
     generate_sorted_values,
     resolve_node_style,
 )
-from common.widget_controls import bounded_int_control, button_control, dropdown_control
+from common.widget_controls import COMPACT_GROUP_WIDTH, bounded_int_control, button_control, compact_labeled_control, dropdown_control
 
 try:
     import nest_asyncio
@@ -607,6 +607,12 @@ def run_app():
     auto_button = button_control(description="Buscar", button_style="success", width="150px")
     finish_button = button_control(description="Finalizar", button_style="info", width="150px", disabled=True)
     reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
+    control_groups = {
+        "size": compact_labeled_control("Tamaño", size_input),
+        "target_mode": compact_labeled_control("Elemento", target_mode_input),
+        "target_position": compact_labeled_control("Posición", target_position_input),
+        "target_readout": compact_labeled_control("Objetivo", target_readout),
+    }
     style_output = widgets.HTML(layout=widgets.Layout(width="100%"))
     body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
     html_output = widgets.VBox(
@@ -619,10 +625,10 @@ def run_app():
     state = None
 
     def first_row_controls():
-        controls = [size_input, target_mode_input]
+        controls = [control_groups["size"], control_groups["target_mode"]]
         if target_mode_input.value == TARGET_EXISTS:
-            controls.append(target_position_input)
-        controls.append(target_readout)
+            controls.append(control_groups["target_position"])
+        controls.append(control_groups["target_readout"])
         return controls
 
     def update_target_readout(target):
@@ -633,7 +639,9 @@ def run_app():
     def update_target_position_visibility():
         target_position_input.layout.display = None if target_mode_input.value == TARGET_EXISTS else "none"
         if ui_state["first_row"] is not None:
-            ui_state["first_row"].children = tuple(first_row_controls())
+            row_controls = first_row_controls()
+            ui_state["first_row"].children = tuple(row_controls)
+            ui_state["first_row"].layout.grid_template_columns = " ".join(f"{COMPACT_GROUP_WIDTH}px" for _ in row_controls)
 
     def build_state(values=None, target_override=None):
         size = len(values) if values is not None else size_input.value
@@ -775,7 +783,17 @@ def run_app():
     target_mode_input.observe(lambda change: on_target_mode_change() if change["name"] == "value" else None, names="value")
     target_position_input.observe(lambda change: on_target_position_change() if change["name"] == "value" else None, names="value")
 
-    first_row_box = widgets.HBox(first_row_controls(), layout=widgets.Layout(width="100%", gap="12px"))
+    initial_row_controls = first_row_controls()
+    first_row_box = widgets.GridBox(
+        initial_row_controls,
+        layout=widgets.Layout(
+            width="100%",
+            grid_template_columns=" ".join(f"{COMPACT_GROUP_WIDTH}px" for _ in initial_row_controls),
+            gap="12px 42px",
+            align_items="center",
+            overflow="visible",
+        ),
+    )
     ui_state["first_row"] = first_row_box
     update_target_position_visibility()
     controls = widgets.VBox(

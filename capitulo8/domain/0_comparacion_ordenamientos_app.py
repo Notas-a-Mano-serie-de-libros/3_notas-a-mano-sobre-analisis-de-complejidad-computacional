@@ -6,7 +6,7 @@ from html import escape
 from IPython.display import display
 import ipywidgets as widgets
 
-from common.widget_controls import bounded_int_control, button_control, dropdown_control
+from common.widget_controls import bounded_int_control, button_control, compact_labeled_control, dropdown_control
 from sort_common import colab_pause, copy_sort_state, create_state as create_sort_state, generate_values, step_sort
 from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, GAP_SEQUENCE_OPTIONS, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES
 
@@ -511,6 +511,9 @@ def run_app():
     auto_button = button_control(description="Ordenar", button_style="success", width="150px")
     finish_button = button_control(description="Finalizar", button_style="info", width="150px", disabled=True)
     reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
+    size_group = compact_labeled_control("Tamaño", size_input)
+    order_group = compact_labeled_control("Orden", order_dropdown)
+    gap_group = compact_labeled_control("h", gap_dropdown)
     style_output = widgets.HTML(value=render_comparison_styles(), layout=widgets.Layout(width="100%"))
     body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
     html_output = widgets.VBox(
@@ -648,7 +651,7 @@ def run_app():
 
     layout = widgets.VBox(
         [
-            widgets.HBox([size_input, order_dropdown, gap_dropdown, algorithms_group], layout=widgets.Layout(width="100%", gap="12px")),
+            widgets.HBox([size_group, order_group, gap_group, algorithms_group], layout=widgets.Layout(width="100%", gap="42px")),
             widgets.HBox([auto_button, finish_button, reset_button], layout=widgets.Layout(width="100%", gap="10px", margin="12px 0 0 0")),
             html_output,
         ],

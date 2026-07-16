@@ -1176,7 +1176,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("while not all_sorts_complete(probe):", source)
         self.assertIn("yield copy_comparison_state(probe)", source)
         self.assertIn("for snapshot in build_comparison_trace(state):", source)
-        self.assertIn("from common.widget_controls import bounded_int_control, button_control, dropdown_control", source)
+        self.assertIn("compact_labeled_control", source)
         self.assertIn('"common/widget_controls.py"', bootstrap)
         self.assertNotIn('description="Buscar"', source)
         self.assertNotIn("AUTO_RENDER_EVERY", source)
