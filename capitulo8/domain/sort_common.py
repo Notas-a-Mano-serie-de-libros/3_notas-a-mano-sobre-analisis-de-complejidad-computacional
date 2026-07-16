@@ -60,6 +60,13 @@ SORT_RESULT_WIDTH = 36
 SORT_RESULT_HEIGHT = 54
 SORT_BOX_RESULT_OFFSET = 29
 SORT_TREE_RESULT_OFFSET = 28
+SORT_CONTROL_STYLE = {"description_width": "0px"}
+SORT_CONTROL_LABEL_WIDTH = 96
+SORT_CONTROL_FIELD_WIDTH = 130
+SORT_CONTROL_GROUP_PADDING_RIGHT = 44
+SORT_CONTROL_GROUP_WIDTH = SORT_CONTROL_LABEL_WIDTH + SORT_CONTROL_FIELD_WIDTH + SORT_CONTROL_GROUP_PADDING_RIGHT + 4
+SORT_CONTROL_GAP = 2
+SORT_CONTROL_COLUMN_GAP = 42
 SORT_BAR_AREA_HEIGHT = 295
 SORT_BAR_MIN_HEIGHT = 18
 SORT_BAR_HEIGHT_RANGE = 250
@@ -1526,6 +1533,36 @@ def render_state_html(state, include_styles=True):
     """
 
 
+def labeled_control(label, control, field_width, group_width=None):
+    control.description = ""
+    control.layout.width = f"{field_width}px"
+    label_widget = widgets.HTML(
+        value=f'<span style="font-weight:700;">{escape(label)}</span>',
+        layout=widgets.Layout(width=f"{SORT_CONTROL_LABEL_WIDTH}px"),
+    )
+    return widgets.HBox(
+        [label_widget, control],
+        layout=widgets.Layout(
+            width=f"{group_width or SORT_CONTROL_LABEL_WIDTH + SORT_CONTROL_GAP + field_width}px",
+            align_items="center",
+            gap=f"{SORT_CONTROL_GAP}px",
+        ),
+    )
+
+
+def controls_grid(groups, columns):
+    return widgets.GridBox(
+        groups,
+        layout=widgets.Layout(
+            width="100%",
+            grid_template_columns=" ".join(f"{SORT_CONTROL_GROUP_WIDTH}px" for _ in range(columns)),
+            gap=f"12px {SORT_CONTROL_COLUMN_GAP}px",
+            align_items="center",
+            overflow="visible",
+        ),
+    )
+
+
 def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_partition=False, has_radix_max=False):
     size_input = bounded_int_control(
         value=default_size_for_view("barras"),
@@ -1533,43 +1570,43 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         max_value=MAX_SIZE,
         step=1,
         description="Tamaño",
-        width="180px",
-        description_style={},
+        width="92px",
+        description_style=SORT_CONTROL_STYLE,
     )
     view_dropdown = dropdown_control(
         options=TREE_VIEW_OPTIONS if has_tree else VIEW_OPTIONS,
         value="barras",
         description="Vista",
-        width="180px",
-        description_style={},
+        width="150px",
+        description_style=SORT_CONTROL_STYLE,
     )
     order_dropdown = dropdown_control(
         options=ORDER_OPTIONS,
         value=False,
         description="Orden",
         width="210px",
-        description_style={},
+        description_style=SORT_CONTROL_STYLE,
     )
     pivot_dropdown = dropdown_control(
         options=PIVOT_OPTIONS,
         value="middle",
         description="Pivote",
-        width="260px",
-        description_style={},
+        width="230px",
+        description_style=SORT_CONTROL_STYLE,
     )
     partition_dropdown = dropdown_control(
         options=PARTITION_OPTIONS,
         value="hoare",
         description="Partición",
-        width="190px",
-        description_style={},
+        width="180px",
+        description_style=SORT_CONTROL_STYLE,
     )
     gap_dropdown = dropdown_control(
         options=GAP_SEQUENCE_OPTIONS,
         value="shell",
         description="h",
-        width="210px",
-        description_style={},
+        width="180px",
+        description_style=SORT_CONTROL_STYLE,
     )
     radix_max_input = bounded_int_control(
         value=999,
@@ -1577,29 +1614,29 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         max_value=99999,
         step=1,
         description="Valor máximo",
-        width="230px",
-        description_style={},
+        width="220px",
+        description_style=SORT_CONTROL_STYLE,
     )
     radix_type_dropdown = dropdown_control(
         options=RADIX_DATA_TYPE_OPTIONS,
         value="numero",
         description="Tipo de dato",
-        width="250px",
-        description_style={},
+        width="280px",
+        description_style=SORT_CONTROL_STYLE,
     )
     radix_number_mode_dropdown = dropdown_control(
         options=RADIX_NUMBER_MODE_OPTIONS,
         value="positive",
         description="Números",
-        width="230px",
-        description_style={},
+        width="220px",
+        description_style=SORT_CONTROL_STYLE,
     )
     radix_base_dropdown = dropdown_control(
         options=RADIX_BASE_OPTIONS,
         value=10,
         description="Base",
-        width="210px",
-        description_style={},
+        width="220px",
+        description_style=SORT_CONTROL_STYLE,
     )
     step_button = button_control(description="Paso siguiente", button_style="info", width="150px")
     auto_button = button_control(description="Ejecución automática", button_style="success", width="190px")
@@ -1623,20 +1660,37 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         "reset": reset_button,
         "book": book_button,
     }
-    first_row = [size_input, view_dropdown, order_dropdown]
+    controls["_groups"] = {}
+    size_group = labeled_control("Tamaño", size_input, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
+    view_group = labeled_control("Vista", view_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
+    order_group = labeled_control("Orden", order_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
+    first_row = [size_group, view_group, order_group]
     second_row = []
     if has_pivot:
-        first_row.append(pivot_dropdown)
+        first_row.append(labeled_control("Pivote", pivot_dropdown, 230, group_width=430))
     if has_partition:
-        first_row.append(partition_dropdown)
+        first_row.append(labeled_control("Partición", partition_dropdown, 180, group_width=380))
     if has_gap_sequence:
-        first_row.append(gap_dropdown)
+        first_row.append(labeled_control("h", gap_dropdown, 180, group_width=380))
     if has_radix_max:
-        first_row.append(radix_type_dropdown)
-        second_row.extend([radix_max_input, radix_number_mode_dropdown, radix_base_dropdown])
-    control_rows = [widgets.HBox(first_row, layout=widgets.Layout(width="100%", gap="12px"))]
-    if second_row:
-        control_rows.append(widgets.HBox(second_row, layout=widgets.Layout(width="100%", gap="12px")))
+        radix_type_group = labeled_control("Tipo de dato", radix_type_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
+        radix_max_group = labeled_control("Valor máximo", radix_max_input, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
+        radix_number_group = labeled_control("Números", radix_number_mode_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
+        radix_base_group = labeled_control("Base", radix_base_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
+        first_row.append(radix_type_group)
+        controls["_groups"].update(
+            {
+                "radix_max": radix_max_group,
+                "radix_number_mode": radix_number_group,
+                "radix_base": radix_base_group,
+            }
+        )
+        second_row.extend([radix_max_group, radix_number_group, radix_base_group])
+    if has_radix_max:
+        empty_group = widgets.Box(layout=widgets.Layout(width=f"{SORT_CONTROL_GROUP_WIDTH}px"))
+        control_rows = [controls_grid(first_row + second_row + [empty_group], columns=4)]
+    else:
+        control_rows = [widgets.HBox(first_row, layout=widgets.Layout(width="100%", gap="12px"))]
     layout = widgets.VBox(
         control_rows
         + [
@@ -1723,6 +1777,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         display = None if is_number else "none"
         for key in ("radix_max", "radix_number_mode", "radix_base"):
             controls[key].layout.display = display
+            controls.get("_groups", {}).get(key, controls[key]).layout.display = display
             controls[key].disabled = not is_number
 
     def build_sort_trace():
