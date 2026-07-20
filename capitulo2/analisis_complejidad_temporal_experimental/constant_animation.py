@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import base64
+from html import escape
 from io import BytesIO
 import time
 import tracemalloc
 from pathlib import Path
 import sys
 
-from IPython.display import HTML, clear_output, display
+from IPython.display import display
 import ipywidgets as widgets
 import matplotlib.pyplot as plt
 import numpy as np
@@ -108,30 +109,93 @@ def results_table(sizes, experimental, mode="time", pending=False):
         formatted_n = f"{int(n):,}".replace(",", r"\,")
         rows.append(
             "<tr>"
-            f'<td style="padding:6px 10px;text-align:center;">\\(10^{{{exponent}}}={formatted_n}\\)</td>'
-            f'<td style="padding:6px 10px;text-align:center;">\\({scientific_latex(theoretical_value)}\\)</td>'
-            f'<td style="padding:6px 10px;text-align:center;">\\({scientific_latex(measured)}\\)</td>'
+            f"<td>\\(10^{{{exponent}}}={formatted_n}\\)</td>"
+            f"<td>\\({scientific_latex(theoretical_value)}\\)</td>"
+            f"<td>\\({scientific_latex(measured)}\\)</td>"
             "</tr>"
         )
     return (
-        '<table style="border-collapse:collapse;margin:8px 0 14px 0;width:100%;max-width:800px;table-layout:auto;">'
+        "<table>"
         "<thead><tr>"
-        '<th style="padding:6px 10px;text-align:center;border-bottom:1px solid;">Cantidad de datos (n)</th>'
-        f'<th style="padding:6px 10px;text-align:center;border-bottom:1px solid;">{theoretical_metric} [{unit}]</th>'
-        f'<th style="padding:6px 10px;text-align:center;border-bottom:1px solid;">{metric} experimental [{unit}]</th>'
+        "<th>Cantidad de datos (n)</th>"
+        f"<th>{theoretical_metric} [{unit}]</th>"
+        f"<th>{metric} experimental [{unit}]</th>"
         "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
     )
 
 
-def figure_placeholder():
-    return HTML(
+def figure_placeholder_html():
+    return (
         '<div aria-hidden="true" '
         'style="width:100%;max-width:800px;aspect-ratio:2/1;visibility:hidden;"></div>'
     )
 
 
+def mathjax_frame(content, height, centered=False):
+    content_layout = (
+        "display:flex;align-items:center;justify-content:center;height:100%;text-align:center;"
+        if centered
+        else ""
+    )
+    srcdoc = f"""<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+html,body{{width:100%;height:100%;margin:0;padding:0;background:transparent;overflow:hidden;}}
+body{{color:#111;font-size:16px;line-height:1.2;}}
+@media (prefers-color-scheme:dark){{body{{color:#f2f2f2;}}}}
+#content{{width:100%;visibility:hidden;{content_layout}}}
+body.math-ready #content{{visibility:visible;}}
+table{{border-collapse:collapse;width:max-content;max-width:100%;margin:0 auto;table-layout:auto;color:inherit;background:transparent;}}
+th,td{{padding:6px 14px;text-align:center;vertical-align:middle;white-space:nowrap;}}
+th{{font-weight:700;color:#202124;background:#f1f3f4;border-bottom:1px solid #bdc1c6;}}
+td{{color:#202124;}}
+tbody tr:nth-child(even) td{{background:#f8f9fa;}}
+mjx-container[jax="SVG"]{{font-size:100% !important;margin:0 !important;}}
+@media (prefers-color-scheme:dark){{
+  th{{color:#e8eaed;background:#303134;border-bottom-color:#5f6368;}}
+  td{{color:#e8eaed;}}
+  tbody tr:nth-child(even) td{{background:#292a2d;}}
+}}
+</style>
+<script>
+window.MathJax = {{
+  tex: {{inlineMath: [['\\\\(', '\\\\)']], processEscapes: true}},
+  svg: {{fontCache: 'none'}},
+  startup: {{typeset: false}}
+}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+<div id="content">{content}</div>
+<script>
+window.addEventListener('load', function () {{
+  if (window.MathJax && MathJax.typesetPromise) {{
+    MathJax.typesetPromise([document.getElementById('content')]).then(function () {{
+      document.body.classList.add('math-ready');
+    }});
+  }}
+}});
+</script>
+</body>
+</html>"""
+    return (
+        '<iframe class="constant-mathjax-frame" '
+        f'srcdoc="{escape(srcdoc, quote=True)}" '
+        f'style="display:block;width:100%;height:{height}px;border:0;overflow:hidden;background:transparent;" '
+        'scrolling="no"></iframe>'
+    )
+
+
+def formula_widget(formula):
+    return widgets.HTML(value=mathjax_frame(rf"\({formula}\)", 30, centered=True))
+
+
 def results_table_widget(sizes, experimental, mode="time", pending=False):
-    return widgets.HTMLMath(value=results_table(sizes, experimental, mode=mode, pending=pending))
+    table = results_table(sizes, experimental, mode=mode, pending=pending)
+    return widgets.HTML(value=mathjax_frame(table, 48 + 42 * len(sizes)))
 
 
 def build_experiment_sizes(maximum_n, points=EXPERIMENT_POINTS):
@@ -211,26 +275,25 @@ def render_result(sizes, experimental, checkpoint_sizes, checkpoint_times, mode)
     image_buffer = BytesIO()
     fig_main.savefig(image_buffer, format="png", bbox_inches="tight", pad_inches=.05)
     plt.close(fig_main)
-    display(results_table_widget(checkpoint_sizes, checkpoint_times, mode=mode))
     encoded_image = base64.b64encode(image_buffer.getvalue()).decode("ascii")
-    display(HTML(f'<img src="data:image/png;base64,{encoded_image}" style="display:block;max-width:100%;height:auto;">'))
+    table_html = mathjax_frame(results_table(checkpoint_sizes, checkpoint_times, mode=mode), 48 + 42 * len(checkpoint_sizes))
+    image_html = f'<img src="data:image/png;base64,{encoded_image}" style="display:block;max-width:100%;height:auto;">'
+    return table_html, image_html
 
 
 def run_app(mode="time"):
     if mode not in {"time", "memory"}:
         raise ValueError("mode debe ser 'time' o 'memory'")
     maximum_state = {"exponent": 5}
-    maximum_value = widgets.HTMLMath(
-        value=r'<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;margin:0;">\(10^{5}\)</div>',
-        layout=widgets.Layout(
+    maximum_value = formula_widget("10^{5}")
+    maximum_value.layout = widgets.Layout(
             width="100%",
             height="32px",
             border="1px solid var(--jp-border-color2, #bdbdbd)",
             display="flex",
             align_items="center",
             justify_content="center",
-        ),
-    )
+        )
     maximum_value.add_class("constant-centered-math")
     maximum_down = widgets.Button(description="◀", tooltip="Potencia anterior", layout=widgets.Layout(width="100%", height="32px"))
     maximum_up = widgets.Button(description="▶", tooltip="Potencia siguiente", layout=widgets.Layout(width="100%", height="32px"))
@@ -275,7 +338,11 @@ def run_app(mode="time"):
     )
     warning_output = widgets.HTML()
     warning_output.layout = widgets.Layout(width="100%", max_width="100%", overflow="hidden")
-    animation_output = widgets.Output(layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"))
+    table_output = widgets.HTML(layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"))
+    figure_output = widgets.HTML(
+        value=figure_placeholder_html(),
+        layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"),
+    )
 
     def execution_value():
         try:
@@ -291,21 +358,18 @@ def run_app(mode="time"):
 
     def update_maximum(exponent):
         maximum_state["exponent"] = min(10, max(1, exponent))
-        maximum_value.value = (
-            '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;margin:0;">'
-            rf'\(10^{{{maximum_state["exponent"]}}}\)'
-            "</div>"
-        )
+        maximum_value.value = mathjax_frame(rf'\(10^{{{maximum_state["exponent"]}}}\)', 30, centered=True)
         refresh_warning()
 
     def refresh_warning(*_):
         warning_output.value = warning_html(maximum_n(), execution_value(), mode=mode)
         _sizes, preview_checkpoints = build_experiment_sizes(maximum_n())
         preview_times = np.full(len(preview_checkpoints), np.nan)
-        with animation_output:
-            clear_output(wait=True)
-            display(results_table_widget(preview_checkpoints, preview_times, mode=mode, pending=True))
-            display(figure_placeholder())
+        table_output.value = mathjax_frame(
+            results_table(preview_checkpoints, preview_times, mode=mode, pending=True),
+            48 + 42 * len(preview_checkpoints),
+        )
+        figure_output.value = figure_placeholder_html()
 
     def decrease_maximum(_):
         update_maximum(maximum_state["exponent"] - 1)
@@ -342,14 +406,12 @@ def run_app(mode="time"):
                 checkpoint_index = checkpoint_indexes.get(int(n))
                 if checkpoint_index is not None:
                     checkpoint_times[checkpoint_index] = experimental[index]
-                    with animation_output:
-                        clear_output(wait=True)
-                        display(results_table_widget(checkpoints, checkpoint_times, mode=mode, pending=True))
-                        display(figure_placeholder())
+                    table_output.value = mathjax_frame(
+                        results_table(checkpoints, checkpoint_times, mode=mode, pending=True),
+                        48 + 42 * len(checkpoints),
+                    )
                 time.sleep(.01)
-            with animation_output:
-                clear_output(wait=True)
-                render_result(sizes, experimental, checkpoints, checkpoint_times, mode)
+            table_output.value, figure_output.value = render_result(sizes, experimental, checkpoints, checkpoint_times, mode)
         finally:
             apply_button.disabled = False
             maximum_down.disabled = False
@@ -433,7 +495,7 @@ def run_app(mode="time"):
         layout=widgets.Layout(height="0px", min_height="0px", overflow="hidden"),
     )
     app = widgets.VBox(
-        [input_style, controls, warning_output, animation_output],
+        [input_style, controls, warning_output, table_output, figure_output],
         layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"),
     )
     app.add_class("constant-animation-root")

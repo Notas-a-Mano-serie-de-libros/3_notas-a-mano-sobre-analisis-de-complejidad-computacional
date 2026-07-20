@@ -72,12 +72,13 @@ def test_tabla_previa_muestra_todas_las_filas_como_pendientes():
     assert "No ejecutado" not in table
 
 
-def test_tabla_dinamica_usa_widget_con_soporte_mathjax():
+def test_tabla_dinamica_usa_iframe_con_mathjax_explicito():
     import ipywidgets as widgets
 
     table = results_table_widget([10], [1e-7])
-    assert isinstance(table, widgets.HTMLMath)
-    assert r"\(10^{1}=10\)" in table.value
+    assert isinstance(table, widgets.HTML)
+    assert "constant-mathjax-frame" in table.value
+    assert "MathJax.typesetPromise" in table.value
 
 
 def test_rango_experimental_conserva_puntos_intermedios_y_potencias():

@@ -13,6 +13,7 @@ from IPython.display import clear_output
 RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main"
 REQUIRED_FILES = (
     "common/__init__.py",
+    "common/animation_runtime.py",
     "common/widget_controls.py",
     "capitulo2/analisis_complejidad_temporal_experimental/constant_animation.py",
 )
