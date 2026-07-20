@@ -8,10 +8,18 @@ EXPERIMENT_DIR = Path(__file__).parents[1] / "capitulo2" / "analisis_complejidad
 sys.path.insert(0, str(EXPERIMENT_DIR))
 
 from constant_animation import (  # noqa: E402
+    DEFAULT_EXECUTIONS,
+    DEFAULT_MAXIMUM_EXPONENT,
+    MAX_SAFE_ELEMENTS,
+    STATUS_COMPLETE,
+    STATUS_LOADING,
+    STATUS_PENDING,
+    STATUS_SKIPPED,
     build_experiment_sizes,
     measure_access,
     measure_access_memory,
     next_order_of_magnitude,
+    pending_table_html,
     previous_order_of_magnitude,
     results_table,
     results_table_widget,
@@ -72,6 +80,33 @@ def test_tabla_previa_muestra_todas_las_filas_como_pendientes():
     assert "No ejecutado" not in table
 
 
+def test_tabla_muestra_estado_en_espera_carga_y_completado():
+    table = results_table(
+        [10, 100, 1_000],
+        [float("nan"), float("nan"), 1e-7],
+        pending=True,
+        statuses=[STATUS_PENDING, STATUS_LOADING, STATUS_COMPLETE],
+    )
+
+    assert "<th>Estado</th>" in table
+    assert "En espera" in table
+    assert "constant-loading" in table
+    assert "constant-result-symbol found" in table
+    assert ">✓</span>" in table
+
+
+def test_tabla_muestra_solo_teorico_para_tamanos_no_ejecutados():
+    table = results_table(
+        [10, MAX_SAFE_ELEMENTS * 10],
+        [1e-7, float("nan")],
+        pending=True,
+        statuses=[STATUS_COMPLETE, STATUS_SKIPPED],
+    )
+
+    assert "Solo teórico" in table
+    assert r"\text{No ejecutado}" in table
+
+
 def test_tabla_dinamica_usa_iframe_con_mathjax_explicito():
     import ipywidgets as widgets
 
@@ -79,6 +114,38 @@ def test_tabla_dinamica_usa_iframe_con_mathjax_explicito():
     assert isinstance(table, widgets.HTML)
     assert "constant-mathjax-frame" in table.value
     assert "MathJax.typesetPromise" in table.value
+    assert "@keyframes constant-spin" in table.value
+    assert "color:#2d7d32;" in table.value
+
+
+def test_tabla_pendiente_reinicia_resultados_pendientes():
+    table = pending_table_html(1_000)
+
+    assert "constant-mathjax-frame" in table
+    assert table.count("Pendiente") == 3
+    assert "En espera" in table
+    assert ">✓</span>" not in table
+
+
+def test_simulacion_incluye_boton_reiniciar_junto_a_ejecutar():
+    source = Path(EXPERIMENT_DIR / "constant_animation.py").read_text(encoding="utf-8")
+
+    assert 'description="Ejecutar"' in source
+    assert 'description="Reiniciar"' in source
+    assert "[apply_button, reset_button]" in source
+    assert "reset_button.on_click(reset_app)" in source
+    assert "asyncio.create_task(run_experiment())" in source
+    assert "await asyncio.sleep(0.01)" in source
+
+
+def test_simulacion_declara_defaults_y_estados():
+    assert DEFAULT_MAXIMUM_EXPONENT == 5
+    assert DEFAULT_EXECUTIONS == 10
+    assert STATUS_PENDING == "pending"
+    assert STATUS_LOADING == "loading"
+    assert STATUS_COMPLETE == "complete"
+    assert STATUS_SKIPPED == "skipped"
+    assert pending_table_html(10**DEFAULT_MAXIMUM_EXPONENT).count("Pendiente") == DEFAULT_MAXIMUM_EXPONENT
 
 
 def test_rango_experimental_conserva_puntos_intermedios_y_potencias():
