@@ -130,6 +130,10 @@ def figure_placeholder():
     )
 
 
+def results_table_widget(sizes, experimental, mode="time", pending=False):
+    return widgets.HTMLMath(value=results_table(sizes, experimental, mode=mode, pending=pending))
+
+
 def build_experiment_sizes(maximum_n, points=EXPERIMENT_POINTS):
     """Divide el rango como el experimento original e incluye cada potencia de diez."""
     safe_maximum = min(maximum_n, MAX_SAFE_ELEMENTS)
@@ -207,7 +211,7 @@ def render_result(sizes, experimental, checkpoint_sizes, checkpoint_times, mode)
     image_buffer = BytesIO()
     fig_main.savefig(image_buffer, format="png", bbox_inches="tight", pad_inches=.05)
     plt.close(fig_main)
-    display(HTML(results_table(checkpoint_sizes, checkpoint_times, mode=mode)))
+    display(results_table_widget(checkpoint_sizes, checkpoint_times, mode=mode))
     encoded_image = base64.b64encode(image_buffer.getvalue()).decode("ascii")
     display(HTML(f'<img src="data:image/png;base64,{encoded_image}" style="display:block;max-width:100%;height:auto;">'))
 
@@ -300,7 +304,7 @@ def run_app(mode="time"):
         preview_times = np.full(len(preview_checkpoints), np.nan)
         with animation_output:
             clear_output(wait=True)
-            display(HTML(results_table(preview_checkpoints, preview_times, mode=mode, pending=True)))
+            display(results_table_widget(preview_checkpoints, preview_times, mode=mode, pending=True))
             display(figure_placeholder())
 
     def decrease_maximum(_):
@@ -340,7 +344,7 @@ def run_app(mode="time"):
                     checkpoint_times[checkpoint_index] = experimental[index]
                     with animation_output:
                         clear_output(wait=True)
-                        display(HTML(results_table(checkpoints, checkpoint_times, mode=mode, pending=True)))
+                        display(results_table_widget(checkpoints, checkpoint_times, mode=mode, pending=True))
                         display(figure_placeholder())
                 time.sleep(.01)
             with animation_output:

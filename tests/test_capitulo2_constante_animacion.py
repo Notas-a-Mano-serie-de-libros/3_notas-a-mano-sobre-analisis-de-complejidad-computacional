@@ -14,6 +14,7 @@ from constant_animation import (  # noqa: E402
     next_order_of_magnitude,
     previous_order_of_magnitude,
     results_table,
+    results_table_widget,
     warning_html,
 )
 
@@ -69,6 +70,14 @@ def test_tabla_previa_muestra_todas_las_filas_como_pendientes():
     table = results_table([10, 100, 1_000], [float("nan")] * 3, pending=True)
     assert table.count("Pendiente") == 3
     assert "No ejecutado" not in table
+
+
+def test_tabla_dinamica_usa_widget_con_soporte_mathjax():
+    import ipywidgets as widgets
+
+    table = results_table_widget([10], [1e-7])
+    assert isinstance(table, widgets.HTMLMath)
+    assert r"\(10^{1}=10\)" in table.value
 
 
 def test_rango_experimental_conserva_puntos_intermedios_y_potencias():
