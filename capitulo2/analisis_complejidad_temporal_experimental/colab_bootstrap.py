@@ -1,4 +1,4 @@
-"""Carga la simulación constante tanto desde el repositorio como desde Colab."""
+"""Carga las simulaciones experimentales del capítulo 2."""
 
 from __future__ import annotations
 
@@ -15,7 +15,9 @@ REQUIRED_FILES = (
     "common/__init__.py",
     "common/animation_runtime.py",
     "common/widget_controls.py",
+    "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py",
     "capitulo2/analisis_complejidad_temporal_experimental/constant_animation.py",
+    "capitulo2/analisis_complejidad_temporal_experimental/complexity_animations.py",
 )
 
 
@@ -57,9 +59,22 @@ root_string = str(project_root.resolve())
 if root_string not in sys.path:
     sys.path.insert(0, root_string)
 
-module_name = "capitulo2.analisis_complejidad_temporal_experimental.constant_animation"
+simulation_name = globals().get("SIMULATION_NAME", "constant")
+module_name = (
+    "capitulo2.analisis_complejidad_temporal_experimental.constant_animation"
+    if simulation_name == "constant"
+    else "capitulo2.analisis_complejidad_temporal_experimental.complexity_animations"
+)
 importlib.invalidate_caches()
-sys.modules.pop(module_name, None)
-constant_animation = importlib.import_module(module_name)
+for loaded_module in (
+    "capitulo2.analisis_complejidad_temporal_experimental.experimental_animation",
+    "capitulo2.analisis_complejidad_temporal_experimental.constant_animation",
+    "capitulo2.analisis_complejidad_temporal_experimental.complexity_animations",
+):
+    sys.modules.pop(loaded_module, None)
+simulation_module = importlib.import_module(module_name)
 clear_output(wait=True)
-constant_animation.run_app(mode=globals().get("SIMULATION_MODE", "time"))
+if simulation_name == "constant":
+    simulation_module.run_app(mode=globals().get("SIMULATION_MODE", "time"))
+else:
+    simulation_module.run_app(simulation_name, mode=globals().get("SIMULATION_MODE", "time"))
