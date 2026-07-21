@@ -39,6 +39,7 @@ from theoretical_graphs import (  # noqa: E402
     THEORETICAL_CONFIGS,
     align_axes_at_origin,
     maximum_safe_power,
+    plot_logarithmic_slow_growth,
     theoretical_domain,
 )
 
@@ -150,8 +151,19 @@ def test_simulacion_incluye_boton_reiniciar_junto_a_ejecutar():
     assert 'description="Reiniciar"' in source
     assert "[apply_button, reset_button]" in source
     assert "reset_button.on_click(reset_app)" in source
-    assert "asyncio.create_task(run_experiment())" in source
+    assert "def schedule_task(coro):" in source
+    assert "loop.create_task(coro)" in source
+    assert "asyncio.run(coro)" in source
+    assert "task = schedule_task(run_experiment())" in source
     assert "await asyncio.sleep(0.01)" in source
+
+
+def test_simulacion_habilita_widgets_en_colab():
+    source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(encoding="utf-8")
+
+    assert "from google.colab import output as colab_output" in source
+    assert "colab_output.enable_custom_widget_manager()" in source
+    assert "nest_asyncio.apply()" in source
 
 
 def test_simulacion_declara_defaults_y_estados():
@@ -268,6 +280,29 @@ def test_graficas_teoricas_alinean_ejes_en_el_origen():
     plt.close(fig)
 
 
+def test_grafica_logaritmica_extrema_llega_hasta_10_a_la_100():
+    import matplotlib.pyplot as plt
+
+    captured = {}
+    original_show = plt.show
+    plt.show = lambda *args, **kwargs: None
+    try:
+        plot_logarithmic_slow_growth()
+        axis = plt.gcf().axes[0]
+        captured["xlim"] = axis.get_xlim()
+        captured["ylim"] = axis.get_ylim()
+        captured["tick_labels"] = [label.get_text() for label in axis.get_xticklabels()]
+        captured["legend_location"] = axis.get_legend()._loc
+    finally:
+        plt.show = original_show
+        plt.close("all")
+
+    assert captured["xlim"][1] == 100
+    assert captured["ylim"][1] > 332
+    assert "$10^{100}$" in captured["tick_labels"]
+    assert captured["legend_location"] == 4
+
+
 def test_notebooks_generales_invocan_perfiles_interactivos():
     expected = {
         "2_complejidad_logaritmica.ipynb": "logarithmic",
@@ -327,6 +362,17 @@ def test_notebook_logaritmico_explica_cambio_de_base():
     assert r"\log_\ell(n)" in source
     assert r"\log_\ell(n) = \frac{\log_b(n)}{\log_b(\ell)}" in source
     assert "misma familia logarítmica" in source
+    assert "crece extremadamente lento" in source
+    assert r"\log_2(10^{100}) = 100\log_2(10) \approx 332.19" in source
+    assert "la siguiente mejor opción práctica suelen ser las soluciones logarítmicas" in source
+
+
+def test_notebook_logaritmico_incluye_figura_hasta_10_a_la_100():
+    notebook = json.loads(Path(EXPERIMENT_DIR / "2_complejidad_logaritmica.ipynb").read_text(encoding="utf-8"))
+    source = "\n".join("".join(cell.get("source", [])) for cell in notebook["cells"])
+
+    assert "plot_logarithmic_slow_growth()" in source
+    assert "Crecimiento logarítmico hasta $10^{100}$" in source
 
 
 def test_notebooks_buscan_bootstrap_local_antes_del_remoto():
@@ -373,9 +419,11 @@ def test_notebooks_generales_no_conservan_celdas_de_imports_antiguas():
     for notebook_name in notebooks:
         notebook = json.loads(Path(EXPERIMENT_DIR / notebook_name).read_text(encoding="utf-8"))
         code_cells = ["".join(cell.get("source", [])) for cell in notebook["cells"] if cell["cell_type"] == "code"]
-        assert len(code_cells) == 4
+        expected_code_cells = 5 if notebook_name == "2_complejidad_logaritmica.ipynb" else 4
+        assert len(code_cells) == expected_code_cells
         assert code_cells[0].startswith("#@title Gráfica del comportamiento teórico")
-        assert code_cells[1].startswith("def ")
+        example_cell_index = 2 if notebook_name == "2_complejidad_logaritmica.ipynb" else 1
+        assert code_cells[example_cell_index].startswith("def ")
         assert all("matplotlib.pyplot" not in cell for cell in code_cells)
         assert all("from scipy" not in cell for cell in code_cells)
         assert all("plt.rcParams" not in cell for cell in code_cells)
@@ -397,6 +445,30 @@ def test_notebooks_generales_siguen_estructura_de_constante():
         cells = notebook["cells"]
         headings = ["".join(cell.get("source", [])).strip().splitlines()[0] for cell in cells]
         types = [cell["cell_type"] for cell in cells]
+
+        if notebook_name == "2_complejidad_logaritmica.ipynb":
+            assert types == [
+                "markdown",
+                "markdown",
+                "code",
+                "code",
+                "markdown",
+                "code",
+                "markdown",
+                "markdown",
+                "code",
+                "markdown",
+                "code",
+            ]
+            assert headings[1] == "## Forma teórica"
+            assert headings[2].startswith("#@title Gráfica del comportamiento teórico")
+            assert headings[3].startswith("#@title Crecimiento logarítmico hasta")
+            assert headings[4].startswith("## Ejemplo:")
+            assert headings[7] == "## Simulaciones experimentales"
+            assert headings[8].startswith("#@title Simulación interactiva de complejidad temporal")
+            assert headings[9] == "### Complejidad espacial experimental"
+            assert headings[10].startswith("#@title Simulación interactiva de complejidad espacial")
+            continue
 
         assert types == [
             "markdown",

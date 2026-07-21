@@ -131,10 +131,49 @@ def plot_theoretical_growth(name):
     plt.show()
 
 
+def plot_logarithmic_slow_growth(maximum_exponent=100):
+    """Muestra que el crecimiento logarítmico sigue siendo lento hasta 10^100."""
+    exponents = np.arange(0, maximum_exponent + 1, dtype=np.float64)
+    y_values = exponents * np.log2(10)
+
+    plt.style.use("default")
+    plt.rcParams.update(GRAPH_STYLE)
+    fig_main, ax1 = plt.subplots(1, 1, figsize=(8, 4))
+    ax1.plot(
+        exponents,
+        y_values,
+        label=r"Función de complejidad teórica $T(n)=\log_2(n)$, con $n=10^k$",
+        linestyle="dotted",
+        color="red",
+    )
+    ax1.scatter([maximum_exponent], [y_values[-1]], color="red", zorder=3)
+    ax1.annotate(
+        rf"$\log_2(10^{{{maximum_exponent}}})\approx {y_values[-1]:.2f}$",
+        xy=(maximum_exponent, y_values[-1]),
+        xytext=(-150, -28),
+        textcoords="offset points",
+        arrowprops={"arrowstyle": "->", "color": "red"},
+    )
+    ax1.set_xlabel(r"Tamaño de la entrada ($n=10^k$)")
+    ax1.set_ylabel("Costo teórico")
+    ax1.set_xlim(left=0, right=maximum_exponent)
+    ax1.set_ylim(bottom=0)
+    align_axes_at_origin(ax1)
+    ax1.set_title("Crecimiento extremadamente lento de una función logarítmica")
+    ax1.set_xticks(np.arange(0, maximum_exponent + 1, 20))
+    ax1.set_xticklabels([rf"$10^{{{int(value)}}}$" for value in ax1.get_xticks()])
+    ax1.legend(loc="lower right")
+    ax1.grid(True)
+    ax1.yaxis.set_major_formatter(plt.ScalarFormatter(useMathText=True))
+    fig_main.tight_layout()
+    plt.show()
+
+
 __all__ = [
     "THEORETICAL_CONFIGS",
     "align_axes_at_origin",
     "maximum_safe_power",
+    "plot_logarithmic_slow_growth",
     "plot_theoretical_growth",
     "theoretical_domain",
 ]

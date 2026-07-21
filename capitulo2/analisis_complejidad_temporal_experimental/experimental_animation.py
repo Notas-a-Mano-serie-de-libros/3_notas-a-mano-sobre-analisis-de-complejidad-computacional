@@ -19,6 +19,16 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from common.widget_controls import button_control, compact_labeled_control
 
+try:
+    import nest_asyncio
+except ImportError:
+    nest_asyncio = None
+
+try:
+    from google.colab import output as colab_output
+except ImportError:
+    colab_output = None
+
 
 EXPERIMENT_POINTS = 200
 STEPPER_FIELD_WIDTH = 184
@@ -237,6 +247,10 @@ def pending_table_html(maximum_n, profile):
 def run_app(profile):
     if profile.mode not in {"time", "memory"}:
         raise ValueError("mode debe ser 'time' o 'memory'")
+    if nest_asyncio is not None:
+        nest_asyncio.apply()
+    if colab_output is not None:
+        colab_output.enable_custom_widget_manager()
 
     maximum_state = {"exponent": profile.default_maximum_exponent}
     maximum_value = formula_widget(rf"10^{{{profile.default_maximum_exponent}}}")
@@ -356,6 +370,14 @@ def run_app(profile):
         executions_control.value = str(next_order_of_magnitude(execution_value()))
         refresh_warning()
 
+    def schedule_task(coro):
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(coro)
+            return None
+        return loop.create_task(coro)
+
     async def run_experiment():
         execution_state["reset_requested"] = False
         set_controls_enabled(False)
@@ -418,7 +440,10 @@ def run_app(profile):
     def apply(_):
         if execution_state["task"] is not None:
             return
-        execution_state["task"] = asyncio.create_task(run_experiment())
+        execution_state["task"] = "running"
+        task = schedule_task(run_experiment())
+        if task is not None:
+            execution_state["task"] = task
 
     executions_control.observe(refresh_warning, names="value")
     maximum_down.on_click(decrease_maximum)
