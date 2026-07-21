@@ -18,6 +18,7 @@ REQUIRED_FILES = (
     "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py",
     "capitulo2/analisis_complejidad_temporal_experimental/constant_animation.py",
     "capitulo2/analisis_complejidad_temporal_experimental/complexity_animations.py",
+    "capitulo2/analisis_complejidad_temporal_experimental/theoretical_graphs.py",
 )
 
 

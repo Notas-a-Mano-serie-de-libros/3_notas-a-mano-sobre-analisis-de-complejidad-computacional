@@ -34,6 +34,13 @@ from experimental_animation import (  # noqa: E402
     results_table as profile_results_table,
 )
 from complexity_animations import PROFILE_CONFIGS, make_profile  # noqa: E402
+from theoretical_graphs import (  # noqa: E402
+    GRAPH_STYLE,
+    THEORETICAL_CONFIGS,
+    align_axes_at_origin,
+    maximum_safe_power,
+    theoretical_domain,
+)
 
 
 def test_medicion_constante_devuelve_un_tiempo_valido():
@@ -163,6 +170,7 @@ def test_bootstrap_remoto_descarga_motor_comun_y_perfiles():
     assert "experimental_animation.py" in source
     assert "complexity_animations.py" in source
     assert "constant_animation.py" in source
+    assert "theoretical_graphs.py" in source
     assert "SIMULATION_NAME" in source
     assert "simulation_module = importlib.import_module(module_name)" in source
     assert "simulation_module.run_app(simulation_name" in source
@@ -201,23 +209,63 @@ def test_perfiles_generales_usan_misma_funcion_teorica_en_tiempo_y_espacio():
 def test_perfiles_generales_usan_estilo_visual_de_constante():
     constant_source = Path(EXPERIMENT_DIR / "constant_animation.py").read_text(encoding="utf-8")
     general_source = Path(EXPERIMENT_DIR / "complexity_animations.py").read_text(encoding="utf-8")
+    theoretical_source = Path(EXPERIMENT_DIR / "theoretical_graphs.py").read_text(encoding="utf-8")
 
-    for style_line in (
+    common_visual_style = (
         'plt.style.use("default")',
         '"figure.facecolor": "white"',
         '"axes.facecolor": "white"',
         '"savefig.facecolor": "white"',
         '"savefig.edgecolor": "white"',
-        '"figure.dpi": 500',
-        '"savefig.dpi": 500',
+        '"figure.dpi": 600',
+        '"savefig.dpi": 600',
         "figsize=(8, 4)",
+        "ax1.grid(True)",
+    )
+    saved_figure_style = (
         'bbox_inches="tight"',
         "pad_inches=0.05",
-        'ax1.legend(loc="upper right")',
-        "ax1.grid(True)",
-    ):
+    )
+
+    for style_line in common_visual_style:
         assert style_line in constant_source
         assert style_line in general_source
+        assert style_line in theoretical_source
+
+    for style_line in saved_figure_style:
+        assert style_line in constant_source
+        assert style_line in general_source
+
+
+def test_graficas_teoricas_definen_todas_las_complejidades_y_limites_seguros():
+    assert set(THEORETICAL_CONFIGS) == {"constant", *PROFILE_CONFIGS.keys()}
+    assert GRAPH_STYLE["figure.dpi"] == 600
+    assert GRAPH_STYLE["savefig.dpi"] == 600
+    assert maximum_safe_power(1_000_000) == 1_000_000
+    assert maximum_safe_power(20_000) == 10_000
+    assert maximum_safe_power(30) == 10
+    assert theoretical_domain(10).tolist() == list(range(11))
+
+
+def test_graficas_teoricas_ubican_leyenda_segun_crecimiento():
+    lower_right = {"constant", "logarithmic", "linear", "log_linear"}
+    upper_left = {"quadratic", "cubic", "exponential", "factorial"}
+
+    assert {name for name, config in THEORETICAL_CONFIGS.items() if config["legend_location"] == "lower right"} == lower_right
+    assert {name for name, config in THEORETICAL_CONFIGS.items() if config["legend_location"] == "upper left"} == upper_left
+
+
+def test_graficas_teoricas_alinean_ejes_en_el_origen():
+    import matplotlib.pyplot as plt
+
+    fig, axis = plt.subplots()
+    align_axes_at_origin(axis)
+
+    assert axis.spines["left"].get_position() == ("data", 0)
+    assert axis.spines["bottom"].get_position() == ("data", 0)
+    assert axis.spines["right"].get_edgecolor()[3] == 0
+    assert axis.spines["top"].get_edgecolor()[3] == 0
+    plt.close(fig)
 
 
 def test_notebooks_generales_invocan_perfiles_interactivos():
@@ -244,6 +292,41 @@ def test_notebooks_generales_invocan_perfiles_interactivos():
         assert "colab_bootstrap.py" in source
         assert "Solo teórico" in source
         assert "Complejidad espacial experimental" in source
+
+
+def test_notebooks_incluyen_grafica_teorica_correcta():
+    expected = {
+        "1_complejidad_constante.ipynb": "constant",
+        "2_complejidad_logaritmica.ipynb": "logarithmic",
+        "3_complejidad_lineal.ipynb": "linear",
+        "4_complejidad_log_lineal.ipynb": "log_linear",
+        "5_complejidad_cuadratica.ipynb": "quadratic",
+        "6_complejidad_cubica.ipynb": "cubic",
+        "7_complejidad_exponencial.ipynb": "exponential",
+        "8_complejidad_factorial.ipynb": "factorial",
+    }
+
+    for notebook_name, simulation_name in expected.items():
+        notebook = json.loads(Path(EXPERIMENT_DIR / notebook_name).read_text(encoding="utf-8"))
+        graph_cells = [
+            "".join(cell.get("source", []))
+            for cell in notebook["cells"]
+            if cell["cell_type"] == "code" and "plot_theoretical_growth" in "".join(cell.get("source", []))
+        ]
+
+        assert len(graph_cells) == 1
+        assert f'plot_theoretical_growth("{simulation_name}")' in graph_cells[0]
+        assert "theoretical_graphs.py" in graph_cells[0]
+        assert "urllib.request.urlopen" in graph_cells[0]
+
+
+def test_notebook_logaritmico_explica_cambio_de_base():
+    notebook = json.loads(Path(EXPERIMENT_DIR / "2_complejidad_logaritmica.ipynb").read_text(encoding="utf-8"))
+    source = "".join(notebook["cells"][1].get("source", []))
+
+    assert r"\log_\ell(n)" in source
+    assert r"\log_\ell(n) = \frac{\log_b(n)}{\log_b(\ell)}" in source
+    assert "misma familia logarítmica" in source
 
 
 def test_notebooks_buscan_bootstrap_local_antes_del_remoto():
@@ -290,8 +373,9 @@ def test_notebooks_generales_no_conservan_celdas_de_imports_antiguas():
     for notebook_name in notebooks:
         notebook = json.loads(Path(EXPERIMENT_DIR / notebook_name).read_text(encoding="utf-8"))
         code_cells = ["".join(cell.get("source", [])) for cell in notebook["cells"] if cell["cell_type"] == "code"]
-        assert len(code_cells) == 3
-        assert code_cells[0].startswith("def ")
+        assert len(code_cells) == 4
+        assert code_cells[0].startswith("#@title Gráfica del comportamiento teórico")
+        assert code_cells[1].startswith("def ")
         assert all("matplotlib.pyplot" not in cell for cell in code_cells)
         assert all("from scipy" not in cell for cell in code_cells)
         assert all("plt.rcParams" not in cell for cell in code_cells)
@@ -314,13 +398,25 @@ def test_notebooks_generales_siguen_estructura_de_constante():
         headings = ["".join(cell.get("source", [])).strip().splitlines()[0] for cell in cells]
         types = [cell["cell_type"] for cell in cells]
 
-        assert types == ["markdown", "markdown", "markdown", "code", "markdown", "markdown", "code", "markdown", "code"]
+        assert types == [
+            "markdown",
+            "markdown",
+            "code",
+            "markdown",
+            "code",
+            "markdown",
+            "markdown",
+            "code",
+            "markdown",
+            "code",
+        ]
         assert headings[1] == "## Forma teórica"
-        assert headings[2].startswith("## Ejemplo:")
-        assert headings[5] == "## Simulaciones experimentales"
-        assert headings[6].startswith("#@title Simulación interactiva de complejidad temporal")
-        assert headings[7] == "### Complejidad espacial experimental"
-        assert headings[8].startswith("#@title Simulación interactiva de complejidad espacial")
+        assert headings[2].startswith("#@title Gráfica del comportamiento teórico")
+        assert headings[3].startswith("## Ejemplo:")
+        assert headings[6] == "## Simulaciones experimentales"
+        assert headings[7].startswith("#@title Simulación interactiva de complejidad temporal")
+        assert headings[8] == "### Complejidad espacial experimental"
+        assert headings[9].startswith("#@title Simulación interactiva de complejidad espacial")
 
 
 def test_rango_experimental_conserva_puntos_intermedios_y_potencias():

@@ -37,8 +37,8 @@ plt.rcParams.update(
         "axes.facecolor": "white",
         "savefig.facecolor": "white",
         "savefig.edgecolor": "white",
-        "figure.dpi": 500,
-        "savefig.dpi": 500,
+        "figure.dpi": 600,
+        "savefig.dpi": 600,
     }
 )
 
