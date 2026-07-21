@@ -202,16 +202,7 @@ La parte interactiva del capítulo está formada por notebooks ejecutables. Cada
 
 La tabla experimental no debe leerse como una verdad absoluta. Debe leerse como evidencia: una forma de observar si el comportamiento medido se parece a la forma teórica.
 
-### Controles principales de las simulaciones
-
-| Control | Qué modifica | Cómo interpretarlo |
-|---|---|---|
-| Máximo $n$ | Tamaño máximo de entrada | Permite estudiar cómo cambia el costo cuando el problema crece. |
-| Ejecuciones | Número de repeticiones por tamaño | A mayor número de ejecuciones, el promedio tiende a estabilizarse. |
-| Reiniciar | Limpia el estado de la simulación | Útil para comparar configuraciones desde cero. |
-| Saltar advertencia | Permite ejecutar casos pesados | Debe usarse con cuidado: algunos tamaños pueden consumir mucho tiempo o memoria. |
-
-En los notebooks de complejidad temporal y espacial, los tamaños suelen avanzar por órdenes de magnitud. Esto ayuda a ver diferencias que serían invisibles si solo se probaran entradas pequeñas.
+Los detalles de uso, controles y columnas de las tablas están en la [guía específica del laboratorio experimental](./analisis_complejidad_temporal_experimental/README.md).
 
 ---
 
@@ -231,121 +222,7 @@ Sigue los notebooks en este orden. La dificultad conceptual y computacional aume
 | 8 | [8_complejidad_exponencial.ipynb](./analisis_complejidad_temporal_experimental/8_complejidad_exponencial.ipynb) | Fibonacci recursivo | El costo se dispara con entradas pequeñas. |
 | 9 | [9_complejidad_factorial.ipynb](./analisis_complejidad_temporal_experimental/9_complejidad_factorial.ipynb) | Conteo de permutaciones | El crecimiento factorial se vuelve inviable casi de inmediato. |
 
-También puedes abrir la guía específica del laboratorio experimental:
-
-- [README del laboratorio de análisis temporal experimental](./analisis_complejidad_temporal_experimental/README.md)
-
----
-
-## Guía de lectura por notebook
-
-### 1. Complejidad constante
-
-Empieza aquí. La complejidad constante es el punto de referencia: una operación como acceder a una posición de un arreglo no necesita recorrer todos los datos.
-
-Mientras ejecutas el notebook, observa:
-
-- si el tiempo cambia de forma significativa al aumentar $n$;
-- cómo se comporta la tabla cuando se usan muchos tamaños de entrada;
-- por qué una medición experimental puede variar aunque la función teórica sea constante.
-
-Abrir: [Local](./analisis_complejidad_temporal_experimental/1_complejidad_constante.ipynb) · [Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/1_complejidad_constante.ipynb)
-
-### 2. Complejidad logarítmica
-
-La búsqueda binaria muestra una idea poderosa: no siempre necesitamos mirar todos los datos. Si la entrada está ordenada, podemos descartar una gran parte del problema en cada paso.
-
-Mientras ejecutas el notebook, observa:
-
-- cuántos pasos se necesitan cuando $n$ crece muchísimo;
-- por qué las bases logarítmicas pertenecen a una misma familia de crecimiento;
-- por qué una función logarítmica suele ser la siguiente mejor opción práctica después de una constante.
-
-Abrir: [Local](./analisis_complejidad_temporal_experimental/2_complejidad_logaritmica.ipynb) · [Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/2_complejidad_logaritmica.ipynb)
-
-### 3. Complejidad lineal
-
-La búsqueda secuencial representa un recorrido completo. Si el elemento está al final o no aparece, el algoritmo debe revisar toda la entrada.
-
-Mientras ejecutas el notebook, observa:
-
-- cómo cambia la gráfica cuando se aumenta $n$;
-- por qué el peor caso es importante;
-- cómo se compara con la búsqueda binaria.
-
-Abrir: [Local](./analisis_complejidad_temporal_experimental/3_complejidad_lineal.ipynb) · [Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/3_complejidad_lineal.ipynb)
-
-### 4. Complejidad log-lineal
-
-La forma $n\log_2(n)$ aparece en muchos algoritmos eficientes de ordenamiento. No es tan suave como una función lineal, pero sigue siendo mucho más manejable que una función cuadrática para entradas grandes.
-
-Mientras ejecutas el notebook, observa:
-
-- cómo se separa de la función lineal;
-- por qué el factor logarítmico no debe ignorarse;
-- qué ocurre al aumentar las ejecuciones experimentales.
-
-Abrir: [Local](./analisis_complejidad_temporal_experimental/4_complejidad_log_lineal.ipynb) · [Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/4_complejidad_log_lineal.ipynb)
-
-### 5. Complejidad cuadrática
-
-La complejidad cuadrática suele aparecer cuando hay dos recorridos anidados. Un ejemplo natural es recorrer todas las posiciones de una matriz $n\times n$.
-
-Mientras ejecutas el notebook, observa:
-
-- cómo el costo cambia cuando $n$ se multiplica por $10$;
-- por qué entradas moderadas pueden volverse pesadas;
-- cómo se diferencia de una función lineal.
-
-Abrir: [Local](./analisis_complejidad_temporal_experimental/5_complejidad_cuadratica.ipynb) · [Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/5_complejidad_cuadratica.ipynb)
-
-### 6. Complejidad cúbica
-
-La complejidad cúbica aparece cuando tres dimensiones de iteración interactúan. La multiplicación clásica de matrices es el ejemplo típico.
-
-Mientras ejecutas el notebook, observa:
-
-- por qué la simulación debe limitar tamaños grandes;
-- cómo el crecimiento cúbico supera rápidamente al cuadrático;
-- qué diferencia hay entre calcular una gráfica teórica y ejecutar un experimento real.
-
-Abrir: [Local](./analisis_complejidad_temporal_experimental/6_complejidad_cubica.ipynb) · [Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/6_complejidad_cubica.ipynb)
-
-### 7. Complejidad polinomial general
-
-Este notebook permite estudiar la familia $C(n)=n^k$. A diferencia de los casos anteriores, aquí el foco está en cambiar el grado $k$ para ver cómo se transforma la curva.
-
-Mientras ejecutas el notebook, observa:
-
-- que $n^0$, $n^1$, $n^2$ y $n^3$ son casos particulares de la misma familia;
-- cómo se vuelve más pronunciada la curva cuando aumenta $k$;
-- por qué varias curvas pueden parecer planas cuando se comparan con una curva de grado alto.
-
-Abrir: [Local](./analisis_complejidad_temporal_experimental/7_complejidad_polinomial_general.ipynb) · [Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/7_complejidad_polinomial_general.ipynb)
-
-### 8. Complejidad exponencial
-
-La complejidad exponencial marca una frontera práctica. En ejemplos como Fibonacci recursivo sin memoización, cada llamada genera nuevas llamadas y el árbol de ejecución crece rápidamente.
-
-Mientras ejecutas el notebook, observa:
-
-- por qué $n$ no necesita ser grande para que el costo sea enorme;
-- qué puntos se marcan como solo teóricos;
-- cómo se relaciona el crecimiento con árboles de llamadas.
-
-Abrir: [Local](./analisis_complejidad_temporal_experimental/8_complejidad_exponencial.ipynb) · [Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/8_complejidad_exponencial.ipynb)
-
-### 9. Complejidad factorial
-
-La complejidad factorial aparece cuando se exploran permutaciones. Es una de las formas más agresivas de crecimiento que se estudian en este capítulo.
-
-Mientras ejecutas el notebook, observa:
-
-- cuántas posibilidades aparecen al aumentar $n$ en una unidad;
-- por qué el experimento debe ser cuidadoso con valores grandes;
-- cómo se compara con la complejidad exponencial.
-
-Abrir: [Local](./analisis_complejidad_temporal_experimental/9_complejidad_factorial.ipynb) · [Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/9_complejidad_factorial.ipynb)
+Si necesitas una descripción más operativa de cada simulación, abre el [README del laboratorio](./analisis_complejidad_temporal_experimental/README.md).
 
 ---
 
@@ -449,20 +326,14 @@ Soluciones:
 
 ---
 
-## Archivos principales del capítulo
+## Guías complementarias del capítulo
 
 | Recurso | Descripción |
 |---|---|
-| [analisis_complejidad_temporal_experimental/README.md](./analisis_complejidad_temporal_experimental/README.md) | Guía específica del laboratorio experimental. |
-| [1_complejidad_constante.ipynb](./analisis_complejidad_temporal_experimental/1_complejidad_constante.ipynb) | Complejidad constante. |
-| [2_complejidad_logaritmica.ipynb](./analisis_complejidad_temporal_experimental/2_complejidad_logaritmica.ipynb) | Complejidad logarítmica. |
-| [3_complejidad_lineal.ipynb](./analisis_complejidad_temporal_experimental/3_complejidad_lineal.ipynb) | Complejidad lineal. |
-| [4_complejidad_log_lineal.ipynb](./analisis_complejidad_temporal_experimental/4_complejidad_log_lineal.ipynb) | Complejidad log-lineal. |
-| [5_complejidad_cuadratica.ipynb](./analisis_complejidad_temporal_experimental/5_complejidad_cuadratica.ipynb) | Complejidad cuadrática. |
-| [6_complejidad_cubica.ipynb](./analisis_complejidad_temporal_experimental/6_complejidad_cubica.ipynb) | Complejidad cúbica. |
-| [7_complejidad_polinomial_general.ipynb](./analisis_complejidad_temporal_experimental/7_complejidad_polinomial_general.ipynb) | Complejidad polinomial general. |
-| [8_complejidad_exponencial.ipynb](./analisis_complejidad_temporal_experimental/8_complejidad_exponencial.ipynb) | Complejidad exponencial. |
-| [9_complejidad_factorial.ipynb](./analisis_complejidad_temporal_experimental/9_complejidad_factorial.ipynb) | Complejidad factorial. |
+| [Laboratorio de complejidad experimental](./analisis_complejidad_temporal_experimental/README.md) | Guía de notebooks interactivos, controles y enlaces local/Colab. |
+| [Análisis de eficiencia](./analisis_eficiencia/README.md) | Guía para los notebooks de límites temporales y espaciales. |
+| [Comparación de complejidades teóricas](./general/comparacion_complejidades_teoricas.ipynb) | Notebook de apoyo para comparar formas de crecimiento. |
+| [Complejidad polinómica](./general/complejidad_polinomica.ipynb) | Notebook de apoyo para estudiar la familia \(n^k\). |
 
 ---
 
