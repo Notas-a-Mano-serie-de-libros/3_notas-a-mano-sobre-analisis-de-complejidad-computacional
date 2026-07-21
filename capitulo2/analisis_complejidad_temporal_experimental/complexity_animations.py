@@ -365,14 +365,19 @@ def measure_space_growth_factory(shape_function):
 
 
 def warning_html_factory(config, shape_function, mode):
-    def warning_html(maximum_n, executions, mode="time"):
+    def warning_html(maximum_n, executions, mode="time", force_full_execution=False):
         warnings = []
         max_safe_elements = config["max_safe_elements"] if mode == "time" else config["space_max_safe_elements"]
         if maximum_n > max_safe_elements:
-            warnings.append(
-                f"Para proteger el entorno, la medición experimental llegará hasta {max_safe_elements:,}; "
-                "los tamaños posteriores mostrarán únicamente la estimación teórica."
-            )
+            if force_full_execution:
+                warnings.append(
+                    "El modo forzado está activo: se intentarán medir todos los tamaños seleccionados, aunque excedan el límite seguro recomendado."
+                )
+            else:
+                warnings.append(
+                    f"Para proteger el entorno, la medición experimental llegará hasta {max_safe_elements:,}; "
+                    "los tamaños posteriores mostrarán únicamente la estimación teórica."
+                )
         theoretical_work = float(shape_function(np.array([min(maximum_n, max_safe_elements)], dtype=np.float64))[0])
         if mode == "time":
             theoretical_time = theoretical_work * executions * T0_SECONDS

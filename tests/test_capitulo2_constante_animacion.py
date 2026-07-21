@@ -29,8 +29,10 @@ from constant_animation import (  # noqa: E402
 from experimental_animation import (  # noqa: E402
     ExperimentProfile,
     build_experiment_sizes as build_profile_sizes,
+    effective_max_safe_elements,
     measure_profile_point,
     pending_table_html as pending_profile_table_html,
+    profile_warning_html,
     results_table as profile_results_table,
 )
 from complexity_animations import PROFILE_CONFIGS, make_profile  # noqa: E402
@@ -63,6 +65,15 @@ def test_entrada_muy_grande_advierte_y_explica_el_limite():
     assert "Advertencia de recursos" in warning
     assert "medición experimental" in warning
     assert "1,000,000" in warning
+
+
+def test_entrada_muy_grande_con_modo_forzado_no_promete_saltar_medicion():
+    warning = warning_html(10**7, 10, force_full_execution=True)
+
+    assert "Advertencia de recursos" in warning
+    assert "modo forzado está activo" in warning
+    assert "se intentarán medir todos" in warning
+    assert "mostrarán únicamente la estimación teórica" not in warning
 
 
 def test_spinner_sube_al_siguiente_orden_de_magnitud():
@@ -158,6 +169,18 @@ def test_simulacion_incluye_boton_reiniciar_junto_a_ejecutar():
     assert "await asyncio.sleep(0.01)" in source
 
 
+def test_simulacion_incluye_opcion_para_forzar_ejecucion_completa():
+    source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(encoding="utf-8")
+
+    assert "force_execution = widgets.Checkbox" in source
+    assert 'description="Ejecutar todos los valores"' in source
+    assert "force_execution.value = False" in source
+    assert "force_execution.disabled = not enabled" in source
+    assert "force_execution.observe(refresh_warning" in source
+    assert "effective_max_safe_elements(profile, force_execution.value)" in source
+    assert "profile_warning_html(profile, maximum_n(), execution_value(), force_execution.value)" in source
+
+
 def test_simulacion_habilita_widgets_en_colab():
     source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(encoding="utf-8")
 
@@ -200,6 +223,15 @@ def test_perfiles_generales_se_pueden_construir():
             assert profile.default_executions >= 1
             assert profile.render_result is not None
             assert profile.warning_html(10, 1, mode) == ""
+
+
+def test_perfiles_generales_advierten_modo_forzado_sin_saltar_medicion():
+    for name in PROFILE_CONFIGS:
+        profile = make_profile(name, mode="time")
+        warning = profile.warning_html(profile.max_safe_elements * 10, 1, "time", True)
+
+        assert "modo forzado está activo" in warning
+        assert "mostrarán únicamente la estimación teórica" not in warning
 
 
 def test_perfiles_generales_no_usan_teoria_constante():
@@ -507,6 +539,39 @@ def test_motor_comun_respeta_limite_seguro_y_checkpoints():
     assert sizes[-1] == 10_000
     assert checkpoints.tolist() == [10, 100, 1_000, 10_000]
     assert 10_000 in set(sizes)
+
+
+def test_motor_comun_permite_saltar_limite_seguro_bajo_demanda():
+    profile = ExperimentProfile(
+        mode="time",
+        theoretical_value=1e-6,
+        unit="s",
+        metric="Tiempo",
+        theoretical_metric="Tiempo teórico",
+        max_safe_elements=1_000,
+        measure=lambda n, executions: 0.0,
+        render_result=lambda *args: ("", ""),
+        warning_html=lambda maximum_n, executions, mode: "",
+    )
+
+    assert effective_max_safe_elements(profile) == 1_000
+    assert effective_max_safe_elements(profile, force_full_execution=True) == 10**10
+
+
+def test_motor_comun_mantiene_compatibilidad_con_advertencias_de_tres_argumentos():
+    profile = ExperimentProfile(
+        mode="time",
+        theoretical_value=1e-6,
+        unit="s",
+        metric="Tiempo",
+        theoretical_metric="Tiempo teórico",
+        max_safe_elements=1_000,
+        measure=lambda n, executions: 0.0,
+        render_result=lambda *args: ("", ""),
+        warning_html=lambda maximum_n, executions, mode: f"{maximum_n}-{executions}-{mode}",
+    )
+
+    assert profile_warning_html(profile, 100, 7, force_full_execution=True) == "100-7-time"
 
 
 def test_motor_comun_renderiza_tabla_pendiente_desde_perfil():

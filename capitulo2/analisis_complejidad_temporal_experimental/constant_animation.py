@@ -101,17 +101,21 @@ def format_bytes(value):
         amount /= 1024
 
 
-def warning_html(maximum_n, executions, mode="time"):
+def warning_html(maximum_n, executions, mode="time", force_full_execution=False):
     sizes = int(np.log10(maximum_n))
     theoretical_time = sizes * executions * T0_SECONDS
     theoretical_bytes = BYTES_PER_INTEGER_IN_LIST * maximum_n
     warnings = []
     if maximum_n > MAX_SAFE_ELEMENTS or theoretical_bytes >= WARNING_BYTES:
-        warnings.append(
-            f"La entrada seleccionada requeriría aproximadamente <b>{format_bytes(theoretical_bytes)}</b>. "
-            f"Para proteger el entorno, la medición experimental llegará hasta {MAX_SAFE_ELEMENTS:,}; "
-            "los tamaños posteriores mostrarán únicamente la estimación teórica."
-        )
+        resource_message = f"La entrada seleccionada requeriría aproximadamente <b>{format_bytes(theoretical_bytes)}</b>. "
+        if force_full_execution:
+            resource_message += "El modo forzado está activo: se intentarán medir todos los tamaños seleccionados."
+        else:
+            resource_message += (
+                f"Para proteger el entorno, la medición experimental llegará hasta {MAX_SAFE_ELEMENTS:,}; "
+                "los tamaños posteriores mostrarán únicamente la estimación teórica."
+            )
+        warnings.append(resource_message)
     if mode == "time" and theoretical_time >= 30:
         warnings.append(f"Las ejecuciones requieren un tiempo teórico acumulado de {theoretical_time:.2f} s.")
     if not warnings:

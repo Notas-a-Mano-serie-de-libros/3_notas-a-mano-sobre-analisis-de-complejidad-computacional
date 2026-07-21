@@ -244,6 +244,19 @@ def pending_table_html(maximum_n, profile):
     )
 
 
+def effective_max_safe_elements(profile, force_full_execution=False):
+    if force_full_execution:
+        return 10**10
+    return profile.max_safe_elements
+
+
+def profile_warning_html(profile, maximum_n, executions, force_full_execution=False):
+    try:
+        return profile.warning_html(maximum_n, executions, profile.mode, force_full_execution)
+    except TypeError:
+        return profile.warning_html(maximum_n, executions, profile.mode)
+
+
 def run_app(profile):
     if profile.mode not in {"time", "memory"}:
         raise ValueError("mode debe ser 'time' o 'memory'")
@@ -305,6 +318,12 @@ def run_app(profile):
         [apply_button, reset_button],
         layout=widgets.Layout(width="100%", gap="10px", margin="12px 0 0 0", justify_content="flex-end"),
     )
+    force_execution = widgets.Checkbox(
+        value=False,
+        description="Ejecutar todos los valores",
+        indent=False,
+        layout=widgets.Layout(width="auto", margin="8px 0 0 0"),
+    )
     warning_output = widgets.HTML()
     warning_output.layout = widgets.Layout(width="100%", max_width="100%", overflow="hidden")
     table_output = widgets.HTML(layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"))
@@ -335,7 +354,7 @@ def run_app(profile):
         refresh_warning()
 
     def refresh_warning(*_):
-        warning_output.value = profile.warning_html(maximum_n(), execution_value(), profile.mode)
+        warning_output.value = profile_warning_html(profile, maximum_n(), execution_value(), force_execution.value)
         table_output.value = pending_table_html(maximum_n(), profile)
         figure_output.value = placeholder_html()
 
@@ -344,7 +363,8 @@ def run_app(profile):
         maximum_state["exponent"] = profile.default_maximum_exponent
         maximum_value.value = mathjax_frame(rf"\(10^{{{profile.default_maximum_exponent}}}\)", 30, centered=True)
         executions_control.value = str(profile.default_executions)
-        warning_output.value = profile.warning_html(maximum_n(), execution_value(), profile.mode)
+        force_execution.value = False
+        warning_output.value = profile_warning_html(profile, maximum_n(), execution_value(), force_execution.value)
         table_output.value = pending_table_html(maximum_n(), profile)
         figure_output.value = placeholder_html()
 
@@ -355,6 +375,7 @@ def run_app(profile):
         executions_control.disabled = not enabled
         executions_down.disabled = not enabled
         executions_up.disabled = not enabled
+        force_execution.disabled = not enabled
 
     def decrease_maximum(_):
         update_maximum(maximum_state["exponent"] - 1)
@@ -384,9 +405,10 @@ def run_app(profile):
         try:
             selected_maximum = maximum_n()
             executions = execution_value()
+            execution_limit = effective_max_safe_elements(profile, force_execution.value)
             sizes, checkpoints = build_experiment_sizes(
                 selected_maximum,
-                profile.max_safe_elements,
+                execution_limit,
                 points=profile.experiment_points,
             )
             experimental = np.full(len(sizes), np.nan)
@@ -405,7 +427,7 @@ def run_app(profile):
             for index, n in enumerate(sizes):
                 if execution_state["reset_requested"]:
                     break
-                if n <= profile.max_safe_elements:
+                if n <= execution_limit:
                     experimental[index] = measure_profile_point(profile, int(n), executions)
                 checkpoint_index = checkpoint_indexes.get(int(n))
                 if checkpoint_index is not None:
@@ -446,6 +468,7 @@ def run_app(profile):
             execution_state["task"] = task
 
     executions_control.observe(refresh_warning, names="value")
+    force_execution.observe(refresh_warning, names="value")
     maximum_down.on_click(decrease_maximum)
     maximum_up.on_click(increase_maximum)
     executions_down.on_click(decrease_executions)
@@ -455,7 +478,7 @@ def run_app(profile):
     refresh_warning()
 
     controls = widgets.VBox(
-        [controls_row, button_row],
+        [controls_row, force_execution, button_row],
         layout=widgets.Layout(width="100%", gap="10px"),
     )
     input_style = widgets.HTML(
