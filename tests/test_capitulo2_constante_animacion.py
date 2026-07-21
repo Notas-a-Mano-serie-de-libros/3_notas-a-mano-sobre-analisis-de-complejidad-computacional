@@ -46,16 +46,17 @@ from theoretical_graphs import (  # noqa: E402
     polynomial_flat_group_limit,
     polynomial_values,
     polynomial_visible_ceiling,
+    polynomial_visible_exponent,
     theoretical_domain,
 )
 from polynomial_animation import (  # noqa: E402
     DEFAULT_MAX_DEGREE,
     DEFAULT_MAXIMUM_N,
     MAX_DEGREE,
+    TABLE_MAX_DEGREE,
     polynomial_table,
     polynomial_table_height,
     render_polynomial_figure,
-    scaled_time_latex,
     scientific_latex,
 )
 
@@ -406,6 +407,7 @@ def test_grafica_polinomial_agrupa_curvas_planas_para_grados_altos():
         axis = plt.gcf().axes[0]
         captured["xlim"] = axis.get_xlim()
         captured["ylim"] = axis.get_ylim()
+        captured["yticks"] = axis.get_yticks()
         captured["title"] = axis.get_title()
         captured["legend"] = axis.get_legend()
         captured["annotations"] = [text.get_text() for text in axis.texts]
@@ -413,13 +415,17 @@ def test_grafica_polinomial_agrupa_curvas_planas_para_grados_altos():
         plt.show = original_show
         plt.close("all")
 
-    assert polynomial_visible_ceiling(10, 10) == 10**6
-    assert polynomial_flat_group_limit(10) == 4
+    assert polynomial_visible_exponent(10) == 11
+    assert polynomial_visible_ceiling(10, 10) == 10**11
+    assert polynomial_flat_group_limit(10) == 9
     assert captured["xlim"] == (2.0, 10.8)
-    assert captured["ylim"] == (-(10**5), 10**6)
+    assert captured["ylim"] == (-0.05 * 10**11, 10**11)
+    assert captured["yticks"][0] == 0
+    assert min(captured["yticks"]) >= 0
     assert captured["title"] == r"$C(n)=n^k$ para $k \in [0, 10]$"
     assert captured["legend"] is None
-    assert r"$n^{[0,4]}$" in captured["annotations"]
+    assert r"$n^{[0,9]}$" in captured["annotations"]
+    assert r"$n^{9}$" not in captured["annotations"]
     assert r"$n^{10}$" in captured["annotations"]
 
 
@@ -437,9 +443,78 @@ def test_grafica_polinomial_no_superpone_grupo_con_primera_curva_visible():
         plt.show = original_show
         plt.close("all")
 
+    assert polynomial_visible_exponent(5) == 6
+    assert polynomial_visible_ceiling(5, 10) == 10**6
     assert polynomial_flat_group_limit(5, 10) == 4
     assert r"$n^{[0,4]}$" in captured["annotations"]
     assert r"$n^{4}$" not in captured["annotations"]
+    assert r"$n^{5}$" in captured["annotations"]
+
+
+def test_grafica_polinomial_generaliza_salto_de_escala_mas_alla_de_diez():
+    import matplotlib.pyplot as plt
+
+    captured = {}
+    original_show = plt.show
+    plt.show = lambda *args, **kwargs: None
+    try:
+        plot_polynomial_family(max_degree=20, maximum_n=10)
+        axis = plt.gcf().axes[0]
+        captured["ylim"] = axis.get_ylim()
+        captured["yticks"] = axis.get_yticks()
+        captured["annotations"] = [text.get_text() for text in axis.texts]
+    finally:
+        plt.show = original_show
+        plt.close("all")
+
+    assert polynomial_visible_exponent(20) == 21
+    assert polynomial_visible_ceiling(20, 10) == 10**21
+    assert polynomial_flat_group_limit(20, 10) == 19
+    assert captured["ylim"] == (-0.05 * 10**21, 10**21)
+    assert captured["yticks"][0] == 0
+    assert min(captured["yticks"]) >= 0
+    assert r"$n^{[0,19]}$" in captured["annotations"]
+    assert r"$n^{19}$" not in captured["annotations"]
+    assert r"$n^{20}$" in captured["annotations"]
+
+
+def test_grafica_polinomial_mantiene_escala_por_bloques_de_cinco_grados():
+    assert [polynomial_visible_exponent(degree) for degree in range(5, 15)] == [
+        6,
+        6,
+        6,
+        6,
+        6,
+        11,
+        11,
+        11,
+        11,
+        11,
+    ]
+
+
+def test_grafica_polinomial_mantiene_labels_en_bandas_estables_dentro_del_bloque():
+    import matplotlib.pyplot as plt
+
+    captured = {}
+    original_show = plt.show
+    plt.show = lambda *args, **kwargs: None
+    try:
+        plot_polynomial_family(max_degree=7, maximum_n=10)
+        axis = plt.gcf().axes[0]
+        captured["positions"] = {text.get_text(): text.xy for text in axis.texts}
+        captured["offsets"] = {text.get_text(): text.get_position() for text in axis.texts}
+    finally:
+        plt.show = original_show
+        plt.close("all")
+
+    visible_ceiling = polynomial_visible_ceiling(7, 10)
+    assert captured["positions"][r"$n^{[0,4]}$"][1] == 10**4
+    assert captured["offsets"][r"$n^{[0,4]}$"] == (5, 0)
+    assert captured["positions"][r"$n^{5}$"][1] == 10**5
+    assert captured["offsets"][r"$n^{6}$"] == (12, 0)
+    assert captured["positions"][r"$n^{6}$"][1] <= visible_ceiling * 0.31
+    assert captured["positions"][r"$n^{7}$"][1] <= visible_ceiling * 0.49
 
 
 def test_simulacion_polinomial_teorica_no_incluye_resultados_experimentales():
@@ -447,16 +522,19 @@ def test_simulacion_polinomial_teorica_no_incluye_resultados_experimentales():
 
     assert DEFAULT_MAXIMUM_N == 10
     assert DEFAULT_MAX_DEGREE == 4
-    assert MAX_DEGREE == 10
+    assert MAX_DEGREE is None
     assert "<th>Grado (k)</th>" in table
     assert "<th>Forma teórica</th>" in table
-    assert r"Operaciones teóricas [ops] para \(n=10\)" in table
-    assert "Escala equivalente [1 op = 1 ns]" in table
+    assert r"Operaciones teóricas para \(n=10\) [adimensional]" in table
     assert r"\(n^{0}\)" in table
-    assert r"\(10^{4}=1.000000\times 10^{4}\)" in table
-    assert r"\(1.000000\times 10^{1}\ \mu s\)" in table
-    assert scaled_time_latex(10**18) == r"3.168809\times 10^{1}\ \text{años}"
-    assert scientific_latex(10**10) == r"1.000000\times 10^{10}"
+    assert r"\(10^{4}\)" in table
+    assert "Escala equivalente" not in table
+    assert "1.000000" not in table
+    assert r"\times" not in table
+    assert "T=" not in table
+    assert "S=" not in table
+    assert scientific_latex(10**10) == r"10^{10}"
+    assert scientific_latex(25_000) == r"2.5\times 10^{4}"
     assert "experimental" not in table.lower()
     assert "Estado" not in table
 
@@ -479,16 +557,26 @@ def test_simulacion_polinomial_usa_stepper_no_campo_editable_para_k():
     assert "BoundedIntText" not in source
 
 
-def test_simulacion_polinomial_agrega_espacio_y_scroll_vertical_para_tablas_largas():
+def test_simulacion_polinomial_muestra_tabla_fija_y_actualiza_figura_automaticamente():
     source = Path(EXPERIMENT_DIR / "polynomial_animation.py").read_text(encoding="utf-8")
 
+    assert TABLE_MAX_DEGREE == 5
     assert polynomial_table_height(5) == 308
-    assert polynomial_table_height(10) == 518
-    assert "TABLE_SCROLL_THRESHOLD = 5" in source
-    assert "TABLE_SCROLL_HEIGHT = 296" in source
+    assert "polynomial_table_html(maximum_n, TABLE_MAX_DEGREE)" in source
+    assert "def refresh" in source
+    assert "figure_output.value = render_polynomial_figure(maximum_n, max_degree)" in source
+    assert "refresh()" in source
+    assert 'description="Aplicar"' not in source
+    assert "def apply_selection" not in source
+    assert "apply_button" not in source
+    assert "widgets.ToggleButtons" not in source
+    assert "point_table_html" not in source
+    assert "range(ANIMATION_TARGET_DEGREE + 1)" not in source
+    assert "threading.Thread" not in source
+    assert "run_sequence_button" not in source
+    assert 'description="Ejecutar desde 0 hasta 20"' not in source
     assert 'margin="18px 0 0 0"' in source
-    assert 'table_container.layout.overflow_y = "auto"' in source
-    assert "max_degree > TABLE_SCROLL_THRESHOLD" in source
+    assert 'table_container.layout.overflow_y = "hidden"' in source
     assert "[style, controls_row, table_container, figure_output]" in source
 
 
@@ -585,8 +673,9 @@ def test_notebook_polinomial_general_tiene_estructura_teorica_interactiva():
     assert "no se realizan ejecuciones experimentales" in source
     assert "El valor máximo de $n$ se mantiene fijo y de solo lectura en $10$" in source
     assert "botones laterales" in source
-    assert "[ops]" in source
-    assert r"1\ \text{op}=1\ \text{ns}" in source
+    assert "La tabla siempre muestra el valor teórico calculado hasta $k=5$" in source
+    assert "Al cambiar el valor de $k$, la figura se actualiza automáticamente" in source
+    assert "cantidad adimensional de operaciones teóricas" in source
     assert all(cell.get("outputs", []) == [] for cell in cells if cell["cell_type"] == "code")
     assert all(cell.get("execution_count") is None for cell in cells if cell["cell_type"] == "code")
 

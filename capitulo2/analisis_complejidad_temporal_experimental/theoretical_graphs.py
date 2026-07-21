@@ -175,15 +175,40 @@ def polynomial_values(n_values, degree):
     return np.power(n_values, degree)
 
 
-def polynomial_visible_ceiling(max_degree, maximum_n=10):
-    """Limita la escala vertical para que las curvas dominantes sigan siendo legibles."""
+def polynomial_visible_exponent(max_degree, block_size=5):
+    """Devuelve el exponente vertical visible para bloques de grados."""
+    if max_degree <= 4:
+        return 1
+    return ((max_degree - 5) // block_size) * block_size + block_size + 1
+
+
+def polynomial_visible_ceiling(max_degree, maximum_n=10, block_size=5):
+    """Devuelve el techo vertical dominante de la familia polinomial."""
     if max_degree <= 4:
         return maximum_n
-    return maximum_n**6
+    return maximum_n ** polynomial_visible_exponent(max_degree, block_size)
+
+
+def polynomial_padded_y_limits(visible_ceiling, padding_fraction=0.05):
+    """Agrega aire visual debajo de cero sin mostrar ticks negativos."""
+    visible_ceiling = float(visible_ceiling)
+    return -visible_ceiling * padding_fraction, visible_ceiling
+
+
+def apply_polynomial_y_axis(axis, visible_ceiling):
+    """Configura el eje y con padding inferior y ticks no negativos."""
+    visible_ceiling = float(visible_ceiling)
+    axis.set_ylim(polynomial_padded_y_limits(visible_ceiling))
+    axis.set_yticks(np.linspace(0, visible_ceiling, 6))
 
 
 def polynomial_flat_group_limit(max_degree, maximum_n=10, visual_threshold=0.02):
-    """Devuelve el último grado visualmente plano frente a la escala dominante."""
+    """Devuelve el último grado visualmente plano frente a la escala dominante.
+
+    La regla general compara el valor final de cada curva, n_max^d, contra un
+    porcentaje del techo visible n_max^k. Todo lo que queda por debajo de ese
+    umbral se agrupa porque visualmente se lee como una familia plana.
+    """
     if max_degree <= 4:
         return None
     visible_ceiling = polynomial_visible_ceiling(max_degree, maximum_n)
@@ -194,6 +219,13 @@ def polynomial_flat_group_limit(max_degree, maximum_n=10, visual_threshold=0.02)
         else:
             break
     return flat_limit if flat_limit is not None and flat_limit >= 1 else None
+
+
+def polynomial_visible_label_fraction(degree, flat_limit, first_fraction=0.12, step=0.18, max_fraction=0.84):
+    """Ubica cada label visible en una banda estable dentro del bloque."""
+    first_visible_degree = 0 if flat_limit is None else flat_limit + 1
+    visible_index = max(0, degree - first_visible_degree)
+    return min(first_fraction + visible_index * step, max_fraction)
 
 
 def label_polynomial_curves(axis, max_degree, lines, n_values, maximum_n=10):
@@ -218,8 +250,7 @@ def label_polynomial_curves(axis, max_degree, lines, n_values, maximum_n=10):
                 )
         return
 
-    visible_degree = min(6, max_degree)
-    reference_value = 0.5 * maximum_n**visible_degree
+    visible_ceiling = polynomial_visible_ceiling(max_degree, maximum_n)
     flat_limit = polynomial_flat_group_limit(max_degree, maximum_n)
     flat_label_added = False
 
@@ -236,30 +267,17 @@ def label_polynomial_curves(axis, max_degree, lines, n_values, maximum_n=10):
                     color="black",
                 )
                 flat_label_added = True
-        elif degree >= visible_degree:
-            position_index = np.abs(y_values - reference_value).argmin()
-            axis.annotate(
-                rf"$n^{{{degree}}}$",
-                xy=(n_values[position_index] + 0.05, y_values[position_index]),
-                xytext=(5, 0),
-                textcoords="offset points",
-                fontsize=14,
-                color=line.get_color(),
-            )
-        elif degree == visible_degree - 1:
-            axis.annotate(
-                rf"$n^{{{degree}}}$",
-                xy=(n_values[-1], y_values[-1]),
-                xytext=(5, 0),
-                textcoords="offset points",
-                fontsize=14,
-                color=line.get_color(),
-            )
         else:
+            target_y = visible_ceiling * polynomial_visible_label_fraction(degree, flat_limit)
+            if y_values[-1] <= target_y:
+                label_x, label_y = n_values[-1], y_values[-1]
+            else:
+                position_index = np.abs(y_values - target_y).argmin()
+                label_x, label_y = n_values[position_index] + 0.05, y_values[position_index]
             axis.annotate(
                 rf"$n^{{{degree}}}$",
-                xy=(n_values[-1], y_values[-1]),
-                xytext=(5, 0),
+                xy=(label_x, label_y),
+                xytext=(12, 0),
                 textcoords="offset points",
                 fontsize=14,
                 color=line.get_color(),
@@ -288,8 +306,9 @@ def plot_polynomial_family(max_degree=4, maximum_n=10):
         ax1.set_xlim([1, maximum_n + 0.6])
         ax1.set_ylim([0, maximum_n])
     else:
+        visible_ceiling = float(polynomial_visible_ceiling(max_degree, maximum_n))
         ax1.set_xlim([2, maximum_n + 0.8])
-        ax1.set_ylim([-(maximum_n**5), polynomial_visible_ceiling(max_degree, maximum_n)])
+        apply_polynomial_y_axis(ax1, visible_ceiling)
         ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
     ax1.set_title(rf"$C(n)=n^k$ para $k \in [0, {max_degree}]$")
     label_polynomial_curves(ax1, max_degree, lines, n_values, maximum_n)
@@ -303,10 +322,14 @@ def plot_polynomial_family(max_degree=4, maximum_n=10):
 __all__ = [
     "THEORETICAL_CONFIGS",
     "align_axes_at_origin",
+    "apply_polynomial_y_axis",
     "maximum_safe_power",
     "label_polynomial_curves",
     "polynomial_flat_group_limit",
+    "polynomial_padded_y_limits",
+    "polynomial_visible_label_fraction",
     "polynomial_visible_ceiling",
+    "polynomial_visible_exponent",
     "plot_polynomial_family",
     "plot_logarithmic_slow_growth",
     "plot_theoretical_growth",

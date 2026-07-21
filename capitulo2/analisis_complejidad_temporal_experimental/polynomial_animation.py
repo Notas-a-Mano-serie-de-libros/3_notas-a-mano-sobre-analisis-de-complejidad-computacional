@@ -22,6 +22,7 @@ from capitulo2.analisis_complejidad_temporal_experimental.experimental_animation
 )
 from capitulo2.analisis_complejidad_temporal_experimental.theoretical_graphs import (  # noqa: E402
     GRAPH_STYLE,
+    apply_polynomial_y_axis,
     label_polynomial_curves,
     polynomial_visible_ceiling,
     polynomial_values,
@@ -36,35 +37,20 @@ except ImportError:
 
 DEFAULT_MAXIMUM_N = 10
 DEFAULT_MAX_DEGREE = 4
-MAX_DEGREE = 10
+MAX_DEGREE = None
+TABLE_MAX_DEGREE = 5
 STEPPER_FIELD_WIDTH = 184
 STEPPER_GROUP_WIDTH = 326
-SECONDS_PER_OPERATION = 1e-9
-TABLE_SCROLL_THRESHOLD = 5
-TABLE_SCROLL_HEIGHT = 296
 
 
 def scientific_latex(value):
+    if value == 0:
+        return "0"
     coefficient, exponent = f"{value:.6e}".split("e")
+    coefficient = coefficient.rstrip("0").rstrip(".")
+    if coefficient == "1":
+        return rf"10^{{{int(exponent)}}}"
     return rf"{coefficient}\times 10^{{{int(exponent)}}}"
-
-
-def scaled_time_latex(operations, seconds_per_operation=SECONDS_PER_OPERATION):
-    seconds = operations * seconds_per_operation
-    units = (
-        ("ns", seconds / 1e-9, 1e-6),
-        (r"\mu s", seconds / 1e-6, 1e-3),
-        ("ms", seconds / 1e-3, 1),
-        ("s", seconds, 60),
-        ("min", seconds / 60, 60 * 60),
-        ("h", seconds / (60 * 60), 24 * 60 * 60),
-        (r"\text{días}", seconds / (24 * 60 * 60), 365.25 * 24 * 60 * 60),
-        (r"\text{años}", seconds / (365.25 * 24 * 60 * 60), float("inf")),
-    )
-    for unit, value, upper_seconds in units:
-        if seconds < upper_seconds:
-            return rf"{scientific_latex(value)}\ \text{{{unit}}}" if "\\" not in unit else rf"{scientific_latex(value)}\ {unit}"
-    return rf"{scientific_latex(seconds)}\ \text{{s}}"
 
 
 def polynomial_table(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX_DEGREE):
@@ -75,8 +61,7 @@ def polynomial_table(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX_DEGREE)
             "<tr>"
             f"<td>\\({degree}\\)</td>"
             f"<td>\\(n^{{{degree}}}\\)</td>"
-            f"<td>\\({maximum_n}^{{{degree}}}={scientific_latex(theoretical_value)}\\)</td>"
-            f"<td>\\({scaled_time_latex(theoretical_value)}\\)</td>"
+            f"<td>\\({scientific_latex(theoretical_value)}\\)</td>"
             "</tr>"
         )
     return (
@@ -84,8 +69,7 @@ def polynomial_table(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX_DEGREE)
         "<thead><tr>"
         "<th>Grado (k)</th>"
         "<th>Forma teórica</th>"
-        f"<th>Operaciones teóricas [ops] para \\(n={maximum_n}\\)</th>"
-        "<th>Escala equivalente [1 op = 1 ns]</th>"
+        f"<th>Operaciones teóricas para \\(n={maximum_n}\\) [adimensional]</th>"
         "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
     )
 
@@ -119,8 +103,9 @@ def render_polynomial_figure(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX
         ax1.set_xlim([1, maximum_n + 0.6])
         ax1.set_ylim([0, maximum_n])
     else:
+        visible_ceiling = float(polynomial_visible_ceiling(max_degree, maximum_n))
         ax1.set_xlim([2, maximum_n + 0.8])
-        ax1.set_ylim([-(maximum_n**5), polynomial_visible_ceiling(max_degree, maximum_n)])
+        apply_polynomial_y_axis(ax1, visible_ceiling)
         ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
     ax1.set_title(rf"$C(n)=n^k$ para $k \in [0, {max_degree}]$")
     label_polynomial_curves(ax1, max_degree, lines, n_values, maximum_n)
@@ -161,7 +146,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
         group_width=STEPPER_GROUP_WIDTH,
     )
 
-    degree_state = {"value": min(MAX_DEGREE, max(0, default_max_degree))}
+    degree_state = {"value": max(0, default_max_degree)}
     degree_value = readonly_math_value(str(degree_state["value"]))
     degree_value.layout = widgets.Layout(
         width="100%",
@@ -211,17 +196,10 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
     def refresh(*_):
         max_degree = int(degree_state["value"])
         degree_value.value = mathjax_frame(rf"\({max_degree}\)", 30, centered=True)
-        table_output.value = polynomial_table_html(maximum_n, max_degree)
-        if max_degree > TABLE_SCROLL_THRESHOLD:
-            table_container.layout.height = f"{TABLE_SCROLL_HEIGHT}px"
-            table_container.layout.overflow_y = "auto"
-        else:
-            table_container.layout.height = f"{polynomial_table_height(max_degree)}px"
-            table_container.layout.overflow_y = "hidden"
         figure_output.value = render_polynomial_figure(maximum_n, max_degree)
 
     def update_degree(value):
-        degree_state["value"] = min(MAX_DEGREE, max(0, value))
+        degree_state["value"] = max(0, value)
         refresh()
 
     def decrease_degree(_):
@@ -232,6 +210,9 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
 
     degree_down.on_click(decrease_degree)
     degree_up.on_click(increase_degree)
+    table_output.value = polynomial_table_html(maximum_n, TABLE_MAX_DEGREE)
+    table_container.layout.height = f"{polynomial_table_height(TABLE_MAX_DEGREE)}px"
+    table_container.layout.overflow_y = "hidden"
     refresh()
 
     style = widgets.HTML(
@@ -307,11 +288,11 @@ __all__ = [
     "DEFAULT_MAXIMUM_N",
     "DEFAULT_MAX_DEGREE",
     "MAX_DEGREE",
+    "TABLE_MAX_DEGREE",
     "polynomial_table",
     "polynomial_table_height",
     "polynomial_table_html",
     "render_polynomial_figure",
     "run_app",
     "scientific_latex",
-    "scaled_time_latex",
 ]
