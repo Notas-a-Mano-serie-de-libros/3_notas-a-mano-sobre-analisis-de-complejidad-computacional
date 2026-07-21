@@ -317,16 +317,22 @@ Las siguientes subsecciones presentan ejemplos que evalúan el tiempo de ejecuci
       <td style="padding:8px; border:1px solid #ccc;"><a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/6_complejidad_cubica.ipynb">🔗 Abrir</a></td>
     </tr>
     <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>2.1.4.8</b> Exponencial</td>
-      <td style="padding:8px; border:1px solid #ccc; text-align:justify;">Sucesión de Fibonacci recursiva. Cada llamada genera dos llamadas adicionales; la cadena de invocaciones crece de forma binaria hasta alcanzar el caso base. Se puede demostrar que el algoritmo realiza como máximo 2ⁿ operaciones.</td>
-      <td style="padding:8px; border:1px solid #ccc; text-align:center;"><b>O(2ⁿ)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/7_complejidad_exponencial.ipynb">🔗 Abrir</a></td>
+      <td style="padding:8px; border:1px solid #ccc;"><b>2.1.4.8</b> Polinomial general</td>
+      <td style="padding:8px; border:1px solid #ccc; text-align:justify;">Familia teórica C(n)=n<sup>k</sup>. Permite observar cómo el crecimiento se vuelve más pronunciado al aumentar el grado k y comparar curvas desde n<sup>0</sup> hasta n<sup>k</sup>.</td>
+      <td style="padding:8px; border:1px solid #ccc; text-align:center;"><b>O(n<sup>k</sup>)</b></td>
+      <td style="padding:8px; border:1px solid #ccc;"><a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/7_complejidad_polinomial_general.ipynb">🔗 Abrir</a></td>
     </tr>
     <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>2.1.4.9</b> Factorial</td>
+      <td style="padding:8px; border:1px solid #ccc;"><b>2.1.4.9</b> Exponencial</td>
+      <td style="padding:8px; border:1px solid #ccc; text-align:justify;">Sucesión de Fibonacci recursiva. Cada llamada genera dos llamadas adicionales; la cadena de invocaciones crece de forma binaria hasta alcanzar el caso base. Se puede demostrar que el algoritmo realiza como máximo 2ⁿ operaciones.</td>
+      <td style="padding:8px; border:1px solid #ccc; text-align:center;"><b>O(2ⁿ)</b></td>
+      <td style="padding:8px; border:1px solid #ccc;"><a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/8_complejidad_exponencial.ipynb">🔗 Abrir</a></td>
+    </tr>
+    <tr>
+      <td style="padding:8px; border:1px solid #ccc;"><b>2.1.4.10</b> Factorial</td>
       <td style="padding:8px; border:1px solid #ccc; text-align:justify;">Generación de todas las permutaciones posibles de una lista. El algoritmo genera cada posible reordenamiento de los n elementos, explorando todas las configuraciones posibles de la lista. El tiempo alcanza los 12 segundos para apenas 10 datos.</td>
       <td style="padding:8px; border:1px solid #ccc; text-align:center;"><b>O(n!)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/8_complejidad_factorial.ipynb">🔗 Abrir</a></td>
+      <td style="padding:8px; border:1px solid #ccc;"><a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/9_complejidad_factorial.ipynb">🔗 Abrir</a></td>
     </tr>
   </tbody>
 </table>

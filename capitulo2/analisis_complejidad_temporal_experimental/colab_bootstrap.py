@@ -19,6 +19,7 @@ REQUIRED_FILES = (
     "capitulo2/analisis_complejidad_temporal_experimental/constant_animation.py",
     "capitulo2/analisis_complejidad_temporal_experimental/complexity_animations.py",
     "capitulo2/analisis_complejidad_temporal_experimental/theoretical_graphs.py",
+    "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py",
 )
 
 
@@ -64,18 +65,25 @@ simulation_name = globals().get("SIMULATION_NAME", "constant")
 module_name = (
     "capitulo2.analisis_complejidad_temporal_experimental.constant_animation"
     if simulation_name == "constant"
-    else "capitulo2.analisis_complejidad_temporal_experimental.complexity_animations"
+    else (
+        "capitulo2.analisis_complejidad_temporal_experimental.polynomial_animation"
+        if simulation_name == "polynomial_general"
+        else "capitulo2.analisis_complejidad_temporal_experimental.complexity_animations"
+    )
 )
 importlib.invalidate_caches()
 for loaded_module in (
     "capitulo2.analisis_complejidad_temporal_experimental.experimental_animation",
     "capitulo2.analisis_complejidad_temporal_experimental.constant_animation",
     "capitulo2.analisis_complejidad_temporal_experimental.complexity_animations",
+    "capitulo2.analisis_complejidad_temporal_experimental.polynomial_animation",
 ):
     sys.modules.pop(loaded_module, None)
 simulation_module = importlib.import_module(module_name)
 clear_output(wait=True)
 if simulation_name == "constant":
     simulation_module.run_app(mode=globals().get("SIMULATION_MODE", "time"))
+elif simulation_name == "polynomial_general":
+    simulation_module.run_app()
 else:
     simulation_module.run_app(simulation_name, mode=globals().get("SIMULATION_MODE", "time"))

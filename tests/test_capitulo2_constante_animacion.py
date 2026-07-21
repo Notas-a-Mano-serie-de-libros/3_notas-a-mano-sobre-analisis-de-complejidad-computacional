@@ -42,7 +42,21 @@ from theoretical_graphs import (  # noqa: E402
     align_axes_at_origin,
     maximum_safe_power,
     plot_logarithmic_slow_growth,
+    plot_polynomial_family,
+    polynomial_flat_group_limit,
+    polynomial_values,
+    polynomial_visible_ceiling,
     theoretical_domain,
+)
+from polynomial_animation import (  # noqa: E402
+    DEFAULT_MAX_DEGREE,
+    DEFAULT_MAXIMUM_N,
+    MAX_DEGREE,
+    polynomial_table,
+    polynomial_table_height,
+    render_polynomial_figure,
+    scaled_time_latex,
+    scientific_latex,
 )
 
 
@@ -205,10 +219,13 @@ def test_bootstrap_remoto_descarga_motor_comun_y_perfiles():
     assert "experimental_animation.py" in source
     assert "complexity_animations.py" in source
     assert "constant_animation.py" in source
+    assert "polynomial_animation.py" in source
     assert "theoretical_graphs.py" in source
     assert "SIMULATION_NAME" in source
+    assert "polynomial_general" in source
     assert "simulation_module = importlib.import_module(module_name)" in source
     assert "simulation_module.run_app(simulation_name" in source
+    assert "simulation_module.run_app()" in source
 
 
 def test_perfiles_generales_se_pueden_construir():
@@ -254,6 +271,7 @@ def test_perfiles_generales_usan_estilo_visual_de_constante():
     constant_source = Path(EXPERIMENT_DIR / "constant_animation.py").read_text(encoding="utf-8")
     general_source = Path(EXPERIMENT_DIR / "complexity_animations.py").read_text(encoding="utf-8")
     theoretical_source = Path(EXPERIMENT_DIR / "theoretical_graphs.py").read_text(encoding="utf-8")
+    polynomial_source = Path(EXPERIMENT_DIR / "polynomial_animation.py").read_text(encoding="utf-8")
 
     common_visual_style = (
         'plt.style.use("default")',
@@ -279,6 +297,10 @@ def test_perfiles_generales_usan_estilo_visual_de_constante():
     for style_line in saved_figure_style:
         assert style_line in constant_source
         assert style_line in general_source
+        assert style_line in polynomial_source
+    assert "plt.rcParams.update(GRAPH_STYLE)" in polynomial_source
+    assert "figsize=(8, 4)" in polynomial_source
+    assert "ax1.grid(True)" in polynomial_source
 
 
 def test_graficas_teoricas_definen_todas_las_complejidades_y_limites_seguros():
@@ -335,6 +357,141 @@ def test_grafica_logaritmica_extrema_llega_hasta_10_a_la_100():
     assert captured["legend_location"] == 4
 
 
+def test_valores_polinomiales_respetan_grado_cero_y_potencias():
+    n_values = np.array([0, 2, 10], dtype=np.float64)
+
+    assert polynomial_values(n_values, 0).tolist() == [1.0, 1.0, 1.0]
+    assert polynomial_values(n_values, 2).tolist() == [0.0, 4.0, 100.0]
+
+
+def test_grafica_polinomial_estatica_usa_k_0_a_4():
+    import matplotlib.pyplot as plt
+
+    captured = {}
+    original_show = plt.show
+    plt.show = lambda *args, **kwargs: None
+    try:
+        plot_polynomial_family(max_degree=4, maximum_n=10)
+        axis = plt.gcf().axes[0]
+        captured["line_count"] = len(axis.lines)
+        captured["xlim"] = axis.get_xlim()
+        captured["ylim"] = axis.get_ylim()
+        captured["ylabel"] = axis.get_ylabel()
+        captured["title"] = axis.get_title()
+        captured["legend"] = axis.get_legend()
+        captured["labels"] = [line.get_label() for line in axis.lines]
+        captured["annotations"] = [text.get_text() for text in axis.texts]
+    finally:
+        plt.show = original_show
+        plt.close("all")
+
+    assert captured["line_count"] == 5
+    assert captured["xlim"] == (1.0, 10.6)
+    assert captured["ylim"] == (0.0, 10.0)
+    assert captured["ylabel"] == "Función de complejidad teórica"
+    assert captured["title"] == r"$C(n)=n^k$ para $k \in [0, 4]$"
+    assert captured["legend"] is None
+    assert captured["labels"] == [rf"$n^{{{degree}}}$" for degree in range(5)]
+    assert captured["annotations"] == [rf"$n^{{{degree}}}$" for degree in range(5)]
+
+
+def test_grafica_polinomial_agrupa_curvas_planas_para_grados_altos():
+    import matplotlib.pyplot as plt
+
+    captured = {}
+    original_show = plt.show
+    plt.show = lambda *args, **kwargs: None
+    try:
+        plot_polynomial_family(max_degree=10, maximum_n=10)
+        axis = plt.gcf().axes[0]
+        captured["xlim"] = axis.get_xlim()
+        captured["ylim"] = axis.get_ylim()
+        captured["title"] = axis.get_title()
+        captured["legend"] = axis.get_legend()
+        captured["annotations"] = [text.get_text() for text in axis.texts]
+    finally:
+        plt.show = original_show
+        plt.close("all")
+
+    assert polynomial_visible_ceiling(10, 10) == 10**6
+    assert polynomial_flat_group_limit(10) == 4
+    assert captured["xlim"] == (2.0, 10.8)
+    assert captured["ylim"] == (-(10**5), 10**6)
+    assert captured["title"] == r"$C(n)=n^k$ para $k \in [0, 10]$"
+    assert captured["legend"] is None
+    assert r"$n^{[0,4]}$" in captured["annotations"]
+    assert r"$n^{10}$" in captured["annotations"]
+
+
+def test_grafica_polinomial_no_superpone_grupo_con_primera_curva_visible():
+    import matplotlib.pyplot as plt
+
+    captured = {}
+    original_show = plt.show
+    plt.show = lambda *args, **kwargs: None
+    try:
+        plot_polynomial_family(max_degree=5, maximum_n=10)
+        axis = plt.gcf().axes[0]
+        captured["annotations"] = [text.get_text() for text in axis.texts]
+    finally:
+        plt.show = original_show
+        plt.close("all")
+
+    assert polynomial_flat_group_limit(5, 10) == 4
+    assert r"$n^{[0,4]}$" in captured["annotations"]
+    assert r"$n^{4}$" not in captured["annotations"]
+
+
+def test_simulacion_polinomial_teorica_no_incluye_resultados_experimentales():
+    table = polynomial_table(10, 4)
+
+    assert DEFAULT_MAXIMUM_N == 10
+    assert DEFAULT_MAX_DEGREE == 4
+    assert MAX_DEGREE == 10
+    assert "<th>Grado (k)</th>" in table
+    assert "<th>Forma teórica</th>" in table
+    assert r"Operaciones teóricas [ops] para \(n=10\)" in table
+    assert "Escala equivalente [1 op = 1 ns]" in table
+    assert r"\(n^{0}\)" in table
+    assert r"\(10^{4}=1.000000\times 10^{4}\)" in table
+    assert r"\(1.000000\times 10^{1}\ \mu s\)" in table
+    assert scaled_time_latex(10**18) == r"3.168809\times 10^{1}\ \text{años}"
+    assert scientific_latex(10**10) == r"1.000000\times 10^{10}"
+    assert "experimental" not in table.lower()
+    assert "Estado" not in table
+
+
+def test_simulacion_polinomial_renderiza_una_figura_embebida():
+    figure_html = render_polynomial_figure(10, 3)
+
+    assert figure_html.startswith('<img src="data:image/png;base64,')
+    assert "max-width:100%" in figure_html
+
+
+def test_simulacion_polinomial_usa_stepper_no_campo_editable_para_k():
+    source = Path(EXPERIMENT_DIR / "polynomial_animation.py").read_text(encoding="utf-8")
+
+    assert "degree_down = widgets.Button" in source
+    assert "degree_up = widgets.Button" in source
+    assert "[degree_down, degree_value, degree_up]" in source
+    assert "degree_down.on_click(decrease_degree)" in source
+    assert "degree_up.on_click(increase_degree)" in source
+    assert "BoundedIntText" not in source
+
+
+def test_simulacion_polinomial_agrega_espacio_y_scroll_vertical_para_tablas_largas():
+    source = Path(EXPERIMENT_DIR / "polynomial_animation.py").read_text(encoding="utf-8")
+
+    assert polynomial_table_height(5) == 308
+    assert polynomial_table_height(10) == 518
+    assert "TABLE_SCROLL_THRESHOLD = 5" in source
+    assert "TABLE_SCROLL_HEIGHT = 296" in source
+    assert 'margin="18px 0 0 0"' in source
+    assert 'table_container.layout.overflow_y = "auto"' in source
+    assert "max_degree > TABLE_SCROLL_THRESHOLD" in source
+    assert "[style, controls_row, table_container, figure_output]" in source
+
+
 def test_notebooks_generales_invocan_perfiles_interactivos():
     expected = {
         "2_complejidad_logaritmica.ipynb": "logarithmic",
@@ -342,8 +499,8 @@ def test_notebooks_generales_invocan_perfiles_interactivos():
         "4_complejidad_log_lineal.ipynb": "log_linear",
         "5_complejidad_cuadratica.ipynb": "quadratic",
         "6_complejidad_cubica.ipynb": "cubic",
-        "7_complejidad_exponencial.ipynb": "exponential",
-        "8_complejidad_factorial.ipynb": "factorial",
+        "8_complejidad_exponencial.ipynb": "exponential",
+        "9_complejidad_factorial.ipynb": "factorial",
     }
 
     for notebook_name, simulation_name in expected.items():
@@ -369,8 +526,8 @@ def test_notebooks_incluyen_grafica_teorica_correcta():
         "4_complejidad_log_lineal.ipynb": "log_linear",
         "5_complejidad_cuadratica.ipynb": "quadratic",
         "6_complejidad_cubica.ipynb": "cubic",
-        "7_complejidad_exponencial.ipynb": "exponential",
-        "8_complejidad_factorial.ipynb": "factorial",
+        "8_complejidad_exponencial.ipynb": "exponential",
+        "9_complejidad_factorial.ipynb": "factorial",
     }
 
     for notebook_name, simulation_name in expected.items():
@@ -407,6 +564,33 @@ def test_notebook_logaritmico_incluye_figura_hasta_10_a_la_100():
     assert "Crecimiento logarítmico hasta $10^{100}$" in source
 
 
+def test_notebook_polinomial_general_tiene_estructura_teorica_interactiva():
+    notebook = json.loads(Path(EXPERIMENT_DIR / "7_complejidad_polinomial_general.ipynb").read_text(encoding="utf-8"))
+    cells = notebook["cells"]
+    source = "\n".join("".join(cell.get("source", [])) for cell in cells)
+    headings = ["".join(cell.get("source", [])).strip().splitlines()[0] for cell in cells]
+
+    assert [cell["cell_type"] for cell in cells] == ["markdown", "markdown", "code", "markdown", "code"]
+    assert headings[0].startswith("# Complejidad polinomial general")
+    assert headings[1] == "## Forma teórica"
+    assert headings[2].startswith("#@title Gráfica del comportamiento teórico")
+    assert headings[3] == "## Simulación teórica interactiva"
+    assert headings[4].startswith("#@title Simulación teórica interactiva")
+    assert r"C(n)=n^k" in source
+    assert r"k\in[0,4]" in source
+    assert "plot_polynomial_family(max_degree=4, maximum_n=10)" in source
+    assert 'SIMULATION_NAME = "polynomial_general"' in source
+    assert "colab_bootstrap.py" in source
+    assert "urllib.request.urlopen" in source
+    assert "no se realizan ejecuciones experimentales" in source
+    assert "El valor máximo de $n$ se mantiene fijo y de solo lectura en $10$" in source
+    assert "botones laterales" in source
+    assert "[ops]" in source
+    assert r"1\ \text{op}=1\ \text{ns}" in source
+    assert all(cell.get("outputs", []) == [] for cell in cells if cell["cell_type"] == "code")
+    assert all(cell.get("execution_count") is None for cell in cells if cell["cell_type"] == "code")
+
+
 def test_notebooks_buscan_bootstrap_local_antes_del_remoto():
     notebooks = (
         "1_complejidad_constante.ipynb",
@@ -415,8 +599,8 @@ def test_notebooks_buscan_bootstrap_local_antes_del_remoto():
         "4_complejidad_log_lineal.ipynb",
         "5_complejidad_cuadratica.ipynb",
         "6_complejidad_cubica.ipynb",
-        "7_complejidad_exponencial.ipynb",
-        "8_complejidad_factorial.ipynb",
+        "8_complejidad_exponencial.ipynb",
+        "9_complejidad_factorial.ipynb",
     )
 
     for notebook_name in notebooks:
@@ -437,6 +621,47 @@ def test_notebooks_buscan_bootstrap_local_antes_del_remoto():
             assert 'base / "colab_bootstrap.py"' in source
 
 
+def test_notebook_polinomial_busca_bootstrap_local_antes_del_remoto():
+    notebook = json.loads(Path(EXPERIMENT_DIR / "7_complejidad_polinomial_general.ipynb").read_text(encoding="utf-8"))
+    simulation_cells = [
+        "".join(cell.get("source", [])) for cell in notebook["cells"] if cell["cell_type"] == "code" and "SIMULATION_NAME" in "".join(cell.get("source", []))
+    ]
+
+    assert len(simulation_cells) == 1
+    source = simulation_cells[0]
+    assert source.index("_bootstrap_path = next(") < source.index("urllib.request.urlopen")
+    assert "Path.cwd().parents" in source
+    assert 'base / "colab_bootstrap.py"' in source
+
+
+def test_referencias_colab_del_capitulo_2_siguen_orden_actual():
+    abrir_source = Path(Path(__file__).parents[1] / "abrir.py").read_text(encoding="utf-8")
+    readme_source = Path(EXPERIMENT_DIR / "README.md").read_text(encoding="utf-8")
+    chapter_readme_source = Path(Path(__file__).parents[1] / "capitulo2" / "README.md").read_text(encoding="utf-8")
+
+    expected_paths = (
+        "1_complejidad_constante.ipynb",
+        "2_complejidad_logaritmica.ipynb",
+        "3_complejidad_lineal.ipynb",
+        "4_complejidad_log_lineal.ipynb",
+        "5_complejidad_cuadratica.ipynb",
+        "6_complejidad_cubica.ipynb",
+        "7_complejidad_polinomial_general.ipynb",
+        "8_complejidad_exponencial.ipynb",
+        "9_complejidad_factorial.ipynb",
+    )
+
+    for path in expected_paths:
+        assert path in readme_source
+        assert path in chapter_readme_source
+
+    assert '"2/polinomial-general"' in abrir_source
+    assert "7_complejidad_polinomial_general.ipynb" in abrir_source
+    assert r"\newcommand{\colabComplejidadPolinomialGeneral}" in readme_source
+    assert "7_complejidad_exponencial.ipynb" not in readme_source + chapter_readme_source + abrir_source
+    assert "8_complejidad_factorial.ipynb" not in readme_source + chapter_readme_source + abrir_source
+
+
 def test_notebooks_generales_no_conservan_celdas_de_imports_antiguas():
     notebooks = (
         "2_complejidad_logaritmica.ipynb",
@@ -444,8 +669,8 @@ def test_notebooks_generales_no_conservan_celdas_de_imports_antiguas():
         "4_complejidad_log_lineal.ipynb",
         "5_complejidad_cuadratica.ipynb",
         "6_complejidad_cubica.ipynb",
-        "7_complejidad_exponencial.ipynb",
-        "8_complejidad_factorial.ipynb",
+        "8_complejidad_exponencial.ipynb",
+        "9_complejidad_factorial.ipynb",
     )
 
     for notebook_name in notebooks:
@@ -468,8 +693,8 @@ def test_notebooks_generales_siguen_estructura_de_constante():
         "4_complejidad_log_lineal.ipynb",
         "5_complejidad_cuadratica.ipynb",
         "6_complejidad_cubica.ipynb",
-        "7_complejidad_exponencial.ipynb",
-        "8_complejidad_factorial.ipynb",
+        "8_complejidad_exponencial.ipynb",
+        "9_complejidad_factorial.ipynb",
     )
 
     for notebook_name in notebooks:

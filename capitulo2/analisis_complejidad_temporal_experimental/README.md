@@ -92,13 +92,18 @@ La siguiente tabla resume los experimentos desarrollados en esta sección, indic
       <td style="padding:8px; text-align:justify;">Modela una triple anidación de ciclos típica en operaciones de álgebra lineal, simulando algoritmos 𝒪(n³) con crecimiento rápido pero aún determinístico.</td>
     </tr>
     <tr>
+      <td style="padding:8px;"><code>polinomial_general()</code></td>
+      <td style="padding:8px;">7_complejidad_polinomial_general.ipynb</td>
+      <td style="padding:8px; text-align:justify;">Explora la familia teórica 𝒪(nᵏ), variando el grado <i>k</i> para observar cómo las curvas polinomiales se vuelven más pronunciadas.</td>
+    </tr>
+    <tr>
       <td style="padding:8px;"><code>exponencial()</code></td>
-      <td style="padding:8px;">7_complejidad_exponencial.ipynb</td>
+      <td style="padding:8px;">8_complejidad_exponencial.ipynb</td>
       <td style="padding:8px; text-align:justify;">Evalúa el crecimiento de una función recursiva que duplica el número de llamadas (𝒪(2ⁿ)), como la implementación ingenua de Fibonacci.</td>
     </tr>
     <tr>
       <td style="padding:8px;"><code>factorial()</code></td>
-      <td style="padding:8px;">8_complejidad_factorial.ipynb</td>
+      <td style="padding:8px;">9_complejidad_factorial.ipynb</td>
       <td style="padding:8px; text-align:justify;">Analiza procesos que generan todas las permutaciones posibles de un conjunto, representando el crecimiento factorial 𝒪(n!).</td>
     </tr>
   </tbody>
@@ -165,9 +170,27 @@ Asimismo, proporciona una base cuantitativa para comparar implementaciones alter
   <li><a href="./4_complejidad_log_lineal.ipynb"><code>4_complejidad_log_lineal.ipynb</code></a></li>
   <li><a href="./5_complejidad_cuadratica.ipynb"><code>5_complejidad_cuadratica.ipynb</code></a></li>
   <li><a href="./6_complejidad_cubica.ipynb"><code>6_complejidad_cubica.ipynb</code></a></li>
-  <li><a href="./7_complejidad_exponencial.ipynb"><code>7_complejidad_exponencial.ipynb</code></a></li>
-  <li><a href="./8_complejidad_factorial.ipynb"><code>8_complejidad_factorial.ipynb</code></a></li>
+  <li><a href="./7_complejidad_polinomial_general.ipynb"><code>7_complejidad_polinomial_general.ipynb</code></a></li>
+  <li><a href="./8_complejidad_exponencial.ipynb"><code>8_complejidad_exponencial.ipynb</code></a></li>
+  <li><a href="./9_complejidad_factorial.ipynb"><code>9_complejidad_factorial.ipynb</code></a></li>
 </ul>
+
+---
+
+## 🔗 Comandos LaTeX para Colab
+
+```tex
+% Complejidades experimentales - Capítulo 2
+\newcommand{\colabComplejidadConstante}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/1_complejidad_constante.ipynb}
+\newcommand{\colabComplejidadLogaritmica}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/2_complejidad_logaritmica.ipynb}
+\newcommand{\colabComplejidadLineal}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/3_complejidad_lineal.ipynb}
+\newcommand{\colabComplejidadLogLineal}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/4_complejidad_log_lineal.ipynb}
+\newcommand{\colabComplejidadCuadratica}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/5_complejidad_cuadratica.ipynb}
+\newcommand{\colabComplejidadCubica}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/6_complejidad_cubica.ipynb}
+\newcommand{\colabComplejidadPolinomialGeneral}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/7_complejidad_polinomial_general.ipynb}
+\newcommand{\colabComplejidadExponencial}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/8_complejidad_exponencial.ipynb}
+\newcommand{\colabComplejidadFactorial}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/analisis_complejidad_temporal_experimental/9_complejidad_factorial.ipynb}
+```
 
 ---
 
