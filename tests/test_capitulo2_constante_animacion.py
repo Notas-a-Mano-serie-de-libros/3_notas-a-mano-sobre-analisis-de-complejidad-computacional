@@ -229,6 +229,22 @@ def test_bootstrap_remoto_descarga_motor_comun_y_perfiles():
     assert "simulation_module.run_app()" in source
 
 
+def test_bootstrap_tolera_que_google_no_este_instalado():
+    source = Path(EXPERIMENT_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
+
+    assert 'find_spec("google.colab")' in source
+    assert "except ModuleNotFoundError:" in source
+
+
+def test_bootstrap_prioriza_simulacion_y_limpia_estado_del_kernel():
+    source = Path(EXPERIMENT_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
+
+    simulation_branch = source.index('if "SIMULATION_NAME" in globals():')
+    graph_branch = source.index('elif "THEORETICAL_GRAPH" in globals():')
+    assert simulation_branch < graph_branch
+    assert 'globals().pop(control_name, None)' in source
+
+
 def test_perfiles_generales_se_pueden_construir():
     expected_names = {"logarithmic", "linear", "log_linear", "quadratic", "cubic", "exponential", "factorial"}
 

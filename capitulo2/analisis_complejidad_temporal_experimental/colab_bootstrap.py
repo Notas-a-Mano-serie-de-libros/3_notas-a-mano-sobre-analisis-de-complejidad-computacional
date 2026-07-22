@@ -39,7 +39,13 @@ RELOADABLE_MODULES = (
 
 
 def running_in_colab():
-    return importlib.util.find_spec("google.colab") is not None
+    try:
+        return importlib.util.find_spec("google.colab") is not None
+    except ModuleNotFoundError:
+        # find_spec() imports the parent package for dotted names. Outside
+        # Colab, ``google`` may not be installed at all, which simply means
+        # this is a local Python environment.
+        return False
 
 
 def find_project_root():
@@ -101,7 +107,20 @@ def run_simulation():
 
 
 prepare_imports()
-if "THEORETICAL_GRAPH" in globals():
-    run_theoretical_graph()
-else:
-    run_simulation()
+try:
+    # Las variables definidas por celdas anteriores permanecen en el kernel.
+    # Si una celda solicita una simulación, debe prevalecer sobre una gráfica
+    # teórica que haya quedado guardada de una ejecución anterior.
+    if "SIMULATION_NAME" in globals():
+        run_simulation()
+    elif "THEORETICAL_GRAPH" in globals():
+        run_theoretical_graph()
+finally:
+    for control_name in (
+        "SIMULATION_NAME",
+        "SIMULATION_MODE",
+        "THEORETICAL_GRAPH",
+        "THEORETICAL_ARGS",
+        "THEORETICAL_KWARGS",
+    ):
+        globals().pop(control_name, None)
