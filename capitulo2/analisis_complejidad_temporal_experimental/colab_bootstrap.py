@@ -1,8 +1,9 @@
-"""Carga las simulaciones experimentales del capítulo 2."""
+"""Carga gráficas y simulaciones interactivas del capítulo 2."""
 
 from __future__ import annotations
 
 import importlib
+import importlib.util
 from pathlib import Path
 import sys
 import urllib.request
@@ -22,14 +23,23 @@ REQUIRED_FILES = (
     "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py",
 )
 
+SIMULATION_MODULES = {
+    "constant": "capitulo2.analisis_complejidad_temporal_experimental.constant_animation",
+    "polynomial_general": "capitulo2.analisis_complejidad_temporal_experimental.polynomial_animation",
+    "default": "capitulo2.analisis_complejidad_temporal_experimental.complexity_animations",
+}
+
+RELOADABLE_MODULES = (
+    "capitulo2.analisis_complejidad_temporal_experimental.experimental_animation",
+    "capitulo2.analisis_complejidad_temporal_experimental.constant_animation",
+    "capitulo2.analisis_complejidad_temporal_experimental.complexity_animations",
+    "capitulo2.analisis_complejidad_temporal_experimental.polynomial_animation",
+    "capitulo2.analisis_complejidad_temporal_experimental.theoretical_graphs",
+)
+
 
 def running_in_colab():
-    try:
-        import google.colab  # noqa: F401
-
-        return True
-    except ImportError:
-        return False
+    return importlib.util.find_spec("google.colab") is not None
 
 
 def find_project_root():
@@ -51,39 +61,47 @@ def download_required_files(root):
         target.write_bytes(urllib.request.urlopen(request).read())
 
 
-project_root = find_project_root()
-if project_root is None:
-    project_root = Path.cwd()
-if running_in_colab():
-    download_required_files(project_root)
+def prepare_imports():
+    project_root = find_project_root() or Path.cwd()
+    if running_in_colab():
+        download_required_files(project_root)
 
-root_string = str(project_root.resolve())
-if root_string not in sys.path:
-    sys.path.insert(0, root_string)
+    root_string = str(project_root.resolve())
+    if root_string not in sys.path:
+        sys.path.insert(0, root_string)
 
-simulation_name = globals().get("SIMULATION_NAME", "constant")
-module_name = (
-    "capitulo2.analisis_complejidad_temporal_experimental.constant_animation"
-    if simulation_name == "constant"
-    else (
-        "capitulo2.analisis_complejidad_temporal_experimental.polynomial_animation"
-        if simulation_name == "polynomial_general"
-        else "capitulo2.analisis_complejidad_temporal_experimental.complexity_animations"
+    importlib.invalidate_caches()
+    for loaded_module in RELOADABLE_MODULES:
+        sys.modules.pop(loaded_module, None)
+
+
+def run_theoretical_graph():
+    theoretical_graphs = importlib.import_module(
+        "capitulo2.analisis_complejidad_temporal_experimental.theoretical_graphs"
     )
-)
-importlib.invalidate_caches()
-for loaded_module in (
-    "capitulo2.analisis_complejidad_temporal_experimental.experimental_animation",
-    "capitulo2.analisis_complejidad_temporal_experimental.constant_animation",
-    "capitulo2.analisis_complejidad_temporal_experimental.complexity_animations",
-    "capitulo2.analisis_complejidad_temporal_experimental.polynomial_animation",
-):
-    sys.modules.pop(loaded_module, None)
-simulation_module = importlib.import_module(module_name)
-clear_output(wait=True)
-if simulation_name == "constant":
-    simulation_module.run_app(mode=globals().get("SIMULATION_MODE", "time"))
-elif simulation_name == "polynomial_general":
-    simulation_module.run_app()
+    graph_name = globals()["THEORETICAL_GRAPH"]
+    graph_args = globals().get("THEORETICAL_ARGS", ())
+    graph_kwargs = globals().get("THEORETICAL_KWARGS", {})
+    clear_output(wait=True)
+    getattr(theoretical_graphs, graph_name)(*graph_args, **graph_kwargs)
+
+
+def run_simulation():
+    simulation_name = globals().get("SIMULATION_NAME", "constant")
+    module_name = SIMULATION_MODULES.get(simulation_name, SIMULATION_MODULES["default"])
+    simulation_module = importlib.import_module(module_name)
+
+    clear_output(wait=True)
+    if simulation_name == "constant":
+        simulation_module.run_app(mode=globals().get("SIMULATION_MODE", "time"))
+    elif simulation_name == "polynomial_general":
+        simulation_module.run_app()
+    else:
+        simulation_module.run_app(simulation_name, mode=globals().get("SIMULATION_MODE", "time"))
+
+
+prepare_imports()
+if "THEORETICAL_GRAPH" in globals():
+    run_theoretical_graph()
 else:
-    simulation_module.run_app(simulation_name, mode=globals().get("SIMULATION_MODE", "time"))
+    run_simulation()

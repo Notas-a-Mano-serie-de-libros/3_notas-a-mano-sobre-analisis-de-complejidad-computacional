@@ -354,9 +354,10 @@ def measure_space_growth_factory(shape_function):
         try:
             for execution in range(executions):
                 before, _ = tracemalloc.get_traced_memory()
-                _buffer = [0] * item_count
+                buffer = [0] * item_count
                 _current, peak = tracemalloc.get_traced_memory()
                 samples[execution] = max(0, peak - before)
+                del buffer
         finally:
             tracemalloc.stop()
         return float(np.mean(samples))
