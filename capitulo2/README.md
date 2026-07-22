@@ -271,43 +271,13 @@ La siguiente figura resume la intuición central: no todas las funciones respond
 
 ## Ejercicios propuestos
 
-Los ejercicios buscan que practiques el cálculo de tiempo y recursos usando:
+Consulta el documento con los ejercicios y sus indicaciones:
 
-$$
-t=T_0\cdot T(n)
-$$
-
-$$
-s=S_0\cdot S(n)
-$$
-
-Antes de resolverlos, identifica siempre:
-
-- qué representa $n$;
-- cuál es la función temporal $T(n)$;
-- cuál es la función espacial $S(n)$;
-- qué unidad usa cada constante;
-- si el resultado final debe expresarse en segundos, minutos, horas, bytes, KB, MB o GB.
-
-1. Una máquina consume $0.001\,[s]$ por operación y $8\,[\text{bytes}]$ de memoria por instrucción. Calcula el tiempo total y el consumo total para $T(n)=n$, $S(n)=n$; $T(n)=n\log_2(n)$, $S(n)=\log_2(n)$; $T(n)=\sqrt{n}$, $S(n)=\log_2(n)$, con $n=10^6$.
-2. Una operación básica toma en promedio $0.002\,[s]$ y $T(n)=n^3$. Para $n=500$, determina el tiempo total de ejecución y cuántas instrucciones puede ejecutar antes de consumir $1\,[GB]$ si consume $16\,[\text{bytes}]$ por operación.
-3. Un algoritmo tiene $T(n)=2^n$ y $S(n)=n!$. Con $T_0=0.0005\,[s]$ y $S_0=4\,[\text{bytes}]$, determina tiempo y consumo para $n\in\{1,10,100,1000,10000\}$ y discute los resultados.
-4. Un sistema necesita procesar $n=10^6$ datos en menos de $10\,[s]$. La máquina ejecuta instrucciones a $0.001\,[s]$ por instrucción. Determina la función de complejidad temporal más adecuada que cumpla con estas restricciones.
-5. Supón que tienes tres algoritmos: $A_1(n)=n\log_2(n)$, $A_2(n)=n^2$, $A_3(n)=10n^2$. Si $n=10^5$ y $T_0=0.002\,[s]$, determina el tiempo de ejecución de cada algoritmo.
-6. Diseña un algoritmo que procese $10^7$ datos en menos de $5\,[s]$. Determina un conjunto de funciones de complejidad que cumplan con esta restricción.
-7. Por restricciones físicas, una máquina solo cuenta con $128\,[MB]$ de memoria. Determina la complejidad tentativa que debe tener un algoritmo capaz de procesar $10^5$ datos.
-8. Estima el tiempo de ejecución para procesar $10^6$ datos usando $T(n)=n!$, asumiendo que cada instrucción toma $10^{-5}\,[s]$.
-9. Un algoritmo con $S(n)=n\log_2(n)$ consume $16\,[\text{bytes}]$ en cada operación. Determina cuántos kilobytes y kibibytes consume si recibe $10000$ datos.
-10. Calcula cuánto tiempo tomaría procesar $20$ datos en un algoritmo con $T(n)=2^n$, asumiendo que cada instrucción toma $1\,[s]$. ¿Es útil en la práctica?
-11. Un algoritmo con $T(n)=n^2$ tarda $0.01\,[s]$ en procesar $1000$ datos. Estima el tiempo para procesar $100000$ datos, asumiendo que el comportamiento se mantiene estable.
-12. Se requiere implementar un algoritmo que procese $10000$ datos en menos de $1\,[s]$. Identifica qué órdenes de complejidad temporal lo permitirían en una máquina que ejecuta $10^7$ instrucciones por segundo.
-13. Un sistema de distribución utiliza $S(n)=2^n$ y logra procesar $20$ datos sin inconvenientes. Determina cuánta memoria requeriría para $25$ datos, expresando el resultado en una unidad adecuada.
-14. Un sistema embebido es capaz de realizar $10^6$ operaciones por segundo, con solo $1\,[MB]$ de memoria. Determina qué órdenes de complejidad temporal y espacial permitirían procesar $5000$ datos de forma eficiente.
-15. Un algoritmo con $T(n)=n\log_2(n)$ tarda $2\,[s]$ en procesar $1000$ datos. Estima si es posible procesar $10000$ datos en menos de $10\,[s]$ bajo el mismo modelo.
-
-Soluciones:
-
-- [Ver soluciones – Ejercicios propuestos del Capítulo 2](https://drive.google.com/file/d/16_BOFsSW8auL9230VSRZU79gesjlDzpW/view)
+<p align="center">
+  <a href="./ejercicios_propuestos.pdf">
+    <img src="https://img.shields.io/badge/Abrir-Ejercicios%20propuestos-red?logo=adobeacrobatreader" alt="Abrir ejercicios propuestos del Capítulo 2 en PDF">
+  </a>
+</p>
 
 ---
 
