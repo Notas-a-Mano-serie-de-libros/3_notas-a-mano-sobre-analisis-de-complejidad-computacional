@@ -71,6 +71,11 @@ _BIG_O_HTML = r"""
 #bo-wrap .demo-title{font-weight:700;font-size:15px;margin:2px 0 8px;color:#333;text-align:left}
 #bo-wrap .demo-line{display:block;text-align:center;margin:6px 0}
 #bo-wrap .demo-sep{height:1px;background:#e0e0e0;margin:12px 0}
+#bo-wrap .theta-solutions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:12px 0}
+#bo-wrap .theta-solution{border:1px solid #e0e0e0;border-radius:4px;padding:10px;background:#fafafa;text-align:center}
+#bo-wrap .theta-intersection{border-top:1px solid #d0d0d0;margin-top:10px;padding-top:10px;text-align:center}
+#bo-wrap .solution-set{border:1px solid #e0e0e0;border-radius:4px;padding:10px;margin:12px 0;background:#fafafa;text-align:center}
+#bo-wrap .solution-title{font-weight:700;text-align:left}
 #bo-wrap #bo-limits{display:flex;justify-content:center;width:100%;overflow-x:auto}
 #bo-wrap table{margin:12px auto 0!important;border-collapse:collapse!important;text-align:center!important;width:auto!important;color:#333!important;background:#fff!important;border:0!important}
 #bo-wrap th,#bo-wrap td{padding:7px 14px!important;white-space:nowrap!important;border:0!important;border-bottom:1px solid #d0d0d0!important;color:#333!important;background:#fff!important;text-align:center!important;vertical-align:middle!important}
@@ -146,8 +151,8 @@ _BIG_O_HTML = r"""
     <div class="row-title">Parámetros adicionales:</div>
     <div class="ctrl vertical additional">
     <label class="single-c"><span class="label-text">\(c\)</span><input type="number" id="bo-c" min="0.1" max="1000" value="1" step="0.1"></label>
-    <label class="theta-c"><span class="label-text">\(c_1\)</span><input type="number" id="bo-c1" min="0.1" max="1000" value="1" step="0.1"></label>
-    <label class="theta-c"><span class="label-text">\(c_2\)</span><input type="number" id="bo-c2" min="0.1" max="1000" value="1" step="0.1"></label>
+    <label class="theta-c"><span class="label-text">\(c_1\)</span><input type="number" id="bo-c1" min="0.1" max="1000" value="0.1" step="0.1"></label>
+    <label class="theta-c"><span class="label-text">\(c_2\)</span><input type="number" id="bo-c2" min="0.1" max="1000" value="1.1" step="0.1"></label>
     <label><span class="label-text">\(\text{Escala}\)</span>
       <select id="bo-scale">
         <option value="linear" selected>Lineal</option>
@@ -173,7 +178,7 @@ _BIG_O_HTML = r"""
     <span style="color:#1565C0"><span class="sw"></span><span id="bo-leg-c">—</span></span>
     <span style="color:#B71C1C"><span class="sw"></span><span id="bo-leg-cg">—</span></span>
     <span style="color:#EF6C00;display:none" id="bo-leg-low-wrap"><span class="sw"></span><span id="bo-leg-low">—</span></span>
-    <span style="color:#66BB6A"><span class="sw" style="border-top-style:dotted"></span><span id="bo-leg-n0">—</span></span>
+    <span style="color:#2E7D32"><span class="sw" style="border-top-style:dotted"></span><span id="bo-leg-n0">—</span></span>
   </div>
   <div class="note" id="bo-reading">—</div>
   <div class="cards">
@@ -189,7 +194,15 @@ _BIG_O_HTML = r"""
 </div>
 
 <script>
-window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],displayMath:[['\\[','\\]'],['$$','$$']]},svg:{fontCache:'none'}};
+window.MathJax = {
+  loader:{load:['[tex]/boldsymbol','[tex]/cancel']},
+  tex:{
+    packages:{'[+]':['boldsymbol','cancel']},
+    inlineMath:[['\\(','\\)'],['$$','$$']],
+    displayMath:[['\\[','\\]'],['$$','$$']]
+  },
+  svg:{fontCache:'none'}
+};
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 <script>
@@ -208,7 +221,7 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     book:{label:'n³+2n²+n+5',latex:'n^3+2n^2+n+5',rank:5,fn:function(n){return n*n*n+2*n*n+n+5;}},
     n4:{label:'n⁴',latex:'n^4',rank:6,fn:function(n){return n*n*n*n;}},
     exp:{label:'2ⁿ',latex:'2^n',rank:7,fn:function(n){return n>1023?Infinity:Math.pow(2,n);}},
-    fact:{label:'n!',latex:'n!',rank:8,fn:function(n){var r=1,m=Math.min(Math.floor(n),170);for(var i=2;i<=m;i++)r*=i;return r;}}
+    fact:{label:'n!',latex:'n!',rank:8,fn:function(n){var m=Math.floor(n);if(m>170)return Infinity;var r=1;for(var i=2;i<=m;i++)r*=i;return r;}}
   };
   var ORDER=['one','log','n','nlog','n2','n3','n4','exp','fact'];
   var C_ORDER=['book','one','log','n','nlog','n2','n3','exp','fact'];
@@ -338,6 +351,84 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
       op+'_{n\\to\\infty}\\left(\\frac{'+cLatex()+'}{'+latexOf(gk)+'}\\right)='+
       displayLimitValue(limitValue(ck,gk));
   }
+  function monomialProfile(key){
+    var profiles={
+      one:{n:0,log:0},log:{n:0,log:1},n:{n:1,log:0},
+      nlog:{n:1,log:1},n2:{n:2,log:0},n3:{n:3,log:0},n4:{n:4,log:0}
+    };
+    return profiles[key]||null;
+  }
+  function factorProductLatex(nPower,logPower){
+    var factors=[];
+    if(nPower===1)factors.push('n');
+    else if(nPower>1)factors.push('n^{'+nPower+'}');
+    if(logPower===1)factors.push('\\log_2(n)');
+    else if(logPower>1)factors.push('\\log_2^{'+logPower+'}(n)');
+    return factors.length?factors.join('\\cdot '):'1';
+  }
+  function simplifiedMonomialRatioLatex(ck,gk){
+    var left=monomialProfile(ck),right=monomialProfile(gk);
+    if(!left || !right)return null;
+    var nDelta=left.n-right.n,logDelta=left.log-right.log;
+    var numerator=factorProductLatex(Math.max(0,nDelta),Math.max(0,logDelta));
+    var denominator=factorProductLatex(Math.max(0,-nDelta),Math.max(0,-logDelta));
+    return denominator==='1'?numerator:'\\frac{'+numerator+'}{'+denominator+'}';
+  }
+  function bookDivisionLatex(gk){
+    var denominator=latexOf(gk);
+    return '\\frac{n^3}{'+denominator+'}+'+
+      '\\frac{2n^2}{'+denominator+'}+'+
+      '\\frac{n}{'+denominator+'}+'+
+      '\\frac{5}{'+denominator+'}';
+  }
+  function bookSimplifiedRatioLatex(gk){
+    var forms={
+      one:'n^3+2n^2+n+5',
+      log:'\\frac{n^3}{\\log_2(n)}+\\frac{2n^2}{\\log_2(n)}+\\frac{n}{\\log_2(n)}+\\frac{5}{\\log_2(n)}',
+      n:'n^2+2n+1+\\frac{5}{n}',
+      nlog:'\\frac{n^2}{\\log_2(n)}+\\frac{2n}{\\log_2(n)}+\\frac{1}{\\log_2(n)}+\\frac{5}{n\\log_2(n)}',
+      n2:'n+2+\\frac{1}{n}+\\frac{5}{n^2}',
+      n3:'1+\\frac{2}{n}+\\frac{1}{n^2}+\\frac{5}{n^3}',
+      n4:'\\frac{1}{n}+\\frac{2}{n^2}+\\frac{1}{n^3}+\\frac{5}{n^4}'
+    };
+    return forms[gk]||bookDivisionLatex(gk);
+  }
+  function simplifiedRatioLatex(ck,gk){
+    if(ck===gk)return '1';
+    if(ck==='book')return bookSimplifiedRatioLatex(gk);
+    return simplifiedMonomialRatioLatex(ck,gk)||'\\frac{'+latexOf(ck)+'}{'+latexOf(gk)+'}';
+  }
+  function canceledRatioLatex(ck,gk,simplified){
+    if(ck==='book' && gk==='n3'){
+      return '1+\\cancelto{0}{\\frac{2}{n}}+'+
+        '\\cancelto{0}{\\frac{1}{n^2}}+'+
+        '\\cancelto{0}{\\frac{5}{n^3}}';
+    }
+    if(limitValue(ck,gk)==='0')return '\\cancelto{0}{'+simplified+'}';
+    return simplified;
+  }
+  function limitProcedureHtml(ck,gk){
+    var op=limitOperatorLatex()+'_{n\\to\\infty}';
+    var rawRatio='\\frac{'+cLatex()+'}{'+latexOf(gk)+'}';
+    var simplified=simplifiedRatioLatex(ck,gk);
+    var canceled=canceledRatioLatex(ck,gk,simplified);
+    var steps=[
+      'k&='+op+'\\left(\\frac{C(n)}{g(n)}\\right)',
+      '&='+op+'\\left('+rawRatio+'\\right)'
+    ];
+    if(ck==='book'){
+      var divided=bookDivisionLatex(gk);
+      steps.push('&='+op+'\\left('+divided+'\\right)');
+      if(simplified!==divided)steps.push('&='+op+'\\left('+simplified+'\\right)');
+    }else if(simplified!==rawRatio){
+      steps.push('&='+op+'\\left('+simplified+'\\right)');
+    }
+    if(canceled!==simplified)steps.push('&='+op+'\\left('+canceled+'\\right)');
+    steps.push('&='+displayLimitValue(limitValue(ck,gk)));
+    return '<div class="demo-line">'+texBlock(
+      '\\displaystyle \\begin{aligned}'+steps.join('\\\\[4pt]')+'\\end{aligned}'
+    )+'</div>';
+  }
   function isUpperMode(){return MODE==='big_o' || MODE==='little_o'}
   function isLowerMode(){return MODE==='big_omega' || MODE==='little_omega'}
   function isThetaMode(){return MODE==='theta'}
@@ -374,6 +465,10 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     return Infinity;
   }
   function cRule(ck,gk){
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    if(bookAgainstCubic && MODE==='big_o')return 'c\\gt 1';
+    if(bookAgainstCubic && MODE==='big_omega')return '0\\lt c\\le 1';
+    if(bookAgainstCubic && MODE==='theta')return '0\\lt c_1\\le 1\\lt c_2';
     var k=cLowerBound(ck,gk);
     if(!isFinite(k))return MODE==='theta'?'\\text{No existen }c_1,c_2':'\\text{No existe }c';
     var upper=cUpperBound(ck,gk);
@@ -383,11 +478,13 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     return 'c\\ge '+fmt(k);
   }
   function defaultC(ck,gk){
+    if(ck==='book' && gk==='n3' && MODE==='big_o')return 1.1;
     var k=cLowerBound(ck,gk);
     if(!isFinite(k))return '';
     var upper=cUpperBound(ck,gk);
+    if(k===0)return 0.1;
     if(isFinite(upper))return upper;
-    return k===0?1:k;
+    return k;
   }
   function latexOf(key){return FNS[key].latex}
   function termLatex(term){
@@ -410,6 +507,7 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
   }
   function tex(content){return '\\('+content+'\\)'}
   function texBlock(content){return '\\['+content+'\\]'}
+  function titleTex(content){return '\\(\\boldsymbol{'+content+'}\\)'}
   function displayLimitValue(value){
     if(value==='∞')return '\\infty';
     return value;
@@ -432,6 +530,7 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     }
     input.disabled=false;
     input.min=k===0?0.1:k;
+    if(ck==='book' && gk==='n3' && MODE==='big_o')input.min=1.1;
     var upper=cUpperBound(ck,gk);
     input.max=isFinite(upper)?upper:1000;
     if(input.value==='' || (parseFloat(input.value)||0)<parseFloat(input.min)){
@@ -451,10 +550,11 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
       return {c1:1,c2:1};
     }
     c1Input.disabled=false;c2Input.disabled=false;
-    c1Input.min=0.1;c2Input.min=1;
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    c1Input.min=0.1;c2Input.min=bookAgainstCubic?1.1:1;
     c1Input.max=1;c2Input.max=1000;
-    if(c1Input.value==='' || (parseFloat(c1Input.value)||0)<=0 || (parseFloat(c1Input.value)||0)>1)c1Input.value=1;
-    if(c2Input.value==='' || (parseFloat(c2Input.value)||0)<1)c2Input.value=1;
+    if(c1Input.value==='' || (parseFloat(c1Input.value)||0)<=0 || (parseFloat(c1Input.value)||0)>1)c1Input.value=0.1;
+    if(c2Input.value==='' || (parseFloat(c2Input.value)||0)<parseFloat(c2Input.min))c2Input.value=bookAgainstCubic?1.1:1;
     return {c1:c1Val(),c2:c2Val()};
   }
   function updateConstantControls(){
@@ -472,17 +572,63 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     if(isMember(ck,gk))return '\\('+cLatex()+'\\in '+modeLatex()+'('+latexOf(gk)+')\\)';
     return '\\('+cLatex()+'\\notin '+modeLatex()+'('+latexOf(gk)+')\\)';
   }
-  function estimateN0(ck,gk,c){
-    if(!isMember(ck,gk))return null;
-    if(isUpperMode() && FNS[ck].rank===FNS[gk].rank && c<1)return null;
-    if(MODE==='big_omega' && FNS[ck].rank===FNS[gk].rank && c>1)return null;
-    if(isThetaMode() && (c.c1<=0 || c.c2<1))return null;
-    var max=1000,suffixOk=true,first=null;
-    for(var n=max;n>=2;n--){
-      suffixOk=suffixOk && satisfiesInequality(ck,gk,c,n);
-      if(suffixOk)first=n;
+  /*
+   * Desde n=16, los cocientes de todas las parejas del catálogo son
+   * monótonos en la dirección indicada por rank. Esto se obtiene de sus
+   * derivadas (polinomios, logaritmos y 2^n) y de
+   * (n+1)!/n!=n+1 para el factorial. Por tanto, una vez satisfecha la
+   * desigualdad en esa cola, no puede aparecer otro cruce posterior.
+   */
+  var VERIFIED_TAIL_START=16;
+  function tailCanSatisfy(ck,gk,c){
+    if(!isMember(ck,gk))return false;
+    if(FNS[ck].rank!==FNS[gk].rank)return true;
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    if(MODE==='big_o')return bookAgainstCubic?c>1:c>=1;
+    if(MODE==='big_omega')return c<=1;
+    if(isThetaMode())return c.c1<=1 && (bookAgainstCubic?c.c2>1:c.c2>=1);
+    return false;
+  }
+  function verifiedThreshold(predicate,tailPossible){
+    if(!tailPossible)return null;
+    var lastViolation=-1;
+    for(var n=0;n<=VERIFIED_TAIL_START;n++){
+      if(!predicate(n))lastViolation=n;
     }
-    return first;
+    if(predicate(VERIFIED_TAIL_START))return lastViolation+1;
+
+    var low=VERIFIED_TAIL_START,high=VERIFIED_TAIL_START*2;
+    while(!predicate(high)){
+      low=high;high*=2;
+    }
+    while(low+1<high){
+      var middle=Math.floor((low+high)/2);
+      if(predicate(middle))high=middle;
+      else low=middle;
+    }
+    return high;
+  }
+  function estimateN0(ck,gk,c){
+    return verifiedThreshold(
+      function(n){return satisfiesInequality(ck,gk,c,n);},
+      tailCanSatisfy(ck,gk,c)
+    );
+  }
+  function verifiedRealThreshold(predicate,integerThreshold){
+    if(integerThreshold===null)return null;
+    if(integerThreshold===0)return 0;
+    var low=integerThreshold-1,high=integerThreshold;
+    for(var i=0;i<60;i++){
+      var middle=(low+high)/2;
+      if(predicate(middle))high=middle;
+      else low=middle;
+    }
+    if(Math.abs(high-Math.round(high))<1e-10)return Math.round(high);
+    return high;
+  }
+  function thresholdNumber(value){
+    if(value===null)return null;
+    return fmtNumber(value);
   }
   function satisfiesInequality(ck,gk,c,n){
     var left=cFn(ck,n),ref=FNS[gk].fn(n);
@@ -492,19 +638,6 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     if(MODE==='little_omega')return left>c*ref;
     if(isThetaMode())return c.c1*ref<=left && left<=c.c2*ref;
     return false;
-  }
-  function estimateA(ck,gk,c){
-    var n0=estimateN0(ck,gk,c);
-    if(n0===null)return null;
-    if(n0<=2)return 2;
-    var lo=n0-1,hi=n0;
-    if(satisfiesInequality(ck,gk,c,lo))return lo;
-    for(var i=0;i<42;i++){
-      var mid=(lo+hi)/2;
-      if(satisfiesInequality(ck,gk,c,mid))hi=mid;
-      else lo=mid;
-    }
-    return hi;
   }
   function parsePowerInput(value,allowZero){
     var text=String(value).trim().replace(/\s+/g,'');
@@ -516,41 +649,128 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     return numeric;
   }
   function inequalityLatex(ck,gk,c,n0){
-    if(!isMember(ck,gk))return '\\text{No existe }c\\text{ que satisfaga la desigualdad para todo }n\\ge n_0';
     var base='';
-    if(MODE==='big_o')base='C(n)\\le c\\cdot g(n)\\quad '+cLatex()+'\\le '+fmt(c)+'\\cdot '+latexOf(gk);
-    if(MODE==='little_o')base='C(n)\\lt c\\cdot g(n)\\quad '+cLatex()+'\\lt '+fmt(c)+'\\cdot '+latexOf(gk);
-    if(MODE==='big_omega')base='C(n)\\ge c\\cdot g(n)\\quad '+cLatex()+'\\ge '+fmt(c)+'\\cdot '+latexOf(gk);
-    if(MODE==='little_omega')base='C(n)\\gt c\\cdot g(n)\\quad '+cLatex()+'\\gt '+fmt(c)+'\\cdot '+latexOf(gk);
-    if(isThetaMode())base='\\begin{aligned}c_1\\cdot g(n)&\\le C(n)\\le c_2\\cdot g(n)\\\\'+fmt(c.c1)+'\\cdot '+latexOf(gk)+'&\\le '+cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk)+'\\end{aligned}';
+    if(MODE==='big_o')base='C(n)\\le c\\cdot g(n)';
+    if(MODE==='little_o')base='C(n)\\lt c\\cdot g(n)';
+    if(MODE==='big_omega')base='C(n)\\ge c\\cdot g(n)';
+    if(MODE==='little_omega')base='C(n)\\gt c\\cdot g(n)';
+    if(isThetaMode())base='c_1\\cdot g(n)\\le C(n)\\le c_2\\cdot g(n)';
     return base;
   }
+  function substitutedInequalityLatex(ck,gk,c){
+    var base='';
+    if(MODE==='big_o')base=cLatex()+'\\le '+fmt(c)+'\\cdot '+latexOf(gk);
+    if(MODE==='little_o')base=cLatex()+'\\lt '+fmt(c)+'\\cdot '+latexOf(gk);
+    if(MODE==='big_omega')base=cLatex()+'\\ge '+fmt(c)+'\\cdot '+latexOf(gk);
+    if(MODE==='little_omega')base=cLatex()+'\\gt '+fmt(c)+'\\cdot '+latexOf(gk);
+    if(isThetaMode())base=fmt(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk);
+    return base;
+  }
+  function realThresholdSetLatex(threshold){
+    if(threshold===null)return '\\varnothing';
+    var value=thresholdNumber(threshold);
+    return '\\{n\\in\\mathbb{R}_{\\ge0}\\mid n\\ge '+value+'\\}=['+value+',\\infty)';
+  }
+  function asymptoticConditionLatex(){
+    if(MODE==='big_o')return 'C(n)\\le c\\cdot g(n)';
+    if(MODE==='little_o')return 'C(n)\\lt c\\cdot g(n)';
+    if(MODE==='big_omega')return 'C(n)\\ge c\\cdot g(n)';
+    if(MODE==='little_omega')return 'C(n)\\gt c\\cdot g(n)';
+    return 'c_1\\cdot g(n)\\le C(n)\\le c_2\\cdot g(n)';
+  }
+  function n0DefinitionLatex(){
+    return 'n_0=\\min\\left\\{\\lceil A\\rceil\\in\\mathbb{N}\\mid '+
+      '\\forall n\\ge A,\\;'+asymptoticConditionLatex()+'\\right\\}';
+  }
+  function thetaPartialSolutionsHtml(ck,gk,c){
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    var lowerPossible=isMember(ck,gk) && c.c1<=1;
+    var upperPossible=isMember(ck,gk) && (bookAgainstCubic?c.c2>1:c.c2>=1);
+    var lowerThreshold=verifiedThreshold(
+      function(n){return c.c1*FNS[gk].fn(n)<=cFn(ck,n);},
+      lowerPossible
+    );
+    var upperThreshold=verifiedThreshold(
+      function(n){return cFn(ck,n)<=c.c2*FNS[gk].fn(n);},
+      upperPossible
+    );
+    var lowerA=verifiedRealThreshold(
+      function(n){return c.c1*FNS[gk].fn(n)<=cFn(ck,n);},
+      lowerThreshold
+    );
+    var upperA=verifiedRealThreshold(
+      function(n){return cFn(ck,n)<=c.c2*FNS[gk].fn(n);},
+      upperThreshold
+    );
+    var intersectionThreshold=(lowerThreshold===null || upperThreshold===null)
+      ?null:Math.max(lowerThreshold,upperThreshold);
+    var intersectionA=(lowerA===null || upperA===null)?null:Math.max(lowerA,upperA);
+    var thetaDefinitionHtml=intersectionA===null?''
+      :'<div class="demo-title">Aplicación de la definición de '+titleTex('n_0')+':</div>'+
+       '<div class="demo-line">'+texBlock(n0DefinitionLatex())+'</div>'+
+       '<div class="demo-line">'+texBlock(
+         'n_0=\\lceil A\\rceil=\\lceil '+thresholdNumber(intersectionA)+'\\rceil='+intersectionThreshold
+       )+'</div>';
+    return '<div class="theta-solutions">'+
+      '<div class="theta-solution"><b>Desigualdad izquierda '+titleTex('c_1g(n)\\le C(n)')+':</b>'+
+        '<div class="demo-line">'+texBlock(fmt(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex())+'</div>'+
+        '<div class="demo-line">'+texBlock('S_1='+realThresholdSetLatex(lowerA))+'</div></div>'+
+      '<div class="theta-solution"><b>Desigualdad derecha '+titleTex('C(n)\\le c_2g(n)')+':</b>'+
+        '<div class="demo-line">'+texBlock(cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk))+'</div>'+
+        '<div class="demo-line">'+texBlock('S_2='+realThresholdSetLatex(upperA))+'</div></div>'+
+      '</div>'+
+      '<div class="theta-intersection"><b>Valores que cumplen ambas desigualdades '+titleTex('S_1\\cap S_2')+':</b>'+
+        '<div class="demo-line">'+texBlock('S_1\\cap S_2='+realThresholdSetLatex(intersectionA))+'</div>'+
+        thetaDefinitionHtml+'</div>';
+  }
+  function singleSolutionSetHtml(n0,aValue){
+    if(n0===null || aValue===null){
+      return '<div class="solution-set"><div class="solution-title">Conjunto solución '+titleTex('S')+':</div>'+
+        '<div class="demo-line">'+texBlock('S=\\varnothing')+'</div>'+
+        '<div class="demo-line">No existe un valor de \\(n_0\\) a partir del cual la desigualdad se cumpla siempre.</div></div>';
+    }
+    return '<div class="solution-set"><div class="solution-title">Conjunto solución '+titleTex('S')+':</div>'+
+      '<div class="demo-line">'+texBlock('S='+realThresholdSetLatex(aValue))+'</div>'+
+      '<div class="demo-title">Aplicación de la definición de '+titleTex('n_0')+':</div>'+
+      '<div class="demo-line">'+texBlock(n0DefinitionLatex())+'</div>'+
+      '<div class="demo-line">'+texBlock('n_0=\\lceil A\\rceil=\\lceil '+thresholdNumber(aValue)+'\\rceil='+n0)+'</div></div>';
+  }
   function proofHtml(ck,gk,c,n0,lim){
-    var limitLine=texBlock(limitExpressionLatex(ck,gk)+'\\quad\\therefore\\quad '+cRule(ck,gk));
-    var n0Title=isThetaMode()?'Cálculo de \\(\\mathbf{n}_0\\) para \\(\\mathbf{c}_1='+fmt(c.c1)+'\\) y \\(\\mathbf{c}_2='+fmt(c.c2)+'\\):':'Cálculo de \\(\\mathbf{n}_0\\) para \\(\\mathbf{c}='+fmt(c)+'\\):';
-    var aValue=estimateA(ck,gk,c);
-    var aDisplay=aValue===null?null:fmt(aValue);
-    var n0FromA=aValue===null?null:Math.ceil(aValue);
+    var limitProcedure=limitProcedureHtml(ck,gk);
+    var thereforeBlock='<div class="demo-title">Por lo tanto:</div>'+
+      '<div class="demo-line">'+texBlock('\\displaystyle '+cRule(ck,gk))+'</div>';
+    var n0Title=isThetaMode()
+      ?'Cálculo verificado de '+titleTex('n_0')+' para '+titleTex('c_1='+fmt(c.c1))+' y '+titleTex('c_2='+fmt(c.c2))+':'
+      :'Cálculo verificado de '+titleTex('n_0')+' para '+titleTex('c='+fmt(c))+':';
     var inequalityLine=texBlock('\\displaystyle '+inequalityLatex(ck,gk,c,n0));
-    if(aValue===null){
+    var substitutedInequalityLine=texBlock('\\displaystyle '+substitutedInequalityLatex(ck,gk,c));
+    var aValue=verifiedRealThreshold(
+      function(n){return satisfiesInequality(ck,gk,c,n);},
+      n0
+    );
+    var partialSolutions=isThetaMode()?thetaPartialSolutionsHtml(ck,gk,c):'';
+    var singleSolution=isThetaMode()?'':singleSolutionSetHtml(n0,aValue);
+    if(n0===null){
       return '<div class="demo-title">Demostración por límite:</div>'+
-        '<div class="demo-line">'+limitLine+'</div>'+
+        limitProcedure+
+        thereforeBlock+
         '<div class="demo-sep"></div>'+
         '<div class="demo-title">'+n0Title+'</div>'+
         '<div class="demo-line">'+inequalityLine+'</div>'+
-        '<div class="demo-line">'+texBlock('\\displaystyle A\\text{ no existe para este }c\\quad\\Rightarrow\\quad n_0\\text{ no existe}')+'</div>';
+        '<div class="demo-line">'+substitutedInequalityLine+'</div>'+
+        partialSolutions+
+        singleSolution+
+        '<div class="demo-line">'+texBlock('\\displaystyle n_0\\text{ no existe para las constantes seleccionadas}')+'</div>';
     }
-    var aLine=texBlock('\\displaystyle n\\ge '+aDisplay);
-    var thresholdLine=texBlock('\\displaystyle A='+aDisplay);
-    var n0Line=texBlock('\\displaystyle n_0=\\lceil A\\rceil=\\lceil '+aDisplay+'\\rceil='+n0FromA);
     return '<div class="demo-title">Demostración por límite:</div>'+
-      '<div class="demo-line">'+limitLine+'</div>'+
+      limitProcedure+
+      thereforeBlock+
       '<div class="demo-sep"></div>'+
       '<div class="demo-title">'+n0Title+'</div>'+
       '<div class="demo-line">'+inequalityLine+'</div>'+
-      '<div class="demo-line">'+aLine+'</div>'+
-      '<div class="demo-line">'+thresholdLine+'</div>'+
-      '<div class="demo-line">'+n0Line+'</div>';
+      '<div class="demo-line">'+substitutedInequalityLine+'</div>'+
+      partialSolutions+
+      singleSolution;
   }
   function readingText(ck,gk,n0,lim){
     if(!isMember(ck,gk))return 'La función seleccionada no satisface la relación asintótica de esta notación con la referencia actual.';
@@ -697,7 +917,7 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
   }
   function drawAxes(a,b,yrange){
     ctx.save();
-    ctx.strokeStyle='#b8b8b8';ctx.lineWidth=0.7;ctx.setLineDash([4,4]);
+    ctx.strokeStyle='#dddddd';ctx.lineWidth=0.7;ctx.setLineDash([]);
     ctx.fillStyle='#333';ctx.font='14px sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
     var xScale=isLogScale()?{scale:1,label:''}:axisScale(b);
     var xt=isLogScale()?logXTicks(a,b):niceTicks(0,b,5);
@@ -770,6 +990,7 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
   }
   function drawN0(n0,a,b,ck,yrange){
     if(n0===null || n0<a || n0>b)return;
+    if(isLogScale() && n0===0)return;
     var x=tx(n0,a,b), y=ty(cFn(ck,n0),yrange);
     ctx.save();
     ctx.strokeStyle=n0Color();ctx.fillStyle=n0Color();ctx.lineWidth=2;ctx.setLineDash([3,4]);
@@ -819,7 +1040,11 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     el('bo-c-rule').innerHTML=tex(cRule(ck,gk));
     el('bo-status').className='val '+cls;
     el('bo-status').innerHTML=membershipText(ck,gk);
-    el('bo-reading').innerHTML=readingText(ck,gk,n0,lim);
+    var reading=readingText(ck,gk,n0,lim);
+    if(isLogScale() && n0===0){
+      reading+=' El valor n₀ = 0 no se muestra en la gráfica porque log(0) no está definido.';
+    }
+    el('bo-reading').innerHTML=reading;
     el('bo-axis-y').innerHTML=tex(modeLatex()+'(g(n))');
     el('bo-cfn').innerHTML=tex(cLatex());
     el('bo-gfn').innerHTML=tex(latexOf(gk));
@@ -831,7 +1056,11 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     el('bo-leg-low-wrap').style.color=c1gColor();
     el('bo-leg-low').innerHTML=tex('c_1\\cdot g(n)='+fmt(c.c1)+'\\cdot '+latexOf(gk));
     el('bo-leg-n0').parentElement.style.color=n0Color();
-    el('bo-leg-n0').innerHTML=n0===null?tex('n_0\\text{ no existe}') : tex('n_0='+n0);
+    el('bo-leg-n0').innerHTML=n0===null
+      ?tex('n_0\\text{ no existe}')
+      :(isLogScale() && n0===0
+        ?tex('n_0=0\\;\\text{(no visible porque }\\log(0)\\text{ no está definido)}')
+        :tex('n_0='+n0));
     el('bo-quotient').innerHTML=proofHtml(ck,gk,c,n0,lim);
     renderLimits(ck,gk);
     typeset();
@@ -866,7 +1095,7 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     }
     var dc=defaultC(cKey(),gKey());
     el('bo-c').value=dc;
-    if(isThetaMode()){el('bo-c1').value=1;el('bo-c2').value=1;}
+    if(isThetaMode()){el('bo-c1').value=0.1;el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;}
     updateConstantControls();
     draw();
   }
@@ -1034,8 +1263,8 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
   regenerateLowerTerms();
   updateConstantControls();
   el('bo-c').value=defaultC(cKey(),gKey());
-  el('bo-c1').value=1;
-  el('bo-c2').value=1;
+  el('bo-c1').value=0.1;
+  el('bo-c2').value=1.1;
   syncInputs(STATE_A,STATE_B);
   draw();
 })();
