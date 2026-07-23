@@ -621,7 +621,6 @@ Las simulaciones del capítulo comparten una misma estructura para que puedas co
 | $a$ y $b$ | Intervalo visible de la gráfica. |
 | $c$ | Constante usada en $O$, $o$, $\Omega$ y $\omega$. |
 | $c_1$ y $c_2$ | Constantes usadas en $\Theta$. |
-| Términos menores | Agrega términos de menor orden a $C(n)$ para observar cómo desaparecen en el límite. |
 | Escala | Permite alternar entre escala lineal y logarítmica. |
 
 Además, puedes mover el intervalo directamente sobre la gráfica. Esto ayuda a ver que muchas desigualdades no tienen que cumplirse desde $n=0$, sino desde algún punto $n_0$.

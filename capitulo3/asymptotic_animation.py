@@ -35,22 +35,29 @@ _BIG_O_HTML = r"""
 #bo-wrap{background:#ffffff;font-family:sans-serif;padding:14px 4px;color:#333}
 #bo-wrap .plot-wrap{position:relative;width:100%;height:380px}
 #bo-wrap canvas{display:block;width:100%;height:380px;background:#ffffff;border:1px solid #e0e0e0;touch-action:none;cursor:grab}
+#bo-wrap .zoom-controls{position:absolute;top:10px;right:10px;z-index:2;display:flex;gap:4px}
+#bo-wrap .zoom-btn{width:34px;height:32px;border:1px solid #bbb;border-radius:3px;background:rgba(255,255,255,.94);color:#333;cursor:pointer;font-size:20px;line-height:1}
+#bo-wrap .zoom-btn:hover{background:#f1f1f1}
+#bo-wrap .zoom-btn.active{background:#e3f2fd;border-color:#1976D2;color:#0D47A1}
+#bo-wrap .zoom-selection{position:absolute;display:none;z-index:1;border:1px dashed #1565C0;background:rgba(21,101,192,.12);pointer-events:none}
 #bo-wrap .axis-label{position:absolute;pointer-events:none;font-size:14px;color:#333}
 #bo-wrap .axis-x{left:82px;right:32px;bottom:8px;text-align:center}
 #bo-wrap .axis-y{left:-24px;top:50%;width:120px;text-align:center;transform:translateY(-50%) rotate(-90deg);transform-origin:center}
 #bo-wrap .controls-grid{display:grid;grid-template-columns:max-content max-content max-content;column-gap:36px;row-gap:12px;margin-bottom:12px;align-items:start}
 #bo-wrap .control-section{display:grid;grid-template-columns:max-content;grid-template-rows:auto auto;row-gap:8px}
+#bo-wrap .control-section>.row-title{margin-bottom:4px}
 #bo-wrap .ctrl{display:flex;gap:28px;flex-wrap:wrap;margin:0 0 12px 4px;align-items:center;font-size:13px;color:#333}
 #bo-wrap .ctrl.vertical{flex-direction:column;align-items:flex-start;gap:8px}
-#bo-wrap .ctrl.additional .label-text{width:124px;min-width:124px;justify-content:center;text-align:center}
 #bo-wrap .controls-grid .ctrl{margin-bottom:0}
 #bo-wrap .ctrl label{display:flex;align-items:center;gap:8px;font-weight:600;min-height:32px}
-#bo-wrap .ctrl .label-text{display:inline-flex;align-items:center;justify-content:flex-end;width:52px;min-width:52px}
+#bo-wrap .ctrl .label-text{display:inline-flex;align-items:center;justify-content:flex-end;width:48px;min-width:48px}
 #bo-wrap .theta-c{display:none}
 #bo-wrap .row-title{font-weight:700;color:#333;line-height:1.1}
 #bo-wrap select,#bo-wrap input[type=number],#bo-wrap input[type=text]{width:112px;height:32px;box-sizing:border-box;padding:2px 4px;border:1px solid #ccc;border-radius:3px;font-size:13px;text-align:center}
 #bo-wrap .stepper{display:inline-grid;grid-template-columns:34px 112px 34px;gap:4px;align-items:center}
 #bo-wrap .stepper-field{display:flex;align-items:center;justify-content:center;width:112px;height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:3px;background:#fff;text-align:center;font-size:14px}
+#bo-wrap .function-stepper{grid-template-columns:34px 176px 34px}
+#bo-wrap .function-stepper .stepper-field{width:176px;white-space:nowrap}
 #bo-wrap .editable-field{outline:none;cursor:text;font-weight:400}
 #bo-wrap .editable-field:focus{border-color:#1976D2;box-shadow:0 0 0 1px #1976D2}
 #bo-wrap .stepper input{width:112px}
@@ -80,9 +87,6 @@ _BIG_O_HTML = r"""
 #bo-wrap .legend{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:8px;font-size:14px;color:#333}
 #bo-wrap .legend .sw{display:inline-block;width:22px;height:0;border-top:3px solid currentColor;vertical-align:middle;margin-right:6px}
 #bo-wrap .note{margin:8px auto 0;max-width:980px;text-align:center;font-size:13px;color:#555}
-#bo-wrap .actions{display:flex;gap:8px;align-items:center}
-#bo-wrap .action-btn{height:32px;border:1px solid #ccc;border-radius:3px;background:#f7f7f7;color:#333;cursor:pointer;padding:0 12px;font-size:13px}
-#bo-wrap .action-btn:hover{background:#eeeeee}
 @media(max-width:900px){#bo-wrap .cards{grid-template-columns:repeat(2,1fr)}}
 </style>
 
@@ -90,9 +94,11 @@ _BIG_O_HTML = r"""
   <div class="instructions">
     <div class="row-title">Instrucciones:</div>
     <ul>
-      <li>Usa los controles para seleccionar \(C(n)\), \(g(n)\), el intervalo visible, las constantes, los términos menores y la escala.</li>
+      <li>Usa los controles para seleccionar \(C(n)\), \(g(n)\), el intervalo visible, las constantes y la escala.</li>
       <li>Puedes escribir valores para \(a\) y \(b\), incluyendo valores como \(10^{20}\), \(1\) o \(15.5\).</li>
-      <li>Arrastra cerca del borde izquierdo o derecho de la gráfica para mover \(a\) o \(b\); arrastra el interior para desplazar el intervalo.</li>
+      <li>Arrastra cerca del borde izquierdo o derecho de la gráfica para mover \(a\) o \(b\); arrastra el interior para desplazar la vista en los ejes \(x\) y \(y\).</li>
+      <li>Usa la rueda del mouse, el trackpad o los botones − y + de la gráfica para reducir o ampliar la vista.</li>
+      <li>Activa Seleccionar área y arrastra un rectángulo sobre la gráfica para ampliar una región específica.</li>
     </ul>
   </div>
   <div class="controls-grid">
@@ -100,7 +106,7 @@ _BIG_O_HTML = r"""
     <div class="row-title">Funciones de referencia:</div>
     <div class="ctrl">
     <label><span class="label-text">\(C(n)\)</span>
-      <span class="stepper">
+      <span class="stepper function-stepper">
         <button type="button" id="bo-cfn-dec">◀</button>
         <span class="stepper-field" id="bo-cfn">—</span>
         <button type="button" id="bo-cfn-inc">▶</button>
@@ -109,7 +115,7 @@ _BIG_O_HTML = r"""
     </div>
     <div class="ctrl">
     <label><span class="label-text">\(g(n)\)</span>
-      <span class="stepper">
+      <span class="stepper function-stepper">
         <button type="button" id="bo-gfn-dec">◀</button>
         <span class="stepper-field" id="bo-gfn">—</span>
         <button type="button" id="bo-gfn-inc">▶</button>
@@ -139,7 +145,6 @@ _BIG_O_HTML = r"""
   <div class="control-section">
     <div class="row-title">Parámetros adicionales:</div>
     <div class="ctrl vertical additional">
-    <label><span class="label-text">\(\text{Términos menores}\)</span><input type="number" id="bo-lower" min="0" max="4" value="0" step="1"></label>
     <label class="single-c"><span class="label-text">\(c\)</span><input type="number" id="bo-c" min="0.1" max="1000" value="1" step="0.1"></label>
     <label class="theta-c"><span class="label-text">\(c_1\)</span><input type="number" id="bo-c1" min="0.1" max="1000" value="1" step="0.1"></label>
     <label class="theta-c"><span class="label-text">\(c_2\)</span><input type="number" id="bo-c2" min="0.1" max="1000" value="1" step="0.1"></label>
@@ -149,11 +154,17 @@ _BIG_O_HTML = r"""
         <option value="log">Logarítmica</option>
       </select>
     </label>
-    <div class="actions"><span class="label-text"></span><button type="button" class="action-btn" id="bo-reset">Restablecer</button></div>
     </div>
   </div>
   </div>
   <div class="plot-wrap">
+    <div class="zoom-controls" aria-label="Controles de zoom">
+      <button type="button" class="zoom-btn" id="bo-zoom-out" title="Reducir la gráfica" aria-label="Reducir la gráfica">−</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-in" title="Ampliar la gráfica" aria-label="Ampliar la gráfica">+</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-select" title="Seleccionar un área" aria-label="Seleccionar un área">□</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-reset" title="Restablecer el zoom" aria-label="Restablecer el zoom">↺</button>
+    </div>
+    <div class="zoom-selection" id="bo-zoom-selection"></div>
     <canvas id="bo-cv"></canvas>
     <div class="axis-label axis-x">\(\text{Tamaño de la entrada }(n)\)</div>
     <div class="axis-label axis-y" id="bo-axis-y">—</div>
@@ -186,7 +197,7 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
   var MODE='__MODE__';
   var root=document.getElementById('bo-wrap');
   var cv=document.getElementById('bo-cv'),ctx=cv.getContext('2d');
-  var W=0,H=0,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null;
+  var W=0,H=0,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,selectionMode=false,selectionStart=null;
   var FNS={
     one:{label:'1',latex:'1',rank:0,fn:function(n){return 1;}},
     log:{label:'log₂(n)',latex:'\\log_2(n)',rank:1,fn:function(n){return n<=1?0:Math.log2(n);}},
@@ -199,10 +210,11 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     fact:{label:'n!',latex:'n!',rank:7,fn:function(n){var r=1,m=Math.min(Math.floor(n),170);for(var i=2;i<=m;i++)r*=i;return r;}}
   };
   var ORDER=['one','log','n','nlog','n2','n3','exp','fact'];
-  var C_ORDER=['one','log','n','nlog','n2','n3','book','exp','fact'];
+  var C_ORDER=['book','one','log','n','nlog','n2','n3','exp','fact'];
   var LOWER_TERMS=[];
   var MAX_B=100000000000000000000;
-  var STATE_A=0,STATE_B=MAX_B,STATE_C_INDEX=4,STATE_G_INDEX=4;
+  var MIN_SPAN=0.000001;
+  var STATE_A=0,STATE_B=MAX_B,STATE_C_INDEX=0,STATE_G_INDEX=ORDER.indexOf('n3');
   function el(id){return document.getElementById(id);}
   function cKey(){return C_ORDER[STATE_C_INDEX]}
   function gKey(){return ORDER[STATE_G_INDEX]}
@@ -212,7 +224,6 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
   function upperFactor(c){return isThetaMode()?c.c2:c}
   function lowerFactor(c){return isThetaMode()?c.c1:c}
   function scaleMode(){return el('bo-scale').value}
-  function lowerCount(){return Math.max(0,Math.min(4,parseInt(el('bo-lower').value,10)||0))}
   function isLogScale(){return scaleMode()==='log'}
   function decadeValue(exp){return Math.pow(10,Math.max(0,Math.round(exp)))}
   function nearestDecade(value,allowZero){
@@ -393,31 +404,8 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     LOWER_TERMS.forEach(function(term){total+=term.coef*FNS[term.key].fn(n);});
     return total;
   }
-  function randomInt(min,max){return min+Math.floor(Math.random()*(max-min+1))}
-  function syncLowerControl(){
-    var input=el('bo-lower');
-    if(cKey()==='book'){
-      input.value=0;
-      input.disabled=true;
-      return;
-    }
-    var available=ORDER.filter(function(key){return FNS[key].rank<FNS[cKey()].rank;}).length;
-    input.max=Math.min(4,available);
-    input.disabled=available===0;
-    if(available===0)input.value=0;
-    if(lowerCount()>available)input.value=available;
-  }
   function regenerateLowerTerms(){
-    syncLowerControl();
     LOWER_TERMS=[];
-    var candidates=ORDER.filter(function(key){return FNS[key].rank<FNS[cKey()].rank;});
-    var count=Math.min(lowerCount(),candidates.length);
-    for(var i=0;i<count;i++){
-      var index=randomInt(0,candidates.length-1);
-      var key=candidates.splice(index,1)[0];
-      LOWER_TERMS.push({key:key,coef:randomInt(1,5)});
-    }
-    LOWER_TERMS.sort(function(a,b){return FNS[b.key].rank-FNS[a.key].rank;});
   }
   function tex(content){return '\\('+content+'\\)'}
   function texBlock(content){return '\\['+content+'\\]'}
@@ -584,9 +572,9 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
   }
   function syncInputs(a,b){
     a=Math.max(0,Math.min(MAX_B-1,a));
-    b=Math.max(1,Math.min(MAX_B,b));
-    if(b<=a)b=a===0?1:Math.min(MAX_B,a*10);
-    if(b<=a){a=0;b=1;}
+    b=Math.max(MIN_SPAN,Math.min(MAX_B,b));
+    if(b-a<MIN_SPAN)b=Math.min(MAX_B,a+MIN_SPAN);
+    if(b-a<MIN_SPAN)a=Math.max(0,b-MIN_SPAN);
     STATE_A=a;STATE_B=b;
     setEditableField('bo-a',a);
     setEditableField('bo-b',b);
@@ -655,12 +643,16 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     return {min:min,max:max};
   }
   function ty(y,yrange){
+    var base;
     if(scaleMode()==='log'){
       if(!(y>0))return null;
       var lo=yTransform(yrange.min),hi=yTransform(yrange.max);
-      return H-PAD.b-(yTransform(y)-lo)/(hi-lo)*(H-PAD.t-PAD.b);
+      base=H-PAD.b-(yTransform(y)-lo)/(hi-lo)*(H-PAD.t-PAD.b);
+    }else{
+      base=H-PAD.b-y/yrange.max*(H-PAD.t-PAD.b);
     }
-    return H-PAD.b-y/yrange.max*(H-PAD.t-PAD.b);
+    var center=(PAD.t+H-PAD.b)/2;
+    return center+(base-center)*Y_SCALE+Y_OFFSET;
   }
   function fx(px,a,b){
     var ratio=(px-PAD.l)/(W-PAD.l-PAD.r);
@@ -882,47 +874,80 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     }
     draw();
   }
-  function setFunctionPair(ck,gk){
-    STATE_C_INDEX=C_ORDER.indexOf(ck);
-    STATE_G_INDEX=ORDER.indexOf(gk);
-  }
   function resetInterval(){
     syncInputs(0,MAX_B);
   }
-  function resetToBookExample(){
-    el('bo-lower').value=0;
-    resetInterval();
-    setFunctionPair('book','n3');
-    regenerateLowerTerms();
-    var dc=defaultC(cKey(),gKey());
-    el('bo-c').value=dc;
-    if(isThetaMode()){
-      el('bo-c1').value=0.5;
-      el('bo-c2').value=2;
-    }
-    updateConstantControls();
+  function zoomCenter(a,b){
+    if(isLogScale())return Math.sqrt(Math.max(1,a)*Math.max(1,b));
+    return a+(b-a)/2;
+  }
+  function zoomAt(focus,factor){
+    var ab=interval(),a=ab[0],b=ab[1],span=b-a;
+    focus=Math.max(a,Math.min(b,focus));
+    var nextSpan=Math.max(MIN_SPAN,Math.min(MAX_B,span*factor));
+    var ratio=span>0?(focus-a)/span:0.5;
+    var nextA=focus-nextSpan*ratio,nextB=nextA+nextSpan;
+    if(nextA<0){nextB-=nextA;nextA=0;}
+    if(nextB>MAX_B){nextA-=nextB-MAX_B;nextB=MAX_B;}
+    syncInputs(Math.max(0,nextA),Math.min(MAX_B,nextB));
     draw();
   }
-  function resetAll(){
-    el('bo-scale').value='linear';
-    resetToBookExample();
+  function resetZoom(){
+    resetInterval();
+    Y_OFFSET=0;Y_SCALE=1;
+    draw();
+  }
+  function clampPlotPoint(p){
+    return {x:Math.max(PAD.l,Math.min(W-PAD.r,p.x)),y:Math.max(PAD.t,Math.min(H-PAD.b,p.y))};
+  }
+  function showSelection(start,current){
+    var box=el('bo-zoom-selection');
+    var left=Math.min(start.x,current.x),top=Math.min(start.y,current.y);
+    box.style.display='block';box.style.left=left+'px';box.style.top=top+'px';
+    box.style.width=Math.abs(current.x-start.x)+'px';box.style.height=Math.abs(current.y-start.y)+'px';
+  }
+  function cancelSelection(){
+    selectionStart=null;el('bo-zoom-selection').style.display='none';
+  }
+  function finishSelection(current){
+    if(!selectionStart)return;
+    current=clampPlotPoint(current);
+    var start=selectionStart,x1=Math.min(start.x,current.x),x2=Math.max(start.x,current.x);
+    var y1=Math.min(start.y,current.y),y2=Math.max(start.y,current.y);
+    cancelSelection();
+    if(x2-x1<8 || y2-y1<8)return;
+    var ab=interval(),a=ab[0],b=ab[1];
+    var nextA=Math.max(a,Math.min(b,fx(x1,a,b))),nextB=Math.max(a,Math.min(b,fx(x2,a,b)));
+    if(nextB-nextA>=MIN_SPAN)syncInputs(nextA,nextB);
+    var plotHeight=H-PAD.t-PAD.b,scaleFactor=plotHeight/(y2-y1),center=(PAD.t+H-PAD.b)/2;
+    Y_SCALE*=scaleFactor;
+    Y_OFFSET=scaleFactor*center+scaleFactor*Y_OFFSET+PAD.t-scaleFactor*y1-center;
+    selectionMode=false;el('bo-zoom-select').classList.remove('active');cv.style.cursor='grab';
+    draw();
   }
   cv.addEventListener('mousedown',function(ev){
     var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1];
+    if(selectionMode){selectionStart=clampPlotPoint(p);showSelection(selectionStart,selectionStart);return;}
     var da=Math.abs(p.x-tx(a,a,b)),db=Math.abs(p.x-tx(b,a,b));
     drag=da<18?'a':(db<18?'b':'pan');
-    panStart={x:p.x,a:a,b:b};
+    panStart={x:p.x,y:p.y,a:a,b:b,yOffset:Y_OFFSET};
     cv.style.cursor=drag==='pan'?'grabbing':'ew-resize';
   });
   cv.addEventListener('dblclick',function(){
-    resetInterval();
-    draw();
+    resetZoom();
   });
+  cv.addEventListener('wheel',function(ev){
+    ev.preventDefault();
+    var p=pointer(ev),ab=interval();
+    var factor=Math.max(0.5,Math.min(2,Math.exp(ev.deltaY*0.002)));
+    zoomAt(fx(p.x,ab[0],ab[1]),factor);
+  },{passive:false});
   cv.addEventListener('mousemove',function(ev){
+    if(selectionStart){showSelection(selectionStart,clampPlotPoint(pointer(ev)));return;}
     if(!drag)return;
     var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1],x=fx(p.x,a,b);
-    if(drag==='a')syncInputs(Math.min(Math.max(0,x),b-1),b);
-    if(drag==='b')syncInputs(a,Math.max(x,a+1));
+    if(drag==='a')syncInputs(Math.min(Math.max(0,x),b-MIN_SPAN),b);
+    if(drag==='b')syncInputs(a,Math.max(x,a+MIN_SPAN));
     if(drag==='pan' && panStart){
       var span=panStart.b-panStart.a;
       var delta=fx(panStart.x,a,b)-fx(p.x,a,b);
@@ -930,25 +955,59 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
       if(na<0){na=0;nb=na+span;}
       if(nb>MAX_B){nb=MAX_B;na=Math.max(0,nb-span);}
       syncInputs(na,nb);
+      Y_OFFSET=panStart.yOffset+(p.y-panStart.y);
     }
     draw();
   });
-  window.addEventListener('mouseup',function(){drag=null;panStart=null;cv.style.cursor='grab';});
-  cv.addEventListener('touchstart',function(ev){ev.preventDefault();var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1];var da=Math.abs(p.x-tx(a,a,b)),db=Math.abs(p.x-tx(b,a,b));drag=da<24?'a':(db<24?'b':'pan');panStart={x:p.x,a:a,b:b};});
-  cv.addEventListener('touchmove',function(ev){if(!drag)return;ev.preventDefault();var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1],x=fx(p.x,a,b);if(drag==='a')syncInputs(Math.min(Math.max(0,x),b-1),b);if(drag==='b')syncInputs(a,Math.max(x,a+1));if(drag==='pan'&&panStart){var span=panStart.b-panStart.a;var delta=fx(panStart.x,a,b)-fx(p.x,a,b);var na=panStart.a+delta,nb=panStart.b+delta;if(na<0){na=0;nb=na+span;}if(nb>MAX_B){nb=MAX_B;na=Math.max(0,nb-span);}syncInputs(na,nb);}draw();});
-  window.addEventListener('touchend',function(){drag=null;panStart=null;});
-  ['bo-lower','bo-c','bo-c1','bo-c2','bo-scale'].forEach(function(id){
+  window.addEventListener('mouseup',function(ev){
+    if(selectionStart){var r=cv.getBoundingClientRect();finishSelection({x:ev.clientX-r.left,y:ev.clientY-r.top});}
+    drag=null;panStart=null;if(!selectionMode)cv.style.cursor='grab';
+  });
+  function touchDistance(ev){
+    var dx=ev.touches[1].clientX-ev.touches[0].clientX;
+    var dy=ev.touches[1].clientY-ev.touches[0].clientY;
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+  function touchCenterX(ev){
+    var r=cv.getBoundingClientRect();
+    return (ev.touches[0].clientX+ev.touches[1].clientX)/2-r.left;
+  }
+  cv.addEventListener('touchstart',function(ev){
+    ev.preventDefault();
+    if(ev.touches.length>=2){pinchDistance=touchDistance(ev);drag=null;panStart=null;return;}
+    var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1];
+    var da=Math.abs(p.x-tx(a,a,b)),db=Math.abs(p.x-tx(b,a,b));
+    drag=da<24?'a':(db<24?'b':'pan');panStart={x:p.x,y:p.y,a:a,b:b,yOffset:Y_OFFSET};
+  });
+  cv.addEventListener('touchmove',function(ev){
+    ev.preventDefault();
+    if(ev.touches.length>=2){
+      var distance=touchDistance(ev),ab=interval();
+      if(pinchDistance)zoomAt(fx(touchCenterX(ev),ab[0],ab[1]),pinchDistance/distance);
+      pinchDistance=distance;return;
+    }
+    if(!drag)return;
+    var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1],x=fx(p.x,a,b);
+    if(drag==='a')syncInputs(Math.min(Math.max(0,x),b-MIN_SPAN),b);
+    if(drag==='b')syncInputs(a,Math.max(x,a+MIN_SPAN));
+    if(drag==='pan'&&panStart){var span=panStart.b-panStart.a;var delta=fx(panStart.x,a,b)-fx(p.x,a,b);var na=panStart.a+delta,nb=panStart.b+delta;if(na<0){na=0;nb=na+span;}if(nb>MAX_B){nb=MAX_B;na=Math.max(0,nb-span);}syncInputs(na,nb);Y_OFFSET=panStart.yOffset+(p.y-panStart.y);}
+    draw();
+  });
+  window.addEventListener('touchend',function(){drag=null;panStart=null;pinchDistance=null;});
+  cv.addEventListener('gesturestart',function(ev){ev.preventDefault();gestureScale=ev.scale||1;},{passive:false});
+  cv.addEventListener('gesturechange',function(ev){ev.preventDefault();var ab=interval(),scale=ev.scale||gestureScale;zoomAt(zoomCenter(ab[0],ab[1]),gestureScale/scale);gestureScale=scale;},{passive:false});
+  el('bo-zoom-in').addEventListener('click',function(){var ab=interval();zoomAt(zoomCenter(ab[0],ab[1]),0.75);});
+  el('bo-zoom-out').addEventListener('click',function(){var ab=interval();zoomAt(zoomCenter(ab[0],ab[1]),4/3);});
+  el('bo-zoom-select').addEventListener('click',function(){
+    selectionMode=!selectionMode;cancelSelection();
+    this.classList.toggle('active',selectionMode);cv.style.cursor=selectionMode?'crosshair':'grab';
+  });
+  el('bo-zoom-reset').addEventListener('click',function(){selectionMode=false;cancelSelection();el('bo-zoom-select').classList.remove('active');cv.style.cursor='grab';resetZoom();});
+  ['bo-c','bo-c1','bo-c2','bo-scale'].forEach(function(id){
     el(id).addEventListener('input',function(){
-      if(id==='bo-lower'){
-        regenerateLowerTerms();
-        var dc=defaultC(cKey(),gKey());
-        el('bo-c').value=dc;
-        if(isThetaMode()){el('bo-c1').value=1;el('bo-c2').value=1;}
-      }
       draw();
     });
   });
-  el('bo-reset').addEventListener('click',resetAll);
   ['bo-a','bo-b'].forEach(function(id){
     el(id).addEventListener('focus',function(){beginEditableField(id);});
     el(id).addEventListener('input',function(){sanitizeEditableField(id);});
