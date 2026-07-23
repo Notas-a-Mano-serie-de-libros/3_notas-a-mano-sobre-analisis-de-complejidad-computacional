@@ -206,10 +206,11 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     n2:{label:'n²',latex:'n^2',rank:4,fn:function(n){return n*n;}},
     n3:{label:'n³',latex:'n^3',rank:5,fn:function(n){return n*n*n;}},
     book:{label:'n³+2n²+n+5',latex:'n^3+2n^2+n+5',rank:5,fn:function(n){return n*n*n+2*n*n+n+5;}},
-    exp:{label:'2ⁿ',latex:'2^n',rank:6,fn:function(n){return n>1023?Infinity:Math.pow(2,n);}},
-    fact:{label:'n!',latex:'n!',rank:7,fn:function(n){var r=1,m=Math.min(Math.floor(n),170);for(var i=2;i<=m;i++)r*=i;return r;}}
+    n4:{label:'n⁴',latex:'n^4',rank:6,fn:function(n){return n*n*n*n;}},
+    exp:{label:'2ⁿ',latex:'2^n',rank:7,fn:function(n){return n>1023?Infinity:Math.pow(2,n);}},
+    fact:{label:'n!',latex:'n!',rank:8,fn:function(n){var r=1,m=Math.min(Math.floor(n),170);for(var i=2;i<=m;i++)r*=i;return r;}}
   };
-  var ORDER=['one','log','n','nlog','n2','n3','exp','fact'];
+  var ORDER=['one','log','n','nlog','n2','n3','n4','exp','fact'];
   var C_ORDER=['book','one','log','n','nlog','n2','n3','exp','fact'];
   var LOWER_TERMS=[];
   var MAX_B=100000000000000000000;
@@ -714,7 +715,7 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     var yt=isLogScale()?logTicks(yrange.min,yrange.max):niceTicks(0,yrange.max,5);
     for(var j=0;j<yt.length;j++){
       var y=ty(yt[j],yrange);
-      if(y===null)continue;
+      if(y===null || y<PAD.t || y>H-PAD.b)continue;
       ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(W-PAD.r,y);ctx.stroke();
       if(isLogScale())drawPowerOfTenLabel(PAD.l-8,y,'right','middle',Math.round(Math.log10(yt[j])));
       else ctx.fillText(fmtScaledAxis(yt[j],yScale.scale),PAD.l-8,y);
@@ -793,6 +794,10 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
     var n0=estimateN0(ck,gk,c),lim=limitValue(ck,gk);
     ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
     drawAxes(a,b,yrange);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(PAD.l,PAD.t,W-PAD.l-PAD.r,H-PAD.t-PAD.b);
+    ctx.clip();
     drawValidArea(data,a,b,yrange,n0);
     drawLine(data.xs,data.c,a,b,yrange,cColor(),2.4);
     drawLine(data.xs,data.cg,a,b,yrange,cgColor(),2.4);
@@ -800,6 +805,7 @@ window.MathJax = window.MathJax || {tex:{inlineMath:[['\\(','\\)'],['$$','$$']],
       drawLine(data.xs,data.c1g,a,b,yrange,c1gColor(),2.0);
     }
     drawN0(n0,a,b,ck,yrange);
+    ctx.restore();
     drawEndpointMarker(a,a,b,'a');
     drawEndpointMarker(b,a,b,'b');
     updateText(a,b,ck,gk,c);
