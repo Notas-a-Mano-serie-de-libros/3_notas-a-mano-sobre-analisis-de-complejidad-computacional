@@ -11,7 +11,8 @@ def _run_app(mode: str, allow_mode_selection: bool = False):
         _BIG_O_HTML
         .replace("__MODE__", mode)
         .replace("__MODE_SELECTABLE__", str(allow_mode_selection).lower())
-        .replace("__MODE_SELECTOR_DISPLAY__", "grid" if allow_mode_selection else "none")
+        .replace("__MODE_SELECTOR_DISPLAY__", "grid")
+        .replace("__MODE_SELECTOR_DISABLED__", "" if allow_mode_selection else "disabled")
         .replace("bo-", instance_prefix)
     )
     display(HTML(html))
@@ -22,23 +23,23 @@ def run_comparison_app():
 
 
 def run_big_o_app():
-    _run_app("big_o", allow_mode_selection=True)
+    _run_app("big_o")
 
 
 def run_little_o_app():
-    _run_app("little_o", allow_mode_selection=True)
+    _run_app("little_o")
 
 
 def run_big_omega_app():
-    _run_app("big_omega", allow_mode_selection=True)
+    _run_app("big_omega")
 
 
 def run_little_omega_app():
-    _run_app("little_omega", allow_mode_selection=True)
+    _run_app("little_omega")
 
 
 def run_theta_app():
-    _run_app("theta", allow_mode_selection=True)
+    _run_app("theta")
 
 
 run_app = run_big_o_app
@@ -97,7 +98,8 @@ _BIG_O_HTML = r"""
 #bo-wrap th,#bo-wrap td{padding:7px 14px!important;white-space:nowrap!important;border:0!important;border-bottom:1px solid #d0d0d0!important;color:#333!important;background:#fff!important;text-align:center!important;vertical-align:middle!important}
 #bo-wrap th{font-weight:700!important}
 #bo-wrap thead tr{border-bottom:1px solid #9E9E9E}
-#bo-wrap tr.active td{background:#f5f5f5!important;border-top:1px solid #9E9E9E!important;border-bottom:1px solid #9E9E9E!important}
+#bo-wrap tbody tr.member td{background:#E8F5E9!important}
+#bo-wrap tbody tr.nonmember td{background:#FFEBEE!important}
 #bo-wrap .ok{color:#2E7D32;font-weight:700}
 #bo-wrap .bad{color:#B71C1C;font-weight:700}
 #bo-wrap .loose{color:#E65100;font-weight:700}
@@ -128,7 +130,7 @@ _BIG_O_HTML = r"""
     <div class="row-title">Notación:</div>
     <div class="ctrl vertical">
       <label><span class="label-text">\(\mathcal{F}\)</span>
-        <select id="bo-mode">
+        <select id="bo-mode" __MODE_SELECTOR_DISABLED__>
           <option value="big_o">Big-O</option>
           <option value="little_o">little-o</option>
           <option value="big_omega">Big-Ω</option>
@@ -254,7 +256,7 @@ _BIG_O_HTML = r"""
   var MODE_SELECTABLE=__MODE_SELECTABLE__;
   var root=document.getElementById('bo-wrap');
   var cv=document.getElementById('bo-cv'),ctx=cv.getContext('2d');
-  var W=0,H=0,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false;
+  var W=0,H=0,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null;
   var FNS={
     one:{label:'1',latex:'1',rank:0,fn:function(n){return 1;}},
     log:{label:'log₂(n)',latex:'\\log_2(n)',rank:1,fn:function(n){return n<=1?0:Math.log2(n);}},
@@ -391,7 +393,7 @@ _BIG_O_HTML = r"""
   }
   function limitExpressionLatex(ck,gk,includeSymbol,operator){
     var op=operator||limitOperatorLatex();
-    return '\\displaystyle '+(includeSymbol?'k=':'')+op+'_{n\\to\\infty}\\left(\\frac{C(n)}{g(n)}\\right)='+
+    return '\\displaystyle '+(includeSymbol?'k=':'')+
       op+'_{n\\to\\infty}\\left(\\frac{'+cLatex()+'}{'+latexOf(gk)+'}\\right)='+
       displayLimitValue(limitValue(ck,gk));
   }
@@ -616,8 +618,9 @@ _BIG_O_HTML = r"""
    * derivadas (polinomios, logaritmos y 2^n) y de
    * (n+1)!/n!=n+1 para el factorial. Por tanto, una vez satisfecha la
    * desigualdad en esa cola, no puede aparecer otro cruce posterior.
-   */
+  */
   var VERIFIED_TAIL_START=16;
+  var thresholdCacheKey='',thresholdCacheValue=null;
   function tailCanSatisfy(ck,gk,c){
     if(!isMember(ck,gk))return false;
     if(FNS[ck].rank!==FNS[gk].rank)return true;
@@ -647,9 +650,13 @@ _BIG_O_HTML = r"""
     return high;
   }
   function estimateN0(ck,gk,c){
+    var cacheKey=MODE+'|'+ck+'|'+gk+'|'+JSON.stringify(c);
+    if(cacheKey===thresholdCacheKey)return thresholdCacheValue;
     var predicate=function(n){return satisfiesInequality(ck,gk,c,n);};
     var integerThreshold=verifiedThreshold(predicate,tailCanSatisfy(ck,gk,c));
-    return verifiedRealThreshold(predicate,integerThreshold);
+    thresholdCacheKey=cacheKey;
+    thresholdCacheValue=verifiedRealThreshold(predicate,integerThreshold);
+    return thresholdCacheValue;
   }
   function verifiedRealThreshold(predicate,integerThreshold){
     if(integerThreshold===null)return null;
@@ -761,10 +768,10 @@ _BIG_O_HTML = r"""
     var thetaN0Html=intersection===null?''
       :defaultN0Html(intersection);
     return '<div class="theta-solutions">'+
-      '<div class="theta-solution"><b>Desigualdad izquierda '+titleTex('c_1g(n)\\le C(n)')+':</b>'+
+      '<div class="theta-solution"><b>Desigualdad izquierda '+titleTex('c_1\\cdot g(n)\\le C(n)')+':</b>'+
         '<div class="demo-line">'+texBlock(fmt(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex())+'</div>'+
         '<div class="demo-line">'+texBlock('S_1='+realThresholdSetLatex(lowerA,true))+'</div></div>'+
-      '<div class="theta-solution"><b>Desigualdad derecha '+titleTex('C(n)\\le c_2g(n)')+':</b>'+
+      '<div class="theta-solution"><b>Desigualdad derecha '+titleTex('C(n)\\le c_2\\cdot g(n)')+':</b>'+
         '<div class="demo-line">'+texBlock(cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk))+'</div>'+
         '<div class="demo-line">'+texBlock('S_2='+realThresholdSetLatex(upperA,true))+'</div></div>'+
       '</div>'+
@@ -863,6 +870,8 @@ _BIG_O_HTML = r"""
     target.textContent=text;
   }
   function sample(a,b,ck,gk,c){
+    var cacheKey=scaleMode()+'|'+a+'|'+b+'|'+ck+'|'+gk+'|'+JSON.stringify(c);
+    if(cacheKey===sampleCacheKey)return sampleCacheValue;
     var xs=[],ys1=[],ys2=[],ys3=[],ys4=[],mx=0,mn=Infinity;
     var logSampling=isLogScale();
     var logLo=logSampling?Math.log10(logXMin(a,b)):0;
@@ -876,7 +885,9 @@ _BIG_O_HTML = r"""
         [v1,v2,v3,v4].forEach(function(v){if(v>0)mn=Math.min(mn,v);});
       }
     }
-    return {xs:xs,c:ys1,g:ys2,cg:ys3,c1g:ys4,max:mx||1,min:isFinite(mn)?mn:1};
+    sampleCacheKey=cacheKey;
+    sampleCacheValue={xs:xs,c:ys1,g:ys2,cg:ys3,c1g:ys4,max:mx||1,min:isFinite(mn)?mn:1};
+    return sampleCacheValue;
   }
   function logXMin(a,b){
     if(a>0)return a;
@@ -1097,10 +1108,19 @@ _BIG_O_HTML = r"""
     ctx.restore();
     drawEndpointMarker(a,a,b,'a');
     drawEndpointMarker(b,a,b,'b');
-    updateText(a,b,ck,gk,c);
+    updateText(a,b,ck,gk,c,threshold,lim);
   }
-  function updateText(a,b,ck,gk,c){
-    var threshold=estimateN0(ck,gk,c),n0=selectedN0(threshold),lim=limitValue(ck,gk),cls=relationClass(ck,gk);
+  function requestDraw(){
+    if(drawFramePending)return;
+    drawFramePending=true;
+    var schedule=window.requestAnimationFrame||function(callback){return setTimeout(callback,16);};
+    schedule(function(){
+      drawFramePending=false;
+      if(root.isConnected)draw();
+    });
+  }
+  function updateText(a,b,ck,gk,c,threshold,lim){
+    var n0=selectedN0(threshold),cls=relationClass(ck,gk);
     el('bo-interval').innerHTML=tex('['+valueLatex(a)+', '+valueLatex(b)+']');
     el('bo-n0').innerHTML=n0===null?tex('\\text{No existe}') : tex('n_0='+thresholdNumber(n0));
     el('bo-limit').innerHTML=tex('k='+displayLimitValue(lim));
@@ -1134,17 +1154,13 @@ _BIG_O_HTML = r"""
     typeset();
   }
   function renderLimits(ck,selectedG){
-    var theta=isThetaMode();
     var html='<table><thead><tr><th>'+tex('\\mathbf{g(n)}')+'</th>'+
-      (theta?'<th>Límite inferior</th><th>Límite superior</th>':'<th>Límite</th>')+
-      '<th>Resultado</th></tr></thead><tbody>';
+      '<th>Límite</th><th>Resultado</th></tr></thead><tbody>';
     ORDER.forEach(function(gk){
-      var cls=relationClass(ck,gk),active=gk===selectedG?' class="active"':'';
-      html+='<tr'+active+'><td>'+tex(latexOf(gk))+'</td>'+
-        (theta
-          ?'<td>'+tex(limitExpressionLatex(ck,gk,false,'\\liminf'))+'</td>'+
-           '<td>'+tex(limitExpressionLatex(ck,gk,false,'\\limsup'))+'</td>'
-          :'<td>'+tex(limitExpressionLatex(ck,gk,false))+'</td>')+
+      var cls=relationClass(ck,gk);
+      var rowClass=(isMember(ck,gk)?'member':'nonmember')+(gk===selectedG?' active':'');
+      html+='<tr class="'+rowClass+'"><td>'+tex(latexOf(gk))+'</td>'+
+        '<td>'+tex(limitExpressionLatex(ck,gk,false))+'</td>'+
         '<td class="'+cls+'">'+membershipText(ck,gk)+'</td></tr>';
     });
     html+='</tbody></table>';
@@ -1172,7 +1188,7 @@ _BIG_O_HTML = r"""
     if(isThetaMode()){el('bo-c1').value=0.1;el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;}
     resetSelectedN0();
     updateConstantControls();
-    draw();
+    requestDraw();
   }
   function stepEndpoint(kind,direction){
     if(kind==='a'){
@@ -1276,7 +1292,7 @@ _BIG_O_HTML = r"""
       syncInputs(na,nb);
       Y_OFFSET=panStart.yOffset+(p.y-panStart.y);
     }
-    draw();
+    requestDraw();
   }
   cv.addEventListener('pointerdown',function(ev){
     ev.preventDefault();

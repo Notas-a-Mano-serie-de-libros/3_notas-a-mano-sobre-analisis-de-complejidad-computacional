@@ -140,6 +140,18 @@ def test_mathjax_se_carga_una_vez_y_espera_startup():
     assert html.count("tex-svg.js") == 1
 
 
+def test_arrastre_reutiliza_calculos_sin_diferir_la_actualizacion_de_n0():
+    html = load_animation_module()._BIG_O_HTML
+    assert "window.requestAnimationFrame||function(callback){return setTimeout(callback,16);}" in html
+    assert "if(drawFramePending)return;" in html
+    assert "if(cacheKey===thresholdCacheKey)return thresholdCacheValue;" in html
+    assert "if(cacheKey===sampleCacheKey)return sampleCacheValue;" in html
+    assert "updateText(a,b,ck,gk,c,threshold,lim);" in html
+    assert "function updateText(a,b,ck,gk,c,threshold,lim)" in html
+    assert "typesetTimer" not in html
+    assert "panelRefreshTimer" not in html
+
+
 def test_resultado_muestra_intervalo_y_n0_directo_sin_bloque_de_seleccion():
     html = load_animation_module()._BIG_O_HTML
     assert r"n_0=\\lceil" not in html
@@ -298,11 +310,38 @@ def test_theta_separa_limite_inferior_y_superior():
     assert "thetaLimitProcedureHtml" in html
     assert "limitProcedureHtml(ck,gk,'\\\\liminf')" in html
     assert "limitProcedureHtml(ck,gk,'\\\\limsup')" in html
-    assert "<th>Límite inferior</th><th>Límite superior</th>" in html
-    assert "limitExpressionLatex(ck,gk,false,'\\\\liminf')" in html
-    assert "limitExpressionLatex(ck,gk,false,'\\\\limsup')" in html
     assert "<strong>Límite inferior (Big-'+titleTex('\\\\Omega')+'):</strong>" in html
     assert "<strong>Límite superior (Big-'+titleTex('O')+'):</strong>" in html
+
+
+def test_tabla_final_muestra_solo_el_limite_solicitado_por_la_notacion():
+    html = load_animation_module()._BIG_O_HTML
+    render_limits = html.split("function renderLimits", 1)[1].split(
+        "function pointer", 1
+    )[0]
+    assert "<th>Límite</th><th>Resultado</th>" in render_limits
+    assert "limitExpressionLatex(ck,gk,false)" in render_limits
+    assert "Límite inferior" not in render_limits
+    assert "Límite superior" not in render_limits
+
+
+def test_tabla_final_resalta_pertenencia_y_sustituye_directamente_las_funciones():
+    html = load_animation_module()._BIG_O_HTML
+    assert "tbody tr.member td{background:#E8F5E9!important}" in html
+    assert "tbody tr.nonmember td{background:#FFEBEE!important}" in html
+    assert "var rowClass=(isMember(ck,gk)?'member':'nonmember')" in html
+    limit_expression = html.split("function limitExpressionLatex", 1)[1].split(
+        "function monomialProfile", 1
+    )[0]
+    assert r"\frac{C(n)}{g(n)}" not in limit_expression
+    assert "cLatex()" in limit_expression
+    assert "latexOf(gk)" in limit_expression
+
+
+def test_titulos_theta_separan_constante_y_funcion_con_producto():
+    html = load_animation_module()._BIG_O_HTML
+    assert "titleTex('c_1\\\\cdot g(n)\\\\le C(n)')" in html
+    assert "titleTex('C(n)\\\\le c_2\\\\cdot g(n)')" in html
 
 
 def test_cada_render_obtiene_ids_independientes(monkeypatch):
@@ -320,7 +359,7 @@ def test_cada_render_obtiene_ids_independientes(monkeypatch):
     assert first_id != second_id
 
 
-def test_comparacion_y_notebooks_especificos_muestran_el_selector(monkeypatch):
+def test_solo_la_comparacion_permite_cambiar_la_notacion(monkeypatch):
     module = load_animation_module()
     rendered = []
     monkeypatch.setattr(module, "display", lambda value: rendered.append(value.data))
@@ -330,13 +369,16 @@ def test_comparacion_y_notebooks_especificos_muestran_el_selector(monkeypatch):
 
     assert "var MODE_SELECTABLE=true;" in rendered[0]
     assert ".mode-section{display:grid}" in rendered[0]
+    assert '<select id="' in rendered[0]
+    assert '" >' in rendered[0]
     assert '<span class="label-text">\\(\\mathcal{F}\\)</span>' in rendered[0]
     assert rendered[0].index("\\(\\mathcal{F}\\)") < rendered[0].index(
         "\\(\\text{Escala}\\)"
     ) < rendered[0].index("Funciones de referencia:")
     assert "var MODE='big_o';" in rendered[0]
-    assert "var MODE_SELECTABLE=true;" in rendered[1]
+    assert "var MODE_SELECTABLE=false;" in rendered[1]
     assert ".mode-section{display:grid}" in rendered[1]
+    assert '" disabled>' in rendered[1]
     assert "var MODE='big_o';" in rendered[1]
 
 
