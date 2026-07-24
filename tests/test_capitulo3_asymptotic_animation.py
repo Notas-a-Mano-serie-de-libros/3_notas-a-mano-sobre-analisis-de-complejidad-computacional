@@ -152,6 +152,88 @@ def test_arrastre_reutiliza_calculos_sin_diferir_la_actualizacion_de_n0():
     assert "panelRefreshTimer" not in html
 
 
+def test_grafica_separa_capas_estaticas_de_elementos_dinamicos():
+    html = load_animation_module()._BIG_O_HTML
+    assert "staticBackground=document.createElement('canvas')" in html
+    assert "staticCurves=document.createElement('canvas')" in html
+    assert "function renderStaticLayers(key,data,a,b,yrange)" in html
+    assert "if(key===staticLayerKey)return;" in html
+    assert "drawStaticLayer(staticBackground);" in html
+    assert "drawValidArea(data,a,b,yrange,n0);" in html
+    assert "drawStaticLayer(staticCurves);" in html
+    assert html.index("drawStaticLayer(staticBackground);") < html.index(
+        "drawValidArea(data,a,b,yrange,n0);"
+    ) < html.index("drawStaticLayer(staticCurves);")
+    assert "drawN0DisplacementFade(threshold,n0,a,b);" in html
+    assert "drawN0(n0,a,b,ck,yrange);" in html
+
+
+def test_resize_no_recrea_el_lienzo_si_el_tamano_no_cambio():
+    html = load_animation_module()._BIG_O_HTML
+    assert "if(cv.width!==pixelWidth || cv.height!==pixelHeight)" in html
+    assert "staticLayerKey='';" in html
+
+
+def test_boton_enfoca_la_grafica_alrededor_del_n0_seleccionado():
+    html = load_animation_module()._BIG_O_HTML
+    assert 'id="bo-zoom-n0"' in html
+    assert 'aria-label="Ver el comportamiento alrededor de n₀"' in html
+    assert "function focusAroundN0()" in html
+    assert "var n0=selectedN0(estimateN0(ck,gk,c));" in html
+    assert "n0/Math.pow(10,0.12)" in html
+    assert "n0*Math.pow(10,0.18)" in html
+    assert "Math.max(0.05,Math.abs(n0)*0.03,epsilonVal()*2)" in html
+    assert "nextA=Math.max(0,n0-radius);" in html
+    assert "nextB=Math.min(MAX_B,n0+radius*1.2);" in html
+    assert "syncInputs(nextA,nextB);" in html
+    assert "Y_OFFSET=0;Y_SCALE=1;" in html
+    assert "function focusVerticalAroundCurves(data,yrange)" in html
+    assert "var values=data.c.concat(data.cg);" in html
+    assert "Y_SCALE=Math.min(80,plotHeight*0.78/Math.abs(bottom-top));" in html
+    assert "focusVerticalAroundCurves(focusData,Y_RANGE_OVERRIDE);" in html
+    assert "el('bo-zoom-n0').addEventListener('click',focusAroundN0);" in html
+
+
+def test_boton_n0_se_desactiva_si_el_umbral_no_puede_mostrarse():
+    html = load_animation_module()._BIG_O_HTML
+    assert "focusButton.disabled=n0===null || (isLogScale() && n0===0);" in html
+    assert "n₀ = 0 no puede mostrarse en una escala logarítmica" in html
+
+
+def test_mas_acerca_y_menos_aleja_la_vista():
+    html = load_animation_module()._BIG_O_HTML
+    assert 'id="bo-zoom-in" title="Acercar la vista"' in html
+    assert 'id="bo-zoom-out" title="Alejar la vista"' in html
+    assert "function zoomIn()" in html
+    assert "function zoomOut()" in html
+    assert "zoomAt(zoomCenter(ab[0],ab[1]),0.5);" in html
+    assert "zoomAt(zoomCenter(ab[0],ab[1]),2);" in html
+    assert "el('bo-zoom-in').addEventListener('click',zoomIn);" in html
+    assert "el('bo-zoom-out').addEventListener('click',zoomOut);" in html
+
+
+def test_parametros_adicionales_conservan_zoom_vista_y_n0_seleccionado():
+    html = load_animation_module()._BIG_O_HTML
+    assert "Y_RANGE_OVERRIDE=null,lastYRange=null" in html
+    assert "function preserveViewportForParameterChange()" in html
+    assert "Y_RANGE_OVERRIDE={min:lastYRange.min,max:lastYRange.max};" in html
+    listeners = html.split("['bo-c','bo-c1','bo-c2'].forEach", 1)[1].split(
+        "el('bo-scale').addEventListener", 1
+    )[0]
+    assert "preserveViewportForParameterChange();" in listeners
+    assert "resetSelectedN0();" not in listeners
+    assert "Y_OFFSET=0" not in listeners
+    assert "Y_SCALE=1" not in listeners
+    assert "Y_RANGE_OVERRIDE=null" not in listeners
+
+
+def test_solo_reset_y_cambios_estructurales_liberan_el_rango_vertical():
+    html = load_animation_module()._BIG_O_HTML
+    assert "Y_OFFSET=0;Y_SCALE=1;Y_RANGE_OVERRIDE=null;" in html
+    assert "el('bo-scale').addEventListener('input',function(){Y_RANGE_OVERRIDE=null;draw();});" in html
+    assert "Y_RANGE_OVERRIDE=yBounds(focusData);" in html
+
+
 def test_resultado_muestra_intervalo_y_n0_directo_sin_bloque_de_seleccion():
     html = load_animation_module()._BIG_O_HTML
     assert r"n_0=\\lceil" not in html

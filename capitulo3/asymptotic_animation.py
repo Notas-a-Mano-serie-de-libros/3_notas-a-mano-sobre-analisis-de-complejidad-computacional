@@ -54,6 +54,8 @@ _BIG_O_HTML = r"""
 #bo-wrap .zoom-btn{width:34px;height:32px;border:1px solid #bbb;border-radius:3px;background:rgba(255,255,255,.94);color:#333;cursor:pointer;font-size:20px;line-height:1}
 #bo-wrap .zoom-btn:hover{background:#f1f1f1}
 #bo-wrap .zoom-btn.active{background:#e3f2fd;border-color:#1976D2;color:#0D47A1}
+#bo-wrap .zoom-btn:disabled{cursor:not-allowed;opacity:.45;background:rgba(245,245,245,.94)}
+#bo-wrap .zoom-n0{width:46px;font-size:13px;font-weight:700}
 #bo-wrap .zoom-selection{position:absolute;display:none;z-index:1;border:1px dashed #1565C0;background:rgba(21,101,192,.12);pointer-events:none}
 #bo-wrap .axis-label{position:absolute;pointer-events:none;font-size:14px;color:#333}
 #bo-wrap .axis-x{left:82px;right:32px;bottom:8px;text-align:center}
@@ -198,8 +200,9 @@ _BIG_O_HTML = r"""
   </div>
   <div class="plot-wrap">
     <div class="zoom-controls" aria-label="Controles de zoom">
-      <button type="button" class="zoom-btn" id="bo-zoom-out" title="Reducir la gráfica" aria-label="Reducir la gráfica">−</button>
-      <button type="button" class="zoom-btn" id="bo-zoom-in" title="Ampliar la gráfica" aria-label="Ampliar la gráfica">+</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-out" title="Alejar la vista" aria-label="Alejar la vista">−</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-in" title="Acercar la vista" aria-label="Acercar la vista">+</button>
+      <button type="button" class="zoom-btn zoom-n0" id="bo-zoom-n0" title="Ver el comportamiento alrededor de n₀" aria-label="Ver el comportamiento alrededor de n₀">n₀</button>
       <button type="button" class="zoom-btn" id="bo-zoom-trackpad" title="Activar o desactivar el zoom con trackpad" aria-label="Activar o desactivar el zoom con trackpad" aria-pressed="false" style="font-size:11px;font-weight:700">TP</button>
       <button type="button" class="zoom-btn" id="bo-zoom-select" title="Seleccionar un área" aria-label="Seleccionar un área">□</button>
       <button type="button" class="zoom-btn" id="bo-zoom-reset" title="Restablecer el zoom" aria-label="Restablecer el zoom">↺</button>
@@ -256,7 +259,8 @@ _BIG_O_HTML = r"""
   var MODE_SELECTABLE=__MODE_SELECTABLE__;
   var root=document.getElementById('bo-wrap');
   var cv=document.getElementById('bo-cv'),ctx=cv.getContext('2d');
-  var W=0,H=0,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null;
+  var staticBackground=document.createElement('canvas'),staticCurves=document.createElement('canvas');
+  var W=0,H=0,DPR=1,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,Y_RANGE_OVERRIDE=null,lastYRange=null,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null,staticLayerKey='';
   var FNS={
     one:{label:'1',latex:'1',rank:0,fn:function(n){return 1;}},
     log:{label:'log₂(n)',latex:'\\log_2(n)',rank:1,fn:function(n){return n<=1?0:Math.log2(n);}},
@@ -835,9 +839,14 @@ _BIG_O_HTML = r"""
   function resize(){
     var dpr=window.devicePixelRatio||1;
     var r=cv.getBoundingClientRect();
-    cv.width=r.width*dpr;cv.height=r.height*dpr;
+    var pixelWidth=Math.max(1,Math.round(r.width*dpr));
+    var pixelHeight=Math.max(1,Math.round(r.height*dpr));
+    if(cv.width!==pixelWidth || cv.height!==pixelHeight){
+      cv.width=pixelWidth;cv.height=pixelHeight;
+      staticLayerKey='';
+    }
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    W=r.width;H=r.height;
+    W=r.width;H=r.height;DPR=dpr;
   }
   function interval(){
     return [STATE_A,STATE_B];
@@ -1085,24 +1094,57 @@ _BIG_O_HTML = r"""
     }
     ctx.restore();
   }
+  function prepareStaticCanvas(layer){
+    if(layer.width!==cv.width || layer.height!==cv.height){
+      layer.width=cv.width;layer.height=cv.height;
+    }
+    var layerContext=layer.getContext('2d');
+    layerContext.setTransform(DPR,0,0,DPR,0,0);
+    layerContext.clearRect(0,0,W,H);
+    return layerContext;
+  }
+  function renderStaticLayers(key,data,a,b,yrange){
+    if(key===staticLayerKey)return;
+    staticLayerKey=key;
+    var visibleContext=ctx;
+    var backgroundContext=prepareStaticCanvas(staticBackground);
+    ctx=backgroundContext;
+    ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+    drawAxes(a,b,yrange);
+
+    var curvesContext=prepareStaticCanvas(staticCurves);
+    ctx=curvesContext;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(PAD.l,PAD.t,W-PAD.l-PAD.r,H-PAD.t-PAD.b);
+    ctx.clip();
+    drawLine(data.xs,data.c,a,b,yrange,cColor(),2.4);
+    drawLine(data.xs,data.cg,a,b,yrange,cgColor(),2.4);
+    if(isThetaMode())drawLine(data.xs,data.c1g,a,b,yrange,c1gColor(),2.0);
+    ctx.restore();
+    ctx=visibleContext;
+  }
+  function drawStaticLayer(layer){
+    ctx.drawImage(layer,0,0,layer.width,layer.height,0,0,W,H);
+  }
   function draw(){
     resize();
     var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
     var ab=interval();syncInputs(ab[0],ab[1]);var a=interval()[0],b=interval()[1];
-    var data=sample(a,b,ck,gk,c),yrange=yBounds(data);
+    var data=sample(a,b,ck,gk,c),automaticYRange=yBounds(data);
+    var yrange=Y_RANGE_OVERRIDE||automaticYRange;
+    lastYRange={min:yrange.min,max:yrange.max};
     var threshold=estimateN0(ck,gk,c),n0=selectedN0(threshold),lim=limitValue(ck,gk);
-    ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
-    drawAxes(a,b,yrange);
+    var layerKey=[MODE,scaleMode(),W,H,DPR,a,b,ck,gk,JSON.stringify(c),yrange.min,yrange.max,Y_SCALE,Y_OFFSET].join('|');
+    renderStaticLayers(layerKey,data,a,b,yrange);
+    ctx.clearRect(0,0,W,H);
+    drawStaticLayer(staticBackground);
     ctx.save();
     ctx.beginPath();
     ctx.rect(PAD.l,PAD.t,W-PAD.l-PAD.r,H-PAD.t-PAD.b);
     ctx.clip();
     drawValidArea(data,a,b,yrange,n0);
-    drawLine(data.xs,data.c,a,b,yrange,cColor(),2.4);
-    drawLine(data.xs,data.cg,a,b,yrange,cgColor(),2.4);
-    if(isThetaMode()){
-      drawLine(data.xs,data.c1g,a,b,yrange,c1gColor(),2.0);
-    }
+    drawStaticLayer(staticCurves);
     drawN0DisplacementFade(threshold,n0,a,b);
     drawN0(n0,a,b,ck,yrange);
     ctx.restore();
@@ -1149,6 +1191,11 @@ _BIG_O_HTML = r"""
       :(isLogScale() && n0===0
         ?tex('n_0=0\\;\\text{(no visible porque }\\log(0)\\text{ no está definido)}')
         :tex('n_0='+thresholdNumber(n0)));
+    var focusButton=el('bo-zoom-n0');
+    focusButton.disabled=n0===null || (isLogScale() && n0===0);
+    focusButton.title=isLogScale() && n0===0
+      ?'n₀ = 0 no puede mostrarse en una escala logarítmica'
+      :'Ver el comportamiento alrededor de n₀';
     el('bo-quotient').innerHTML=proofHtml(ck,gk,c,threshold);
     renderLimits(ck,gk);
     typeset();
@@ -1187,6 +1234,7 @@ _BIG_O_HTML = r"""
     el('bo-c').value=dc;
     if(isThetaMode()){el('bo-c1').value=0.1;el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;}
     resetSelectedN0();
+    Y_RANGE_OVERRIDE=null;
     updateConstantControls();
     requestDraw();
   }
@@ -1218,9 +1266,65 @@ _BIG_O_HTML = r"""
     syncInputs(Math.max(0,nextA),Math.min(MAX_B,nextB));
     draw();
   }
+  function zoomIn(){
+    var ab=interval();
+    zoomAt(zoomCenter(ab[0],ab[1]),0.5);
+  }
+  function zoomOut(){
+    var ab=interval();
+    zoomAt(zoomCenter(ab[0],ab[1]),2);
+  }
   function resetZoom(){
     resetInterval();
+    Y_OFFSET=0;Y_SCALE=1;Y_RANGE_OVERRIDE=null;
+    draw();
+  }
+  function preserveViewportForParameterChange(){
+    if(Y_RANGE_OVERRIDE===null && lastYRange){
+      Y_RANGE_OVERRIDE={min:lastYRange.min,max:lastYRange.max};
+    }
+  }
+  function focusVerticalAroundCurves(data,yrange){
+    var values=data.c.concat(data.cg);
+    if(isThetaMode())values=values.concat(data.c1g);
+    values=values.filter(function(value){return isFinite(value) && (!isLogScale() || value>0);});
+    if(!values.length)return;
+    var low=Math.min.apply(null,values),high=Math.max.apply(null,values);
+    var padding=Math.max((high-low)*0.18,Math.max(Math.abs(low),Math.abs(high))*0.002,1e-9);
+    low=isLogScale()?Math.max(1e-9,low/1.08):low-padding;
+    high=isLogScale()?high*1.08:high+padding;
+    var top=ty(high,yrange),bottom=ty(low,yrange);
+    if(top===null || bottom===null || Math.abs(bottom-top)<1e-9)return;
+    var plotHeight=H-PAD.t-PAD.b,plotCenter=(PAD.t+H-PAD.b)/2;
+    var bandCenter=(top+bottom)/2;
+    Y_SCALE=Math.min(80,plotHeight*0.78/Math.abs(bottom-top));
+    Y_OFFSET=-(bandCenter-plotCenter)*Y_SCALE;
+  }
+  function focusAroundN0(){
+    var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
+    var n0=selectedN0(estimateN0(ck,gk,c));
+    if(n0===null || (isLogScale() && n0===0))return;
+    var nextA,nextB;
+    if(isLogScale()){
+      nextA=Math.max(1e-9,n0/Math.pow(10,0.12));
+      nextB=Math.min(MAX_B,n0*Math.pow(10,0.18));
+    }else{
+      var radius=Math.max(0.05,Math.abs(n0)*0.03,epsilonVal()*2);
+      nextA=Math.max(0,n0-radius);
+      nextB=Math.min(MAX_B,n0+radius*1.2);
+    }
+    if(nextB-nextA<MIN_SPAN){
+      nextA=Math.max(0,n0-MIN_SPAN);
+      nextB=Math.min(MAX_B,n0+MIN_SPAN);
+    }
+    selectionMode=false;cancelSelection();
+    el('bo-zoom-select').classList.remove('active');
+    cv.style.cursor='grab';
+    syncInputs(nextA,nextB);
     Y_OFFSET=0;Y_SCALE=1;
+    var focusData=sample(nextA,nextB,ck,gk,c);
+    Y_RANGE_OVERRIDE=yBounds(focusData);
+    focusVerticalAroundCurves(focusData,Y_RANGE_OVERRIDE);
     draw();
   }
   function clampPlotPoint(p){
@@ -1336,8 +1440,9 @@ _BIG_O_HTML = r"""
   cv.addEventListener('pointercancel',endPointer);
   cv.addEventListener('gesturestart',function(ev){if(!trackpadZoomEnabled)return;ev.preventDefault();gestureScale=ev.scale||1;},{passive:false});
   cv.addEventListener('gesturechange',function(ev){if(!trackpadZoomEnabled)return;ev.preventDefault();var ab=interval(),scale=ev.scale||gestureScale;zoomAt(zoomCenter(ab[0],ab[1]),gestureScale/scale);gestureScale=scale;},{passive:false});
-  el('bo-zoom-in').addEventListener('click',function(){var ab=interval();zoomAt(zoomCenter(ab[0],ab[1]),0.75);});
-  el('bo-zoom-out').addEventListener('click',function(){var ab=interval();zoomAt(zoomCenter(ab[0],ab[1]),4/3);});
+  el('bo-zoom-in').addEventListener('click',zoomIn);
+  el('bo-zoom-out').addEventListener('click',zoomOut);
+  el('bo-zoom-n0').addEventListener('click',focusAroundN0);
   el('bo-zoom-trackpad').addEventListener('click',function(){
     trackpadZoomEnabled=!trackpadZoomEnabled;
     this.classList.toggle('active',trackpadZoomEnabled);
@@ -1354,6 +1459,7 @@ _BIG_O_HTML = r"""
       MODE=this.value;
       STATE_G_INDEX=ORDER.indexOf(defaultGKeyForMode());
       resetSelectedN0();
+      Y_RANGE_OVERRIDE=null;
       el('bo-c').value=defaultC(cKey(),gKey());
       el('bo-c1').value=0.1;
       el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;
@@ -1363,15 +1469,16 @@ _BIG_O_HTML = r"""
   }
   ['bo-c','bo-c1','bo-c2'].forEach(function(id){
     el(id).addEventListener('input',function(){
-      resetSelectedN0();
+      preserveViewportForParameterChange();
       draw();
     });
   });
   el('bo-epsilon').addEventListener('input',function(){
     if((parseFloat(this.value)||0)<=0)this.value=0.000001;
+    preserveViewportForParameterChange();
     draw();
   });
-  el('bo-scale').addEventListener('input',function(){draw();});
+  el('bo-scale').addEventListener('input',function(){Y_RANGE_OVERRIDE=null;draw();});
   ['bo-a','bo-b'].forEach(function(id){
     el(id).addEventListener('focus',function(){beginEditableField(id);});
     el(id).addEventListener('input',function(){sanitizeEditableField(id);});
