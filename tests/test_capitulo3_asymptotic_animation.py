@@ -168,6 +168,24 @@ def test_grafica_separa_capas_estaticas_de_elementos_dinamicos():
     assert "drawN0(n0,a,b,ck,yrange);" in html
 
 
+def test_umbral_y_cruces_se_distinguen_del_n0_seleccionado():
+    html = load_animation_module()._BIG_O_HTML
+    assert 'id="bo-leg-threshold"' in html
+    assert "function drawThresholdAndCrossings(threshold,a,b,ck,gk,c,yrange)" in html
+    assert "ctx.strokeStyle='#00838F'" in html
+    assert "drawThresholdAndCrossings(threshold,a,b,ck,gk,c,yrange);" in html
+    assert "Math.abs(left-bound)>Math.max" in html
+    assert "(isStrictMode()?'\\\\inf(I)=':'\\\\min(I)=')" in html
+
+
+def test_enfoque_n0_mantiene_estado_activo_hasta_cambiar_la_vista():
+    html = load_animation_module()._BIG_O_HTML
+    assert "n0FocusActive=true;" in html
+    assert "focusButton.classList.toggle('active',n0FocusActive);" in html
+    assert "function deactivateN0Focus()" in html
+    assert "deactivateN0Focus();" in html
+
+
 def test_resize_no_recrea_el_lienzo_si_el_tamano_no_cambio():
     html = load_animation_module()._BIG_O_HTML
     assert "if(cv.width!==pixelWidth || cv.height!==pixelHeight)" in html
@@ -230,8 +248,50 @@ def test_parametros_adicionales_conservan_zoom_vista_y_n0_seleccionado():
 def test_solo_reset_y_cambios_estructurales_liberan_el_rango_vertical():
     html = load_animation_module()._BIG_O_HTML
     assert "Y_OFFSET=0;Y_SCALE=1;Y_RANGE_OVERRIDE=null;" in html
-    assert "el('bo-scale').addEventListener('input',function(){Y_RANGE_OVERRIDE=null;draw();});" in html
+    assert "el('bo-scale').addEventListener('input',function(){Y_RANGE_OVERRIDE=null;deactivateN0Focus();draw();});" in html
     assert "Y_RANGE_OVERRIDE=yBounds(focusData);" in html
+
+
+def test_bloqueo_independiente_de_ejes_evitan_cambios_de_vista():
+    html = load_animation_module()._BIG_O_HTML
+    assert 'id="bo-lock-x"' in html
+    assert 'id="bo-lock-y"' in html
+    assert "if(lockX)return;" in html
+    assert "if(!lockX)syncInputs(na,nb);" in html
+    assert "if(!lockY)Y_OFFSET=panStart.yOffset+(p.y-panStart.y);" in html
+    assert "this.classList.toggle('active',lockX)" in html
+    assert "this.classList.toggle('active',lockY)" in html
+
+
+def test_historial_restaura_vista_parametros_y_n0():
+    html = load_animation_module()._BIG_O_HTML
+    assert 'id="bo-history-undo"' in html
+    assert 'id="bo-history-redo"' in html
+    assert "function viewSnapshot()" in html
+    assert "function captureHistory()" in html
+    assert "function restoreSnapshot(snapshot)" in html
+    assert "function undoHistory()" in html
+    assert "function redoHistory()" in html
+    assert "historyUndo.length>50" in html
+
+
+def test_n0_dinamico_no_recompone_la_demostracion_ni_la_tabla():
+    html = load_animation_module()._BIG_O_HTML
+    assert "function renderDynamicMath(id,latex)" in html
+    assert "mathJax.tex2svgPromise(requested,{display:false})" in html
+    assert "state.pending=latex;" in html
+    assert "if(state.running)return;" in html
+    assert "function updateDynamicN0(n0)" in html
+    assert "if(drag==='n0')updateDynamicN0(n0);" in html
+
+
+def test_muestreo_se_adapta_al_ancho_curvatura_y_cruce():
+    html = load_animation_module()._BIG_O_HTML
+    assert "function adaptiveSampleCount(ck,gk)" in html
+    assert "Math.max(120,Math.min(520,count))" in html
+    assert "if(FNS[ck].rank>=7 || FNS[gk].rank>=7)" in html
+    assert "var crossing=estimateN0(ck,gk,c);" in html
+    assert "positions.push(crossing);" in html
 
 
 def test_resultado_muestra_intervalo_y_n0_directo_sin_bloque_de_seleccion():
@@ -401,8 +461,10 @@ def test_tabla_final_muestra_solo_el_limite_solicitado_por_la_notacion():
     render_limits = html.split("function renderLimits", 1)[1].split(
         "function pointer", 1
     )[0]
-    assert "<th>Límite</th><th>Resultado</th>" in render_limits
-    assert "limitExpressionLatex(ck,gk,false)" in render_limits
+    assert "<th>Resultado del límite '+tex('(k)')+'</th><th>Pertenencia</th>" in render_limits
+    assert "tex(displayLimitValue(limitValue(ck,gk)))" in render_limits
+    assert "tex('k='+displayLimitValue(limitValue(ck,gk)))" not in render_limits
+    assert "limitExpressionLatex(ck,gk,false)" not in render_limits
     assert "Límite inferior" not in render_limits
     assert "Límite superior" not in render_limits
 
@@ -412,12 +474,52 @@ def test_tabla_final_resalta_pertenencia_y_sustituye_directamente_las_funciones(
     assert "tbody tr.member td{background:#E8F5E9!important}" in html
     assert "tbody tr.nonmember td{background:#FFEBEE!important}" in html
     assert "var rowClass=(isMember(ck,gk)?'member':'nonmember')" in html
-    limit_expression = html.split("function limitExpressionLatex", 1)[1].split(
-        "function monomialProfile", 1
+
+
+def test_informacion_inferior_se_organiza_en_secciones_plegables():
+    html = load_animation_module()._BIG_O_HTML
+    assert '<details class="info-section" id="bo-result-section" open>' in html
+    assert '<details class="info-section" id="bo-limit-section">' in html
+    assert '<details class="info-section" id="bo-n0-section">' in html
+    assert '<details class="info-section" id="bo-comparison-section">' in html
+    assert html.count('<details class="info-section"') == 4
+    assert html.count(" open>") == 1
+    assert ".result-body{min-height:172px" in html
+    assert r"<summary>Conjunto solución y \(\boldsymbol{n_0}\)</summary>" in html
+
+
+def test_resultado_resume_respuesta_antes_del_procedimiento():
+    html = load_animation_module()._BIG_O_HTML
+    assert 'id="bo-result-main"' in html
+    assert 'id="bo-result-n0"' in html
+    assert "function resultSummaryHtml(ck,gk,c,threshold)" in html
+    assert "realThresholdSetLatex(" in html
+    assert r"\\begin{gathered}" in html
+    assert r"\\begin{aligned}'+relation" not in html
+    assert "renderDynamicMath('bo-result-n0',latex);" in html
+    assert ".result-body{min-height:172px;box-sizing:border-box;text-align:center}" in html
+    assert ".result-body .cards,#bo-wrap .result-body .card,#bo-wrap .result-body .val{text-align:center}" in html
+
+
+def test_tarjetas_inferiores_conservan_solo_tres_datos_principales():
+    html = load_animation_module()._BIG_O_HTML
+    result_section = html.split('id="bo-result-section"', 1)[1].split(
+        "</details>", 1
     )[0]
-    assert r"\frac{C(n)}{g(n)}" not in limit_expression
-    assert "cLatex()" in limit_expression
-    assert "latexOf(gk)" in limit_expression
+    assert result_section.count('class="card"') == 3
+    assert "n₀ seleccionado" in result_section
+    assert "Condición sobre c" in result_section
+    assert "Conclusión" in result_section
+    assert "Intervalo visible" not in html
+    assert "Límite del cociente" not in html
+
+
+def test_limite_y_n0_se_generan_en_bloques_independientes():
+    html = load_animation_module()._BIG_O_HTML
+    assert "function limitProofHtml(ck,gk,c)" in html
+    assert "function n0ProofHtml(ck,gk,c,n0)" in html
+    assert "el('bo-limit-proof').innerHTML=limitProofHtml(ck,gk,c);" in html
+    assert "el('bo-n0-proof').innerHTML=n0ProofHtml(ck,gk,c,threshold);" in html
 
 
 def test_titulos_theta_separan_constante_y_funcion_con_producto():

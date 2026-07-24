@@ -56,6 +56,7 @@ _BIG_O_HTML = r"""
 #bo-wrap .zoom-btn.active{background:#e3f2fd;border-color:#1976D2;color:#0D47A1}
 #bo-wrap .zoom-btn:disabled{cursor:not-allowed;opacity:.45;background:rgba(245,245,245,.94)}
 #bo-wrap .zoom-n0{width:46px;font-size:13px;font-weight:700}
+#bo-wrap .zoom-small{width:38px;font-size:11px;font-weight:700}
 #bo-wrap .zoom-selection{position:absolute;display:none;z-index:1;border:1px dashed #1565C0;background:rgba(21,101,192,.12);pointer-events:none}
 #bo-wrap .axis-label{position:absolute;pointer-events:none;font-size:14px;color:#333}
 #bo-wrap .axis-x{left:82px;right:32px;bottom:8px;text-align:center}
@@ -82,11 +83,19 @@ _BIG_O_HTML = r"""
 #bo-wrap .stepper input{width:112px}
 #bo-wrap .stepper button{width:34px;height:32px;border:1px solid #ccc;border-radius:3px;background:#f7f7f7;color:#333;cursor:pointer;font-size:13px;line-height:1}
 #bo-wrap .stepper button:hover{background:#eeeeee}
-#bo-wrap .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px}
+#bo-wrap .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
 #bo-wrap .card{background:#f7f7f7;border:1px solid #e8e8e8;border-radius:4px;padding:10px 14px}
 #bo-wrap .card .lbl{font-size:11px;color:#78909C;margin-bottom:3px}
 #bo-wrap .card .val{font-size:15px;font-weight:600}
 #bo-wrap .fml{margin-top:10px;background:#f7f7f7;border:1px solid #e8e8e8;border-radius:4px;padding:10px 20px;font-size:15px;color:#333;min-height:44px;text-align:center}
+#bo-wrap .info-sections{margin-top:12px}
+#bo-wrap .info-section{border:1px solid #dedede;border-radius:5px;background:#fff;margin-top:8px;overflow:hidden}
+#bo-wrap .info-section>summary{cursor:pointer;padding:10px 14px;font-weight:700;background:#f7f7f7;list-style-position:inside}
+#bo-wrap .info-section[open]>summary{border-bottom:1px solid #e2e2e2}
+#bo-wrap .section-content{padding:12px 18px}
+#bo-wrap .result-body{min-height:172px;box-sizing:border-box;text-align:center}
+#bo-wrap .result-equations{min-height:70px;display:flex;flex-direction:column;justify-content:center;text-align:center}
+#bo-wrap .result-body .cards,#bo-wrap .result-body .card,#bo-wrap .result-body .val{text-align:center}
 #bo-wrap .demo-title{font-weight:700;font-size:15px;margin:2px 0 8px;color:#333;text-align:left}
 #bo-wrap .demo-line{display:block;text-align:center;margin:6px 0}
 #bo-wrap .demo-sep{height:1px;background:#e0e0e0;margin:12px 0}
@@ -203,6 +212,10 @@ _BIG_O_HTML = r"""
       <button type="button" class="zoom-btn" id="bo-zoom-out" title="Alejar la vista" aria-label="Alejar la vista">−</button>
       <button type="button" class="zoom-btn" id="bo-zoom-in" title="Acercar la vista" aria-label="Acercar la vista">+</button>
       <button type="button" class="zoom-btn zoom-n0" id="bo-zoom-n0" title="Ver el comportamiento alrededor de n₀" aria-label="Ver el comportamiento alrededor de n₀">n₀</button>
+      <button type="button" class="zoom-btn zoom-small" id="bo-lock-x" title="Bloquear el eje x" aria-label="Bloquear el eje x" aria-pressed="false">X</button>
+      <button type="button" class="zoom-btn zoom-small" id="bo-lock-y" title="Bloquear el eje y" aria-label="Bloquear el eje y" aria-pressed="false">Y</button>
+      <button type="button" class="zoom-btn zoom-small" id="bo-history-undo" title="Deshacer cambio de vista" aria-label="Deshacer cambio de vista" disabled>↶</button>
+      <button type="button" class="zoom-btn zoom-small" id="bo-history-redo" title="Rehacer cambio de vista" aria-label="Rehacer cambio de vista" disabled>↷</button>
       <button type="button" class="zoom-btn" id="bo-zoom-trackpad" title="Activar o desactivar el zoom con trackpad" aria-label="Activar o desactivar el zoom con trackpad" aria-pressed="false" style="font-size:11px;font-weight:700">TP</button>
       <button type="button" class="zoom-btn" id="bo-zoom-select" title="Seleccionar un área" aria-label="Seleccionar un área">□</button>
       <button type="button" class="zoom-btn" id="bo-zoom-reset" title="Restablecer el zoom" aria-label="Restablecer el zoom">↺</button>
@@ -215,20 +228,39 @@ _BIG_O_HTML = r"""
       <span style="color:#1565C0"><span class="sw"></span><span id="bo-leg-c">—</span></span>
       <span style="color:#EF6C00;display:none" id="bo-leg-low-wrap"><span class="sw"></span><span id="bo-leg-low">—</span></span>
       <span style="color:#B71C1C"><span class="sw"></span><span id="bo-leg-cg">—</span></span>
+      <span style="color:#00838F"><span class="sw" style="border-top-style:dashed"></span><span id="bo-leg-threshold">—</span></span>
       <span style="color:#2E7D32"><span class="sw" style="border-top-style:dotted"></span><span id="bo-leg-n0">—</span></span>
     </div>
   </div>
-  <div class="note" id="bo-reading">—</div>
-  <div class="cards">
-    <div class="card"><div class="lbl">Intervalo visible</div><div class="val" id="bo-interval">—</div></div>
-    <div class="card"><div class="lbl">n₀ seleccionado</div><div class="val" id="bo-n0">—</div></div>
-    <div class="card"><div class="lbl">Límite del cociente</div><div class="val" id="bo-limit">—</div></div>
-    <div class="card"><div class="lbl" id="bo-c-rule-label">Condición sobre c</div><div class="val" id="bo-c-rule">—</div></div>
-    <div class="card"><div class="lbl">Conclusión</div><div class="val" id="bo-status">—</div></div>
+  <div class="info-sections">
+    <details class="info-section" id="bo-result-section" open>
+      <summary>Resultado</summary>
+      <div class="section-content result-body">
+        <div class="result-equations">
+          <div id="bo-result-main">—</div>
+          <div id="bo-result-n0">—</div>
+        </div>
+        <div class="cards">
+          <div class="card"><div class="lbl">n₀ seleccionado</div><div class="val" id="bo-n0">—</div></div>
+          <div class="card"><div class="lbl" id="bo-c-rule-label">Condición sobre c</div><div class="val" id="bo-c-rule">—</div></div>
+          <div class="card"><div class="lbl">Conclusión</div><div class="val" id="bo-status">—</div></div>
+        </div>
+        <div class="note" id="bo-reading">—</div>
+      </div>
+    </details>
+    <details class="info-section" id="bo-limit-section">
+      <summary>Verificación por límite</summary>
+      <div class="section-content fml" id="bo-limit-proof">—</div>
+    </details>
+    <details class="info-section" id="bo-n0-section">
+      <summary>Conjunto solución y \(\boldsymbol{n_0}\)</summary>
+      <div class="section-content fml" id="bo-n0-proof">—</div>
+    </details>
+    <details class="info-section" id="bo-comparison-section">
+      <summary>Comparación con otras funciones</summary>
+      <div class="section-content"><div id="bo-limits"></div></div>
+    </details>
   </div>
-
-  <div class="fml" id="bo-quotient">—</div>
-  <div id="bo-limits"></div>
 </div>
 
 <script>
@@ -260,7 +292,7 @@ _BIG_O_HTML = r"""
   var root=document.getElementById('bo-wrap');
   var cv=document.getElementById('bo-cv'),ctx=cv.getContext('2d');
   var staticBackground=document.createElement('canvas'),staticCurves=document.createElement('canvas');
-  var W=0,H=0,DPR=1,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,Y_RANGE_OVERRIDE=null,lastYRange=null,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null,staticLayerKey='';
+  var W=0,H=0,DPR=1,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,Y_RANGE_OVERRIDE=null,lastYRange=null,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,n0FocusActive=false,lockX=false,lockY=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null,staticLayerKey='',historyUndo=[],historyRedo=[],historyCapturePending=false,dynamicMathState={};
   var FNS={
     one:{label:'1',latex:'1',rank:0,fn:function(n){return 1;}},
     log:{label:'log₂(n)',latex:'\\log_2(n)',rank:1,fn:function(n){return n<=1?0:Math.log2(n);}},
@@ -394,12 +426,6 @@ _BIG_O_HTML = r"""
     if(MODE==='big_o')return '\\limsup';
     if(MODE==='big_omega')return '\\liminf';
     return '\\lim';
-  }
-  function limitExpressionLatex(ck,gk,includeSymbol,operator){
-    var op=operator||limitOperatorLatex();
-    return '\\displaystyle '+(includeSymbol?'k=':'')+
-      op+'_{n\\to\\infty}\\left(\\frac{'+cLatex()+'}{'+latexOf(gk)+'}\\right)='+
-      displayLimitValue(limitValue(ck,gk));
   }
   function monomialProfile(key){
     var profiles={
@@ -562,6 +588,33 @@ _BIG_O_HTML = r"""
       console.error('No fue posible componer las ecuaciones de la simulación.',error);
     });
   }
+  function renderDynamicMath(id,latex){
+    var state=dynamicMathState[id]||(dynamicMathState[id]={running:false,pending:null});
+    state.pending=latex;
+    if(state.running)return;
+    state.running=true;
+    var requested=state.pending;state.pending=null;
+    window.__asymptoticMathJaxReady.then(function(mathJax){
+      if(!root.isConnected || !mathJax.tex2svgPromise)return null;
+      return mathJax.tex2svgPromise(requested,{display:false});
+    }).then(function(rendered){
+      var currentNode=el(id);
+      if(rendered && currentNode && state.pending===null)currentNode.replaceChildren(rendered);
+    }).catch(function(error){
+      console.error('No fue posible actualizar el valor dinámico de n₀.',error);
+    }).finally(function(){
+      state.running=false;
+      if(state.pending!==null)renderDynamicMath(id,state.pending);
+    });
+  }
+  function updateDynamicN0(n0){
+    var latex=n0===null?'n_0\\text{ no existe}':'n_0='+thresholdNumber(n0);
+    renderDynamicMath('bo-n0',latex);
+    renderDynamicMath('bo-result-n0',latex);
+    renderDynamicMath('bo-leg-n0',isLogScale() && n0===0
+      ?'n_0=0\\;\\text{(no visible porque }\\log(0)\\text{ no está definido)}'
+      :latex);
+  }
   function enforceC(ck,gk){
     if(isThetaMode())return enforceThetaC(ck,gk);
     var input=el('bo-c'),k=cLowerBound(ck,gk);
@@ -661,6 +714,24 @@ _BIG_O_HTML = r"""
     thresholdCacheKey=cacheKey;
     thresholdCacheValue=verifiedRealThreshold(predicate,integerThreshold);
     return thresholdCacheValue;
+  }
+  function thetaThresholdComponents(ck,gk,c){
+    if(!isThetaMode())return [];
+    function solve(predicate,possible){
+      return verifiedRealThreshold(predicate,verifiedThreshold(predicate,possible));
+    }
+    var member=isMember(ck,gk);
+    var bookAgainstCubic=ck==='book' && gk==='n3';
+    return [
+      {kind:'lower',value:solve(
+        function(n){return c.c1*FNS[gk].fn(n)<=cFn(ck,n);},
+        member && c.c1<=1
+      )},
+      {kind:'upper',value:solve(
+        function(n){return cFn(ck,n)<=c.c2*FNS[gk].fn(n);},
+        member && (bookAgainstCubic?c.c2>1:c.c2>=1)
+      )}
+    ];
   }
   function verifiedRealThreshold(predicate,integerThreshold){
     if(integerThreshold===null)return null;
@@ -794,10 +865,14 @@ _BIG_O_HTML = r"""
       '<div class="demo-line">'+texBlock('n\\in '+realThresholdSetLatex(n0,includesBoundary))+'</div>'+
       defaultN0Html(n0)+'</div>';
   }
-  function proofHtml(ck,gk,c,n0){
+  function limitProofHtml(ck,gk,c){
     var limitProcedure=isThetaMode()?thetaLimitProcedureHtml(ck,gk):limitProcedureHtml(ck,gk);
     var thereforeBlock='<div class="demo-title">Por lo tanto:</div>'+
       '<div class="demo-line">'+texBlock('\\displaystyle '+cRule(ck,gk))+'</div>';
+    return '<div class="demo-title">Criterio correspondiente a la notación:</div>'+
+      limitProcedure+thereforeBlock;
+  }
+  function n0ProofHtml(ck,gk,c,n0){
     var n0Title=isThetaMode()
       ?'Determinación de '+titleTex('n_0')+' para '+titleTex('c_1='+fmt(c.c1))+' y '+titleTex('c_2='+fmt(c.c2))+':'
       :'Determinación de '+titleTex('n_0')+' para '+titleTex('c='+fmt(c))+':';
@@ -806,26 +881,25 @@ _BIG_O_HTML = r"""
     var partialSolutions=isThetaMode()?thetaPartialSolutionsHtml(ck,gk,c):'';
     var singleSolution=isThetaMode()?'':singleSolutionSetHtml(ck,gk,c,n0);
     if(n0===null){
-      return '<div class="demo-title">Demostración por límite:</div>'+
-        limitProcedure+
-        thereforeBlock+
-        '<div class="demo-sep"></div>'+
-        '<div class="demo-title">'+n0Title+'</div>'+
+      return '<div class="demo-title">'+n0Title+'</div>'+
         '<div class="demo-line">'+inequalityLine+'</div>'+
         '<div class="demo-line">'+substitutedInequalityLine+'</div>'+
         partialSolutions+
         singleSolution+
         '<div class="demo-line">'+texBlock('\\displaystyle n_0\\text{ no existe para las constantes seleccionadas}')+'</div>';
     }
-    return '<div class="demo-title">Demostración por límite:</div>'+
-      limitProcedure+
-      thereforeBlock+
-      '<div class="demo-sep"></div>'+
-      '<div class="demo-title">'+n0Title+'</div>'+
+    return '<div class="demo-title">'+n0Title+'</div>'+
       '<div class="demo-line">'+inequalityLine+'</div>'+
       '<div class="demo-line">'+substitutedInequalityLine+'</div>'+
       partialSolutions+
       singleSolution;
+  }
+  function resultSummaryHtml(ck,gk,c,threshold){
+    var relation=cLatex()+(isMember(ck,gk)?'\\in ':'\\notin ')+modeLatex()+'('+latexOf(gk)+')';
+    var solution='n\\in '+realThresholdSetLatex(
+      threshold,solutionIncludesBoundary(ck,gk,c,threshold)
+    );
+    return texBlock('\\displaystyle \\begin{gathered}'+relation+'\\\\[4pt]'+solution+'\\end{gathered}');
   }
   function readingText(ck,gk){
     if(!isMember(ck,gk))return 'La función seleccionada no satisface la relación asintótica de esta notación con la referencia actual.';
@@ -878,15 +952,39 @@ _BIG_O_HTML = r"""
     if(firstDot!==-1)text=text.slice(0,firstDot+1)+text.slice(firstDot+1).replace(/\\./g,'');
     target.textContent=text;
   }
+  function adaptiveSampleCount(ck,gk){
+    var count=Math.ceil(Math.max(320,W-PAD.l-PAD.r)/4);
+    if(isLogScale())count=Math.ceil(count*1.25);
+    if(FNS[ck].rank>=7 || FNS[gk].rank>=7)count=Math.ceil(count*1.4);
+    return Math.max(120,Math.min(520,count));
+  }
   function sample(a,b,ck,gk,c){
-    var cacheKey=scaleMode()+'|'+a+'|'+b+'|'+ck+'|'+gk+'|'+JSON.stringify(c);
+    var pointCount=adaptiveSampleCount(ck,gk);
+    var cacheKey=scaleMode()+'|'+W+'|'+a+'|'+b+'|'+ck+'|'+gk+'|'+JSON.stringify(c)+'|'+pointCount;
     if(cacheKey===sampleCacheKey)return sampleCacheValue;
     var xs=[],ys1=[],ys2=[],ys3=[],ys4=[],mx=0,mn=Infinity;
     var logSampling=isLogScale();
     var logLo=logSampling?Math.log10(logXMin(a,b)):0;
     var logHi=logSampling?Math.log10(Math.max(b,logXMin(a,b))):0;
-    for(var i=0;i<=260;i++){
-      var n=logSampling?Math.pow(10,logLo+(logHi-logLo)*i/260):a+(b-a)*i/260;
+    var positions=[];
+    for(var i=0;i<=pointCount;i++){
+      positions.push(logSampling?Math.pow(10,logLo+(logHi-logLo)*i/pointCount):a+(b-a)*i/pointCount);
+    }
+    var crossing=estimateN0(ck,gk,c);
+    if(crossing!==null && crossing>=a && crossing<=b){
+      positions.push(crossing);
+      if(logSampling && crossing>0){
+        var logStep=(logHi-logLo)/pointCount;
+        positions.push(crossing/Math.pow(10,logStep/3),crossing*Math.pow(10,logStep/3));
+      }else{
+        var step=(b-a)/pointCount;
+        positions.push(Math.max(a,crossing-step/3),Math.min(b,crossing+step/3));
+      }
+    }
+    positions.sort(function(left,right){return left-right;});
+    for(var positionIndex=0;positionIndex<positions.length;positionIndex++){
+      var n=positions[positionIndex];
+      if(positionIndex>0 && Math.abs(n-positions[positionIndex-1])<=Math.max(1e-12,Math.abs(n)*1e-14))continue;
       var v1=cFn(ck,n),v2=FNS[gk].fn(n),v3=upperFactor(c)*v2,v4=lowerFactor(c)*v2;
       if(isFinite(v1)&&isFinite(v2)&&isFinite(v3)&&isFinite(v4)){
         xs.push(n);ys1.push(v1);ys2.push(v2);ys3.push(v3);ys4.push(v4);
@@ -1061,6 +1159,29 @@ _BIG_O_HTML = r"""
     ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,H-PAD.b);ctx.stroke();
     ctx.restore();
   }
+  function drawThresholdAndCrossings(threshold,a,b,ck,gk,c,yrange){
+    if(threshold===null || threshold<a || threshold>b || (isLogScale() && threshold===0))return;
+    var x=tx(threshold,a,b);
+    ctx.save();
+    ctx.strokeStyle='#00838F';ctx.lineWidth=1.6;ctx.setLineDash([7,4]);
+    ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,H-PAD.b);ctx.stroke();
+    ctx.setLineDash([]);
+    var points=isThetaMode()?thetaThresholdComponents(ck,gk,c):[{kind:'single',value:threshold}];
+    points.forEach(function(point){
+      if(point.value===null || point.value<a || point.value>b || (isLogScale() && point.value===0))return;
+      var px=tx(point.value,a,b),py=ty(cFn(ck,point.value),yrange);
+      if(py===null || py<PAD.t || py>H-PAD.b)return;
+      var reference=FNS[gk].fn(point.value);
+      var bound=point.kind==='lower'?c.c1*reference:
+        (point.kind==='upper'?c.c2*reference:c*reference);
+      var left=cFn(ck,point.value);
+      if(Math.abs(left-bound)>Math.max(1e-8,Math.abs(left)*1e-7,Math.abs(bound)*1e-7))return;
+      ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);
+      ctx.fillStyle=point.kind==='lower'?'#EF6C00':'#00838F';
+      ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+    });
+    ctx.restore();
+  }
   function drawN0DisplacementFade(threshold,n0,a,b){
     var initialN0=minimumSelectedN0(threshold);
     if(initialN0===null || n0===null || n0<=initialN0+1e-12)return;
@@ -1146,11 +1267,13 @@ _BIG_O_HTML = r"""
     drawValidArea(data,a,b,yrange,n0);
     drawStaticLayer(staticCurves);
     drawN0DisplacementFade(threshold,n0,a,b);
+    drawThresholdAndCrossings(threshold,a,b,ck,gk,c,yrange);
     drawN0(n0,a,b,ck,yrange);
     ctx.restore();
     drawEndpointMarker(a,a,b,'a');
     drawEndpointMarker(b,a,b,'b');
-    updateText(a,b,ck,gk,c,threshold,lim);
+    if(drag==='n0')updateDynamicN0(n0);
+    else updateText(a,b,ck,gk,c,threshold,lim);
   }
   function requestDraw(){
     if(drawFramePending)return;
@@ -1163,9 +1286,9 @@ _BIG_O_HTML = r"""
   }
   function updateText(a,b,ck,gk,c,threshold,lim){
     var n0=selectedN0(threshold),cls=relationClass(ck,gk);
-    el('bo-interval').innerHTML=tex('['+valueLatex(a)+', '+valueLatex(b)+']');
+    el('bo-result-main').innerHTML=resultSummaryHtml(ck,gk,c,threshold);
+    el('bo-result-n0').innerHTML=n0===null?tex('n_0\\text{ no existe}'):tex('n_0='+thresholdNumber(n0));
     el('bo-n0').innerHTML=n0===null?tex('\\text{No existe}') : tex('n_0='+thresholdNumber(n0));
-    el('bo-limit').innerHTML=tex('k='+displayLimitValue(lim));
     el('bo-c-rule-label').textContent=isThetaMode()?'Condición sobre c₁,c₂':'Condición sobre c';
     el('bo-c-rule').innerHTML=tex(cRule(ck,gk));
     el('bo-status').className='val '+cls;
@@ -1185,6 +1308,10 @@ _BIG_O_HTML = r"""
     el('bo-leg-low-wrap').style.display=isThetaMode()?'inline':'none';
     el('bo-leg-low-wrap').style.color=c1gColor();
     el('bo-leg-low').innerHTML=tex('c_1\\cdot g(n)='+fmt(c.c1)+'\\cdot '+latexOf(gk));
+    el('bo-leg-threshold').parentElement.style.display=threshold===null?'none':'inline';
+    el('bo-leg-threshold').innerHTML=threshold===null?'':tex(
+      (isStrictMode()?'\\inf(I)=':'\\min(I)=')+thresholdNumber(threshold)
+    );
     el('bo-leg-n0').parentElement.style.color=n0Color();
     el('bo-leg-n0').innerHTML=n0===null
       ?tex('n_0\\text{ no existe}')
@@ -1193,21 +1320,23 @@ _BIG_O_HTML = r"""
         :tex('n_0='+thresholdNumber(n0)));
     var focusButton=el('bo-zoom-n0');
     focusButton.disabled=n0===null || (isLogScale() && n0===0);
+    focusButton.classList.toggle('active',n0FocusActive);
     focusButton.title=isLogScale() && n0===0
       ?'n₀ = 0 no puede mostrarse en una escala logarítmica'
       :'Ver el comportamiento alrededor de n₀';
-    el('bo-quotient').innerHTML=proofHtml(ck,gk,c,threshold);
+    el('bo-limit-proof').innerHTML=limitProofHtml(ck,gk,c);
+    el('bo-n0-proof').innerHTML=n0ProofHtml(ck,gk,c,threshold);
     renderLimits(ck,gk);
     typeset();
   }
   function renderLimits(ck,selectedG){
     var html='<table><thead><tr><th>'+tex('\\mathbf{g(n)}')+'</th>'+
-      '<th>Límite</th><th>Resultado</th></tr></thead><tbody>';
+      '<th>Resultado del límite '+tex('(k)')+'</th><th>Pertenencia</th></tr></thead><tbody>';
     ORDER.forEach(function(gk){
       var cls=relationClass(ck,gk);
       var rowClass=(isMember(ck,gk)?'member':'nonmember')+(gk===selectedG?' active':'');
       html+='<tr class="'+rowClass+'"><td>'+tex(latexOf(gk))+'</td>'+
-        '<td>'+tex(limitExpressionLatex(ck,gk,false))+'</td>'+
+        '<td>'+tex(displayLimitValue(limitValue(ck,gk)))+'</td>'+
         '<td class="'+cls+'">'+membershipText(ck,gk)+'</td></tr>';
     });
     html+='</tbody></table>';
@@ -1217,6 +1346,63 @@ _BIG_O_HTML = r"""
     var r=cv.getBoundingClientRect();
     return {x:ev.clientX-r.left,y:ev.clientY-r.top};
   }
+  function viewSnapshot(){
+    return {
+      mode:MODE,a:STATE_A,b:STATE_B,cIndex:STATE_C_INDEX,gIndex:STATE_G_INDEX,n0:STATE_N0,
+      c:el('bo-c').value,c1:el('bo-c1').value,c2:el('bo-c2').value,epsilon:el('bo-epsilon').value,
+      scale:el('bo-scale').value,yOffset:Y_OFFSET,yScale:Y_SCALE,
+      yRange:Y_RANGE_OVERRIDE?{min:Y_RANGE_OVERRIDE.min,max:Y_RANGE_OVERRIDE.max}:null,
+      focus:n0FocusActive,lockX:lockX,lockY:lockY
+    };
+  }
+  function updateHistoryButtons(){
+    el('bo-history-undo').disabled=historyUndo.length===0;
+    el('bo-history-redo').disabled=historyRedo.length===0;
+  }
+  function captureHistory(){
+    var snapshot=viewSnapshot();
+    if(!historyUndo.length || JSON.stringify(historyUndo[historyUndo.length-1])!==JSON.stringify(snapshot)){
+      historyUndo.push(snapshot);
+      if(historyUndo.length>50)historyUndo.shift();
+    }
+    historyRedo=[];
+    updateHistoryButtons();
+  }
+  function captureHistoryBurst(){
+    if(historyCapturePending)return;
+    historyCapturePending=true;captureHistory();
+    setTimeout(function(){historyCapturePending=false;},250);
+  }
+  function restoreSnapshot(snapshot){
+    MODE=snapshot.mode;STATE_A=snapshot.a;STATE_B=snapshot.b;
+    STATE_C_INDEX=snapshot.cIndex;STATE_G_INDEX=snapshot.gIndex;STATE_N0=snapshot.n0;
+    el('bo-mode').value=MODE;el('bo-c').value=snapshot.c;el('bo-c1').value=snapshot.c1;
+    el('bo-c2').value=snapshot.c2;el('bo-epsilon').value=snapshot.epsilon;
+    el('bo-scale').value=snapshot.scale;
+    Y_OFFSET=snapshot.yOffset;Y_SCALE=snapshot.yScale;
+    Y_RANGE_OVERRIDE=snapshot.yRange?{min:snapshot.yRange.min,max:snapshot.yRange.max}:null;
+    n0FocusActive=snapshot.focus;lockX=snapshot.lockX;lockY=snapshot.lockY;
+    el('bo-lock-x').classList.toggle('active',lockX);
+    el('bo-lock-y').classList.toggle('active',lockY);
+    el('bo-lock-x').setAttribute('aria-pressed',lockX?'true':'false');
+    el('bo-lock-y').setAttribute('aria-pressed',lockY?'true':'false');
+    updateConstantControls();syncInputs(STATE_A,STATE_B);draw();
+  }
+  function undoHistory(){
+    if(!historyUndo.length)return;
+    historyRedo.push(viewSnapshot());
+    restoreSnapshot(historyUndo.pop());updateHistoryButtons();
+  }
+  function redoHistory(){
+    if(!historyRedo.length)return;
+    historyUndo.push(viewSnapshot());
+    restoreSnapshot(historyRedo.pop());updateHistoryButtons();
+  }
+  function deactivateN0Focus(){
+    if(!n0FocusActive)return;
+    n0FocusActive=false;
+    el('bo-zoom-n0').classList.remove('active');
+  }
   function handleEndpointInput(id){
     var input=el(id),raw=parsePowerInput(input.textContent,id==='bo-a');
     if(!isFinite(raw))return;
@@ -1225,6 +1411,7 @@ _BIG_O_HTML = r"""
     typeset();
   }
   function stepFunction(kind,direction){
+    captureHistory();
     if(kind==='c'){
       STATE_C_INDEX=Math.max(0,Math.min(C_ORDER.length-1,STATE_C_INDEX+direction));
     }else{
@@ -1239,6 +1426,8 @@ _BIG_O_HTML = r"""
     requestDraw();
   }
   function stepEndpoint(kind,direction){
+    if(lockX)return;
+    captureHistory();deactivateN0Focus();
     if(kind==='a'){
       var nextA=direction>0?nextPower(STATE_A,true):previousPower(STATE_A,true);
       syncInputs(Math.min(nextA,STATE_B-1),STATE_B);
@@ -1256,6 +1445,9 @@ _BIG_O_HTML = r"""
     return a+(b-a)/2;
   }
   function zoomAt(focus,factor){
+    if(lockX)return;
+    captureHistoryBurst();
+    deactivateN0Focus();
     var ab=interval(),a=ab[0],b=ab[1],span=b-a;
     focus=Math.max(a,Math.min(b,focus));
     var nextSpan=Math.max(MIN_SPAN,Math.min(MAX_B,span*factor));
@@ -1275,6 +1467,7 @@ _BIG_O_HTML = r"""
     zoomAt(zoomCenter(ab[0],ab[1]),2);
   }
   function resetZoom(){
+    captureHistory();deactivateN0Focus();
     resetInterval();
     Y_OFFSET=0;Y_SCALE=1;Y_RANGE_OVERRIDE=null;
     draw();
@@ -1304,6 +1497,7 @@ _BIG_O_HTML = r"""
     var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
     var n0=selectedN0(estimateN0(ck,gk,c));
     if(n0===null || (isLogScale() && n0===0))return;
+    captureHistory();
     var nextA,nextB;
     if(isLogScale()){
       nextA=Math.max(1e-9,n0/Math.pow(10,0.12));
@@ -1320,11 +1514,15 @@ _BIG_O_HTML = r"""
     selectionMode=false;cancelSelection();
     el('bo-zoom-select').classList.remove('active');
     cv.style.cursor='grab';
-    syncInputs(nextA,nextB);
-    Y_OFFSET=0;Y_SCALE=1;
-    var focusData=sample(nextA,nextB,ck,gk,c);
-    Y_RANGE_OVERRIDE=yBounds(focusData);
-    focusVerticalAroundCurves(focusData,Y_RANGE_OVERRIDE);
+    if(!lockX)syncInputs(nextA,nextB);
+    if(!lockY){Y_OFFSET=0;Y_SCALE=1;}
+    var focusedInterval=interval();
+    var focusData=sample(focusedInterval[0],focusedInterval[1],ck,gk,c);
+    if(!lockY){
+      Y_RANGE_OVERRIDE=yBounds(focusData);
+      focusVerticalAroundCurves(focusData,Y_RANGE_OVERRIDE);
+    }
+    n0FocusActive=true;
     draw();
   }
   function clampPlotPoint(p){
@@ -1348,10 +1546,13 @@ _BIG_O_HTML = r"""
     if(x2-x1<8 || y2-y1<8)return;
     var ab=interval(),a=ab[0],b=ab[1];
     var nextA=Math.max(a,Math.min(b,fx(x1,a,b))),nextB=Math.max(a,Math.min(b,fx(x2,a,b)));
-    if(nextB-nextA>=MIN_SPAN)syncInputs(nextA,nextB);
+    if(!lockX && nextB-nextA>=MIN_SPAN)syncInputs(nextA,nextB);
     var plotHeight=H-PAD.t-PAD.b,scaleFactor=plotHeight/(y2-y1),center=(PAD.t+H-PAD.b)/2;
-    Y_SCALE*=scaleFactor;
-    Y_OFFSET=scaleFactor*center+scaleFactor*Y_OFFSET+PAD.t-scaleFactor*y1-center;
+    if(!lockY){
+      Y_SCALE*=scaleFactor;
+      Y_OFFSET=scaleFactor*center+scaleFactor*Y_OFFSET+PAD.t-scaleFactor*y1-center;
+    }
+    deactivateN0Focus();
     selectionMode=false;el('bo-zoom-select').classList.remove('active');cv.style.cursor='grab';
     draw();
   }
@@ -1380,8 +1581,8 @@ _BIG_O_HTML = r"""
     if(selectionStart){showSelection(selectionStart,clampPlotPoint(p));return;}
     if(!drag)return;
     var ab=interval(),a=ab[0],b=ab[1],x=fx(p.x,a,b);
-    if(drag==='a')syncInputs(Math.min(Math.max(0,x),b-MIN_SPAN),b);
-    if(drag==='b')syncInputs(a,Math.max(x,a+MIN_SPAN));
+    if(drag==='a' && !lockX){deactivateN0Focus();syncInputs(Math.min(Math.max(0,x),b-MIN_SPAN),b);}
+    if(drag==='b' && !lockX){deactivateN0Focus();syncInputs(a,Math.max(x,a+MIN_SPAN));}
     if(drag==='n0'){
       var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
       var minimum=minimumSelectedN0(estimateN0(ck,gk,c));
@@ -1393,13 +1594,15 @@ _BIG_O_HTML = r"""
       var na=panStart.a+delta,nb=panStart.b+delta;
       if(na<0){na=0;nb=na+span;}
       if(nb>MAX_B){nb=MAX_B;na=Math.max(0,nb-span);}
-      syncInputs(na,nb);
-      Y_OFFSET=panStart.yOffset+(p.y-panStart.y);
+      if(!lockX)syncInputs(na,nb);
+      if(!lockY)Y_OFFSET=panStart.yOffset+(p.y-panStart.y);
+      if(!lockX || !lockY)deactivateN0Focus();
     }
     requestDraw();
   }
   cv.addEventListener('pointerdown',function(ev){
     ev.preventDefault();
+    captureHistory();
     cv.setPointerCapture(ev.pointerId);
     activePointers[ev.pointerId]=pointer(ev);
     var points=activePointerValues();
@@ -1417,8 +1620,9 @@ _BIG_O_HTML = r"""
     zoomAt(fx(p.x,ab[0],ab[1]),factor);
   },{passive:false});
   cv.addEventListener('pointermove',function(ev){
+    var currentPoint=pointer(ev);
     if(!(ev.pointerId in activePointers))return;
-    activePointers[ev.pointerId]=pointer(ev);
+    activePointers[ev.pointerId]=currentPoint;
     var points=activePointerValues();
     if(points.length>=2){
       var distance=pointerDistance(points),ab=interval();
@@ -1443,6 +1647,16 @@ _BIG_O_HTML = r"""
   el('bo-zoom-in').addEventListener('click',zoomIn);
   el('bo-zoom-out').addEventListener('click',zoomOut);
   el('bo-zoom-n0').addEventListener('click',focusAroundN0);
+  el('bo-history-undo').addEventListener('click',undoHistory);
+  el('bo-history-redo').addEventListener('click',redoHistory);
+  el('bo-lock-x').addEventListener('click',function(){
+    captureHistory();lockX=!lockX;
+    this.classList.toggle('active',lockX);this.setAttribute('aria-pressed',lockX?'true':'false');
+  });
+  el('bo-lock-y').addEventListener('click',function(){
+    captureHistory();lockY=!lockY;
+    this.classList.toggle('active',lockY);this.setAttribute('aria-pressed',lockY?'true':'false');
+  });
   el('bo-zoom-trackpad').addEventListener('click',function(){
     trackpadZoomEnabled=!trackpadZoomEnabled;
     this.classList.toggle('active',trackpadZoomEnabled);
@@ -1456,6 +1670,7 @@ _BIG_O_HTML = r"""
   el('bo-mode').value=MODE;
   if(MODE_SELECTABLE){
     el('bo-mode').addEventListener('change',function(){
+      captureHistory();
       MODE=this.value;
       STATE_G_INDEX=ORDER.indexOf(defaultGKeyForMode());
       resetSelectedN0();
@@ -1468,17 +1683,20 @@ _BIG_O_HTML = r"""
     });
   }
   ['bo-c','bo-c1','bo-c2'].forEach(function(id){
+    el(id).addEventListener('focus',captureHistory);
     el(id).addEventListener('input',function(){
       preserveViewportForParameterChange();
       draw();
     });
   });
+  el('bo-epsilon').addEventListener('focus',captureHistory);
   el('bo-epsilon').addEventListener('input',function(){
     if((parseFloat(this.value)||0)<=0)this.value=0.000001;
     preserveViewportForParameterChange();
     draw();
   });
-  el('bo-scale').addEventListener('input',function(){Y_RANGE_OVERRIDE=null;draw();});
+  el('bo-scale').addEventListener('focus',captureHistory);
+  el('bo-scale').addEventListener('input',function(){Y_RANGE_OVERRIDE=null;deactivateN0Focus();draw();});
   ['bo-a','bo-b'].forEach(function(id){
     el(id).addEventListener('focus',function(){beginEditableField(id);});
     el(id).addEventListener('input',function(){sanitizeEditableField(id);});
