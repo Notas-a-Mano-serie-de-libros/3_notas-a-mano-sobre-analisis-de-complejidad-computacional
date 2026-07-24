@@ -236,6 +236,58 @@ def test_control_epsilon_y_arrastre_de_n0_estan_disponibles():
     assert "rgba(120,120,120,0.12)" in html
 
 
+def test_boton_activa_y_desactiva_zoom_con_trackpad():
+    html = load_animation_module()._BIG_O_HTML
+    assert 'id="bo-zoom-trackpad"' in html
+    assert 'aria-pressed="false"' in html
+    assert "trackpadZoomEnabled=false" in html
+    assert "trackpadZoomEnabled=!trackpadZoomEnabled" in html
+    assert "if(!trackpadZoomEnabled)return;" in html
+
+
+def test_etiquetas_de_controles_estan_centradas_en_su_columna():
+    html = load_animation_module()._BIG_O_HTML
+    assert ".label-text{display:inline-flex;align-items:center;justify-content:center;" in html
+    assert "min-width:48px;text-align:center" in html
+
+
+def test_grafica_usa_altura_ampliada():
+    html = load_animation_module()._BIG_O_HTML
+    assert ".plot-wrap{position:relative;width:100%;height:480px}" in html
+    assert "canvas{display:block;width:100%;height:480px" in html
+
+
+def test_leyenda_esta_dentro_de_la_esquina_superior_izquierda():
+    html = load_animation_module()._BIG_O_HTML
+    assert ".legend{position:absolute;left:92px;top:48px;" in html
+    assert "flex-direction:column;align-items:flex-start" in html
+    assert "width:250px;box-sizing:border-box" in html
+    assert "PAD={l:82,r:32,t:38,b:58}" in html
+    assert ".axis-x{left:82px;right:32px" in html
+    assert "ctx.rect(PAD.l,PAD.t,W-PAD.l-PAD.r,H-PAD.t-PAD.b)" in html
+    assert "border:1px solid rgba(80,80,80,.28)" in html
+    assert "box-shadow:0 1px 3px rgba(0,0,0,.10)" in html
+    plot = html.split('<div class="plot-wrap">', 1)[1].split('<div class="note"', 1)[0]
+    assert plot.index('id="bo-leg-c"') < plot.index('id="bo-leg-low"')
+    assert plot.index('id="bo-leg-low"') < plot.index('id="bo-leg-cg"')
+    assert plot.index('id="bo-leg-cg"') < plot.index('id="bo-leg-n0"')
+
+
+def test_parametros_reservan_altura_para_dos_filas():
+    html = load_animation_module()._BIG_O_HTML
+    assert ".ctrl.vertical.additional{min-height:72px}" in html
+
+
+def test_etiquetas_a_y_b_quedan_debajo_de_los_ticks_y_evitan_el_titulo():
+    html = load_animation_module()._BIG_O_HTML
+    assert "ctx.moveTo(x,y+22);ctx.lineTo(x-6,y+33);ctx.lineTo(x+6,y+33)" in html
+    assert "if(!overlapsAxisTitle){" in html
+    assert "ctx.fillText(label,x,y+36)" in html
+    assert "axisTitle='Tamaño de la entrada (n)'" in html
+    assert "ctx.fillStyle='#6A1B9A';ctx.strokeStyle='#6A1B9A'" in html
+    assert "function n0Color(){return '#2E7D32'}" in html
+
+
 def test_titulo_de_interseccion_theta_esta_alineado_a_la_izquierda():
     html = load_animation_module()._BIG_O_HTML
     assert '<div class="theta-intersection"><div class="solution-title">Valores que cumplen ambas desigualdades ' in html

@@ -47,8 +47,8 @@ run_app = run_big_o_app
 _BIG_O_HTML = r"""
 <style>
 #bo-wrap{background:#ffffff;font-family:sans-serif;padding:14px 4px;color:#333}
-#bo-wrap .plot-wrap{position:relative;width:100%;height:380px}
-#bo-wrap canvas{display:block;width:100%;height:380px;background:#ffffff;border:1px solid #e0e0e0;touch-action:none;cursor:grab}
+#bo-wrap .plot-wrap{position:relative;width:100%;height:480px}
+#bo-wrap canvas{display:block;width:100%;height:480px;background:#ffffff;border:1px solid #e0e0e0;touch-action:none;cursor:grab}
 #bo-wrap .zoom-controls{position:absolute;top:10px;right:10px;z-index:2;display:flex;gap:4px}
 #bo-wrap .zoom-btn{width:34px;height:32px;border:1px solid #bbb;border-radius:3px;background:rgba(255,255,255,.94);color:#333;cursor:pointer;font-size:20px;line-height:1}
 #bo-wrap .zoom-btn:hover{background:#f1f1f1}
@@ -62,9 +62,10 @@ _BIG_O_HTML = r"""
 #bo-wrap .control-section>.row-title{margin-bottom:4px}
 #bo-wrap .ctrl{display:flex;gap:28px;flex-wrap:wrap;margin:0 0 12px 4px;align-items:center;font-size:13px;color:#333}
 #bo-wrap .ctrl.vertical{flex-direction:column;align-items:flex-start;gap:8px}
+#bo-wrap .ctrl.vertical.additional{min-height:72px}
 #bo-wrap .controls-grid .ctrl{margin-bottom:0}
 #bo-wrap .ctrl label{display:flex;align-items:center;gap:8px;font-weight:600;min-height:32px}
-#bo-wrap .ctrl .label-text{display:inline-flex;align-items:center;justify-content:flex-end;width:48px;min-width:48px}
+#bo-wrap .ctrl .label-text{display:inline-flex;align-items:center;justify-content:center;width:48px;min-width:48px;text-align:center}
 #bo-wrap .mode-section{display:__MODE_SELECTOR_DISPLAY__}
 #bo-wrap .theta-c{display:none}
 #bo-wrap .row-title{font-weight:700;color:#333;line-height:1.1}
@@ -104,7 +105,7 @@ _BIG_O_HTML = r"""
 #bo-wrap .instructions .row-title{margin-bottom:4px}
 #bo-wrap .instructions ul{margin:0 0 0 18px;padding:0;font-size:13px;color:#555}
 #bo-wrap .instructions li{margin:2px 0}
-#bo-wrap .legend{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-top:8px;font-size:14px;color:#333}
+#bo-wrap .legend{position:absolute;left:92px;top:48px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:7px;width:250px;box-sizing:border-box;padding:7px 9px;border:1px solid rgba(80,80,80,.28);border-radius:4px;background:rgba(255,255,255,.90);box-shadow:0 1px 3px rgba(0,0,0,.10);font-size:14px;color:#333}
 #bo-wrap .legend .sw{display:inline-block;width:22px;height:0;border-top:3px solid currentColor;vertical-align:middle;margin-right:6px}
 #bo-wrap .note{margin:8px auto 0;max-width:980px;text-align:center;font-size:13px;color:#555}
 @media(max-width:900px){#bo-wrap .cards{grid-template-columns:repeat(2,1fr)}}
@@ -118,7 +119,7 @@ _BIG_O_HTML = r"""
       <li>Puedes escribir valores para \(a\) y \(b\), incluyendo valores como \(10^{20}\), \(1\) o \(15.5\).</li>
       <li>Arrastra cerca del borde izquierdo o derecho de la gráfica para mover \(a\) o \(b\); arrastra el interior para desplazar la vista en los ejes \(x\) y \(y\).</li>
       <li>Arrastra la línea verde de \(n_0\) para seleccionar cualquier umbral válido dentro del conjunto solución.</li>
-      <li>Usa la rueda del mouse, el trackpad o los botones − y + de la gráfica para reducir o ampliar la vista.</li>
+      <li>Con el botón TP activo, usa la rueda del mouse o el trackpad para reducir o ampliar la vista; también puedes utilizar los botones − y +.</li>
       <li>Activa Seleccionar área y arrastra un rectángulo sobre la gráfica para ampliar una región específica.</li>
     </ul>
   </div>
@@ -197,6 +198,7 @@ _BIG_O_HTML = r"""
     <div class="zoom-controls" aria-label="Controles de zoom">
       <button type="button" class="zoom-btn" id="bo-zoom-out" title="Reducir la gráfica" aria-label="Reducir la gráfica">−</button>
       <button type="button" class="zoom-btn" id="bo-zoom-in" title="Ampliar la gráfica" aria-label="Ampliar la gráfica">+</button>
+      <button type="button" class="zoom-btn" id="bo-zoom-trackpad" title="Activar o desactivar el zoom con trackpad" aria-label="Activar o desactivar el zoom con trackpad" aria-pressed="false" style="font-size:11px;font-weight:700">TP</button>
       <button type="button" class="zoom-btn" id="bo-zoom-select" title="Seleccionar un área" aria-label="Seleccionar un área">□</button>
       <button type="button" class="zoom-btn" id="bo-zoom-reset" title="Restablecer el zoom" aria-label="Restablecer el zoom">↺</button>
     </div>
@@ -204,12 +206,12 @@ _BIG_O_HTML = r"""
     <canvas id="bo-cv"></canvas>
     <div class="axis-label axis-x">\(\text{Tamaño de la entrada }(n)\)</div>
     <div class="axis-label axis-y" id="bo-axis-y">—</div>
-  </div>
-  <div class="legend">
-    <span style="color:#1565C0"><span class="sw"></span><span id="bo-leg-c">—</span></span>
-    <span style="color:#B71C1C"><span class="sw"></span><span id="bo-leg-cg">—</span></span>
-    <span style="color:#EF6C00;display:none" id="bo-leg-low-wrap"><span class="sw"></span><span id="bo-leg-low">—</span></span>
-    <span style="color:#2E7D32"><span class="sw" style="border-top-style:dotted"></span><span id="bo-leg-n0">—</span></span>
+    <div class="legend">
+      <span style="color:#1565C0"><span class="sw"></span><span id="bo-leg-c">—</span></span>
+      <span style="color:#EF6C00;display:none" id="bo-leg-low-wrap"><span class="sw"></span><span id="bo-leg-low">—</span></span>
+      <span style="color:#B71C1C"><span class="sw"></span><span id="bo-leg-cg">—</span></span>
+      <span style="color:#2E7D32"><span class="sw" style="border-top-style:dotted"></span><span id="bo-leg-n0">—</span></span>
+    </div>
   </div>
   <div class="note" id="bo-reading">—</div>
   <div class="cards">
@@ -252,7 +254,7 @@ _BIG_O_HTML = r"""
   var MODE_SELECTABLE=__MODE_SELECTABLE__;
   var root=document.getElementById('bo-wrap');
   var cv=document.getElementById('bo-cv'),ctx=cv.getContext('2d');
-  var W=0,H=0,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,selectionMode=false,selectionStart=null;
+  var W=0,H=0,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false;
   var FNS={
     one:{label:'1',latex:'1',rank:0,fn:function(n){return 1;}},
     log:{label:'log₂(n)',latex:'\\log_2(n)',rank:1,fn:function(n){return n<=1?0:Math.log2(n);}},
@@ -1055,11 +1057,21 @@ _BIG_O_HTML = r"""
   function drawEndpointMarker(n,a,b,label){
     var x=tx(n,a,b),y=H-PAD.b;
     ctx.save();
-    ctx.fillStyle='#2E7D32';ctx.strokeStyle='#2E7D32';
-    ctx.beginPath();
-    ctx.moveTo(x,y+2);ctx.lineTo(x-6,y+13);ctx.lineTo(x+6,y+13);ctx.closePath();ctx.fill();
-    ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
-    ctx.fillText(label,x,y+16);
+    ctx.textAlign='center';ctx.textBaseline='top';
+    var axisTitle='Tamaño de la entrada (n)';
+    var axisCenter=PAD.l+(W-PAD.l-PAD.r)/2;
+    ctx.font='14px sans-serif';
+    var axisHalfWidth=ctx.measureText(axisTitle).width/2+12;
+    ctx.font='bold 12px sans-serif';
+    var labelHalfWidth=ctx.measureText(label).width/2;
+    var overlapsAxisTitle=x+labelHalfWidth>=axisCenter-axisHalfWidth &&
+      x-labelHalfWidth<=axisCenter+axisHalfWidth;
+    if(!overlapsAxisTitle){
+      ctx.fillStyle='#6A1B9A';ctx.strokeStyle='#6A1B9A';
+      ctx.beginPath();
+      ctx.moveTo(x,y+22);ctx.lineTo(x-6,y+33);ctx.lineTo(x+6,y+33);ctx.closePath();ctx.fill();
+      ctx.fillText(label,x,y+36);
+    }
     ctx.restore();
   }
   function draw(){
@@ -1278,6 +1290,7 @@ _BIG_O_HTML = r"""
     resetZoom();
   });
   cv.addEventListener('wheel',function(ev){
+    if(!trackpadZoomEnabled)return;
     ev.preventDefault();
     var p=pointer(ev),ab=interval();
     var factor=Math.max(0.5,Math.min(2,Math.exp(ev.deltaY*0.002)));
@@ -1305,10 +1318,15 @@ _BIG_O_HTML = r"""
   }
   cv.addEventListener('pointerup',endPointer);
   cv.addEventListener('pointercancel',endPointer);
-  cv.addEventListener('gesturestart',function(ev){ev.preventDefault();gestureScale=ev.scale||1;},{passive:false});
-  cv.addEventListener('gesturechange',function(ev){ev.preventDefault();var ab=interval(),scale=ev.scale||gestureScale;zoomAt(zoomCenter(ab[0],ab[1]),gestureScale/scale);gestureScale=scale;},{passive:false});
+  cv.addEventListener('gesturestart',function(ev){if(!trackpadZoomEnabled)return;ev.preventDefault();gestureScale=ev.scale||1;},{passive:false});
+  cv.addEventListener('gesturechange',function(ev){if(!trackpadZoomEnabled)return;ev.preventDefault();var ab=interval(),scale=ev.scale||gestureScale;zoomAt(zoomCenter(ab[0],ab[1]),gestureScale/scale);gestureScale=scale;},{passive:false});
   el('bo-zoom-in').addEventListener('click',function(){var ab=interval();zoomAt(zoomCenter(ab[0],ab[1]),0.75);});
   el('bo-zoom-out').addEventListener('click',function(){var ab=interval();zoomAt(zoomCenter(ab[0],ab[1]),4/3);});
+  el('bo-zoom-trackpad').addEventListener('click',function(){
+    trackpadZoomEnabled=!trackpadZoomEnabled;
+    this.classList.toggle('active',trackpadZoomEnabled);
+    this.setAttribute('aria-pressed',trackpadZoomEnabled?'true':'false');
+  });
   el('bo-zoom-select').addEventListener('click',function(){
     selectionMode=!selectionMode;cancelSelection();
     this.classList.toggle('active',selectionMode);cv.style.cursor=selectionMode?'crosshair':'grab';
