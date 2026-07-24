@@ -1,30 +1,44 @@
 from __future__ import annotations
 
+from uuid import uuid4
+
 from IPython.display import HTML, display
 
 
-def _run_app(mode: str):
-    display(HTML(_BIG_O_HTML.replace("__MODE__", mode)))
+def _run_app(mode: str, allow_mode_selection: bool = False):
+    instance_prefix = f"asym-{uuid4().hex}-"
+    html = (
+        _BIG_O_HTML
+        .replace("__MODE__", mode)
+        .replace("__MODE_SELECTABLE__", str(allow_mode_selection).lower())
+        .replace("__MODE_SELECTOR_DISPLAY__", "grid" if allow_mode_selection else "none")
+        .replace("bo-", instance_prefix)
+    )
+    display(HTML(html))
+
+
+def run_comparison_app():
+    _run_app("big_o", allow_mode_selection=True)
 
 
 def run_big_o_app():
-    _run_app("big_o")
+    _run_app("big_o", allow_mode_selection=True)
 
 
 def run_little_o_app():
-    _run_app("little_o")
+    _run_app("little_o", allow_mode_selection=True)
 
 
 def run_big_omega_app():
-    _run_app("big_omega")
+    _run_app("big_omega", allow_mode_selection=True)
 
 
 def run_little_omega_app():
-    _run_app("little_omega")
+    _run_app("little_omega", allow_mode_selection=True)
 
 
 def run_theta_app():
-    _run_app("theta")
+    _run_app("theta", allow_mode_selection=True)
 
 
 run_app = run_big_o_app
@@ -51,6 +65,7 @@ _BIG_O_HTML = r"""
 #bo-wrap .controls-grid .ctrl{margin-bottom:0}
 #bo-wrap .ctrl label{display:flex;align-items:center;gap:8px;font-weight:600;min-height:32px}
 #bo-wrap .ctrl .label-text{display:inline-flex;align-items:center;justify-content:flex-end;width:48px;min-width:48px}
+#bo-wrap .mode-section{display:__MODE_SELECTOR_DISPLAY__}
 #bo-wrap .theta-c{display:none}
 #bo-wrap .row-title{font-weight:700;color:#333;line-height:1.1}
 #bo-wrap select,#bo-wrap input[type=number],#bo-wrap input[type=text]{width:112px;height:32px;box-sizing:border-box;padding:2px 4px;border:1px solid #ccc;border-radius:3px;font-size:13px;text-align:center}
@@ -102,11 +117,32 @@ _BIG_O_HTML = r"""
       <li>Usa los controles para seleccionar \(C(n)\), \(g(n)\), el intervalo visible, las constantes y la escala.</li>
       <li>Puedes escribir valores para \(a\) y \(b\), incluyendo valores como \(10^{20}\), \(1\) o \(15.5\).</li>
       <li>Arrastra cerca del borde izquierdo o derecho de la gráfica para mover \(a\) o \(b\); arrastra el interior para desplazar la vista en los ejes \(x\) y \(y\).</li>
+      <li>Arrastra la línea verde de \(n_0\) para seleccionar cualquier umbral válido dentro del conjunto solución.</li>
       <li>Usa la rueda del mouse, el trackpad o los botones − y + de la gráfica para reducir o ampliar la vista.</li>
       <li>Activa Seleccionar área y arrastra un rectángulo sobre la gráfica para ampliar una región específica.</li>
     </ul>
   </div>
   <div class="controls-grid">
+  <div class="control-section mode-section">
+    <div class="row-title">Notación:</div>
+    <div class="ctrl vertical">
+      <label><span class="label-text">\(\mathcal{F}\)</span>
+        <select id="bo-mode">
+          <option value="big_o">Big-O</option>
+          <option value="little_o">little-o</option>
+          <option value="big_omega">Big-Ω</option>
+          <option value="little_omega">little-ω</option>
+          <option value="theta">Theta</option>
+        </select>
+      </label>
+      <label><span class="label-text">\(\text{Escala}\)</span>
+        <select id="bo-scale">
+          <option value="linear" selected>Lineal</option>
+          <option value="log">Logarítmica</option>
+        </select>
+      </label>
+    </div>
+  </div>
   <div class="control-section">
     <div class="row-title">Funciones de referencia:</div>
     <div class="ctrl">
@@ -153,12 +189,7 @@ _BIG_O_HTML = r"""
     <label class="single-c"><span class="label-text">\(c\)</span><input type="number" id="bo-c" min="0.1" max="1000" value="1" step="0.1"></label>
     <label class="theta-c"><span class="label-text">\(c_1\)</span><input type="number" id="bo-c1" min="0.1" max="1000" value="0.1" step="0.1"></label>
     <label class="theta-c"><span class="label-text">\(c_2\)</span><input type="number" id="bo-c2" min="0.1" max="1000" value="1.1" step="0.1"></label>
-    <label><span class="label-text">\(\text{Escala}\)</span>
-      <select id="bo-scale">
-        <option value="linear" selected>Lineal</option>
-        <option value="log">Logarítmica</option>
-      </select>
-    </label>
+    <label class="little-c"><span class="label-text">\(\varepsilon\)</span><input type="number" id="bo-epsilon" min="0.000001" max="1000" value="0.01" step="0.01"></label>
     </div>
   </div>
   </div>
@@ -183,7 +214,7 @@ _BIG_O_HTML = r"""
   <div class="note" id="bo-reading">—</div>
   <div class="cards">
     <div class="card"><div class="lbl">Intervalo visible</div><div class="val" id="bo-interval">—</div></div>
-    <div class="card"><div class="lbl">n₀ estimado</div><div class="val" id="bo-n0">—</div></div>
+    <div class="card"><div class="lbl">n₀ seleccionado</div><div class="val" id="bo-n0">—</div></div>
     <div class="card"><div class="lbl">Límite del cociente</div><div class="val" id="bo-limit">—</div></div>
     <div class="card"><div class="lbl" id="bo-c-rule-label">Condición sobre c</div><div class="val" id="bo-c-rule">—</div></div>
     <div class="card"><div class="lbl">Conclusión</div><div class="val" id="bo-status">—</div></div>
@@ -194,20 +225,31 @@ _BIG_O_HTML = r"""
 </div>
 
 <script>
-window.MathJax = {
-  loader:{load:['[tex]/boldsymbol','[tex]/cancel']},
-  tex:{
-    packages:{'[+]':['boldsymbol','cancel']},
-    inlineMath:[['\\(','\\)'],['$$','$$']],
-    displayMath:[['\\[','\\]'],['$$','$$']]
-  },
-  svg:{fontCache:'none'}
-};
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-<script>
 (function(){
+  if(!window.__asymptoticMathJaxReady){
+    window.__asymptoticMathJaxReady=new Promise(function(resolve,reject){
+      window.MathJax={
+        loader:{load:['[tex]/boldsymbol','[tex]/cancel']},
+        tex:{
+          packages:{'[+]':['boldsymbol','cancel']},
+          inlineMath:[['\\(','\\)'],['$$','$$']],
+          displayMath:[['\\[','\\]'],['$$','$$']]
+        },
+        svg:{fontCache:'none'}
+      };
+      var script=document.createElement('script');
+      script.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+      script.async=true;
+      script.onload=function(){
+        var startup=window.MathJax && MathJax.startup && MathJax.startup.promise;
+        Promise.resolve(startup).then(function(){resolve(window.MathJax);},reject);
+      };
+      script.onerror=function(){reject(new Error('No fue posible cargar MathJax.'));};
+      document.head.appendChild(script);
+    });
+  }
   var MODE='__MODE__';
+  var MODE_SELECTABLE=__MODE_SELECTABLE__;
   var root=document.getElementById('bo-wrap');
   var cv=document.getElementById('bo-cv'),ctx=cv.getContext('2d');
   var W=0,H=0,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,selectionMode=false,selectionStart=null;
@@ -225,26 +267,28 @@ window.MathJax = {
   };
   var ORDER=['one','log','n','nlog','n2','n3','n4','exp','fact'];
   var C_ORDER=['book','one','log','n','nlog','n2','n3','exp','fact'];
-  var LOWER_TERMS=[];
   var MAX_B=100000000000000000000;
   var MIN_SPAN=0.000001;
-  var STATE_A=0,STATE_B=MAX_B,STATE_C_INDEX=0,STATE_G_INDEX=ORDER.indexOf('n3');
-  function el(id){return document.getElementById(id);}
+  function defaultGKeyForMode(){
+    if(MODE==='little_o')return 'n4';
+    if(MODE==='little_omega')return 'n2';
+    return 'n3';
+  }
+  var STATE_A=0,STATE_B=MAX_B,STATE_C_INDEX=0,STATE_G_INDEX=ORDER.indexOf(defaultGKeyForMode()),STATE_N0=null;
+  function el(id){return typeof document==='undefined'?null:document.getElementById(id);}
   function cKey(){return C_ORDER[STATE_C_INDEX]}
   function gKey(){return ORDER[STATE_G_INDEX]}
   function cVal(){return Math.max(0.1,parseFloat(el('bo-c').value)||1)}
   function c1Val(){return Math.max(0.1,parseFloat(el('bo-c1').value)||1)}
   function c2Val(){return Math.max(0.1,parseFloat(el('bo-c2').value)||1)}
+  function epsilonVal(){
+    var input=el('bo-epsilon');
+    return Math.max(0.000001,parseFloat(input?input.value:0.01)||0.01);
+  }
   function upperFactor(c){return isThetaMode()?c.c2:c}
   function lowerFactor(c){return isThetaMode()?c.c1:c}
   function scaleMode(){return el('bo-scale').value}
   function isLogScale(){return scaleMode()==='log'}
-  function decadeValue(exp){return Math.pow(10,Math.max(0,Math.round(exp)))}
-  function nearestDecade(value,allowZero){
-    if(allowZero && value<=0)return 0;
-    if(value<=1)return 1;
-    return Math.pow(10,Math.round(Math.log10(value)));
-  }
   function powerText(value){
     if(!isFinite(value))return '∞';
     if(value===0)return '0';
@@ -270,6 +314,7 @@ window.MathJax = {
     if(!isFinite(value))return '\\infty';
     if(value===0)return '0';
     if(isPowerOfTen(value))return powerLatex(value);
+    if(Math.abs(value)>=10000 || Math.abs(value)<0.001)return fmt(value);
     return fmtNumber(value);
   }
   function fmtNumber(value){
@@ -298,7 +343,11 @@ window.MathJax = {
   }
   function fmt(x){
     if(!isFinite(x))return '∞';
-    if(Math.abs(x)>=10000 || (Math.abs(x)>0 && Math.abs(x)<0.001))return x.toExponential(2);
+    if(Math.abs(x)>=10000 || (Math.abs(x)>0 && Math.abs(x)<0.001)){
+      var exponent=Math.floor(Math.log10(Math.abs(x)));
+      var mantissa=Math.round(x/Math.pow(10,exponent)*100)/100;
+      return mantissa+'\\cdot 10^{'+exponent+'}';
+    }
     return (Math.round(x*100)/100).toString();
   }
   function drawPowerOfTenLabel(x,y,align,baseline,exp){
@@ -333,21 +382,14 @@ window.MathJax = {
     if(MODE==='theta')return '\\Theta';
     return 'O';
   }
-  function modeName(){
-    if(MODE==='little_o')return 'notación o';
-    if(MODE==='big_omega')return 'notación Ω';
-    if(MODE==='little_omega')return 'notación ω';
-    if(MODE==='theta')return 'notación Θ';
-    return 'notación O';
-  }
   function limitOperatorLatex(){
     if(MODE==='big_o')return '\\limsup';
     if(MODE==='big_omega')return '\\liminf';
     return '\\lim';
   }
-  function limitExpressionLatex(ck,gk){
-    var op=limitOperatorLatex();
-    return '\\displaystyle k='+op+'_{n\\to\\infty}\\left(\\frac{C(n)}{g(n)}\\right)='+
+  function limitExpressionLatex(ck,gk,includeSymbol,operator){
+    var op=operator||limitOperatorLatex();
+    return '\\displaystyle '+(includeSymbol?'k=':'')+op+'_{n\\to\\infty}\\left(\\frac{C(n)}{g(n)}\\right)='+
       op+'_{n\\to\\infty}\\left(\\frac{'+cLatex()+'}{'+latexOf(gk)+'}\\right)='+
       displayLimitValue(limitValue(ck,gk));
   }
@@ -407,8 +449,8 @@ window.MathJax = {
     if(limitValue(ck,gk)==='0')return '\\cancelto{0}{'+simplified+'}';
     return simplified;
   }
-  function limitProcedureHtml(ck,gk){
-    var op=limitOperatorLatex()+'_{n\\to\\infty}';
+  function limitProcedureHtml(ck,gk,operator){
+    var op=(operator||limitOperatorLatex())+'_{n\\to\\infty}';
     var rawRatio='\\frac{'+cLatex()+'}{'+latexOf(gk)+'}';
     var simplified=simplifiedRatioLatex(ck,gk);
     var canceled=canceledRatioLatex(ck,gk,simplified);
@@ -429,7 +471,14 @@ window.MathJax = {
       '\\displaystyle \\begin{aligned}'+steps.join('\\\\[4pt]')+'\\end{aligned}'
     )+'</div>';
   }
-  function isUpperMode(){return MODE==='big_o' || MODE==='little_o'}
+  function thetaLimitProcedureHtml(ck,gk){
+    return '<div class="theta-solutions">'+
+      '<div class="theta-solution"><div class="solution-title"><strong>Límite inferior (Big-'+titleTex('\\Omega')+'):</strong></div>'+
+        limitProcedureHtml(ck,gk,'\\liminf')+'</div>'+
+      '<div class="theta-solution"><div class="solution-title"><strong>Límite superior (Big-'+titleTex('O')+'):</strong></div>'+
+        limitProcedureHtml(ck,gk,'\\limsup')+'</div>'+
+      '</div>';
+  }
   function isLowerMode(){return MODE==='big_omega' || MODE==='little_omega'}
   function isThetaMode(){return MODE==='theta'}
   function cColor(){return '#1565C0'}
@@ -487,24 +536,8 @@ window.MathJax = {
     return k;
   }
   function latexOf(key){return FNS[key].latex}
-  function termLatex(term){
-    if(term.key==='one')return String(term.coef);
-    if(term.coef===1)return latexOf(term.key);
-    return term.coef+'\\cdot '+latexOf(term.key);
-  }
-  function cLatex(){
-    var parts=[latexOf(cKey())];
-    LOWER_TERMS.forEach(function(term){parts.push(termLatex(term));});
-    return parts.join('+');
-  }
-  function cFn(ck,n){
-    var total=FNS[ck].fn(n);
-    LOWER_TERMS.forEach(function(term){total+=term.coef*FNS[term.key].fn(n);});
-    return total;
-  }
-  function regenerateLowerTerms(){
-    LOWER_TERMS=[];
-  }
+  function cLatex(){return latexOf(cKey())}
+  function cFn(ck,n){return FNS[ck].fn(n)}
   function tex(content){return '\\('+content+'\\)'}
   function texBlock(content){return '\\['+content+'\\]'}
   function titleTex(content){return '\\(\\boldsymbol{'+content+'}\\)'}
@@ -512,13 +545,14 @@ window.MathJax = {
     if(value==='∞')return '\\infty';
     return value;
   }
-  function typeset(attempt){
-    attempt=attempt||0;
-    if(window.MathJax && MathJax.typesetPromise){
-      MathJax.typesetPromise([root]).catch(function(){});
-    }else if(attempt<8){
-      setTimeout(function(){typeset(attempt+1);},150);
-    }
+  function typeset(){
+    window.__asymptoticMathJaxReady.then(function(mathJax){
+      if(!root.isConnected)return;
+      if(mathJax.typesetClear)mathJax.typesetClear([root]);
+      return mathJax.typesetPromise([root]);
+    }).catch(function(error){
+      console.error('No fue posible componer las ecuaciones de la simulación.',error);
+    });
   }
   function enforceC(ck,gk){
     if(isThetaMode())return enforceThetaC(ck,gk);
@@ -559,8 +593,10 @@ window.MathJax = {
   }
   function updateConstantControls(){
     var theta=isThetaMode();
+    var little=isStrictMode();
     Array.prototype.forEach.call(root.querySelectorAll('.single-c'),function(node){node.style.display=theta?'none':'flex';});
     Array.prototype.forEach.call(root.querySelectorAll('.theta-c'),function(node){node.style.display=theta?'flex':'none';});
+    Array.prototype.forEach.call(root.querySelectorAll('.little-c'),function(node){node.style.display=little?'flex':'none';});
   }
   function relationClass(ck,gk){
     if(!isMember(ck,gk))return 'bad';
@@ -609,10 +645,9 @@ window.MathJax = {
     return high;
   }
   function estimateN0(ck,gk,c){
-    return verifiedThreshold(
-      function(n){return satisfiesInequality(ck,gk,c,n);},
-      tailCanSatisfy(ck,gk,c)
-    );
+    var predicate=function(n){return satisfiesInequality(ck,gk,c,n);};
+    var integerThreshold=verifiedThreshold(predicate,tailCanSatisfy(ck,gk,c));
+    return verifiedRealThreshold(predicate,integerThreshold);
   }
   function verifiedRealThreshold(predicate,integerThreshold){
     if(integerThreshold===null)return null;
@@ -628,7 +663,7 @@ window.MathJax = {
   }
   function thresholdNumber(value){
     if(value===null)return null;
-    return fmtNumber(value);
+    return fmt(value);
   }
   function satisfiesInequality(ck,gk,c,n){
     var left=cFn(ck,n),ref=FNS[gk].fn(n);
@@ -648,7 +683,7 @@ window.MathJax = {
     if(!isFinite(numeric))return allowZero?0:1;
     return numeric;
   }
-  function inequalityLatex(ck,gk,c,n0){
+  function inequalityLatex(){
     var base='';
     if(MODE==='big_o')base='C(n)\\le c\\cdot g(n)';
     if(MODE==='little_o')base='C(n)\\lt c\\cdot g(n)';
@@ -666,21 +701,39 @@ window.MathJax = {
     if(isThetaMode())base=fmt(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk);
     return base;
   }
-  function realThresholdSetLatex(threshold){
+  function isStrictMode(){return MODE==='little_o' || MODE==='little_omega'}
+  function solutionIncludesBoundary(ck,gk,c,threshold){
+    if(threshold===null)return false;
+    return !isStrictMode();
+  }
+  function realThresholdSetLatex(threshold,includesBoundary){
     if(threshold===null)return '\\varnothing';
     var value=thresholdNumber(threshold);
-    return '\\{n\\in\\mathbb{R}_{\\ge0}\\mid n\\ge '+value+'\\}=['+value+',\\infty)';
+    return (includesBoundary?'[':'(')+value+',\\infty)';
   }
-  function asymptoticConditionLatex(){
-    if(MODE==='big_o')return 'C(n)\\le c\\cdot g(n)';
-    if(MODE==='little_o')return 'C(n)\\lt c\\cdot g(n)';
-    if(MODE==='big_omega')return 'C(n)\\ge c\\cdot g(n)';
-    if(MODE==='little_omega')return 'C(n)\\gt c\\cdot g(n)';
-    return 'c_1\\cdot g(n)\\le C(n)\\le c_2\\cdot g(n)';
+  function minimumSelectedN0(threshold){
+    if(threshold===null)return null;
+    return isStrictMode()?threshold+epsilonVal():threshold;
   }
-  function n0DefinitionLatex(){
-    return 'n_0=\\min\\left\\{\\lceil A\\rceil\\in\\mathbb{N}\\mid '+
-      '\\forall n\\ge A,\\;'+asymptoticConditionLatex()+'\\right\\}';
+  function selectedN0(threshold){
+    var minimum=minimumSelectedN0(threshold);
+    if(minimum===null){STATE_N0=null;return null;}
+    if(STATE_N0===null || STATE_N0<minimum)STATE_N0=minimum;
+    return STATE_N0;
+  }
+  function resetSelectedN0(){
+    STATE_N0=null;
+  }
+  function defaultN0Latex(threshold){
+    if(isStrictMode()){
+      return 'n_0='+thresholdNumber(threshold)+'+\\varepsilon='+
+        thresholdNumber(minimumSelectedN0(threshold));
+    }
+    return 'n_0='+thresholdNumber(threshold);
+  }
+  function defaultN0Html(threshold){
+    return '<div class="demo-title">Valor de '+titleTex('n_0')+' seleccionado por defecto:</div>'+
+      '<div class="demo-line">'+texBlock(defaultN0Latex(threshold))+'</div>';
   }
   function thetaPartialSolutionsHtml(ck,gk,c){
     var bookAgainstCubic=ck==='book' && gk==='n3';
@@ -702,54 +755,43 @@ window.MathJax = {
       function(n){return cFn(ck,n)<=c.c2*FNS[gk].fn(n);},
       upperThreshold
     );
-    var intersectionThreshold=(lowerThreshold===null || upperThreshold===null)
-      ?null:Math.max(lowerThreshold,upperThreshold);
-    var intersectionA=(lowerA===null || upperA===null)?null:Math.max(lowerA,upperA);
-    var thetaDefinitionHtml=intersectionA===null?''
-      :'<div class="demo-title">Aplicación de la definición de '+titleTex('n_0')+':</div>'+
-       '<div class="demo-line">'+texBlock(n0DefinitionLatex())+'</div>'+
-       '<div class="demo-line">'+texBlock(
-         'n_0=\\lceil A\\rceil=\\lceil '+thresholdNumber(intersectionA)+'\\rceil='+intersectionThreshold
-       )+'</div>';
+    var intersection=(lowerA===null || upperA===null)?null:Math.max(lowerA,upperA);
+    var thetaN0Html=intersection===null?''
+      :defaultN0Html(intersection);
     return '<div class="theta-solutions">'+
       '<div class="theta-solution"><b>Desigualdad izquierda '+titleTex('c_1g(n)\\le C(n)')+':</b>'+
         '<div class="demo-line">'+texBlock(fmt(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex())+'</div>'+
-        '<div class="demo-line">'+texBlock('S_1='+realThresholdSetLatex(lowerA))+'</div></div>'+
+        '<div class="demo-line">'+texBlock('S_1='+realThresholdSetLatex(lowerA,true))+'</div></div>'+
       '<div class="theta-solution"><b>Desigualdad derecha '+titleTex('C(n)\\le c_2g(n)')+':</b>'+
         '<div class="demo-line">'+texBlock(cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk))+'</div>'+
-        '<div class="demo-line">'+texBlock('S_2='+realThresholdSetLatex(upperA))+'</div></div>'+
+        '<div class="demo-line">'+texBlock('S_2='+realThresholdSetLatex(upperA,true))+'</div></div>'+
       '</div>'+
-      '<div class="theta-intersection"><b>Valores que cumplen ambas desigualdades '+titleTex('S_1\\cap S_2')+':</b>'+
-        '<div class="demo-line">'+texBlock('S_1\\cap S_2='+realThresholdSetLatex(intersectionA))+'</div>'+
-        thetaDefinitionHtml+'</div>';
+      '<div class="theta-intersection"><div class="solution-title">Valores que cumplen ambas desigualdades '+titleTex('S_1\\cap S_2')+':</div>'+
+        '<div class="demo-line">'+texBlock('n\\in '+realThresholdSetLatex(intersection,true))+'</div>'+
+        thetaN0Html+'</div>';
   }
-  function singleSolutionSetHtml(n0,aValue){
-    if(n0===null || aValue===null){
-      return '<div class="solution-set"><div class="solution-title">Conjunto solución '+titleTex('S')+':</div>'+
-        '<div class="demo-line">'+texBlock('S=\\varnothing')+'</div>'+
+  function singleSolutionSetHtml(ck,gk,c,n0){
+    if(n0===null){
+      return '<div class="solution-set"><div class="solution-title">Conjunto solución:</div>'+
+        '<div class="demo-line">'+texBlock('n\\in\\varnothing')+'</div>'+
         '<div class="demo-line">No existe un valor de \\(n_0\\) a partir del cual la desigualdad se cumpla siempre.</div></div>';
     }
-    return '<div class="solution-set"><div class="solution-title">Conjunto solución '+titleTex('S')+':</div>'+
-      '<div class="demo-line">'+texBlock('S='+realThresholdSetLatex(aValue))+'</div>'+
-      '<div class="demo-title">Aplicación de la definición de '+titleTex('n_0')+':</div>'+
-      '<div class="demo-line">'+texBlock(n0DefinitionLatex())+'</div>'+
-      '<div class="demo-line">'+texBlock('n_0=\\lceil A\\rceil=\\lceil '+thresholdNumber(aValue)+'\\rceil='+n0)+'</div></div>';
+    var includesBoundary=solutionIncludesBoundary(ck,gk,c,n0);
+    return '<div class="solution-set"><div class="solution-title">Conjunto solución:</div>'+
+      '<div class="demo-line">'+texBlock('n\\in '+realThresholdSetLatex(n0,includesBoundary))+'</div>'+
+      defaultN0Html(n0)+'</div>';
   }
-  function proofHtml(ck,gk,c,n0,lim){
-    var limitProcedure=limitProcedureHtml(ck,gk);
+  function proofHtml(ck,gk,c,n0){
+    var limitProcedure=isThetaMode()?thetaLimitProcedureHtml(ck,gk):limitProcedureHtml(ck,gk);
     var thereforeBlock='<div class="demo-title">Por lo tanto:</div>'+
       '<div class="demo-line">'+texBlock('\\displaystyle '+cRule(ck,gk))+'</div>';
     var n0Title=isThetaMode()
-      ?'Cálculo verificado de '+titleTex('n_0')+' para '+titleTex('c_1='+fmt(c.c1))+' y '+titleTex('c_2='+fmt(c.c2))+':'
-      :'Cálculo verificado de '+titleTex('n_0')+' para '+titleTex('c='+fmt(c))+':';
-    var inequalityLine=texBlock('\\displaystyle '+inequalityLatex(ck,gk,c,n0));
+      ?'Determinación de '+titleTex('n_0')+' para '+titleTex('c_1='+fmt(c.c1))+' y '+titleTex('c_2='+fmt(c.c2))+':'
+      :'Determinación de '+titleTex('n_0')+' para '+titleTex('c='+fmt(c))+':';
+    var inequalityLine=texBlock('\\displaystyle '+inequalityLatex());
     var substitutedInequalityLine=texBlock('\\displaystyle '+substitutedInequalityLatex(ck,gk,c));
-    var aValue=verifiedRealThreshold(
-      function(n){return satisfiesInequality(ck,gk,c,n);},
-      n0
-    );
     var partialSolutions=isThetaMode()?thetaPartialSolutionsHtml(ck,gk,c):'';
-    var singleSolution=isThetaMode()?'':singleSolutionSetHtml(n0,aValue);
+    var singleSolution=isThetaMode()?'':singleSolutionSetHtml(ck,gk,c,n0);
     if(n0===null){
       return '<div class="demo-title">Demostración por límite:</div>'+
         limitProcedure+
@@ -772,7 +814,7 @@ window.MathJax = {
       partialSolutions+
       singleSolution;
   }
-  function readingText(ck,gk,n0,lim){
+  function readingText(ck,gk){
     if(!isMember(ck,gk))return 'La función seleccionada no satisface la relación asintótica de esta notación con la referencia actual.';
     if(MODE==='big_o')return 'La curva azul queda eventualmente debajo de la cota construida con la función de referencia.';
     if(MODE==='little_o')return 'La curva azul queda estrictamente por debajo de cualquier múltiplo positivo de la referencia para valores suficientemente grandes.';
@@ -997,6 +1039,19 @@ window.MathJax = {
     ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,H-PAD.b);ctx.stroke();
     ctx.restore();
   }
+  function drawN0DisplacementFade(threshold,n0,a,b){
+    var initialN0=minimumSelectedN0(threshold);
+    if(initialN0===null || n0===null || n0<=initialN0+1e-12)return;
+    var left=PAD.l;
+    var right=Math.min(W-PAD.r,tx(n0,a,b));
+    if(right<=left)return;
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,0.48)';
+    ctx.fillRect(left,PAD.t,right-left,H-PAD.t-PAD.b);
+    ctx.fillStyle='rgba(120,120,120,0.12)';
+    ctx.fillRect(left,PAD.t,right-left,H-PAD.t-PAD.b);
+    ctx.restore();
+  }
   function drawEndpointMarker(n,a,b,label){
     var x=tx(n,a,b),y=H-PAD.b;
     ctx.save();
@@ -1012,7 +1067,7 @@ window.MathJax = {
     var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
     var ab=interval();syncInputs(ab[0],ab[1]);var a=interval()[0],b=interval()[1];
     var data=sample(a,b,ck,gk,c),yrange=yBounds(data);
-    var n0=estimateN0(ck,gk,c),lim=limitValue(ck,gk);
+    var threshold=estimateN0(ck,gk,c),n0=selectedN0(threshold),lim=limitValue(ck,gk);
     ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
     drawAxes(a,b,yrange);
     ctx.save();
@@ -1025,6 +1080,7 @@ window.MathJax = {
     if(isThetaMode()){
       drawLine(data.xs,data.c1g,a,b,yrange,c1gColor(),2.0);
     }
+    drawN0DisplacementFade(threshold,n0,a,b);
     drawN0(n0,a,b,ck,yrange);
     ctx.restore();
     drawEndpointMarker(a,a,b,'a');
@@ -1032,15 +1088,15 @@ window.MathJax = {
     updateText(a,b,ck,gk,c);
   }
   function updateText(a,b,ck,gk,c){
-    var n0=estimateN0(ck,gk,c),lim=limitValue(ck,gk),cls=relationClass(ck,gk);
+    var threshold=estimateN0(ck,gk,c),n0=selectedN0(threshold),lim=limitValue(ck,gk),cls=relationClass(ck,gk);
     el('bo-interval').innerHTML=tex('['+valueLatex(a)+', '+valueLatex(b)+']');
-    el('bo-n0').innerHTML=n0===null?tex('\\text{No existe}') : tex('n_0='+n0);
+    el('bo-n0').innerHTML=n0===null?tex('\\text{No existe}') : tex('n_0='+thresholdNumber(n0));
     el('bo-limit').innerHTML=tex('k='+displayLimitValue(lim));
     el('bo-c-rule-label').textContent=isThetaMode()?'Condición sobre c₁,c₂':'Condición sobre c';
     el('bo-c-rule').innerHTML=tex(cRule(ck,gk));
     el('bo-status').className='val '+cls;
     el('bo-status').innerHTML=membershipText(ck,gk);
-    var reading=readingText(ck,gk,n0,lim);
+    var reading=readingText(ck,gk);
     if(isLogScale() && n0===0){
       reading+=' El valor n₀ = 0 no se muestra en la gráfica porque log(0) no está definido.';
     }
@@ -1060,24 +1116,31 @@ window.MathJax = {
       ?tex('n_0\\text{ no existe}')
       :(isLogScale() && n0===0
         ?tex('n_0=0\\;\\text{(no visible porque }\\log(0)\\text{ no está definido)}')
-        :tex('n_0='+n0));
-    el('bo-quotient').innerHTML=proofHtml(ck,gk,c,n0,lim);
+        :tex('n_0='+thresholdNumber(n0)));
+    el('bo-quotient').innerHTML=proofHtml(ck,gk,c,threshold);
     renderLimits(ck,gk);
     typeset();
   }
   function renderLimits(ck,selectedG){
-    var html='<table><thead><tr><th>'+tex('\\mathbf{g(n)}')+'</th><th>Límite</th><th>Resultado</th></tr></thead><tbody>';
+    var theta=isThetaMode();
+    var html='<table><thead><tr><th>'+tex('\\mathbf{g(n)}')+'</th>'+
+      (theta?'<th>Límite inferior</th><th>Límite superior</th>':'<th>Límite</th>')+
+      '<th>Resultado</th></tr></thead><tbody>';
     ORDER.forEach(function(gk){
       var cls=relationClass(ck,gk),active=gk===selectedG?' class="active"':'';
-      html+='<tr'+active+'><td>'+tex(latexOf(gk))+'</td><td>'+tex(limitExpressionLatex(ck,gk).replace(/^\\displaystyle k=/,'\\displaystyle '))+'</td><td class="'+cls+'">'+membershipText(ck,gk)+'</td></tr>';
+      html+='<tr'+active+'><td>'+tex(latexOf(gk))+'</td>'+
+        (theta
+          ?'<td>'+tex(limitExpressionLatex(ck,gk,false,'\\liminf'))+'</td>'+
+           '<td>'+tex(limitExpressionLatex(ck,gk,false,'\\limsup'))+'</td>'
+          :'<td>'+tex(limitExpressionLatex(ck,gk,false))+'</td>')+
+        '<td class="'+cls+'">'+membershipText(ck,gk)+'</td></tr>';
     });
     html+='</tbody></table>';
     el('bo-limits').innerHTML=html;
   }
   function pointer(ev){
     var r=cv.getBoundingClientRect();
-    var p=ev.touches?ev.touches[0]:ev;
-    return {x:p.clientX-r.left,y:p.clientY-r.top};
+    return {x:ev.clientX-r.left,y:ev.clientY-r.top};
   }
   function handleEndpointInput(id){
     var input=el(id),raw=parsePowerInput(input.textContent,id==='bo-a');
@@ -1089,13 +1152,13 @@ window.MathJax = {
   function stepFunction(kind,direction){
     if(kind==='c'){
       STATE_C_INDEX=Math.max(0,Math.min(C_ORDER.length-1,STATE_C_INDEX+direction));
-      regenerateLowerTerms();
     }else{
       STATE_G_INDEX=Math.max(0,Math.min(ORDER.length-1,STATE_G_INDEX+direction));
     }
     var dc=defaultC(cKey(),gKey());
     el('bo-c').value=dc;
     if(isThetaMode()){el('bo-c1').value=0.1;el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;}
+    resetSelectedN0();
     updateConstantControls();
     draw();
   }
@@ -1160,29 +1223,38 @@ window.MathJax = {
     selectionMode=false;el('bo-zoom-select').classList.remove('active');cv.style.cursor='grab';
     draw();
   }
-  cv.addEventListener('mousedown',function(ev){
-    var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1];
+  var activePointers={};
+  function activePointerValues(){
+    return Object.keys(activePointers).map(function(id){return activePointers[id];});
+  }
+  function pointerDistance(points){
+    var dx=points[1].x-points[0].x,dy=points[1].y-points[0].y;
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+  function beginDrag(p,pointerType){
+    var ab=interval(),a=ab[0],b=ab[1];
     if(selectionMode){selectionStart=clampPlotPoint(p);showSelection(selectionStart,selectionStart);return;}
+    var threshold=pointerType==='touch'?24:18;
+    var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
+    var currentN0=selectedN0(estimateN0(ck,gk,c));
+    var dn=currentN0===null?Infinity:Math.abs(p.x-tx(currentN0,a,b));
     var da=Math.abs(p.x-tx(a,a,b)),db=Math.abs(p.x-tx(b,a,b));
-    drag=da<18?'a':(db<18?'b':'pan');
+    var overN0=dn<threshold && p.y<H-PAD.b-18;
+    drag=overN0?'n0':(da<threshold?'a':(db<threshold?'b':'pan'));
     panStart={x:p.x,y:p.y,a:a,b:b,yOffset:Y_OFFSET};
     cv.style.cursor=drag==='pan'?'grabbing':'ew-resize';
-  });
-  cv.addEventListener('dblclick',function(){
-    resetZoom();
-  });
-  cv.addEventListener('wheel',function(ev){
-    ev.preventDefault();
-    var p=pointer(ev),ab=interval();
-    var factor=Math.max(0.5,Math.min(2,Math.exp(ev.deltaY*0.002)));
-    zoomAt(fx(p.x,ab[0],ab[1]),factor);
-  },{passive:false});
-  cv.addEventListener('mousemove',function(ev){
-    if(selectionStart){showSelection(selectionStart,clampPlotPoint(pointer(ev)));return;}
+  }
+  function continueDrag(p){
+    if(selectionStart){showSelection(selectionStart,clampPlotPoint(p));return;}
     if(!drag)return;
-    var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1],x=fx(p.x,a,b);
+    var ab=interval(),a=ab[0],b=ab[1],x=fx(p.x,a,b);
     if(drag==='a')syncInputs(Math.min(Math.max(0,x),b-MIN_SPAN),b);
     if(drag==='b')syncInputs(a,Math.max(x,a+MIN_SPAN));
+    if(drag==='n0'){
+      var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
+      var minimum=minimumSelectedN0(estimateN0(ck,gk,c));
+      if(minimum!==null)STATE_N0=Math.max(minimum,Math.min(MAX_B,x));
+    }
     if(drag==='pan' && panStart){
       var span=panStart.b-panStart.a;
       var delta=fx(panStart.x,a,b)-fx(p.x,a,b);
@@ -1193,42 +1265,46 @@ window.MathJax = {
       Y_OFFSET=panStart.yOffset+(p.y-panStart.y);
     }
     draw();
-  });
-  window.addEventListener('mouseup',function(ev){
-    if(selectionStart){var r=cv.getBoundingClientRect();finishSelection({x:ev.clientX-r.left,y:ev.clientY-r.top});}
-    drag=null;panStart=null;if(!selectionMode)cv.style.cursor='grab';
-  });
-  function touchDistance(ev){
-    var dx=ev.touches[1].clientX-ev.touches[0].clientX;
-    var dy=ev.touches[1].clientY-ev.touches[0].clientY;
-    return Math.sqrt(dx*dx+dy*dy);
   }
-  function touchCenterX(ev){
-    var r=cv.getBoundingClientRect();
-    return (ev.touches[0].clientX+ev.touches[1].clientX)/2-r.left;
-  }
-  cv.addEventListener('touchstart',function(ev){
+  cv.addEventListener('pointerdown',function(ev){
     ev.preventDefault();
-    if(ev.touches.length>=2){pinchDistance=touchDistance(ev);drag=null;panStart=null;return;}
-    var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1];
-    var da=Math.abs(p.x-tx(a,a,b)),db=Math.abs(p.x-tx(b,a,b));
-    drag=da<24?'a':(db<24?'b':'pan');panStart={x:p.x,y:p.y,a:a,b:b,yOffset:Y_OFFSET};
+    cv.setPointerCapture(ev.pointerId);
+    activePointers[ev.pointerId]=pointer(ev);
+    var points=activePointerValues();
+    if(points.length>=2){pinchDistance=pointerDistance(points);drag=null;panStart=null;return;}
+    beginDrag(points[0],ev.pointerType);
   });
-  cv.addEventListener('touchmove',function(ev){
+  cv.addEventListener('dblclick',function(){
+    resetZoom();
+  });
+  cv.addEventListener('wheel',function(ev){
     ev.preventDefault();
-    if(ev.touches.length>=2){
-      var distance=touchDistance(ev),ab=interval();
-      if(pinchDistance)zoomAt(fx(touchCenterX(ev),ab[0],ab[1]),pinchDistance/distance);
-      pinchDistance=distance;return;
+    var p=pointer(ev),ab=interval();
+    var factor=Math.max(0.5,Math.min(2,Math.exp(ev.deltaY*0.002)));
+    zoomAt(fx(p.x,ab[0],ab[1]),factor);
+  },{passive:false});
+  cv.addEventListener('pointermove',function(ev){
+    if(!(ev.pointerId in activePointers))return;
+    activePointers[ev.pointerId]=pointer(ev);
+    var points=activePointerValues();
+    if(points.length>=2){
+      var distance=pointerDistance(points),ab=interval();
+      var centerX=(points[0].x+points[1].x)/2;
+      if(pinchDistance && distance>0)zoomAt(fx(centerX,ab[0],ab[1]),pinchDistance/distance);
+      pinchDistance=distance;
+      return;
     }
-    if(!drag)return;
-    var p=pointer(ev),ab=interval(),a=ab[0],b=ab[1],x=fx(p.x,a,b);
-    if(drag==='a')syncInputs(Math.min(Math.max(0,x),b-MIN_SPAN),b);
-    if(drag==='b')syncInputs(a,Math.max(x,a+MIN_SPAN));
-    if(drag==='pan'&&panStart){var span=panStart.b-panStart.a;var delta=fx(panStart.x,a,b)-fx(p.x,a,b);var na=panStart.a+delta,nb=panStart.b+delta;if(na<0){na=0;nb=na+span;}if(nb>MAX_B){nb=MAX_B;na=Math.max(0,nb-span);}syncInputs(na,nb);Y_OFFSET=panStart.yOffset+(p.y-panStart.y);}
-    draw();
+    continueDrag(points[0]);
   });
-  window.addEventListener('touchend',function(){drag=null;panStart=null;pinchDistance=null;});
+  function endPointer(ev){
+    var p=pointer(ev);
+    if(selectionStart)finishSelection(p);
+    delete activePointers[ev.pointerId];
+    drag=null;panStart=null;pinchDistance=null;
+    if(!selectionMode)cv.style.cursor='grab';
+  }
+  cv.addEventListener('pointerup',endPointer);
+  cv.addEventListener('pointercancel',endPointer);
   cv.addEventListener('gesturestart',function(ev){ev.preventDefault();gestureScale=ev.scale||1;},{passive:false});
   cv.addEventListener('gesturechange',function(ev){ev.preventDefault();var ab=interval(),scale=ev.scale||gestureScale;zoomAt(zoomCenter(ab[0],ab[1]),gestureScale/scale);gestureScale=scale;},{passive:false});
   el('bo-zoom-in').addEventListener('click',function(){var ab=interval();zoomAt(zoomCenter(ab[0],ab[1]),0.75);});
@@ -1238,11 +1314,30 @@ window.MathJax = {
     this.classList.toggle('active',selectionMode);cv.style.cursor=selectionMode?'crosshair':'grab';
   });
   el('bo-zoom-reset').addEventListener('click',function(){selectionMode=false;cancelSelection();el('bo-zoom-select').classList.remove('active');cv.style.cursor='grab';resetZoom();});
-  ['bo-c','bo-c1','bo-c2','bo-scale'].forEach(function(id){
+  el('bo-mode').value=MODE;
+  if(MODE_SELECTABLE){
+    el('bo-mode').addEventListener('change',function(){
+      MODE=this.value;
+      STATE_G_INDEX=ORDER.indexOf(defaultGKeyForMode());
+      resetSelectedN0();
+      el('bo-c').value=defaultC(cKey(),gKey());
+      el('bo-c1').value=0.1;
+      el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;
+      updateConstantControls();
+      draw();
+    });
+  }
+  ['bo-c','bo-c1','bo-c2'].forEach(function(id){
     el(id).addEventListener('input',function(){
+      resetSelectedN0();
       draw();
     });
   });
+  el('bo-epsilon').addEventListener('input',function(){
+    if((parseFloat(this.value)||0)<=0)this.value=0.000001;
+    draw();
+  });
+  el('bo-scale').addEventListener('input',function(){draw();});
   ['bo-a','bo-b'].forEach(function(id){
     el(id).addEventListener('focus',function(){beginEditableField(id);});
     el(id).addEventListener('input',function(){sanitizeEditableField(id);});
@@ -1259,8 +1354,11 @@ window.MathJax = {
   el('bo-a-inc').addEventListener('click',function(){stepEndpoint('a',1);});
   el('bo-b-dec').addEventListener('click',function(){stepEndpoint('b',-1);});
   el('bo-b-inc').addEventListener('click',function(){stepEndpoint('b',1);});
-  window.addEventListener('resize',draw);
-  regenerateLowerTerms();
+  if(window.ResizeObserver){
+    new ResizeObserver(function(){if(root.isConnected)draw();}).observe(cv.parentElement);
+  }else{
+    window.addEventListener('resize',function(){if(root.isConnected)draw();});
+  }
   updateConstantControls();
   el('bo-c').value=defaultC(cKey(),gKey());
   el('bo-c1').value=0.1;
@@ -1273,6 +1371,7 @@ window.MathJax = {
 
 
 __all__ = [
+    "run_comparison_app",
     "run_big_o_app",
     "run_little_o_app",
     "run_big_omega_app",

@@ -63,6 +63,7 @@ Usa estos notebooks en paralelo con el libro. En local, los enlaces abren los ar
 
 | Notación | Notebook local | Colab | Qué deberías observar |
 |---|---|---|---|
+| Comparación general | [Abrir local](./0_comparacion_notaciones_asintoticas.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/0_comparacion_notaciones_asintoticas.ipynb) | Cómo cambian la desigualdad, los límites, las constantes y el intervalo solución entre las cinco notaciones. |
 | Big-$O$ | [Abrir local](./1_notacion_big_o.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/1_notacion_big_o.ipynb) | Cuándo $C(n)$ queda por debajo de $c\cdot g(n)$. |
 | little-$o$ | [Abrir local](./2_notacion_little_o.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/2_notacion_little_o.ipynb) | Cuándo $C(n)$ crece estrictamente más lento que $g(n)$. |
 | Big-$\Omega$ | [Abrir local](./3_notacion_big_omega.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/3_notacion_big_omega.ipynb) | Cuándo $C(n)$ queda por encima de $c\cdot g(n)$. |
