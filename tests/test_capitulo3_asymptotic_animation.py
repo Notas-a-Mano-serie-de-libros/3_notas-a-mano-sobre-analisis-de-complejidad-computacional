@@ -411,12 +411,21 @@ def test_grafica_usa_altura_ampliada():
     assert "canvas{display:block;width:100%;height:480px" in html
 
 
+def test_controles_permanecen_dentro_de_la_grafica_sin_tapar_el_area_de_dibujo():
+    html = load_animation_module()._BIG_O_HTML
+
+    assert ".zoom-controls{position:absolute;top:10px;right:10px;z-index:3;display:flex;gap:4px}" in html
+    plot = html.split('<div class="plot-wrap">', 1)[1].split('<div class="note"', 1)[0]
+    assert plot.index('<div class="zoom-controls"') < plot.index('<canvas id="bo-cv">')
+    assert "PAD={l:82,r:32,t:58,b:58}" in html
+
+
 def test_leyenda_esta_dentro_de_la_esquina_superior_izquierda():
     html = load_animation_module()._BIG_O_HTML
     assert ".legend{position:absolute;left:92px;top:48px;" in html
     assert "flex-direction:column;align-items:flex-start" in html
     assert "width:250px;box-sizing:border-box" in html
-    assert "PAD={l:82,r:32,t:38,b:58}" in html
+    assert "PAD={l:82,r:32,t:58,b:58}" in html
     assert ".axis-x{left:82px;right:32px" in html
     assert "ctx.rect(PAD.l,PAD.t,W-PAD.l-PAD.r,H-PAD.t-PAD.b)" in html
     assert "border:1px solid rgba(80,80,80,.28)" in html

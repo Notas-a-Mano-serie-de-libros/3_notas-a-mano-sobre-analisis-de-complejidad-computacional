@@ -50,7 +50,7 @@ _BIG_O_HTML = r"""
 #bo-wrap{background:#ffffff;font-family:sans-serif;padding:14px 4px;color:#333}
 #bo-wrap .plot-wrap{position:relative;width:100%;height:480px}
 #bo-wrap canvas{display:block;width:100%;height:480px;background:#ffffff;border:1px solid #e0e0e0;touch-action:none;cursor:grab}
-#bo-wrap .zoom-controls{position:absolute;top:10px;right:10px;z-index:2;display:flex;gap:4px}
+#bo-wrap .zoom-controls{position:absolute;top:10px;right:10px;z-index:3;display:flex;gap:4px}
 #bo-wrap .zoom-btn{width:34px;height:32px;border:1px solid #bbb;border-radius:3px;background:rgba(255,255,255,.94);color:#333;cursor:pointer;font-size:20px;line-height:1}
 #bo-wrap .zoom-btn:hover{background:#f1f1f1}
 #bo-wrap .zoom-btn.active{background:#e3f2fd;border-color:#1976D2;color:#0D47A1}
@@ -292,7 +292,7 @@ _BIG_O_HTML = r"""
   var root=document.getElementById('bo-wrap');
   var cv=document.getElementById('bo-cv'),ctx=cv.getContext('2d');
   var staticBackground=document.createElement('canvas'),staticCurves=document.createElement('canvas');
-  var W=0,H=0,DPR=1,PAD={l:82,r:32,t:38,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,Y_RANGE_OVERRIDE=null,lastYRange=null,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,n0FocusActive=false,lockX=false,lockY=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null,staticLayerKey='',historyUndo=[],historyRedo=[],historyCapturePending=false,dynamicMathState={};
+  var W=0,H=0,DPR=1,PAD={l:82,r:32,t:58,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,Y_RANGE_OVERRIDE=null,lastYRange=null,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,n0FocusActive=false,lockX=false,lockY=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null,staticLayerKey='',historyUndo=[],historyRedo=[],historyCapturePending=false,dynamicMathState={};
   var FNS={
     one:{label:'1',latex:'1',rank:0,fn:function(n){return 1;}},
     log:{label:'log₂(n)',latex:'\\log_2(n)',rank:1,fn:function(n){return n<=1?0:Math.log2(n);}},

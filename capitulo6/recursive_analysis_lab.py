@@ -167,10 +167,27 @@ def build_trace(algorithm: str, n: int):
         if parent is not None:
             nodes[parent].children.append(node_id)
         stack.append(node_id)
-        events.append({"kind": "enter", "node": node_id, "stack": tuple(stack)})
-        for child_value in _children(algorithm, value):
-            visit(child_value, depth + 1, node_id)
-        events.append({"kind": "return", "node": node_id, "stack": tuple(stack)})
+
+        def add_event(kind: str, line: int):
+            events.append(
+                {"kind": kind, "line": line, "node": node_id, "stack": tuple(stack)}
+            )
+
+        add_event("enter", 0)
+        add_event("line", 1)
+        children = _children(algorithm, value)
+        if not children:
+            add_event("return", 2)
+        elif algorithm == "power_fast":
+            add_event("line", 3)
+            visit(children[0], depth + 1, node_id)
+            add_event("line", 4)
+            add_event("return", 5 if value % 2 else 6)
+        else:
+            for child_value in children:
+                add_event("line", 3)
+                visit(child_value, depth + 1, node_id)
+            add_event("return", 3)
         stack.pop()
 
     visit(n, 0, None)
@@ -283,6 +300,8 @@ def _call_stack_panel(
             else "Se desapila"
             if node_id == current and event["kind"] == "return"
             else "Nueva llamada"
+            if node_id == current and event["kind"] == "enter"
+            else "En ejecución"
             if node_id == current
             else "En espera"
         )
@@ -375,14 +394,17 @@ def _highlight_code_line(line: str, language: str) -> str:
     return highlight(line, lexer, HtmlFormatter(nowrap=True)).rstrip("\n")
 
 
-def _code_panel(algorithm: str, language: str, is_base: bool) -> str:
+def _language_line(algorithm: str, language: str, trace_line: int) -> int:
+    if language not in {"java", "c"}:
+        return trace_line
+    if algorithm == "power_fast":
+        return {0: 0, 1: 1, 2: 2, 3: 4, 4: 5, 5: 6, 6: 8}[trace_line]
+    return 4 if trace_line == 3 else trace_line
+
+
+def _code_panel(algorithm: str, language: str, active_line: int) -> str:
     lines = CODE_SNIPPETS[language][algorithm]
-    return_lines = [
-        index
-        for index, line in enumerate(lines)
-        if line.strip().startswith(("return ", "retornar "))
-    ]
-    active_line = return_lines[0] if is_base else return_lines[-1]
+    active_line = _language_line(algorithm, language, active_line)
     rows = []
     for index, line in enumerate(lines):
         css = " current" if index == active_line else ""
@@ -418,6 +440,7 @@ STYLES = """
 .lab-configuration-summary{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-bottom:1px solid #e2e2e2!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;font-family:sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:24px!important;text-align:left!important}.lab-configuration-summary:hover{background:#f7f7f7!important}.lab-configuration-summary .fa{color:#333!important}
 .lab-controls{box-sizing:border-box!important;width:100%!important;padding:12px!important;border:0!important;background:#fff!important;margin:0!important}
 .lab-controls .widget-label{color:#333;font-weight:700}
+.lab-control-label{display:flex!important;align-items:center!important;justify-content:center!important;height:32px!important;min-height:32px!important;color:#333!important;font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;text-align:center!important}.lab-control-label .widget-htmlmath-content{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;color:#333!important}
 .lab-controls select{box-sizing:border-box;width:176px!important;height:32px;padding:2px 4px;border:1px solid #ccc;border-radius:3px;background:#fff!important;color:#333;font-size:13px;text-align:center;text-align-last:center;appearance:auto!important}
 .lab-controls select option{background:#fff;color:#333}
 .lab-controls input:not([type="range"]){box-sizing:border-box;width:176px!important;height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background:#fff!important;color:#333!important;font-size:13px!important;text-align:center!important}
@@ -443,11 +466,12 @@ STYLES = """
 .lab-code .k{color:#005cc5;font-weight:600}.lab-code .kt,.lab-code .nb,.lab-code .bp{color:#005cc5}.lab-code .nf{color:#6f42c1}.lab-code .n{color:#24292e}.lab-code .mi,.lab-code .mf{color:#005a8d}.lab-code .s,.lab-code .s1,.lab-code .s2{color:#22863a}.lab-code .c,.lab-code .c1,.lab-code .cm{color:#6a737d;font-style:italic}.lab-code .o{color:#d73a49}.lab-code .p{color:#24292e}
 .lab-tree-scroll{height:426px;overflow:auto;background:#fff}.lab-tree{display:block;width:100%;min-width:520px;background:#fff}
 .lab-edge{fill:none;stroke:#202124;stroke-width:1.7}.lab-arrow-head{fill:#202124!important;stroke:none!important}.lab-node circle{fill:#fff;stroke:#202124;stroke-width:1.7}.lab-node text{text-anchor:middle;font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:15px;font-weight:400;fill:#111!important}.lab-node.base circle{fill:#e8f5e9;stroke:#202124}
-.lab-call-stack{display:flex;height:426px;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;padding:14px 18px 0;overflow:auto;background:#fff}
-.lab-call-frame{display:flex;width:min(100%,330px);align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border:1px solid #bbb;border-radius:3px;background:#f7f7f7}
+.lab-call-stack{display:flex;height:426px;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:14px 18px 0;overflow:auto;background:#fff}
+.lab-call-frame{display:flex;width:min(100%,330px);align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border:1px solid #202124;border-radius:0;background:#f7f7f7}
+.lab-call-frame+.lab-call-frame{border-top:0}
 .lab-call-frame b{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif}.lab-call-frame span{font-size:12px;color:#5f6368!important}
-.lab-call-frame.current-call{border:2px solid #a47b20;background:#f4e8bd}.lab-call-frame.current-return{border:2px solid #3d7d47;background:#e8f5e9}
-.lab-stack-base{width:min(100%,360px);padding:6px 10px;border-top:2px solid #202124;text-align:center;color:#5f6368!important;font-size:12px}
+.lab-call-frame.current-call{background:#f4e8bd}.lab-call-frame.current-return{background:#e8f5e9}
+.lab-stack-base{width:min(100%,360px);margin-top:5px;padding:6px 10px;border-top:2px solid #202124;text-align:center;color:#5f6368!important;font-size:12px}
 .lab-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:0;overflow:hidden}.lab-metric{padding:10px;text-align:center;border-right:1px solid #e2e2e2;background:#fff}.lab-metric:last-child{border-right:0}.lab-metric b{display:block;font-size:18px}
 @media(max-width:760px){.lab-execution-grid{grid-template-columns:1fr}.lab-execution-grid>.lab-section:first-child{border-right:1px solid #dedede}.lab-metrics{grid-template-columns:repeat(2,1fr)}.lab-metric:nth-child(2){border-right:0}.lab-metric:nth-child(-n+2){border-bottom:1px solid #e2e2e2}}
 </style>
@@ -524,7 +548,7 @@ def run_app():
             + _language_logo(language.value)
             + '</summary><div class="lab-section-content">'
             + _code_panel(
-                algorithm.value, language.value, not nodes[event["node"]].children
+                algorithm.value, language.value, event["line"]
             )
             + '</div></details>'
             '<details class="lab-section lab-state-panel" open><summary>Estado de la ejecución</summary>'
@@ -603,10 +627,12 @@ def run_app():
     reset.on_click(lambda _: (stop_playback(), state.update(step=0), render()))
 
     def labeled(label, control):
-        label_widget = widgets.HTML(
-            value=f'<b>{html.escape(label)}</b>',
+        label_formula = r"\(n\)" if label == "n" else rf"\(\text{{{label}}}\)"
+        label_widget = widgets.HTMLMath(
+            value=label_formula,
             layout=widgets.Layout(width="96px"),
         )
+        label_widget.add_class("lab-control-label")
         row = widgets.HBox(
             [label_widget, control],
             layout=widgets.Layout(width="280px", align_items="center", gap="8px"),
@@ -624,7 +650,7 @@ def run_app():
     input_controls = widgets.VBox(
         [
             labeled("Lenguaje", language),
-            labeled("Entrada n", size),
+            labeled("n", size),
         ],
         layout=widgets.Layout(width="280px", gap="8px"),
     )

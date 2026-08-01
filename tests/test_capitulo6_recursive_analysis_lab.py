@@ -84,6 +84,12 @@ def test_lab_uses_editable_input_right_aligned_actions_and_collapsible_panels():
     assert 'labeled("Algoritmo", algorithm)' in SOURCE
     assert 'labeled("Análisis", analysis_type)' in SOURCE
     assert 'labeled("Lenguaje", language)' in SOURCE
+    assert 'labeled("n", size)' in SOURCE
+    assert 'labeled("Entrada n", size)' not in SOURCE
+    assert 'add_class("lab-control-label")' in SOURCE
+    assert 'label_widget = widgets.HTMLMath(' in SOURCE
+    assert 'r"\\(n\\)"' in SOURCE
+    assert 'rf"\\(\\text{{{label}}}\\)"' in SOURCE
     assert SOURCE.count('layout=widgets.Layout(width="176px", height="32px")') == 4
     assert "Resultado del análisis" not in SOURCE
     assert 'description="Configuración"' in SOURCE
@@ -173,6 +179,30 @@ def test_code_panel_uses_white_background_and_numbered_gutter():
     assert "font-weight:700;user-select:none" in SOURCE
     assert "lab-code-python" not in markup
     assert "background:rgb(20%,60%,35%)" not in SOURCE
+
+
+def test_trace_highlights_each_executed_line_like_a_debugger():
+    from capitulo6.recursive_analysis_lab import _code_panel, build_trace
+
+    nodes, events = build_trace("factorial", 2)
+
+    assert [event["line"] for event in events[:3]] == [0, 1, 3]
+    assert events[0]["kind"] == "enter"
+    assert nodes[events[0]["node"]].n == 2
+    assert 'lab-code-line current' in _code_panel("factorial", "python", 0)
+    assert events[-1]["kind"] == "return"
+    assert events[-1]["line"] == 3
+
+
+def test_fast_power_debug_trace_visits_assignment_branch_and_return_lines():
+    from capitulo6.recursive_analysis_lab import _language_line, build_trace
+
+    nodes, events = build_trace("power_fast", 2)
+    root_lines = [event["line"] for event in events if event["node"] == nodes[0].id]
+
+    assert root_lines == [0, 1, 3, 4, 6]
+    assert [_language_line("power_fast", "java", line) for line in root_lines] == [0, 1, 4, 5, 8]
+    assert _language_line("factorial", "c", 3) == 4
 
 
 def test_code_panel_header_has_fixed_height_for_every_logo():
