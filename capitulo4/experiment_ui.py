@@ -429,10 +429,10 @@ def run_app(profile, display_app=True, mode_selector=None):
         layout=widgets.Layout(
             width="auto",
             display="flex",
-            flex_flow="row wrap",
-            column_gap="36px",
+            flex_flow="column nowrap",
+            column_gap="0px",
             row_gap="12px",
-            align_items="center",
+            align_items="flex-start",
             overflow="visible",
         ),
     )
@@ -823,14 +823,16 @@ def run_app(profile, display_app=True, mode_selector=None):
             box-sizing: border-box !important;
             display: flex !important;
             width: auto !important;
-            flex-flow: row wrap !important;
-            column-gap: 36px !important;
+            flex-flow: column nowrap !important;
+            column-gap: 0 !important;
             row-gap: 12px !important;
             overflow: visible !important;
           }
           .experimental-parameters-grid > .widget-box {
             box-sizing: border-box !important;
-            width: auto !important;
+            width: 292px !important;
+            min-width: 292px !important;
+            max-width: 292px !important;
             overflow: visible !important;
           }
           .experimental-controls button {

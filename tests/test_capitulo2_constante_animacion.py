@@ -221,7 +221,8 @@ def test_controles_comparten_medidas_espaciado_y_flecha_del_resto_de_la_obra():
     assert "STEPPER_VALUE_WIDTH = 120" in source
     assert "STEPPER_GAP = 0" in source
     assert "gap: 0 !important" in source
-    assert "column-gap: 36px !important" in source
+    assert "flex-flow: column nowrap !important" in source
+    assert "column-gap: 0 !important" in source
     assert "row-gap: 12px !important" in source
     assert "appearance: auto !important" in source
     assert "-webkit-appearance: menulist !important" in source

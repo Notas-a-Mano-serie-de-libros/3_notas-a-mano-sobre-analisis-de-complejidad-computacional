@@ -19,17 +19,23 @@ def test_shared_widget_control_grids_wrap_at_natural_width():
     assert 'layout=widgets.Layout(width="auto", flex="0 0 auto")' in controls
 
 
-def test_chapters_two_and_four_parameter_panels_wrap():
+def test_chapters_two_and_four_parameter_panels_use_aligned_columns():
     paths = (
         "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py",
-        "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py",
         "capitulo4/experiment_ui.py",
     )
     for path in paths:
         module_source = source(path)
         assert "widgets.Box(" in module_source
         assert 'width="auto"' in module_source
-        assert 'flex_flow="row wrap"' in module_source
+        assert 'flex_flow="column nowrap"' in module_source
+        assert "flex-flow: column nowrap !important" in module_source
+        assert "width: 292px !important" in module_source
+
+    polynomial_source = source(
+        "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py"
+    )
+    assert 'flex_flow="row wrap"' in polynomial_source
 
 
 def test_chapter_three_control_sections_use_flex_wrap():
