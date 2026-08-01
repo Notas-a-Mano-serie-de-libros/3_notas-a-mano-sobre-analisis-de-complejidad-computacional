@@ -104,9 +104,9 @@ def test_spinner_baja_al_orden_de_magnitud_anterior():
 
 def test_tabla_incluye_una_fila_por_cada_potencia():
     table = results_table([10, 100], [1e-7, float("nan")])
-    assert r"\(10^{1}=10\)" in table
-    assert r"\(10^{2}=100\)" in table
-    assert r"1.000000\times 10^{-7}" in table
+    assert "10<sup>1</sup> = 10" in table
+    assert "10<sup>2</sup> = 100" in table
+    assert '1.000000<span class="constant-times">×</span>10<sup>-7</sup>' in table
     assert "Tiempo teórico [s]" in table
     assert "No ejecutado" in table
 
@@ -147,24 +147,32 @@ def test_tabla_muestra_solo_teorico_para_tamanos_no_ejecutados():
     )
 
     assert "Solo teórico" in table
-    assert r"\text{No ejecutado}" in table
+    assert "No ejecutado" in table
 
 
-def test_tabla_dinamica_usa_iframe_con_mathjax_explicito():
+def test_tabla_dinamica_usa_html_nativo_sin_recargar_iframes():
     import ipywidgets as widgets
 
     table = results_table_widget([10], [1e-7])
     assert isinstance(table, widgets.HTML)
-    assert "constant-mathjax-frame" in table.value
-    assert "MathJax.typesetPromise" in table.value
+    assert "constant-native-table" in table.value
+    assert "constant-mathjax-frame" not in table.value
+    assert "MathJax.typesetPromise" not in table.value
     assert "@keyframes constant-spin" in table.value
     assert "color:#2d7d32;" in table.value
+    assert "display:inline-table" in table.value
+    assert "text-align:center !important" in table.value
+    assert "background:#fff !important" in table.value
+    assert "background:#f3f4f6 !important" in table.value
+    assert "color:#000 !important" in table.value
+    assert 'class="constant-equation"' in table.value
+    assert "'STIX Two Math','STIXGeneral','Cambria Math','Latin Modern Math'" in table.value
 
 
 def test_tabla_pendiente_reinicia_resultados_pendientes():
     table = pending_table_html(1_000)
 
-    assert "constant-mathjax-frame" in table
+    assert "constant-native-table" in table
     assert table.count("Pendiente") == 3
     assert "En espera" in table
     assert ">✓</span>" not in table
@@ -181,7 +189,66 @@ def test_simulacion_incluye_boton_reiniciar_junto_a_ejecutar():
     assert "loop.create_task(coro)" in source
     assert "asyncio.run(coro)" in source
     assert "task = schedule_task(run_experiment())" in source
-    assert "await asyncio.sleep(0.01)" in source
+    assert "await asyncio.to_thread(" in source
+    assert "await asyncio.sleep(0)" in source
+
+
+def test_simulacion_unifica_configuracion_resultado_y_tipo_de_analisis():
+    source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'configuration_panel = subpanel(' in source
+    assert '"Configuración"' in source
+    assert 'result_panel = subpanel("Resultado"' in source
+    assert '[configuration_panel, result_panel]' in source
+    assert '("Temporal", "time")' in source
+    assert '("Espacial", "memory")' in source
+    assert '"Análisis",' in source
+    assert 'run_app(\n            profile_factory(mode), display_app=False, mode_selector=selector' in source
+    assert 'add_class("experimental-subpanel-summary")' in source
+    assert "def toggle_content(_):" in source
+    assert 'content.layout.display = "none" if collapsed else "flex"' in source
+
+
+def test_controles_comparten_medidas_espaciado_y_flecha_del_resto_de_la_obra():
+    source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "STEPPER_FIELD_WIDTH = 188" in source
+    assert "STEPPER_BUTTON_WIDTH = 34" in source
+    assert "STEPPER_VALUE_WIDTH = 120" in source
+    assert "STEPPER_GAP = 0" in source
+    assert "gap: 0 !important" in source
+    assert "column-gap: 36px !important" in source
+    assert "row-gap: 12px !important" in source
+    assert "appearance: auto !important" in source
+    assert "-webkit-appearance: menulist !important" in source
+    assert ".constant-animation-root .widget-dropdown {" in source
+    assert "background: transparent !important;\n            border: 0 !important;" in source
+    assert ".constant-animation-root .widget-dropdown,\n          .constant-animation-root .widget-dropdown select" not in source
+    assert "background: #fff !important;\n            color: #333 !important;\n            border-color" not in source
+
+
+def test_configuracion_no_repite_la_ecuacion_implicita_del_experimento():
+    source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "function_output = formula_widget" not in source
+    assert '[controls, warning_output]' in source
+
+
+def test_resultado_muestra_tabla_y_plantilla_antes_de_ejecutar():
+    source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "table_output.value = pending_table_html" in source
+    assert "figure_output.value = placeholder_html()" in source
+    assert "profile.render_template(selected_maximum)" in source
+    assert "[table_output, figure_output]" in source
 
 
 def test_simulacion_incluye_opcion_para_forzar_ejecucion_completa():
@@ -957,5 +1024,5 @@ def test_motor_comun_permite_tiempo_teorico_por_n():
 
     table = profile_results_table([10, 100], [1e-7, 1e-7], profile)
 
-    assert r"1.000000\times 10^{-5}" in table
-    assert r"1.000000\times 10^{-4}" in table
+    assert '1.000000<span class="constant-times">×</span>10<sup>-5</sup>' in table
+    assert '1.000000<span class="constant-times">×</span>10<sup>-4</sup>' in table

@@ -32,9 +32,12 @@ except ImportError:
 
 
 EXPERIMENT_POINTS = 200
-STEPPER_FIELD_WIDTH = 184
-STEPPER_LABEL_WIDTH = 88
-STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 2
+STEPPER_FIELD_WIDTH = 188
+STEPPER_LABEL_WIDTH = 96
+STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 8
+STEPPER_BUTTON_WIDTH = 34
+STEPPER_VALUE_WIDTH = 120
+STEPPER_GAP = 0
 DEFAULT_MAXIMUM_EXPONENT = 5
 DEFAULT_EXECUTIONS = 10
 STATUS_PENDING = "pending"
@@ -214,6 +217,15 @@ def scientific_latex(value, pending=False, status=None):
     return rf"{coefficient}\times 10^{{{int(exponent)}}}"
 
 
+def scientific_html(value, pending=False, status=None):
+    if status == STATUS_SKIPPED:
+        return "No ejecutado"
+    if not np.isfinite(value):
+        return "Pendiente" if pending else "No ejecutado"
+    coefficient, exponent = f"{value:.6e}".split("e")
+    return f'{coefficient}<span class="constant-times">×</span>10<sup>{int(exponent)}</sup>'
+
+
 def theoretical_value_for(profile, n):
     if profile.theoretical is not None:
         return profile.theoretical(int(n))
@@ -243,12 +255,12 @@ def results_table(sizes, experimental, profile, pending=False, statuses=None):
     for row_index, (n, measured) in enumerate(zip(sizes, experimental)):
         status = statuses[row_index] if row_index < len(statuses) else None
         exponent = int(np.log10(n))
-        formatted_n = f"{int(n):,}".replace(",", r"\,")
+        formatted_n = f"{int(n):,}".replace(",", "\u202f")
         rows.append(
             "<tr>"
-            f"<td>\\(10^{{{exponent}}}={formatted_n}\\)</td>"
-            f"<td>\\({scientific_latex(theoretical_value_for(profile, n))}\\)</td>"
-            f"<td>\\({scientific_latex(measured, pending=pending, status=status)}\\)</td>"
+            f'<td><span class="constant-equation">10<sup>{exponent}</sup> = {formatted_n}</span></td>'
+            f'<td><span class="constant-equation">{scientific_html(theoretical_value_for(profile, n))}</span></td>'
+            f'<td><span class="constant-equation">{scientific_html(measured, pending=pending, status=status)}</span></td>'
             f"<td>{status_html(measured, status, pending=pending)}</td>"
             "</tr>"
         )
@@ -265,7 +277,27 @@ def results_table(sizes, experimental, profile, pending=False, statuses=None):
 
 def results_table_html(sizes, experimental, profile, pending=False, statuses=None):
     table = results_table(sizes, experimental, profile, pending=pending, statuses=statuses)
-    return mathjax_frame(table, 48 + 42 * len(sizes))
+    return (
+        '<div class="constant-native-table">'
+        "<style>"
+        ".constant-native-table{box-sizing:border-box;width:100%;overflow-x:auto;background:#fff !important;color:#000 !important;text-align:center;font-size:16px;line-height:1.2;}"
+        ".constant-native-table table{display:inline-table;border-collapse:collapse !important;width:max-content !important;max-width:100%;margin:0 auto !important;table-layout:auto;background:transparent !important;color:#000 !important;}"
+        ".constant-native-table th,.constant-native-table td{padding:6px 14px !important;text-align:center !important;vertical-align:middle !important;white-space:nowrap;height:42px;box-sizing:border-box;color:#000 !important;}"
+        ".constant-native-table thead,.constant-native-table thead tr,.constant-native-table th{font-weight:700;color:#000 !important;background:#fff !important;}"
+        ".constant-native-table th{border-bottom:1px solid #9e9e9e !important;}"
+        ".constant-native-table tbody tr:nth-child(odd),.constant-native-table tbody tr:nth-child(odd) td{background:#fff !important;}"
+        ".constant-native-table tbody tr:nth-child(even),.constant-native-table tbody tr:nth-child(even) td{background:#f3f4f6 !important;}"
+        ".constant-native-table .constant-equation{font-family:'STIX Two Math','STIXGeneral','Cambria Math','Latin Modern Math','Times New Roman',serif;font-size:16px;font-weight:400;font-style:normal;letter-spacing:0;white-space:nowrap;}"
+        ".constant-native-table .constant-equation sup{font-family:inherit;font-size:.72em;line-height:0;vertical-align:super;}"
+        ".constant-native-table .constant-times{font-family:inherit;padding:0 .22em;}"
+        ".constant-native-table .constant-status{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;vertical-align:middle;}"
+        ".constant-native-table .constant-result-symbol{font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32;}"
+        ".constant-native-table .constant-loading{width:16px;height:16px;min-width:16px;border:2px solid #bdc1c6;border-top-color:#1a73e8;border-radius:50%;animation:constant-spin .75s linear infinite;box-sizing:border-box;}"
+        ".constant-native-table .constant-status-pending,.constant-native-table .constant-status-skipped{font-size:14px;font-weight:400;color:#5f6368 !important;}"
+        "@keyframes constant-spin{to{transform:rotate(360deg);}}"
+        "</style>"
+        f"{table}</div>"
+    )
 
 
 def results_table_widget(sizes, experimental, profile, pending=False, statuses=None):
@@ -301,7 +333,7 @@ def profile_warning_html(profile, maximum_n, executions, force_full_execution=Fa
         return profile.warning_html(maximum_n, executions, profile.mode)
 
 
-def run_app(profile, display_app=True):
+def run_app(profile, display_app=True, mode_selector=None):
     if profile.mode not in {"time", "memory"}:
         raise ValueError("mode debe ser 'time' o 'memory'")
     if nest_asyncio is not None:
@@ -312,11 +344,11 @@ def run_app(profile, display_app=True):
     maximum_state = {"exponent": profile.default_maximum_exponent}
     maximum_value = formula_widget(rf"10^{{{profile.default_maximum_exponent}}}")
     maximum_value.layout = widgets.Layout(
-        width="100px",
-        min_width="100px",
-        max_width="100px",
+        width=f"{STEPPER_VALUE_WIDTH}px",
+        min_width=f"{STEPPER_VALUE_WIDTH}px",
+        max_width=f"{STEPPER_VALUE_WIDTH}px",
         height="32px",
-        flex="0 0 100px",
+        flex=f"0 0 {STEPPER_VALUE_WIDTH}px",
         border="1px solid var(--jp-border-color2, #bdbdbd)",
         display="flex",
         align_items="center",
@@ -324,17 +356,17 @@ def run_app(profile, display_app=True):
     )
     maximum_value.add_class("constant-centered-math")
     step_button_layout = widgets.Layout(
-        width="42px",
-        min_width="42px",
-        max_width="42px",
+        width=f"{STEPPER_BUTTON_WIDTH}px",
+        min_width=f"{STEPPER_BUTTON_WIDTH}px",
+        max_width=f"{STEPPER_BUTTON_WIDTH}px",
         height="32px",
-        flex="0 0 42px",
+        flex=f"0 0 {STEPPER_BUTTON_WIDTH}px",
     )
     maximum_down = widgets.Button(description="◀", tooltip="Potencia anterior", layout=step_button_layout)
     maximum_up = widgets.Button(description="▶", tooltip="Potencia siguiente", layout=step_button_layout)
     maximum_stepper = widgets.HBox(
         [maximum_down, maximum_value, maximum_up],
-        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap="0px"),
+        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap=f"{STEPPER_GAP}px"),
     )
     maximum_stepper.add_class("experimental-stepper")
     maximum_group = compact_labeled_control(
@@ -347,11 +379,11 @@ def run_app(profile, display_app=True):
     executions_control = widgets.Text(
         value=str(profile.default_executions),
         layout=widgets.Layout(
-            width="100px",
-            min_width="100px",
-            max_width="100px",
+            width=f"{STEPPER_VALUE_WIDTH}px",
+            min_width=f"{STEPPER_VALUE_WIDTH}px",
+            max_width=f"{STEPPER_VALUE_WIDTH}px",
             height="32px",
-            flex="0 0 100px",
+            flex=f"0 0 {STEPPER_VALUE_WIDTH}px",
         ),
     )
     executions_control.add_class("constant-centered-input")
@@ -359,27 +391,27 @@ def run_app(profile, display_app=True):
         description="◀",
         tooltip="Orden de magnitud anterior",
         layout=widgets.Layout(
-            width="42px",
-            min_width="42px",
-            max_width="42px",
+            width=f"{STEPPER_BUTTON_WIDTH}px",
+            min_width=f"{STEPPER_BUTTON_WIDTH}px",
+            max_width=f"{STEPPER_BUTTON_WIDTH}px",
             height="32px",
-            flex="0 0 42px",
+            flex=f"0 0 {STEPPER_BUTTON_WIDTH}px",
         ),
     )
     executions_up = widgets.Button(
         description="▶",
         tooltip="Orden de magnitud siguiente",
         layout=widgets.Layout(
-            width="42px",
-            min_width="42px",
-            max_width="42px",
+            width=f"{STEPPER_BUTTON_WIDTH}px",
+            min_width=f"{STEPPER_BUTTON_WIDTH}px",
+            max_width=f"{STEPPER_BUTTON_WIDTH}px",
             height="32px",
-            flex="0 0 42px",
+            flex=f"0 0 {STEPPER_BUTTON_WIDTH}px",
         ),
     )
     executions_stepper = widgets.HBox(
         [executions_down, executions_control, executions_up],
-        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap="0px"),
+        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap=f"{STEPPER_GAP}px"),
     )
     executions_stepper.add_class("experimental-stepper")
     executions_group = compact_labeled_control(
@@ -389,13 +421,28 @@ def run_app(profile, display_app=True):
         group_width=STEPPER_GROUP_WIDTH,
         label_width=STEPPER_LABEL_WIDTH,
     )
+    control_groups = []
+    if mode_selector is not None:
+        mode_selector.description = ""
+        mode_selector.layout = widgets.Layout(
+            width=f"{STEPPER_FIELD_WIDTH}px", height="32px"
+        )
+        analysis_group = compact_labeled_control(
+            "Análisis",
+            mode_selector,
+            field_width=STEPPER_FIELD_WIDTH,
+            group_width=STEPPER_GROUP_WIDTH,
+            label_width=STEPPER_LABEL_WIDTH,
+        )
+        control_groups.append(analysis_group)
+    control_groups.extend([maximum_group, executions_group])
     controls_row = widgets.Box(
-        [maximum_group, executions_group],
+        control_groups,
         layout=widgets.Layout(
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap="12px",
+            gap="12px 36px",
             align_items="center",
             overflow="visible",
         ),
@@ -535,7 +582,9 @@ def run_app(profile, display_app=True):
                 if execution_state["reset_requested"]:
                     break
                 if n <= execution_limit:
-                    experimental[index] = measure_profile_point(profile, int(n), executions)
+                    experimental[index] = await asyncio.to_thread(
+                        measure_profile_point, profile, int(n), executions
+                    )
                 checkpoint_index = checkpoint_indexes.get(int(n))
                 if checkpoint_index is not None:
                     checkpoint_times[checkpoint_index] = experimental[index]
@@ -550,7 +599,7 @@ def run_app(profile, display_app=True):
                         statuses=checkpoint_statuses,
                     )
                 if index % max(1, profile.yield_every) == 0 or checkpoint_index is not None:
-                    await asyncio.sleep(0.01)
+                    await asyncio.sleep(0)
             if execution_state["reset_requested"]:
                 reset_app()
             else:
@@ -595,46 +644,41 @@ def run_app(profile, display_app=True):
         layout=widgets.Layout(width="100%", gap="10px"),
     )
     controls.add_class("experimental-controls")
-    analysis_kind = "temporal" if profile.mode == "time" else "espacial"
-    panel_header = widgets.HTML(
-        value=(
-            f'<div class="experimental-panel-title">'
-            f'Análisis experimental {analysis_kind}:</div>'
-        ),
-        layout=widgets.Layout(width="100%"),
-    )
     def subpanel(title, children):
-        header = widgets.HTML(
-            value=f'<div class="experimental-subpanel-title">{title}</div>',
-            layout=widgets.Layout(width="100%"),
+        header = widgets.Button(
+            description=title,
+            icon="caret-down",
+            layout=widgets.Layout(width="100%", height="44px"),
         )
+        header.add_class("experimental-subpanel-summary")
         content = widgets.VBox(
             children,
             layout=widgets.Layout(width="100%", gap="0px"),
         )
         content.add_class("experimental-subpanel-content")
+
+        def toggle_content(_):
+            collapsed = content.layout.display != "none"
+            content.layout.display = "none" if collapsed else "flex"
+            header.icon = "caret-right" if collapsed else "caret-down"
+
+        header.on_click(toggle_content)
         panel = widgets.VBox([header, content], layout=widgets.Layout(width="100%", gap="0px"))
         panel.add_class("experimental-subpanel")
         return panel
 
-    symbol = "T" if profile.mode == "time" else "S"
-    function_output = formula_widget(rf"{symbol}(n)={profile.function_latex}")
-    function_output.layout = widgets.Layout(width="100%", height="46px")
-    parameters_panel = subpanel("Parámetros:", [controls, warning_output])
-    function_panel = subpanel("Función analizada:", [function_output])
+    configuration_panel = subpanel(
+        "Configuración",
+        [controls, warning_output],
+    )
     result_content = widgets.VBox(
         [table_output, figure_output],
         layout=widgets.Layout(width="100%", gap="12px", overflow_x="hidden"),
     )
     result_content.add_class("experimental-result-content")
-    result_panel = subpanel("Resultado:", [result_content])
-    panel_content = widgets.VBox(
-        [parameters_panel, function_panel, result_panel],
-        layout=widgets.Layout(width="100%", gap="0px"),
-    )
-    panel_content.add_class("experimental-panel-content")
+    result_panel = subpanel("Resultado", [result_content])
     main_panel = widgets.VBox(
-        [panel_header, panel_content],
+        [configuration_panel, result_panel],
         layout=widgets.Layout(width="100%", gap="0px"),
     )
     main_panel.add_class("experimental-main-panel")
@@ -644,9 +688,9 @@ def run_app(profile, display_app=True):
           .constant-centered-input input {
             text-align: center !important;
             box-sizing: border-box !important;
-            width: 100px !important;
-            min-width: 100px !important;
-            max-width: 100px !important;
+            width: 120px !important;
+            min-width: 120px !important;
+            max-width: 120px !important;
             height: 32px !important;
             min-height: 32px !important;
             max-height: 32px !important;
@@ -655,9 +699,9 @@ def run_app(profile, display_app=True):
           .constant-centered-input,
           .constant-centered-math {
             box-sizing: border-box !important;
-            width: 100px !important;
-            min-width: 100px !important;
-            max-width: 100px !important;
+            width: 120px !important;
+            min-width: 120px !important;
+            max-width: 120px !important;
             height: 32px !important;
             min-height: 32px !important;
             max-height: 32px !important;
@@ -707,9 +751,9 @@ def run_app(profile, display_app=True):
             box-sizing: border-box !important;
             width: 100% !important;
             margin: 0 !important;
-            border: 1px solid #dedede !important;
-            border-radius: 5px !important;
-            overflow: hidden !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
             background: #fff !important;
           }
           .experimental-panel-title {
@@ -745,16 +789,35 @@ def run_app(profile, display_app=True):
           .experimental-subpanel + .experimental-subpanel {
             border-top: 0 !important;
           }
-          .experimental-subpanel-title {
+          .experimental-main-panel > .experimental-subpanel:first-child {
+            border-radius: 5px 5px 0 0 !important;
+          }
+          .experimental-main-panel > .experimental-subpanel:last-child {
+            border-radius: 0 0 5px 5px !important;
+          }
+          .experimental-subpanel-summary {
             box-sizing: border-box !important;
             width: 100% !important;
+            height: 44px !important;
+            min-height: 44px !important;
             margin: 0 !important;
-            padding: 8px 12px !important;
+            padding: 10px 14px !important;
+            border: 0 !important;
             border-bottom: 1px solid #e5e5e5 !important;
+            border-radius: 0 !important;
             background: #f7f7f7 !important;
             color: #333 !important;
+            font-family: sans-serif !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
+            line-height: 24px !important;
             text-align: left !important;
+          }
+          .experimental-subpanel-summary:hover {
+            background: #f7f7f7 !important;
+          }
+          .experimental-subpanel-summary .fa {
+            color: #333 !important;
           }
           .experimental-subpanel-content {
             box-sizing: border-box !important;
@@ -776,6 +839,8 @@ def run_app(profile, display_app=True):
             display: flex !important;
             width: auto !important;
             flex-flow: row wrap !important;
+            column-gap: 36px !important;
+            row-gap: 12px !important;
             overflow: visible !important;
           }
           .experimental-parameters-grid > .widget-box {
@@ -795,14 +860,15 @@ def run_app(profile, display_app=True):
           .experimental-stepper {
             display: flex !important;
             flex-wrap: nowrap !important;
+            gap: 0 !important;
             overflow: visible !important;
           }
           .experimental-stepper button {
             box-sizing: border-box !important;
-            width: 42px !important;
-            min-width: 42px !important;
-            max-width: 42px !important;
-            flex: 0 0 42px !important;
+            width: 34px !important;
+            min-width: 34px !important;
+            max-width: 34px !important;
+            flex: 0 0 34px !important;
           }
           .experimental-controls input {
             border: 1px solid #ccc !important;
@@ -810,13 +876,38 @@ def run_app(profile, display_app=True):
             background: #fff !important;
             color: #333 !important;
           }
-          .constant-animation-root .widget-dropdown,
+          .constant-animation-root .widget-dropdown {
+            box-sizing: border-box !important;
+            width: 188px !important;
+            min-width: 188px !important;
+            max-width: 188px !important;
+            height: 32px !important;
+            min-height: 32px !important;
+            max-height: 32px !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+          }
           .constant-animation-root .widget-dropdown select,
           .constant-animation-root select {
-            background: #fff !important;
+            box-sizing: border-box !important;
+            width: 188px !important;
+            min-width: 188px !important;
+            max-width: 188px !important;
+            height: 32px !important;
+            min-height: 32px !important;
+            max-height: 32px !important;
+            padding: 2px 24px 2px 6px !important;
+            background-color: #fff !important;
             color: #333 !important;
-            border-color: #ccc !important;
+            border: 1px solid #ccc !important;
+            border-radius: 3px !important;
             color-scheme: light !important;
+            appearance: auto !important;
+            -webkit-appearance: menulist !important;
+            font-size: 13px !important;
           }
           .constant-animation-root .widget-dropdown option,
           .constant-animation-root select option {
@@ -895,9 +986,7 @@ def run_selectable_app(profile_factory, initial_mode="time"):
     selector = widgets.Dropdown(
         options=[("Temporal", "time"), ("Espacial", "memory")],
         value=initial_mode,
-        description="Complejidad:",
-        style={"description_width": "110px"},
-        layout=widgets.Layout(width="360px"),
+        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", height="32px"),
     )
     selector.add_class("experimental-mode-selector")
     body = widgets.VBox(layout=widgets.Layout(width="100%"))
@@ -910,21 +999,15 @@ def run_selectable_app(profile_factory, initial_mode="time"):
             reset_callback = getattr(previous, "_experimental_reset", None)
             if reset_callback is not None:
                 reset_callback()
-        current_app["widget"] = run_app(profile_factory(mode), display_app=False)
+        current_app["widget"] = run_app(
+            profile_factory(mode), display_app=False, mode_selector=selector
+        )
         body.children = (current_app["widget"],)
 
     selector.observe(update_mode, names="value")
     update_mode()
-    selector_panel = widgets.VBox(
-        [
-            widgets.HTML(value='<div class="experimental-panel-title">Tipo de análisis:</div>'),
-            widgets.Box([selector], layout=widgets.Layout(width="100%", padding="12px")),
-        ],
-        layout=widgets.Layout(width="100%", gap="0px"),
-    )
-    selector_panel.add_class("experimental-main-panel")
     wrapper = widgets.VBox(
-        [selector_panel, body],
+        [body],
         layout=widgets.Layout(width="100%", max_width="100%", gap="0px"),
     )
     wrapper.add_class("constant-animation-root")

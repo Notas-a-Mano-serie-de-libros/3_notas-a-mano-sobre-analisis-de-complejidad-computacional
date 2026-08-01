@@ -9,8 +9,11 @@ Para estudiar el contexto completo, vuelve a la [guía principal del Capítulo 2
 1. Abre el notebook correspondiente, en local o en Colab.
 2. Ejecuta primero la explicación y la gráfica teórica.
 3. Revisa el código fuente del experimento antes de correr la simulación.
-4. Ajusta los controles interactivos: máximo \(n\), número de ejecuciones o \(k\), según el notebook.
-5. Ejecuta la simulación y compara la tabla con la figura final.
+4. En <b>Configuración</b>, elige análisis temporal o espacial y ajusta el máximo \(n\), el número de ejecuciones o \(k\), según el notebook.
+5. Revisa en <b>Resultado</b> la tabla pendiente y la gráfica plantilla, visibles antes de ejecutar.
+6. Ejecuta la simulación y observa cómo aparece la curva experimental sobre la gráfica existente.
+
+Las simulaciones experimentales comparten una sola interfaz para tiempo y espacio. Cambiar el tipo de análisis actualiza unidades, etiquetas, tabla, advertencias y gráfica sin requerir una segunda simulación.
 
 Cuando el notebook muestre una advertencia, úsala como señal de escala: no significa que el experimento esté mal, sino que la función elegida puede exigir demasiado tiempo o memoria.
 
