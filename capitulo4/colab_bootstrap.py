@@ -41,4 +41,4 @@ if module_path is None:
     urllib.request.urlretrieve(base_url + "experiment_ui.py", ui_path)
 
 module = _load(module_path)
-module.run_experiment(globals()["EXAMPLE_NAME"], globals()["EXPERIMENT_MODE"])
+module.run_experiment(globals()["EXAMPLE_NAME"], None)

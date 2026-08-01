@@ -15,6 +15,7 @@ from typing import Callable
 
 import matplotlib.pyplot as plt
 from matplotlib import ticker
+from matplotlib.lines import Line2D
 import numpy as np
 from IPython.display import HTML
 
@@ -380,14 +381,12 @@ def _render_result(example_name, example, profile, mode, sizes, experimental, ch
     for spine in ax.spines.values():
         spine.set_color("#000000")
         spine.set_linewidth(0.8)
-    fig.tight_layout()
+    fig.subplots_adjust(left=0.13, right=0.97, bottom=0.17, top=0.86)
     buffer = BytesIO()
     fig.savefig(
         buffer,
         format="png",
         dpi=DISPLAY_DPI,
-        bbox_inches="tight",
-        pad_inches=0.05,
         facecolor="white",
         edgecolor="white",
         transparent=False,
@@ -404,7 +403,45 @@ def _render_result(example_name, example, profile, mode, sizes, experimental, ch
     return table, f'<img src="data:image/png;base64,{image}" style="display:block;max-width:100%;height:auto;">'
 
 
-def run_experiment(example_name: str, mode: str):
+def _render_template(maximum_n, mode):
+    fig, ax = plt.subplots(figsize=(8, 4), dpi=DISPLAY_DPI, facecolor="white")
+    ax.set_facecolor("white")
+    symbol = "T" if mode == "time" else "S"
+    ax.set_xlim(0, max(1, maximum_n))
+    ax.set_ylim(0, 1)
+    ax.set_xlabel(r"$\mathrm{Tamaño\ de\ la\ entrada}\ (n)$")
+    ax.set_ylabel(
+        r"$\mathrm{Tiempo\ de\ ejecución}\ [s]$" if mode == "time"
+        else r"$\mathrm{Consumo\ de\ memoria}\ [bytes]$"
+    )
+    ax.set_title("Complejidad teórica vs. experimental")
+    ax.grid(True, color="#CFD8DC", linestyle="-", linewidth=0.6, alpha=0.55)
+    ax.legend(
+        handles=[
+            Line2D([], [], color="#1f77b4", linewidth=1.5,
+                   label=rf"${symbol}(n)\ \mathrm{{experimental}}$"),
+            Line2D([], [], color="red", linewidth=1.5, linestyle=":",
+                   label=rf"${symbol}(n)\ \mathrm{{teórica}}$"),
+        ],
+        loc="upper right", frameon=True, framealpha=0.9,
+        facecolor="white", edgecolor="#E0E0E0",
+    )
+    _format_axis_text(ax)
+    for spine in ax.spines.values():
+        spine.set_color("#000000")
+        spine.set_linewidth(0.8)
+    fig.subplots_adjust(left=0.13, right=0.97, bottom=0.17, top=0.86)
+    buffer = BytesIO()
+    fig.savefig(
+        buffer, format="png", dpi=DISPLAY_DPI,
+        facecolor="white", edgecolor="white", transparent=False,
+    )
+    plt.close(fig)
+    image = base64.b64encode(buffer.getvalue()).decode("ascii")
+    return f'<img src="data:image/png;base64,{image}" style="display:block;max-width:100%;height:auto;">'
+
+
+def _profile_for(example_name: str, mode: str):
     if example_name not in EXAMPLES:
         raise ValueError(f"Ejemplo desconocido: {example_name}")
     if mode not in {"time", "memory"}:
@@ -424,6 +461,7 @@ def run_experiment(example_name: str, mode: str):
         prepare=example.prepare,
         measure_prepared=_measure_prepared(example, mode),
         render_result=None,
+        render_template=lambda maximum_n: _render_template(maximum_n, mode),
         warning_html=_warning(example, mode),
         theoretical=lambda _n: float("nan"),
         default_maximum_exponent=default_exponent,
@@ -439,7 +477,17 @@ def run_experiment(example_name: str, mode: str):
             checkpoints, checkpoint_values, statuses,
         ),
     )
-    UI.run_app(profile)
+    return profile
+
+
+def run_experiment(example_name: str, mode: str | None = None):
+    if example_name not in EXAMPLES:
+        raise ValueError(f"Ejemplo desconocido: {example_name}")
+    if mode is not None and mode not in {"time", "memory"}:
+        raise ValueError("mode debe ser 'time', 'memory' o None")
+    if mode is None:
+        return UI.run_selectable_app(lambda selected: _profile_for(example_name, selected))
+    return UI.run_app(_profile_for(example_name, mode))
 
 
 __all__ = ["EXAMPLES", "run_experiment"]
