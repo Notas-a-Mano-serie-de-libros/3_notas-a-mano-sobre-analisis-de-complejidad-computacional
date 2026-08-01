@@ -4,6 +4,31 @@
 
 ---
 
+<h2>🧪 Laboratorios interactivos</h2>
+
+<table style="width:100%; border-collapse:collapse; margin-top:1em;">
+  <thead>
+    <tr style="background-color:#f2f2f2;">
+      <th style="padding:8px; border:1px solid #ccc;">Laboratorio</th>
+      <th style="padding:8px; border:1px solid #ccc;">Propósito</th>
+      <th style="padding:8px; border:1px solid #ccc;">Local</th>
+      <th style="padding:8px; border:1px solid #ccc;">Colab</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:8px; border:1px solid #ccc;"><b>Análisis recursivo</b></td>
+      <td style="padding:8px; border:1px solid #ccc;">Construye las relaciones temporal y espacial y muestra cómo se apilan las llamadas y se desapilan en orden inverso desde el caso base.</td>
+      <td style="padding:8px; border:1px solid #ccc;"><a href="./0_laboratorio_analisis_recursivo.ipynb">Abrir</a></td>
+      <td style="padding:8px; border:1px solid #ccc;"><a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo6/0_laboratorio_analisis_recursivo.ipynb">Ejecutar</a></td>
+    </tr>
+  </tbody>
+</table>
+
+Los notebooks empleados como apoyo para gráficas estáticas se encuentran en <a href="./referencias/"><code>referencias/</code></a>.
+
+---
+
 <h2>🧭 Contenido del capítulo</h2>
 
 <ul>
