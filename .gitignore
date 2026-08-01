@@ -7,3 +7,7 @@ __pycache__/
 # Generated application bundles/build artifacts
 dist/
 build/
+
+# Generated figures produced by notebooks and simulations
+**/graficas/*
+!**/graficas/.gitkeep

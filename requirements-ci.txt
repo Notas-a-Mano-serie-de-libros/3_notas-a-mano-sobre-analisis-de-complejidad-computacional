@@ -1,6 +1,7 @@
 pytest
 numpy
 matplotlib
+IPython
 ipywidgets
 scipy
 scikit-learn

@@ -76,6 +76,26 @@ class TestPerformanceContracts(unittest.TestCase):
 
         self.assertEqual(result.stdout.strip(), "")
 
+    def test_generated_graphics_policy_is_installed_and_clean(self):
+        script = PROJECT_ROOT / "scripts" / "clean_generated_graphics.py"
+        result = subprocess.run(
+            [sys.executable, str(script), "--check"],
+            check=True,
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_ROOT,
+        )
+        pre_push = (PROJECT_ROOT / "scripts" / "git_hooks" / "pre-push").read_text(
+            encoding="utf-8"
+        )
+        installer = (PROJECT_ROOT / "scripts" / "install_git_hooks.py").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertEqual(result.stdout.strip(), "")
+        self.assertIn("clean_generated_graphics.py", pre_push)
+        self.assertIn('("pre-commit", "pre-push")', installer)
+
     def test_colab_validation_scripts_pass(self):
         for script_name in (
             "validate_colab_bootstrap.py",
@@ -107,11 +127,15 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("concurrency:", workflow)
         self.assertIn("cache-dependency-path: requirements-ci.txt", workflow)
         self.assertIn("python -m pip install -r requirements-ci.txt", workflow)
+        colab_job = workflow.split("  colab-sanity:\n", 1)[1].split("  tests:\n", 1)[0]
+        self.assertIn("Install validation dependencies", colab_job)
+        self.assertIn("python -m pip install -r requirements-ci.txt", colab_job)
         for job in ("notebooks-clean:", "lint-python:", "colab-sanity:", "tests:", "benchmark:", "security:"):
             self.assertIn(job, workflow)
         for version in ('"3.10"', '"3.11"', '"3.12"'):
             self.assertIn(version, workflow)
         self.assertIn("python scripts/clean_notebooks.py --check --diagnose", workflow)
+        self.assertIn("python scripts/clean_generated_graphics.py --check", workflow)
         self.assertIn("ruff check capitulo7 capitulo8 common scripts tests", workflow)
         self.assertIn("python scripts/validate_colab_bootstrap.py", workflow)
         self.assertIn("python scripts/validate_colab_links.py", workflow)
@@ -128,7 +152,11 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("proyecto-notas-a-mano.zip", release)
         self.assertIn("--exclude 'artifacts'", release)
         self.assertIn("validate-html-snapshots", precommit)
+        self.assertIn("clean-generated-graphics", precommit)
         self.assertIn("requirements-ci.txt", (PROJECT_ROOT / "requirements-dev.txt").read_text(encoding="utf-8"))
+        ci_requirements = (PROJECT_ROOT / "requirements-ci.txt").read_text(encoding="utf-8").splitlines()
+        self.assertIn("IPython", ci_requirements)
+        self.assertIn("ipywidgets", ci_requirements)
         self.assertIn("actions/workflows/ci.yml/badge.svg", readme)
         self.assertIn("actions/workflows/codeql.yml/badge.svg", readme)
 

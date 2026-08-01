@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+python3 scripts/clean_generated_graphics.py
+
+tracked_graphics="$({ git ls-files | grep -E '(^|/)graficas/.+' | grep -v -E '(^|/)graficas/\.gitkeep$'; } || true)"
+if [[ -n "${tracked_graphics}" ]]; then
+  echo "El push fue cancelado: hay gráficas generadas rastreadas por Git."
+  echo "Elimínalas del índice y crea un nuevo commit:"
+  echo "${tracked_graphics}"
+  exit 1
+fi
+
+if ! python3 scripts/clean_generated_graphics.py --check; then
+  echo "El push fue cancelado: no se pudieron limpiar todas las gráficas generadas."
+  exit 1
+fi

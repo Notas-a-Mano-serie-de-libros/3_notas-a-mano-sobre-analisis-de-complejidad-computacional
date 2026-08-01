@@ -766,7 +766,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
 
         self.assertIn("background: #ffffff", html)
         self.assertIn("background:#e5e7eb", html)
-        self.assertIn("border: 1px solid #d1d5db", html)
+        self.assertIn("--sort-border: #9ca3af", html)
         self.assertIn("border-radius: 0;", html)
         self.assertIn('<div class="bar-value">64</div>', html)
         self.assertIn('<div class="bar-index">0</div>', html)
@@ -1208,7 +1208,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("Pasos", html)
         self.assertIn("Arreglo", html)
         self.assertIn("background: #ffffff;", html)
-        self.assertIn("border: 1px solid #d1d5db;", html)
+        self.assertIn("--sort-border: #9ca3af;", html)
         self.assertIn("overflow-x: hidden;", html)
         self.assertIn("comparison-bars-result", html)
         self.assertIn("--comparison-count:6;", html)

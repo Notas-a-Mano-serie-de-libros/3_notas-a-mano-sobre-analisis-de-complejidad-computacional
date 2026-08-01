@@ -30,9 +30,10 @@ def install_notebook_filter() -> None:
 
 
 def main() -> None:
-    installed = install_hook("pre-commit")
+    installed = [install_hook(name) for name in ("pre-commit", "pre-push")]
     install_notebook_filter()
-    print(f"Hook instalado: {installed.relative_to(PROJECT_ROOT)}")
+    for hook in installed:
+        print(f"Hook instalado: {hook.relative_to(PROJECT_ROOT)}")
     print("Filtro de notebooks instalado: strip-notebook-output")
 
 

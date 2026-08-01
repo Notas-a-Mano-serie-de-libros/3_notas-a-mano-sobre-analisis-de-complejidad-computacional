@@ -7,6 +7,11 @@ repos:
         language: system
         pass_filenames: false
         types_or: [jupyter]
+      - id: clean-generated-graphics
+        name: Check generated graphics are absent
+        entry: python scripts/clean_generated_graphics.py --check
+        language: system
+        pass_filenames: false
       - id: ruff
         name: Ruff lint
         entry: ruff check capitulo7 capitulo8 common scripts tests

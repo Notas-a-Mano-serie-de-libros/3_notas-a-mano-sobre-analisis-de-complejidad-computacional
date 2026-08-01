@@ -140,6 +140,22 @@ Cada notebook puede ejecutarse de manera independiente y contiene ejemplos autod
 Los resultados pueden reproducirse sin dependencias externas.
 </p>
 
+<h3>Preparación del repositorio para desarrollo</h3>
+
+<p style="text-align:justify;">
+Las imágenes producidas por notebooks y simulaciones se guardan en carpetas <code>graficas/</code>, pero no forman parte del repositorio. Para instalar los hooks que limpian notebooks y eliminan estas imágenes antes de cada push, ejecute una vez:
+</p>
+
+```bash
+python3 scripts/install_git_hooks.py
+```
+
+<p>La limpieza también puede ejecutarse manualmente:</p>
+
+```bash
+python3 scripts/clean_generated_graphics.py
+```
+
 <p style="text-align:justify;">
 Para abrir las simulaciones interactivas del capítulo 7 en local con el código oculto, use el lanzador basado en Voilà:
 </p>
