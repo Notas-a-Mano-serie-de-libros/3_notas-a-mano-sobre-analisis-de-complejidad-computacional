@@ -30,7 +30,7 @@ def test_chapters_two_and_four_parameter_panels_use_aligned_columns():
         assert 'width="auto"' in module_source
         assert 'flex_flow="column nowrap"' in module_source
         assert "flex-flow: column nowrap !important" in module_source
-        assert "width: 292px !important" in module_source
+        assert "width: 346px !important" in module_source
 
     polynomial_source = source(
         "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py"

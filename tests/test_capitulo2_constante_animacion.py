@@ -252,16 +252,20 @@ def test_resultado_muestra_tabla_y_plantilla_antes_de_ejecutar():
     assert "[table_output, figure_output]" in source
 
 
-def test_simulacion_incluye_opcion_para_forzar_ejecucion_completa():
+def test_simulacion_incluye_selector_para_restringir_n_maximo():
     source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(encoding="utf-8")
 
-    assert "force_execution = widgets.Checkbox" in source
-    assert 'description="Ejecutar todos los valores"' in source
+    assert "force_execution = widgets.Dropdown" in source
+    assert 'options=[("Sí", False), ("No", True)]' in source
+    assert '"Restringir n máximo"' in source
+    assert "control_groups.extend([maximum_group, executions_group, restriction_group])" in source
     assert "force_execution.value = False" in source
     assert "force_execution.disabled = not enabled" in source
     assert "force_execution.observe(refresh_warning" in source
     assert "effective_max_safe_elements(profile, force_execution.value)" in source
     assert "profile_warning_html(profile, maximum_n(), execution_value(), force_execution.value)" in source
+    assert "⚠ Ejecución sin restricciones" in source
+    assert "Ejecutar sin limitaciones incrementará el tiempo de ejecución y el consumo de recursos." in source
 
 
 def test_simulacion_habilita_widgets_en_colab():
@@ -965,7 +969,9 @@ def test_motor_comun_mantiene_compatibilidad_con_advertencias_de_tres_argumentos
         warning_html=lambda maximum_n, executions, mode: f"{maximum_n}-{executions}-{mode}",
     )
 
-    assert profile_warning_html(profile, 100, 7, force_full_execution=True) == "100-7-time"
+    warning = profile_warning_html(profile, 100, 7, force_full_execution=True)
+    assert "⚠ Ejecución sin restricciones" in warning
+    assert warning.endswith("100-7-time")
 
 
 def test_motor_comun_renderiza_tabla_pendiente_desde_perfil():

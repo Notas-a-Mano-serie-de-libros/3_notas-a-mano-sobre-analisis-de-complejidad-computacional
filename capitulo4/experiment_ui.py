@@ -54,7 +54,7 @@ except ImportError:
 
 EXPERIMENT_POINTS = 200
 STEPPER_FIELD_WIDTH = 188
-STEPPER_LABEL_WIDTH = 96
+STEPPER_LABEL_WIDTH = 150
 STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 8
 STEPPER_BUTTON_WIDTH = 34
 STEPPER_VALUE_WIDTH = 120
@@ -348,9 +348,20 @@ def effective_max_safe_elements(profile, force_full_execution=False):
 
 def profile_warning_html(profile, maximum_n, executions, force_full_execution=False):
     try:
-        return profile.warning_html(maximum_n, executions, profile.mode, force_full_execution)
+        profile_warning = profile.warning_html(
+            maximum_n, executions, profile.mode, force_full_execution
+        )
     except TypeError:
-        return profile.warning_html(maximum_n, executions, profile.mode)
+        profile_warning = profile.warning_html(maximum_n, executions, profile.mode)
+    if not force_full_execution:
+        return profile_warning
+    unrestricted_warning = (
+        '<div style="border-left:4px solid #d97706;padding:8px 12px;margin:8px 0 0;">'
+        '<b>⚠ Ejecución sin restricciones</b><br>'
+        'Ejecutar sin limitaciones incrementará el tiempo de ejecución y el consumo de recursos.'
+        '</div>'
+    )
+    return unrestricted_warning + profile_warning
 
 
 def run_app(profile, display_app=True, mode_selector=None):
@@ -417,13 +428,25 @@ def run_app(profile, display_app=True, mode_selector=None):
         group_width=STEPPER_GROUP_WIDTH,
         label_width=STEPPER_LABEL_WIDTH,
     )
+    force_execution = widgets.Dropdown(
+        options=[("Sí", False), ("No", True)],
+        value=False,
+        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", height="32px"),
+    )
+    force_execution.add_class("experimental-restriction-selector")
+    restriction_group = compact_labeled_control(
+        "Restringir n máximo", force_execution,
+        field_width=STEPPER_FIELD_WIDTH,
+        group_width=STEPPER_GROUP_WIDTH,
+        label_width=STEPPER_LABEL_WIDTH,
+    )
     control_groups = []
     if mode_selector is not None:
         control_groups.append(compact_labeled_control(
             "Análisis", mode_selector, field_width=STEPPER_FIELD_WIDTH,
             group_width=STEPPER_GROUP_WIDTH, label_width=STEPPER_LABEL_WIDTH,
         ))
-    control_groups.extend([maximum_group, executions_group])
+    control_groups.extend([maximum_group, executions_group, restriction_group])
     controls_row = widgets.Box(
         control_groups,
         layout=widgets.Layout(
@@ -447,12 +470,6 @@ def run_app(profile, display_app=True, mode_selector=None):
             width="100%", gap="10px", margin="12px 0 0 0",
             flex_flow="row wrap", justify_content="flex-end", overflow="visible",
         ),
-    )
-    force_execution = widgets.Checkbox(
-        value=False,
-        description="Ejecutar todos los valores",
-        indent=False,
-        layout=widgets.Layout(width="auto", margin="8px 0 0 0"),
     )
     warning_output = widgets.HTML()
     warning_output.layout = widgets.Layout(width="100%", max_width="100%", overflow="hidden")
@@ -630,7 +647,7 @@ def run_app(profile, display_app=True, mode_selector=None):
     refresh_warning()
 
     controls = widgets.VBox(
-        [controls_row, force_execution, button_row],
+        [controls_row, button_row],
         layout=widgets.Layout(width="100%", gap="10px"),
     )
     controls.add_class("experimental-controls")
@@ -830,9 +847,9 @@ def run_app(profile, display_app=True, mode_selector=None):
           }
           .experimental-parameters-grid > .widget-box {
             box-sizing: border-box !important;
-            width: 292px !important;
-            min-width: 292px !important;
-            max-width: 292px !important;
+            width: 346px !important;
+            min-width: 346px !important;
+            max-width: 346px !important;
             overflow: visible !important;
           }
           .experimental-controls button {

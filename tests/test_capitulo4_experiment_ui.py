@@ -22,6 +22,11 @@ def test_interfaz_comparte_paneles_y_medidas_del_capitulo_dos():
     assert "experimental-subpanel-summary" in UI_SOURCE
     assert "appearance: auto !important" in UI_SOURCE
     assert "-webkit-appearance: menulist !important" in UI_SOURCE
+    assert "STEPPER_LABEL_WIDTH = 150" in UI_SOURCE
+    assert 'options=[("Sí", False), ("No", True)]' in UI_SOURCE
+    assert '"Restringir n máximo"' in UI_SOURCE
+    assert "⚠ Ejecución sin restricciones" in UI_SOURCE
+    assert "Ejecutar sin limitaciones incrementará el tiempo de ejecución y el consumo de recursos." in UI_SOURCE
 
 
 def test_tabla_es_nativa_formateada_y_la_medicion_no_bloquea_la_vista():
