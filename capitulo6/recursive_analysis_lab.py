@@ -181,12 +181,14 @@ def build_trace(algorithm: str, n: int):
         elif algorithm == "power_fast":
             add_event("line", 3)
             visit(children[0], depth + 1, node_id)
+            add_event("resume", 3)
             add_event("line", 4)
             add_event("return", 5 if value % 2 else 6)
         else:
             for child_value in children:
                 add_event("line", 3)
                 visit(child_value, depth + 1, node_id)
+                add_event("resume", 3)
             add_event("return", 3)
         stack.pop()
 
@@ -246,12 +248,18 @@ def _tree_svg(nodes: list[Node], events: list[dict], step: int) -> str:
     for node in visible:
         levels.setdefault(node.depth, []).append(node)
     width = 720
-    height = max(250, 84 + 84 * max(levels, default=0))
+    height = 426
+    maximum_depth = max((node.depth for node in nodes), default=0)
+    top_padding = 38
+    usable_height = height - 2 * top_padding
     positions: dict[int, tuple[float, float]] = {}
     for depth, level_nodes in levels.items():
         for index, node in enumerate(level_nodes, 1):
             positions[node.id] = (
-                width * index / (len(level_nodes) + 1), 44 + depth * 84
+                width * index / (len(level_nodes) + 1),
+                top_padding
+                if maximum_depth == 0
+                else top_padding + usable_height * depth / maximum_depth,
             )
     edges = []
     circles = []
@@ -287,34 +295,69 @@ def _call_stack_panel(
     active_stack = event["stack"]
     current = event["node"]
     is_base = not nodes[current].children
+    finished = step == len(events) - 1
     frames = []
     completed = {
         item["node"] for item in events[: step + 1] if item["kind"] == "return"
     }
     for node_id in reversed(active_stack):
         node = nodes[node_id]
-        css = " current-return" if node_id == current and event["kind"] == "return" else " current-call" if node_id == current else ""
+        if node_id == current and event["kind"] == "return" and finished:
+            css = " current-return completed"
+        elif node_id == current and event["kind"] == "return":
+            css = " current-return frame-pop"
+        elif node_id == current and event["kind"] == "enter":
+            css = " current-call frame-push"
+        elif node_id == current and event["kind"] == "resume":
+            css = " current-call frame-resume"
+        elif node_id == current:
+            css = " current-call"
+        else:
+            css = " waiting"
         state = (
-            "Caso base · retorna"
+            ""
+            if node_id == current and finished
+            else "Caso base · retorna"
             if node_id == current and event["kind"] == "return" and is_base
             else "Se desapila"
             if node_id == current and event["kind"] == "return"
             else "Nueva llamada"
             if node_id == current and event["kind"] == "enter"
+            else "Recibe el resultado"
+            if node_id == current and event["kind"] == "resume"
             else "En ejecución"
             if node_id == current
             else "En espera"
         )
-        frames.append(
+        state_markup = f"<span>{state}</span>" if state else ""
+        frame_markup = (
             f'<div class="lab-call-frame{css}">'
             rf'<b>\({_frame_expression(algorithm, node, nodes, completed)}\)</b>'
-            f'<span>{state}</span></div>'
+            f'{state_markup}</div>'
         )
+        if node_id == current and finished:
+            frame_markup = (
+                '<div class="lab-completed-row">'
+                + frame_markup
+                + '<span class="lab-finish-check" role="img" title="Completado" '
+                'aria-label="Completado">✓</span></div>'
+            )
+        frames.append(frame_markup)
     return (
         '<div class="lab-call-stack" aria-label="Pila de llamadas">'
         + "".join(frames)
         + '<div class="lab-stack-base">Base de la pila · problema original</div></div>'
     )
+
+
+def _event_delay(event: dict, nodes: list[Node]) -> float:
+    if event["kind"] == "enter":
+        return 0.55
+    if event["kind"] == "resume":
+        return 0.3
+    if event["kind"] == "return":
+        return 0.75 if not nodes[event["node"]].children else 0.6
+    return 0.32
 
 
 def _cost_expression(algorithm: str, analysis_type: str) -> str:
@@ -440,13 +483,13 @@ STYLES = """
 .lab-configuration-summary{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-bottom:1px solid #e2e2e2!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;font-family:sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:24px!important;text-align:left!important}.lab-configuration-summary:hover{background:#f7f7f7!important}.lab-configuration-summary .fa{color:#333!important}
 .lab-controls{box-sizing:border-box!important;width:100%!important;padding:12px!important;border:0!important;background:#fff!important;margin:0!important}
 .lab-controls .widget-label{color:#333;font-weight:700}
-.lab-control-label{display:flex!important;align-items:center!important;justify-content:center!important;height:32px!important;min-height:32px!important;color:#333!important;font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;text-align:center!important}.lab-control-label .widget-htmlmath-content{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;color:#333!important}
+.lab-control-label{display:flex!important;align-items:center!important;justify-content:center!important;height:32px!important;min-height:32px!important;color:#333!important;font-size:13px!important;font-weight:700!important;text-align:center!important}.lab-control-label .widget-htmlmath-content{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;color:#333!important}.lab-control-label mjx-container,.lab-control-label mjx-container *{color:#333!important}
 .lab-controls select{box-sizing:border-box;width:176px!important;height:32px;padding:2px 4px;border:1px solid #ccc;border-radius:3px;background:#fff!important;color:#333;font-size:13px;text-align:center;text-align-last:center;appearance:auto!important}
 .lab-controls select option{background:#fff;color:#333}
 .lab-controls input:not([type="range"]){box-sizing:border-box;width:176px!important;height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background:#fff!important;color:#333!important;font-size:13px!important;text-align:center!important}
 .lab-controls .lab-field{width:176px!important;height:32px!important}.lab-controls .lab-field input{width:176px!important;height:32px!important}
 .lab-controls .lab-field.widget-disabled{opacity:1!important}.lab-controls .lab-field input:disabled{opacity:1!important;background:#f7f7f7!important;color:#333!important;cursor:default!important}
-.lab-control-row{width:280px!important;min-width:280px!important;max-width:280px!important}.lab-control-row>.widget-html{flex:0 0 96px!important;width:96px!important}.lab-control-row>.widget-dropdown,.lab-control-row>.widget-text,.lab-control-row>.widget-int{flex:0 0 176px!important;width:176px!important}
+.lab-control-row{width:280px!important;min-width:280px!important;max-width:280px!important}.lab-control-row>.widget-html,.lab-control-row>.widget-htmlmath{flex:0 0 96px!important;width:96px!important}.lab-control-row>.widget-dropdown,.lab-control-row>.widget-text,.lab-control-row>.widget-int{flex:0 0 176px!important;width:176px!important}
 .lab-controls input[type="number"]{-moz-appearance:textfield!important;appearance:textfield!important}
 .lab-controls input[type="number"]::-webkit-inner-spin-button,.lab-controls input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none!important;margin:0!important}
 .lab-controls .widget-readout{background:#fff!important;color:#333!important;font-family:sans-serif!important}
@@ -456,7 +499,7 @@ STYLES = """
 .lab-parameter-controls{width:100%!important;column-gap:36px!important;row-gap:12px!important}.lab-actions{box-sizing:border-box!important;width:100%!important;margin:0!important;padding-top:4px!important;justify-content:flex-end!important}
 .lab-section{box-sizing:border-box;width:100%;margin:0;border:1px solid #dedede;border-bottom:0;border-radius:0;background:#fff;overflow:hidden}.lab-section:first-child{border-radius:5px 5px 0 0}.lab-section:last-child{border-bottom:1px solid #dedede;border-radius:0 0 5px 5px}
 .lab-section>summary{box-sizing:border-box;width:100%;padding:9px 12px;cursor:pointer;background:#f7f7f7;color:#333;font-size:16px;font-weight:700;line-height:1.45}.lab-section[open]>summary{border-bottom:1px solid #e2e2e2}.lab-section-content{box-sizing:border-box;width:100%;background:#fff}
-.lab-code-summary{display:flex!important;height:44px!important;min-height:44px!important;max-height:44px!important;align-items:center;justify-content:space-between;overflow:hidden}.lab-language-logo{display:block;flex:0 0 26px;width:26px;height:26px;object-fit:contain}
+.lab-code-summary{position:relative;display:flex!important;height:44px!important;min-height:44px!important;max-height:44px!important;padding-left:32px!important;align-items:center;justify-content:space-between;overflow:hidden}.lab-code-summary::before{position:absolute;left:12px;top:50%;content:"▾";font-size:13px;line-height:1;transform:translateY(-50%)}.lab-code-panel:not([open])>.lab-code-summary::before{content:"▸"}.lab-language-logo{display:block;flex:0 0 26px;width:26px;height:26px;object-fit:contain}
 .lab-analysis-panel{margin:0;border-bottom:1px solid #dedede!important;border-radius:0 0 5px 5px!important}.lab-analysis-steps{padding:10px 18px 14px;font-size:16px;line-height:1.55}.lab-analysis-step{margin:8px 0 14px!important;line-height:1.55}.lab-analysis-step-title{font-weight:700;text-align:left}.lab-analysis-step-solution{width:100%;padding:4px 12px 0;text-align:center}.lab-analysis-result{margin:16px 0 2px!important}.lab-analysis-equation{padding:6px 0 4px;font-size:18px}
 .lab-visual-sections{width:100%;margin:0}.lab-code-panel{border-radius:0!important}.lab-code-panel[open] .lab-code{height:auto;min-height:0}
 .lab-state-panel{border-bottom:0!important;border-radius:0!important}
@@ -464,15 +507,21 @@ STYLES = """
 .lab-code{height:auto;min-height:0;padding:0;overflow-x:auto;overflow-y:hidden;background:#fff;font:14px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
 .lab-code-line{display:grid;grid-template-columns:42px minmax(max-content,1fr);min-height:28px;white-space:pre-wrap}.lab-line-number{display:flex;align-items:center;justify-content:center;padding:3px 4px;border-right:1px solid #d8d8d8;background:#f2f2f2;color:#666!important;font-weight:700;user-select:none}.lab-line-source{display:block;padding:3px 10px;border-left:3px solid transparent;background:#fff}.lab-code-line.current .lab-line-number{background:#ece8d8;color:#444!important}.lab-code-line.current .lab-line-source{background:#f4e8bd;border-left-color:#a47b20}
 .lab-code .k{color:#005cc5;font-weight:600}.lab-code .kt,.lab-code .nb,.lab-code .bp{color:#005cc5}.lab-code .nf{color:#6f42c1}.lab-code .n{color:#24292e}.lab-code .mi,.lab-code .mf{color:#005a8d}.lab-code .s,.lab-code .s1,.lab-code .s2{color:#22863a}.lab-code .c,.lab-code .c1,.lab-code .cm{color:#6a737d;font-style:italic}.lab-code .o{color:#d73a49}.lab-code .p{color:#24292e}
-.lab-tree-scroll{height:426px;overflow:auto;background:#fff}.lab-tree{display:block;width:100%;min-width:520px;background:#fff}
+.lab-tree-scroll{height:426px;overflow:auto;background:#fff}.lab-tree{display:block;width:100%;height:100%;min-width:520px;background:#fff}
 .lab-edge{fill:none;stroke:#202124;stroke-width:1.7}.lab-arrow-head{fill:#202124!important;stroke:none!important}.lab-node circle{fill:#fff;stroke:#202124;stroke-width:1.7}.lab-node text{text-anchor:middle;font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:15px;font-weight:400;fill:#111!important}.lab-node.base circle{fill:#e8f5e9;stroke:#202124}
 .lab-call-stack{display:flex;height:426px;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:14px 18px 0;overflow:auto;background:#fff}
-.lab-call-frame{display:flex;width:min(100%,330px);align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border:1px solid #202124;border-radius:0;background:#f7f7f7}
+.lab-call-frame{display:flex;width:min(100%,330px);align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border:1px solid #202124;border-radius:0;background:#f7f7f7;transition:background-color .2s ease,opacity .2s ease,transform .2s ease}
 .lab-call-frame+.lab-call-frame{border-top:0}
 .lab-call-frame b{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif}.lab-call-frame span{font-size:12px;color:#5f6368!important}
-.lab-call-frame.current-call{background:#f4e8bd}.lab-call-frame.current-return{background:#e8f5e9}
+.lab-call-frame.waiting{opacity:.62}.lab-call-frame.current-call{background:#f4e8bd;opacity:1}.lab-call-frame.current-return{background:#e8f5e9;opacity:1}.lab-call-frame.completed{transform:none;opacity:1}
+.lab-completed-row{position:relative;width:min(100%,330px)}.lab-completed-row .lab-call-frame{width:100%}
+.lab-finish-check{position:absolute;left:calc(100% + 8px);top:50%;display:inline-block!important;width:28px;font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32!important;text-align:center;transform:translateY(-50%)}
+.lab-call-frame.frame-push{animation:lab-frame-push .22s ease-out}.lab-call-frame.frame-resume{animation:lab-frame-resume .24s ease-out}.lab-call-frame.frame-pop{animation:lab-frame-pop .28s ease-in-out}
+@keyframes lab-frame-push{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:translateY(0)}}@keyframes lab-frame-resume{0%{transform:scale(.985)}55%{transform:scale(1.012)}100%{transform:scale(1)}}@keyframes lab-frame-pop{0%{opacity:1;transform:translateY(0)}65%{opacity:1;transform:translateY(-2px)}100%{opacity:.38;transform:translateY(-9px)}}
 .lab-stack-base{width:min(100%,360px);margin-top:5px;padding:6px 10px;border-top:2px solid #202124;text-align:center;color:#5f6368!important;font-size:12px}
 .lab-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:0;overflow:hidden}.lab-metric{padding:10px;text-align:center;border-right:1px solid #e2e2e2;background:#fff}.lab-metric:last-child{border-right:0}.lab-metric b{display:block;font-size:18px}
+.lab-widget-panels{box-sizing:border-box!important;width:100%!important;margin:0!important;gap:0!important;overflow:visible!important}.lab-widget-panel{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;gap:0!important;border:1px solid #dedede!important;border-bottom:0!important;background:#fff!important;overflow:hidden!important}.lab-widget-header{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;gap:0!important;border-bottom:1px solid #e2e2e2!important;background:#f7f7f7!important;overflow:hidden!important}.lab-widget-summary{flex:1 1 auto!important;width:auto!important;min-width:0!important;height:44px!important;padding:9px 12px!important;border:0!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;font-size:16px!important;font-weight:700!important;text-align:left!important}.lab-widget-summary:hover{background:#f7f7f7!important}.lab-widget-logo{position:relative!important;z-index:1!important;flex:0 0 42px!important;width:42px!important;height:44px!important;margin:0!important;padding:9px 12px 9px 4px!important;background:transparent!important;overflow:hidden!important}.lab-widget-logo .widget-html-content{display:flex!important;align-items:center!important;justify-content:flex-end!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;background:transparent!important}.lab-widget-logo .lab-language-logo{margin:0!important;background:transparent!important}.lab-widget-content{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;background:#fff!important;overflow:hidden!important}.lab-widget-execution{display:flex!important;width:100%!important;min-width:0!important;gap:0!important;overflow:hidden!important}.lab-widget-execution>.lab-widget-panel{flex:0 0 50%!important;width:50%!important;min-width:0!important;height:470px!important}.lab-widget-execution>.lab-widget-panel:first-child{border-right:0!important}.lab-widget-execution>.lab-widget-panel:last-child{border-bottom:1px solid #dedede!important}.lab-widget-execution .lab-widget-content{height:426px!important;min-height:426px!important;max-height:426px!important;overflow:hidden!important}
+.lab-widget-execution>.lab-widget-panel.lab-collapsed{height:44px!important}
 @media(max-width:760px){.lab-execution-grid{grid-template-columns:1fr}.lab-execution-grid>.lab-section:first-child{border-right:1px solid #dedede}.lab-metrics{grid-template-columns:repeat(2,1fr)}.lab-metric:nth-child(2){border-right:0}.lab-metric:nth-child(-n+2){border-bottom:1px solid #e2e2e2}}
 </style>
 """
@@ -508,8 +557,52 @@ def run_app():
     play = widgets.Button(description="Reproducir", icon="play")
     reset = widgets.Button(description="Reiniciar", icon="refresh")
     method = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
-    visualization = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
+    code_content = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
+    state_content = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
+    stack_content = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
+    tree_content = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
+    language_logo = widgets.HTML(layout=widgets.Layout(width="42px", height="44px"))
+    language_logo.add_class("lab-widget-logo")
     state = {"nodes": [], "events": [], "step": 0, "play_task": None}
+
+    def collapsible_panel(title, content, extra=None):
+        summary = widgets.Button(
+            description=title, icon="caret-down",
+            layout=widgets.Layout(width="100%", height="44px"),
+        )
+        summary.add_class("lab-widget-summary")
+        header_children = [summary] + ([extra] if extra is not None else [])
+        header = widgets.HBox(header_children, layout=widgets.Layout(width="100%", gap="0"))
+        header.add_class("lab-widget-header")
+        content.add_class("lab-widget-content")
+
+        def toggle(_):
+            collapsed = content.layout.display != "none"
+            content.layout.display = "none" if collapsed else "block"
+            summary.icon = "caret-right" if collapsed else "caret-down"
+            if collapsed:
+                panel.add_class("lab-collapsed")
+            else:
+                panel.remove_class("lab-collapsed")
+
+        summary.on_click(toggle)
+        panel = widgets.VBox([header, content], layout=widgets.Layout(width="100%", gap="0"))
+        panel.add_class("lab-widget-panel")
+        return panel
+
+    code_panel = collapsible_panel("Algoritmo", code_content, language_logo)
+    state_panel = collapsible_panel("Prueba de escritorio", state_content)
+    stack_panel = collapsible_panel("Pila de recursión", stack_content)
+    tree_panel = collapsible_panel("Árbol de recursión", tree_content)
+    execution_panels = widgets.HBox(
+        [stack_panel, tree_panel], layout=widgets.Layout(width="100%", gap="0")
+    )
+    execution_panels.add_class("lab-widget-execution")
+    visualization = widgets.VBox(
+        [code_panel, state_panel, execution_panels],
+        layout=widgets.Layout(width="100%", gap="0"),
+    )
+    visualization.add_class("lab-widget-panels")
 
     def stop_playback():
         task = state.get("play_task")
@@ -541,31 +634,18 @@ def run_app():
         entered = sum(item["kind"] == "enter" for item in events[: step + 1])
         returned = sum(item["kind"] == "return" for item in events[: step + 1])
         maximum_depth = max(len(item["stack"]) for item in events[: step + 1])
-        visualization.value = (
-            '<div class="lab-visual-sections">'
-            '<details class="lab-section lab-code-panel" open>'
-            '<summary class="lab-code-summary"><span>Código activo</span>'
-            + _language_logo(language.value)
-            + '</summary><div class="lab-section-content">'
-            + _code_panel(
-                algorithm.value, language.value, event["line"]
-            )
-            + '</div></details>'
-            '<details class="lab-section lab-state-panel" open><summary>Estado de la ejecución</summary>'
+        language_logo.value = _language_logo(language.value)
+        code_content.value = _code_panel(algorithm.value, language.value, event["line"])
+        state_content.value = (
             '<div class="lab-section-content lab-metrics">'
             f'<div class="lab-metric"><b>{step + 1}/{len(events)}</b>Evento</div>'
             f'<div class="lab-metric"><b>{entered}</b>Llamadas iniciadas</div>'
             f'<div class="lab-metric"><b>{returned}</b>Llamadas terminadas</div>'
             f'<div class="lab-metric"><b>{maximum_depth}</b>Profundidad máxima</div>'
-            '</div></details><div class="lab-execution-grid">'
-            '<details class="lab-section" open><summary>Pila de recursión</summary>'
-            '<div class="lab-section-content">'
-            + _call_stack_panel(algorithm.value, nodes, events, step)
-            + '</div></details><details class="lab-section" open>'
-            '<summary>Árbol de recursión</summary><div class="lab-section-content">'
-            + _tree_svg(nodes, events, step)
-            + "</div></details></div></div>"
+            '</div>'
         )
+        stack_content.value = _call_stack_panel(algorithm.value, nodes, events, step)
+        tree_content.value = _tree_svg(nodes, events, step)
 
     def select_algorithm(change):
         if change.get("name") != "value":
@@ -600,7 +680,8 @@ def run_app():
     async def play_process():
         try:
             while state["step"] < len(state["events"]) - 1:
-                await asyncio.sleep(0.65)
+                next_event = state["events"][state["step"] + 1]
+                await asyncio.sleep(_event_delay(next_event, state["nodes"]))
                 move_step(1)
         except asyncio.CancelledError:
             return
@@ -627,7 +708,11 @@ def run_app():
     reset.on_click(lambda _: (stop_playback(), state.update(step=0), render()))
 
     def labeled(label, control):
-        label_formula = r"\(n\)" if label == "n" else rf"\(\text{{{label}}}\)"
+        label_formula = (
+            r"\(\boldsymbol{n}\)"
+            if label == "n"
+            else rf"\(\boldsymbol{{\mathrm{{{label}}}}}\)"
+        )
         label_widget = widgets.HTMLMath(
             value=label_formula,
             layout=widgets.Layout(width="96px"),

@@ -88,8 +88,8 @@ def test_lab_uses_editable_input_right_aligned_actions_and_collapsible_panels():
     assert 'labeled("Entrada n", size)' not in SOURCE
     assert 'add_class("lab-control-label")' in SOURCE
     assert 'label_widget = widgets.HTMLMath(' in SOURCE
-    assert 'r"\\(n\\)"' in SOURCE
-    assert 'rf"\\(\\text{{{label}}}\\)"' in SOURCE
+    assert 'r"\\(\\boldsymbol{n}\\)"' in SOURCE
+    assert 'rf"\\(\\boldsymbol{{\\mathrm{{{label}}}}}\\)"' in SOURCE
     assert SOURCE.count('layout=widgets.Layout(width="176px", height="32px")') == 4
     assert "Resultado del análisis" not in SOURCE
     assert 'description="Configuración"' in SOURCE
@@ -151,8 +151,40 @@ def test_recursion_tree_uses_arrows_and_only_marks_base_cases():
     assert entering_markup == returning_markup
 
 
+def test_recursion_tree_uses_the_full_available_vertical_height():
+    from capitulo6.recursive_analysis_lab import _tree_svg, build_trace
+
+    nodes, events = build_trace("factorial", 4)
+    final_markup = _tree_svg(nodes, events, len(events) - 1)
+
+    assert 'viewBox="0 0 720 426"' in final_markup
+    assert 'cy="38.0"' in final_markup
+    assert 'cy="388.0"' in final_markup
+    assert ".lab-tree{display:block;width:100%;height:100%;" in SOURCE
+
+    initial_markup = _tree_svg(nodes, events, 0)
+    assert 'cy="38.0"' in initial_markup
+    assert 'cy="213.0"' not in initial_markup
+
+    second_level_step = next(
+        index for index, event in enumerate(events)
+        if event["kind"] == "enter" and nodes[event["node"]].depth == 1
+    )
+    second_level_markup = _tree_svg(nodes, events, second_level_step)
+    assert 'cy="154.7"' in second_level_markup
+    assert 'cy="154.7"' in final_markup
+    assert 'cy="388.0"' not in second_level_markup
+
+
 def test_execution_state_precedes_stack_and_tree_panels():
-    assert SOURCE.index("Estado de la ejecución") < SOURCE.index("Pila de recursión")
+    assert SOURCE.index("Prueba de escritorio") < SOURCE.index("Pila de recursión")
+
+
+def test_execution_panels_use_book_section_names():
+    assert 'collapsible_panel("Algoritmo", code_content, language_logo)' in SOURCE
+    assert 'collapsible_panel("Prueba de escritorio", state_content)' in SOURCE
+    assert "Código activo" not in SOURCE
+    assert "Estado de la ejecución" not in SOURCE
 
 
 def test_code_panel_identifies_the_selected_language_with_a_logo():
@@ -163,7 +195,11 @@ def test_code_panel_identifies_the_selected_language_with_a_logo():
     assert "java-original.svg" in _language_logo("java")
     assert "C1stEdition.svg" in _language_logo("c")
     assert _language_logo("pseudocode") == ""
-    assert 'class="lab-code-summary"' in SOURCE
+    assert 'language_logo = widgets.HTML(' in SOURCE
+    assert 'language_logo.value = _language_logo(language.value)' in SOURCE
+    assert ".lab-widget-logo .widget-html-content" in SOURCE
+    assert ".lab-widget-logo .lab-language-logo" in SOURCE
+    assert "background:transparent!important" in SOURCE
 
 
 def test_code_panel_uses_white_background_and_numbered_gutter():
@@ -200,13 +236,102 @@ def test_fast_power_debug_trace_visits_assignment_branch_and_return_lines():
     nodes, events = build_trace("power_fast", 2)
     root_lines = [event["line"] for event in events if event["node"] == nodes[0].id]
 
-    assert root_lines == [0, 1, 3, 4, 6]
-    assert [_language_line("power_fast", "java", line) for line in root_lines] == [0, 1, 4, 5, 8]
+    assert root_lines == [0, 1, 3, 3, 4, 6]
+    assert [_language_line("power_fast", "java", line) for line in root_lines] == [0, 1, 4, 4, 5, 8]
     assert _language_line("factorial", "c", 3) == 4
+
+
+def test_recursive_transition_receives_child_result_before_parent_returns():
+    from capitulo6.recursive_analysis_lab import _call_stack_panel, build_trace
+
+    nodes, events = build_trace("factorial", 2)
+    resume_step = next(
+        index for index, event in enumerate(events)
+        if event["kind"] == "resume" and event["node"] == 0
+    )
+    markup = _call_stack_panel("factorial", nodes, events, resume_step)
+
+    assert events[resume_step - 1]["kind"] == "return"
+    assert events[resume_step + 1]["kind"] == "return"
+    assert r"f(2)=2\cdot 1=2" in markup
+    assert "Recibe el resultado" in markup
+    assert "frame-resume" in markup
+
+
+def test_playback_uses_event_specific_transition_delays():
+    from capitulo6.recursive_analysis_lab import _event_delay, build_trace
+
+    nodes, events = build_trace("factorial", 2)
+    delays = {event["kind"]: _event_delay(event, nodes) for event in events}
+
+    assert delays["line"] < delays["enter"]
+    assert delays["resume"] < delays["line"]
+    assert delays["resume"] == 0.3
+    assert "await asyncio.sleep(_event_delay(next_event, state[\"nodes\"]))" in SOURCE
+    assert ".lab-call-frame.waiting{opacity:.62}" in SOURCE
+
+
+def test_final_unwind_shows_completion_check_next_to_result():
+    from capitulo6.recursive_analysis_lab import _call_stack_panel, build_trace
+
+    nodes, events = build_trace("factorial", 3)
+    final_markup = _call_stack_panel("factorial", nodes, events, len(events) - 1)
+    previous_markup = _call_stack_panel("factorial", nodes, events, len(events) - 2)
+
+    assert r"f(3)=3\cdot 2=6" in final_markup
+    assert 'class="lab-finish-check"' in final_markup
+    assert "✓" in final_markup
+    assert "completed" in final_markup
+    assert 'class="lab-completed-row"><div class="lab-call-frame' in final_markup
+    assert '</div><span class="lab-finish-check"' in final_markup
+    assert "font-family:serif;font-size:28px" in SOURCE
+    assert "border-radius:50%" not in SOURCE
+    assert ".lab-completed-row{position:relative;width:min(100%,330px)}" in SOURCE
+    assert "left:calc(100% + 8px);top:50%" in SOURCE
+    assert "grid-template-columns:minmax(0,330px) 28px" not in SOURCE
+    assert 'class="lab-finish-check"' not in previous_markup
 
 
 def test_code_panel_header_has_fixed_height_for_every_logo():
     assert "height:44px!important;min-height:44px!important;max-height:44px!important" in SOURCE
+
+
+def test_code_panel_has_visible_expand_and_collapse_indicator():
+    assert 'icon="caret-down"' in SOURCE
+    assert 'summary.icon = "caret-right" if collapsed else "caret-down"' in SOURCE
+    assert 'content.layout.display = "none" if collapsed else "block"' in SOURCE
+
+
+def test_playback_updates_panel_contents_without_recreating_collapsible_panels():
+    render_source = SOURCE.split("    def render(*_):", 1)[1].split(
+        "    def select_algorithm", 1
+    )[0]
+
+    assert "code_content.value =" in render_source
+    assert "state_content.value =" in render_source
+    assert "stack_content.value =" in render_source
+    assert "tree_content.value =" in render_source
+    assert "collapsible_panel(" not in render_source
+
+
+def test_widget_panels_preserve_original_fixed_heights_without_outer_scroll():
+    assert ".lab-widget-execution>.lab-widget-panel" in SOURCE
+    assert "height:470px!important" in SOURCE
+    assert ".lab-widget-execution .lab-widget-content" in SOURCE
+    assert "height:426px!important;min-height:426px!important;max-height:426px!important" in SOURCE
+    assert "min-width:0!important" in SOURCE
+    assert "overflow:hidden!important" in SOURCE
+    assert '.lab-widget-panel.lab-collapsed{height:44px!important}' in SOURCE
+    assert 'panel.add_class("lab-collapsed")' in SOURCE
+    assert 'panel.remove_class("lab-collapsed")' in SOURCE
+
+
+def test_all_configuration_field_titles_are_bold():
+    assert ".lab-control-label .widget-htmlmath-content" in SOURCE
+    assert SOURCE.count(r"\boldsymbol") >= 2
+    assert r"\mathrm" in SOURCE
+    assert ".lab-control-label{display:flex!important" in SOURCE
+    assert "font-size:13px!important;font-weight:700!important" in SOURCE
 
 
 def test_chapter_six_reference_notebooks_are_separated():
