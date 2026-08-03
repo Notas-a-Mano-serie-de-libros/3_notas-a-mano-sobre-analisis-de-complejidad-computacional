@@ -308,14 +308,15 @@ def _measure_prepared(example, mode):
 
 def _warning(example, mode):
     def warning(maximum_n, executions, _mode=mode, force_full_execution=False):
-        execution_limit = example.absolute_max if force_full_execution else example.hard_max
+        if force_full_execution:
+            return ""
+        execution_limit = example.hard_max
         if maximum_n <= execution_limit:
             return ""
-        limit_kind = "límite absoluto seguro" if force_full_execution else "límite seguro"
         return (
             '<div style="border-left:4px solid #d97706;padding:8px 12px;margin:6px 0;">'
             "<b>⚠ Advertencia de recursos</b><br>"
-            f"Para proteger el entorno, la medición experimental llegará hasta el {limit_kind} "
+            "Para proteger el entorno, la medición experimental llegará hasta el límite seguro "
             f"de {execution_limit:,}; "
             "los tamaños posteriores mostrarán únicamente la estimación teórica.</div>"
         )
@@ -340,14 +341,18 @@ def _fit_scale(shape, measured_values, tail_fraction=0.75):
     return max(0.0, float(np.dot(shape, measured_values) / denominator))
 
 
-def _render_result(example_name, example, profile, mode, sizes, experimental, checkpoints, checkpoint_values, statuses):
+def _render_result(
+    example_name, example, profile, mode, sizes, experimental, checkpoints,
+    checkpoint_values, statuses, shape_function=None,
+):
     mask = np.isfinite(experimental)
     measured_sizes = np.asarray(sizes[mask], dtype=float)
     measured_values = np.asarray(experimental[mask], dtype=float)
-    shape = _shape(example_name, mode, measured_sizes)
+    selected_shape = shape_function or _shape
+    shape = selected_shape(example_name, mode, measured_sizes)
     scale = _fit_scale(shape, measured_values)
     theoretical = shape * scale
-    checkpoint_theoretical = _shape(example_name, mode, checkpoints) * scale
+    checkpoint_theoretical = selected_shape(example_name, mode, checkpoints) * scale
 
     fig, ax = plt.subplots(figsize=(8, 4), dpi=DISPLAY_DPI, facecolor="white")
     ax.set_facecolor("white")

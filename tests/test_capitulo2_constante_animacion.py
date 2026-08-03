@@ -258,7 +258,7 @@ def test_simulacion_incluye_selector_para_restringir_n_maximo():
     assert "force_execution = widgets.Dropdown" in source
     assert 'options=[("Sí", False), ("No", True)]' in source
     assert '"Restringir n máximo"' in source
-    assert "control_groups.extend([maximum_group, executions_group, restriction_group])" in source
+    assert "[maximum_group, sampling_group, restriction_group]" in source
     assert "force_execution.value = False" in source
     assert "force_execution.disabled = not enabled" in source
     assert "force_execution.observe(refresh_warning" in source
@@ -266,6 +266,24 @@ def test_simulacion_incluye_selector_para_restringir_n_maximo():
     assert "profile_warning_html(profile, maximum_n(), execution_value(), force_execution.value)" in source
     assert "⚠ Ejecución sin restricciones" in source
     assert "Ejecutar sin limitaciones incrementará el tiempo de ejecución y el consumo de recursos." in source
+
+
+def test_simulacion_permite_configurar_los_puntos_de_muestreo():
+    source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(encoding="utf-8")
+
+    assert "DEFAULT_SAMPLING_POINTS = 30" in source
+    assert '"Puntos de muestreo"' in source
+    assert "sampling_value = widgets.Text(" in source
+    assert "[sampling_down, sampling_value, sampling_up]" in source
+    assert "value = max(10, min(1000, value))" in source
+    assert "previous_order_of_magnitude(sampling_point_count())" in source
+    assert "next_order_of_magnitude(sampling_point_count())" in source
+    assert "points=sampling_point_count()" in source
+    assert "update_sampling_points(DEFAULT_SAMPLING_POINTS)" in source
+    assert "sampling_down.disabled = not enabled" in source
+    assert "sampling_value.disabled = not enabled" in source
+    assert '"Ejecuciones"' not in source
+    assert "return max(1, int(profile.default_executions))" in source
 
 
 def test_simulacion_habilita_widgets_en_colab():

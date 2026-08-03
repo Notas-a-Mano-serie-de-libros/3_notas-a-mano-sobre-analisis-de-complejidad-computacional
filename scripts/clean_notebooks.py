@@ -16,6 +16,9 @@ TRANSIENT_CELL_METADATA = {
 def notebook_issues(notebook: dict) -> list[str]:
     issues = []
 
+    if "widgets" in notebook.get("metadata", {}):
+        issues.append("metadata.widgets")
+
     for index, cell in enumerate(notebook.get("cells", []), start=1):
         if cell.get("cell_type") != "code":
             continue
@@ -33,6 +36,8 @@ def notebook_issues(notebook: dict) -> list[str]:
 
 def clean_notebook_data(notebook: dict) -> bool:
     changed = bool(notebook_issues(notebook))
+
+    notebook.get("metadata", {}).pop("widgets", None)
 
     for cell in notebook.get("cells", []):
         if cell.get("cell_type") != "code":

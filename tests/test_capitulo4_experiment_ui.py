@@ -29,6 +29,30 @@ def test_interfaz_comparte_paneles_y_medidas_del_capitulo_dos():
     assert "Ejecutar sin limitaciones incrementará el tiempo de ejecución y el consumo de recursos." in UI_SOURCE
 
 
+def test_no_restringir_elimina_el_limite_en_lugar_de_cambiarlo_por_otro():
+    from capitulo4.experiment_ui import effective_max_safe_elements
+
+    class Profile:
+        max_safe_elements = 30
+        absolute_max_safe_elements = 35
+
+    assert effective_max_safe_elements(Profile(), False) == 30
+    assert effective_max_safe_elements(Profile(), True) == 10**10
+
+
+def test_interfaz_comun_expone_puntos_de_muestreo_configurables():
+    assert "DEFAULT_SAMPLING_POINTS = 30" in UI_SOURCE
+    assert '"Puntos de muestreo"' in UI_SOURCE
+    assert "sampling_value = widgets.Text(" in UI_SOURCE
+    assert "[sampling_down, sampling_value, sampling_up]" in UI_SOURCE
+    assert "value = max(10, min(1000, value))" in UI_SOURCE
+    assert "previous_order_of_magnitude(sampling_point_count())" in UI_SOURCE
+    assert "next_order_of_magnitude(sampling_point_count())" in UI_SOURCE
+    assert "points=sampling_point_count()" in UI_SOURCE
+    assert '"Ejecuciones"' not in UI_SOURCE
+    assert "return max(1, int(profile.default_executions))" in UI_SOURCE
+
+
 def test_tabla_es_nativa_formateada_y_la_medicion_no_bloquea_la_vista():
     assert "constant-native-table" in UI_SOURCE
     assert "constant-equation" in UI_SOURCE

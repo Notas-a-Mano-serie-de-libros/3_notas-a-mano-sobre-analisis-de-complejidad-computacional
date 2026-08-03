@@ -17,6 +17,7 @@ class TestNotebooksAreClean(unittest.TestCase):
 
             with self.subTest(notebook=notebook_path.relative_to(PROJECT_ROOT)):
                 notebook = json.loads(notebook_path.read_text(encoding="utf-8"))
+                self.assertNotIn("widgets", notebook.get("metadata", {}))
                 for index, cell in enumerate(notebook.get("cells", [])):
                     if cell.get("cell_type") != "code":
                         continue

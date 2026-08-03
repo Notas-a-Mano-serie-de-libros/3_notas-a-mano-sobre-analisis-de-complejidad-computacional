@@ -61,6 +61,7 @@ STEPPER_VALUE_WIDTH = 120
 STEPPER_GAP = 0
 DEFAULT_MAXIMUM_EXPONENT = 5
 DEFAULT_EXECUTIONS = 10
+DEFAULT_SAMPLING_POINTS = 30
 STATUS_PENDING = "pending"
 STATUS_LOADING = "loading"
 STATUS_COMPLETE = "complete"
@@ -342,7 +343,7 @@ def pending_table_html(maximum_n, profile):
 
 def effective_max_safe_elements(profile, force_full_execution=False):
     if force_full_execution:
-        return profile.absolute_max_safe_elements
+        return 10**10
     return profile.max_safe_elements
 
 
@@ -364,7 +365,13 @@ def profile_warning_html(profile, maximum_n, executions, force_full_execution=Fa
     return unrestricted_warning + profile_warning
 
 
-def run_app(profile, display_app=True, mode_selector=None):
+def run_app(
+    profile,
+    display_app=True,
+    mode_selector=None,
+    leading_control_groups=(),
+    configuration_extras=(),
+):
     if profile.mode not in {"time", "memory"}:
         raise ValueError("mode debe ser 'time' o 'memory'")
     if nest_asyncio is not None:
@@ -391,8 +398,8 @@ def run_app(profile, display_app=True, mode_selector=None):
         max_width=f"{STEPPER_BUTTON_WIDTH}px", height="32px",
         flex=f"0 0 {STEPPER_BUTTON_WIDTH}px",
     )
-    maximum_down = widgets.Button(description="◀", tooltip="Potencia anterior", layout=step_button_layout)
-    maximum_up = widgets.Button(description="▶", tooltip="Potencia siguiente", layout=step_button_layout)
+    maximum_down = widgets.Button(description="", icon="caret-left", tooltip="Potencia anterior", layout=step_button_layout)
+    maximum_up = widgets.Button(description="", icon="caret-right", tooltip="Potencia siguiente", layout=step_button_layout)
     maximum_stepper = widgets.HBox(
         [maximum_down, maximum_value, maximum_up],
         layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap=f"{STEPPER_GAP}px"),
@@ -405,25 +412,33 @@ def run_app(profile, display_app=True, mode_selector=None):
         group_width=STEPPER_GROUP_WIDTH,
         label_width=STEPPER_LABEL_WIDTH,
     )
-    executions_control = widgets.Text(
-        value=str(profile.default_executions),
+    sampling_value = widgets.Text(
+        value=str(DEFAULT_SAMPLING_POINTS),
         layout=widgets.Layout(
-            width=f"{STEPPER_VALUE_WIDTH}px", min_width=f"{STEPPER_VALUE_WIDTH}px",
-            max_width=f"{STEPPER_VALUE_WIDTH}px", height="32px",
-            flex=f"0 0 {STEPPER_VALUE_WIDTH}px",
+        width=f"{STEPPER_VALUE_WIDTH}px", min_width=f"{STEPPER_VALUE_WIDTH}px",
+        max_width=f"{STEPPER_VALUE_WIDTH}px", height="32px",
+        flex=f"0 0 {STEPPER_VALUE_WIDTH}px",
         ),
     )
-    executions_control.add_class("constant-centered-input")
-    executions_down = widgets.Button(description="◀", tooltip="Orden de magnitud anterior", layout=step_button_layout)
-    executions_up = widgets.Button(description="▶", tooltip="Orden de magnitud siguiente", layout=step_button_layout)
-    executions_stepper = widgets.HBox(
-        [executions_down, executions_control, executions_up],
-        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap=f"{STEPPER_GAP}px"),
+    sampling_value.add_class("constant-centered-input")
+    sampling_down = widgets.Button(
+        description="", icon="caret-left", tooltip="Reducir puntos de muestreo",
+        layout=step_button_layout,
     )
-    executions_stepper.add_class("experimental-stepper")
-    executions_group = compact_labeled_control(
-        "Ejecuciones",
-        executions_stepper,
+    sampling_up = widgets.Button(
+        description="", icon="caret-right", tooltip="Aumentar puntos de muestreo",
+        layout=step_button_layout,
+    )
+    sampling_stepper = widgets.HBox(
+        [sampling_down, sampling_value, sampling_up],
+        layout=widgets.Layout(
+            width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap=f"{STEPPER_GAP}px"
+        ),
+    )
+    sampling_stepper.add_class("experimental-stepper")
+    sampling_stepper.add_class("experimental-sampling-points")
+    sampling_group = compact_labeled_control(
+        "Puntos de muestreo", sampling_stepper,
         field_width=STEPPER_FIELD_WIDTH,
         group_width=STEPPER_GROUP_WIDTH,
         label_width=STEPPER_LABEL_WIDTH,
@@ -440,13 +455,15 @@ def run_app(profile, display_app=True, mode_selector=None):
         group_width=STEPPER_GROUP_WIDTH,
         label_width=STEPPER_LABEL_WIDTH,
     )
-    control_groups = []
+    control_groups = list(leading_control_groups)
     if mode_selector is not None:
         control_groups.append(compact_labeled_control(
             "Análisis", mode_selector, field_width=STEPPER_FIELD_WIDTH,
             group_width=STEPPER_GROUP_WIDTH, label_width=STEPPER_LABEL_WIDTH,
         ))
-    control_groups.extend([maximum_group, executions_group, restriction_group])
+    control_groups.extend(
+        [maximum_group, sampling_group, restriction_group]
+    )
     controls_row = widgets.Box(
         control_groups,
         layout=widgets.Layout(
@@ -487,16 +504,22 @@ def run_app(profile, display_app=True, mode_selector=None):
     template_cache = {}
 
     def execution_value():
-        try:
-            value = int(executions_control.value)
-        except ValueError:
-            value = 1
-        value = max(1, value)
-        executions_control.value = str(value)
-        return value
+        return max(1, int(profile.default_executions))
 
     def maximum_n():
         return 10 ** maximum_state["exponent"]
+
+    def sampling_point_count():
+        try:
+            value = int(sampling_value.value)
+        except ValueError:
+            value = DEFAULT_SAMPLING_POINTS
+        value = max(10, min(1000, value))
+        sampling_value.value = str(value)
+        return value
+
+    def update_sampling_points(value):
+        sampling_value.value = str(max(10, min(1000, int(value))))
 
     def placeholder_html():
         selected_maximum = maximum_n()
@@ -525,7 +548,7 @@ def run_app(profile, display_app=True, mode_selector=None):
         execution_state["reset_requested"] = True
         maximum_state["exponent"] = profile.default_maximum_exponent
         maximum_value.value = mathjax_frame(rf"\(10^{{{profile.default_maximum_exponent}}}\)", 30, centered=True)
-        executions_control.value = str(profile.default_executions)
+        update_sampling_points(DEFAULT_SAMPLING_POINTS)
         force_execution.value = False
         warning_output.value = profile_warning_html(profile, maximum_n(), execution_value(), force_execution.value)
         table_output.value = pending_table_html(maximum_n(), profile)
@@ -535,9 +558,9 @@ def run_app(profile, display_app=True, mode_selector=None):
         apply_button.disabled = not enabled
         maximum_down.disabled = not enabled
         maximum_up.disabled = not enabled
-        executions_control.disabled = not enabled
-        executions_down.disabled = not enabled
-        executions_up.disabled = not enabled
+        sampling_down.disabled = not enabled
+        sampling_up.disabled = not enabled
+        sampling_value.disabled = not enabled
         force_execution.disabled = not enabled
 
     def decrease_maximum(_):
@@ -546,13 +569,11 @@ def run_app(profile, display_app=True, mode_selector=None):
     def increase_maximum(_):
         update_maximum(maximum_state["exponent"] + 1)
 
-    def decrease_executions(_):
-        executions_control.value = str(previous_order_of_magnitude(execution_value()))
-        refresh_warning()
+    def decrease_sampling_points(_):
+        update_sampling_points(previous_order_of_magnitude(sampling_point_count()))
 
-    def increase_executions(_):
-        executions_control.value = str(next_order_of_magnitude(execution_value()))
-        refresh_warning()
+    def increase_sampling_points(_):
+        update_sampling_points(next_order_of_magnitude(sampling_point_count()))
 
     def schedule_task(coro):
         try:
@@ -572,7 +593,7 @@ def run_app(profile, display_app=True, mode_selector=None):
             sizes, checkpoints = build_experiment_sizes(
                 selected_maximum,
                 execution_limit,
-                points=profile.experiment_points,
+                points=sampling_point_count(),
             )
             experimental = np.full(len(sizes), np.nan)
             checkpoint_times = np.full(len(checkpoints), np.nan)
@@ -636,12 +657,11 @@ def run_app(profile, display_app=True, mode_selector=None):
         if task is not None:
             execution_state["task"] = task
 
-    executions_control.observe(refresh_warning, names="value")
     force_execution.observe(refresh_warning, names="value")
     maximum_down.on_click(decrease_maximum)
     maximum_up.on_click(increase_maximum)
-    executions_down.on_click(decrease_executions)
-    executions_up.on_click(increase_executions)
+    sampling_down.on_click(decrease_sampling_points)
+    sampling_up.on_click(increase_sampling_points)
     apply_button.on_click(apply)
     reset_button.on_click(reset_app)
     refresh_warning()
@@ -672,7 +692,7 @@ def run_app(profile, display_app=True, mode_selector=None):
         panel.add_class("experimental-subpanel")
         return panel
 
-    configuration_panel = subpanel("Configuración", [controls, warning_output])
+    configuration_panel = subpanel("Configuración", [controls, *configuration_extras, warning_output])
     result_content = widgets.VBox(
         [table_output, figure_output],
         layout=widgets.Layout(width="100%", gap="0px", overflow_x="hidden"),
@@ -741,8 +761,17 @@ def run_app(profile, display_app=True, mode_selector=None):
           .constant-animation-root .widget-label,
           .constant-animation-root .widget-checkbox,
           .constant-animation-root .widget-checkbox .widget-label,
-          .constant-animation-root .widget-html-content {
+          .constant-animation-root .widget-html-content,
+          .constant-animation-root .widget-htmlmath-content {
             color: #333 !important;
+          }
+          .constant-animation-root .widget-htmlmath-content mjx-container,
+          .constant-animation-root .widget-htmlmath-content mjx-container * {
+            color: #333 !important;
+          }
+          .constant-animation-root .widget-htmlmath-content mjx-container svg,
+          .constant-animation-root .widget-htmlmath-content mjx-container svg * {
+            fill: #333 !important;
           }
           .constant-animation-root label,
           .constant-animation-root .widget-label,
@@ -873,6 +902,13 @@ def run_app(profile, display_app=True, mode_selector=None):
             min-width: 34px !important;
             max-width: 34px !important;
             flex: 0 0 34px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            text-overflow: clip !important;
+          }
+          .experimental-stepper button .fa {
+            width: auto !important;
+            margin: 0 !important;
           }
           .experimental-controls input {
             border: 1px solid #ccc !important;

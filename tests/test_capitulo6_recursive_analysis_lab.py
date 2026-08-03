@@ -16,6 +16,29 @@ def test_recursive_lab_supports_requested_analysis_examples():
     }
 
 
+def test_book_examples_are_selectable_in_the_last_panel():
+    from capitulo6.recursive_examples_analysis import EXAMPLES
+
+    assert set(EXAMPLES) == {
+        "factorial", "fibonacci", "power_fast", "merge_sort", "binary_tree"
+    }
+    assert EXAMPLES["factorial"].time_order == r"\Theta(n)"
+    assert EXAMPLES["fibonacci"].time_order == r"\Theta(\varphi^n)"
+    assert EXAMPLES["power_fast"].time_order == r"\Theta(\log_2 n)"
+    assert EXAMPLES["merge_sort"].time_order == r"\Theta(n\log_2 n)"
+    assert "caso promedio" in EXAMPLES["binary_tree"].note
+    assert "Análisis de ejemplos" not in SOURCE
+
+    import json
+    notebook = json.loads(
+        (Path(__file__).resolve().parents[1] / "capitulo6" / "0_laboratorio_analisis_recursivo.ipynb").read_text(encoding="utf-8")
+    )
+    assert notebook["cells"][-2]["cell_type"] == "markdown"
+    assert notebook["cells"][-2]["source"][0] == "## Análisis de ejemplos\n"
+    assert notebook["cells"][-1]["cell_type"] == "code"
+    assert "examples_bootstrap.py" in "".join(notebook["cells"][-1]["source"])
+
+
 def test_fibonacci_trace_distinguishes_total_calls_from_stack_depth():
     from capitulo6.recursive_analysis_lab import build_trace
 
