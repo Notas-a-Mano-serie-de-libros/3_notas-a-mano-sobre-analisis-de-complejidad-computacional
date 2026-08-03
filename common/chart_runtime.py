@@ -83,7 +83,12 @@ def display_table(df) -> None:
             toggle.description = f"Mostrar todos ({n_total} registros)"
 
     toggle.observe(on_toggle, names="value")
-    display(widgets.VBox([out_short, toggle, out_full]))
+    table_panel = widgets.VBox(
+        [out_short, toggle, out_full],
+        layout=widgets.Layout(width="100%", margin="16px 0 0 0"),
+    )
+    table_panel.add_class("simulation-table-panel")
+    display(table_panel)
 
 
 def format_large_tick(value, _position):

@@ -278,7 +278,7 @@ def run_comparison_app(variants, state_factory):
         ],
         layout=widgets.Layout(width="100%", gap="0"),
     )
-    display(build_sort_panel(parameters, output, title="Comparación de variantes de ordenamiento:"))
+    display(build_sort_panel(parameters, output, title="Comparación de variantes de ordenamiento"))
     redraw()
 
 

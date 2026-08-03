@@ -14,6 +14,11 @@ COMPACT_GROUP_PADDING_RIGHT = 44
 COMPACT_GROUP_GAP = 2
 COMPACT_COLUMN_GAP = 42
 COMPACT_GROUP_WIDTH = COMPACT_LABEL_WIDTH + COMPACT_FIELD_WIDTH + COMPACT_GROUP_PADDING_RIGHT + COMPACT_GROUP_GAP
+STANDARD_FIELD_WIDTH = 188
+STANDARD_CONTROL_HEIGHT = 32
+STANDARD_ACTION_HEIGHT = 38
+STANDARD_ACTION_GAP = 0
+STANDARD_ACTION_MARGIN_TOP = 16
 
 
 @dataclass(frozen=True)
@@ -102,12 +107,14 @@ def dropdown_control(*, options, value, description, width, description_style=No
 
 
 def button_control(*, description, button_style, width, disabled=False):
-    return widgets.Button(
+    button = widgets.Button(
         description=description,
-        button_style=button_style,
+        button_style="",
         disabled=disabled,
-        layout=widgets.Layout(width="auto", flex="0 0 auto"),
+        layout=widgets.Layout(width=width, flex=f"0 0 {width}", height=f"{STANDARD_ACTION_HEIGHT}px"),
     )
+    button.add_class("simulation-button")
+    return button
 
 
 def compact_labeled_control(
@@ -129,12 +136,51 @@ def compact_labeled_control(
     )
     return widgets.HBox(
         [label_widget, control],
+        layout=widgets.Layout(width=f"{group_width}px", align_items="center"),
+    )
+
+
+def action_button_row(buttons, *, justify_content="flex-end"):
+    """Fila responsiva común para las acciones de todas las simulaciones."""
+
+    row = widgets.HBox(
+        list(buttons),
         layout=widgets.Layout(
-            width=f"{group_width}px",
-            align_items="center",
-            gap=f"{COMPACT_GROUP_GAP}px",
+            width="100%",
+            gap=f"{STANDARD_ACTION_GAP}px",
+            margin=f"{STANDARD_ACTION_MARGIN_TOP}px 0 0 0",
+            flex_flow="row wrap",
+            justify_content=justify_content,
+            overflow="visible",
         ),
     )
+    row.add_class("simulation-action-row")
+    return row
+
+
+def collapsible_panel(title, content, *, prefix, open_by_default=True):
+    """Panel desplegable con el mismo comportamiento y dimensiones en toda la obra."""
+
+    header = widgets.Button(
+        description=title.rstrip(":"),
+        icon="caret-down" if open_by_default else "caret-right",
+        layout=widgets.Layout(width="100%", height="44px"),
+    )
+    header.add_class(f"{prefix}-subpanel-title")
+    content.layout.display = "flex" if open_by_default else "none"
+
+    def toggle(_):
+        expanded = content.layout.display != "none"
+        content.layout.display = "none" if expanded else "flex"
+        header.icon = "caret-right" if expanded else "caret-down"
+
+    header.on_click(toggle)
+    panel = widgets.VBox(
+        [header, content],
+        layout=widgets.Layout(width="100%", gap="0px"),
+    )
+    panel.add_class(f"{prefix}-subpanel")
+    return panel
 
 
 def compact_controls_grid(groups, columns):

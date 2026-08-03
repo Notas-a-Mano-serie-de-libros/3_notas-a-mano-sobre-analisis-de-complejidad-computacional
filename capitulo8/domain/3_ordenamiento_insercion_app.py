@@ -578,7 +578,7 @@ def run_comparison_app():
         ],
         layout=widgets.Layout(width="100%"),
     )
-    display(build_sort_panel(parameters, html_output, title="Comparación de variantes de inserción:"))
+    display(build_sort_panel(parameters, html_output, title="Comparación de variantes de inserción"))
     redraw(force_static=True)
 
 

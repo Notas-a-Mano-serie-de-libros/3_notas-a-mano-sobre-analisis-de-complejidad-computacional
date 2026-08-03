@@ -438,7 +438,8 @@ def test_grafica_usa_altura_ampliada():
 def test_controles_permanecen_dentro_de_la_grafica_sin_tapar_el_area_de_dibujo():
     html = load_animation_module()._BIG_O_HTML
 
-    assert ".zoom-controls{position:absolute;top:10px;right:10px;z-index:3;display:flex;gap:4px}" in html
+    assert ".zoom-controls{position:absolute;top:10px;right:10px;z-index:3;display:flex;gap:0}" in html
+    assert ".zoom-btn{width:34px;height:32px;border:1px solid #ccc;border-radius:0" in html
     plot = html.split('<div class="plot-wrap">', 1)[1].split('<div class="note"', 1)[0]
     assert plot.index('<div class="zoom-controls"') < plot.index('<canvas id="bo-cv">')
     assert "PAD={l:82,r:32,t:58,b:58}" in html

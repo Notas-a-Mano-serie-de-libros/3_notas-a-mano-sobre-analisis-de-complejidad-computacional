@@ -25,7 +25,15 @@ from search_common import (
     generate_sorted_values,
     resolve_node_style,
 )
-from common.widget_controls import COMPACT_GROUP_WIDTH, bounded_int_control, button_control, compact_labeled_control, dropdown_control
+from common.widget_controls import (
+    COMPACT_GROUP_WIDTH,
+    action_button_row,
+    bounded_int_control,
+    button_control,
+    collapsible_panel,
+    compact_labeled_control,
+    dropdown_control,
+)
 
 
 COMPARISON_CONTROL_GRID_COLUMNS = "246px 246px"
@@ -41,6 +49,7 @@ COMPARISON_PANEL_CSS = """
 .comparison-subpanel{width:100%;margin:0;border:1px solid #e1e1e1;background:#fff}
 .comparison-subpanel+.comparison-subpanel{border-top:0}
 .comparison-subpanel-title{padding:8px 12px;border-bottom-color:#e5e5e5}
+button.comparison-subpanel-title{height:44px!important;min-height:44px!important;border:0!important;border-bottom:1px solid #e5e5e5!important;border-radius:0!important;background:#f7f7f7!important;font-family:sans-serif!important;font-size:16px!important;text-align:left!important}
 .comparison-subpanel-content{width:100%;padding:12px;background:#fff}
 .comparison-result-content{padding:0!important}
 .comparison-result-content>.widget-html-content,
@@ -53,11 +62,11 @@ COMPARISON_PANEL_CSS = """
 .comparison-simulation-root .widget-label,.comparison-simulation-root label,.comparison-simulation-root .widget-checkbox .widget-label{font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;line-height:1.1!important}
 .comparison-simulation-root select,.comparison-simulation-root input{background:#fff!important;color:#333!important}
 .comparison-simulation-root input{height:32px!important;min-height:32px!important}
-.comparison-simulation-root .widget-dropdown{width:140px!important;height:32px!important;min-height:32px!important;color-scheme:light!important}
-.comparison-simulation-root .widget-dropdown select{width:140px!important;height:32px!important;min-height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background-color:#fff!important;color:#333!important;color-scheme:light!important;font-size:13px!important;text-align:center!important;appearance:auto!important;-webkit-appearance:menulist!important}
+.comparison-simulation-root .widget-dropdown{width:188px!important;height:32px!important;min-height:32px!important;color-scheme:light!important}
+.comparison-simulation-root .widget-dropdown select{width:188px!important;height:32px!important;min-height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background-color:#fff!important;color:#333!important;color-scheme:light!important;font-size:13px!important;text-align:center!important;appearance:auto!important;-webkit-appearance:menulist!important}
 .comparison-simulation-root .widget-dropdown select:focus{outline:none!important;border-color:#1976d2!important;box-shadow:0 0 0 1px #1976d2!important}
 .comparison-simulation-root .widget-dropdown option{background:#fff!important;color:#333!important}
-.comparison-simulation-root .widget-button{min-height:38px;border:1px solid #cfcfcf;border-radius:4px;background:#f7f7f7;color:#333;box-shadow:none}
+.comparison-simulation-root .widget-button{min-height:38px;border:1px solid #ccc;border-radius:0;background:#f7f7f7;color:#333;box-shadow:none}
 .comparison-simulation-root .widget-button:hover{background:#eee}
 .comparison-control-group,
 .comparison-control-group > .widget-html,
@@ -89,7 +98,9 @@ COMPARISON_PANEL_CSS = """
   align-items:center!important;
   width:100%!important;
   overflow:visible!important;
+  gap:0!important;
 }
+.comparison-action-row>.widget-button{margin:0!important;border-color:#cfcfcf!important;border-radius:0!important}
 </style>
 """
 
@@ -934,17 +945,7 @@ def run_app():
     first_row_box.add_class("comparison-controls-grid")
     ui_state["first_row"] = first_row_box
     update_target_position_visibility()
-    button_row = widgets.HBox(
-        [auto_button, finish_button, reset_button],
-        layout=widgets.Layout(
-            width="100%",
-            gap="10px",
-            margin="16px 0 0 0",
-            flex_flow="row wrap",
-            justify_content="flex-end",
-            align_items="center",
-        ),
-    )
+    button_row = action_button_row([auto_button, finish_button, reset_button])
     for button in (auto_button, finish_button, reset_button):
         button.layout.height = "38px"
     button_row.add_class("comparison-action-row")
@@ -957,24 +958,19 @@ def run_app():
     html_output.add_class("comparison-result-content")
 
     def panel(title, content):
-        container = widgets.VBox(
-            [widgets.HTML(f'<div class="comparison-subpanel-title">{escape(title)}</div>'), content],
-            layout=widgets.Layout(width="100%", gap="0"),
-        )
-        container.add_class("comparison-subpanel")
-        return container
+        return collapsible_panel(title, content, prefix="comparison")
 
     panel_content = widgets.VBox(
         [
-            panel("Parámetros:", parameters_content),
-            panel("Resultado:", html_output),
+            panel("Parámetros", parameters_content),
+            panel("Resultado", html_output),
         ],
         layout=widgets.Layout(width="100%", gap="0"),
     )
     panel_content.add_class("comparison-panel-content")
     main_panel = widgets.VBox(
         [
-            widgets.HTML('<div class="comparison-panel-title">Comparación de búsquedas:</div>'),
+            widgets.HTML('<div class="comparison-panel-title">Comparación de búsquedas</div>'),
             panel_content,
         ],
         layout=widgets.Layout(width="100%", gap="0"),

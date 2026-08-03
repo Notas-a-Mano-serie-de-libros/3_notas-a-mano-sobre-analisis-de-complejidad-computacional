@@ -212,7 +212,7 @@ def run_pivot_comparison_app():
         ],
         layout=widgets.Layout(width="100%"),
     )
-    display(build_sort_panel(parameters, output, title="Comparación de pivotes de ordenamiento rápido:"))
+    display(build_sort_panel(parameters, output, title="Comparación de pivotes de ordenamiento rápido"))
     redraw()
 
 

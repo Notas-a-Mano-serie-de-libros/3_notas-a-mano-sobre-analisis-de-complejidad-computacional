@@ -19,7 +19,7 @@ def test_general_expression_always_keeps_symbolic_external_cost():
     )
 
     for markup in (quadratic, zero):
-        assert "Expresión general:" in markup
+        assert "Expresión general" in markup
         assert "+f(n)" in markup
         assert r"\sum_{i=1}^{m}" in markup
         assert r"\(\displaystyle C(n)=" in markup
@@ -116,7 +116,7 @@ def test_all_collapsible_panel_titles_share_style_and_icon():
     )
     assert 'content:"▶"' in SOURCE
     assert '<span class="recursion-panel-marker">' not in SOURCE
-    assert 'aria-expanded="true">Configuración:</button>' in SOURCE
+    assert 'aria-expanded="true">Configuración</button>' in SOURCE
 
 
 def test_builder_limits_term_count_to_supported_methods():

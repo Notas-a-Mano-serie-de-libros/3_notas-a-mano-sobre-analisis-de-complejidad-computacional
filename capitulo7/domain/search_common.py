@@ -11,7 +11,15 @@ import ipywidgets as widgets
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
 from common.visual_roles import SEARCH_EXPONENTIAL_STYLES, SEARCH_RANGE_HIGHLIGHT_STYLES, SEARCH_ROLE_STYLES, SEARCH_SEQUENTIAL_STYLES, SEARCH_TERNARY_STYLES, TARGET
-from common.widget_controls import COMPACT_GROUP_WIDTH, bounded_int_control, button_control, compact_labeled_control, dropdown_control
+from common.widget_controls import (
+    COMPACT_GROUP_WIDTH,
+    action_button_row,
+    bounded_int_control,
+    button_control,
+    collapsible_panel,
+    compact_labeled_control,
+    dropdown_control,
+)
 
 try:
     import nest_asyncio
@@ -394,6 +402,9 @@ def _build_search_css() -> str:
     border-bottom-color: #e5e5e5;
     background: #f7f7f7;
   }}
+  button.search-subpanel-title {{height:44px!important;min-height:44px!important;border:0!important;
+    border-bottom:1px solid #e5e5e5!important;border-radius:0!important;background:#f7f7f7!important;
+    font-family:sans-serif!important;font-size:16px!important;text-align:left!important}}
   .search-subpanel-content {{
     width: 100%;
     padding: 12px;
@@ -462,13 +473,17 @@ def _build_search_css() -> str:
   .search-simulation-root .widget-button {{
     min-height: 38px;
     border: 1px solid #cfcfcf;
-    border-radius: 4px;
+    border-radius: 0;
     background: #f7f7f7;
     color: #333333;
     box-shadow: none;
   }}
   .search-simulation-root .widget-button:hover {{
     background: #eeeeee;
+  }}
+  .search-simulation-root .simulation-action-row {{gap:0!important}}
+  .search-simulation-root .simulation-action-row > .widget-button {{
+    margin:0!important;border-color:#cfcfcf!important;border-radius:0!important;
   }}
   .search-app {{
     width: 100%;
@@ -1103,15 +1118,8 @@ def run_search_app(
     )
     ui_state["first_row"] = first_row_box
     update_target_position_visibility()
-    button_row = widgets.HBox(
-        [step_button, auto_button, finish_button, reset_button, book_button],
-        layout=widgets.Layout(
-            width="100%",
-            gap="10px",
-            margin="16px 0 0 0",
-            flex_flow="row wrap",
-            justify_content="flex-end",
-        ),
+    button_row = action_button_row(
+        [step_button, auto_button, finish_button, reset_button, book_button]
     )
     parameters_content = widgets.VBox(
         [first_row_box, button_row],
@@ -1124,28 +1132,20 @@ def run_search_app(
     html_output.add_class("search-result-content")
 
     def panel(title, content):
-        container = widgets.VBox(
-            [
-                widgets.HTML(f'<div class="search-subpanel-title">{escape(title)}</div>'),
-                content,
-            ],
-            layout=widgets.Layout(width="100%", gap="0"),
-        )
-        container.add_class("search-subpanel")
-        return container
+        return collapsible_panel(title, content, prefix="search")
 
     panel_content = widgets.VBox(
         [
-            panel("Parámetros:", parameters_content),
-            panel("Procedimiento:", formula_output),
-            panel("Resultado:", html_output),
+            panel("Parámetros", parameters_content),
+            panel("Procedimiento", formula_output),
+            panel("Resultado", html_output),
         ],
         layout=widgets.Layout(width="100%", gap="0"),
     )
     panel_content.add_class("search-panel-content")
     main_panel = widgets.VBox(
         [
-            widgets.HTML('<div class="search-panel-title">Simulación de búsqueda:</div>'),
+            widgets.HTML('<div class="search-panel-title">Simulación de búsqueda</div>'),
             panel_content,
         ],
         layout=widgets.Layout(width="100%", gap="0"),

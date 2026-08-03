@@ -16,7 +16,7 @@ def test_shared_widget_control_grids_wrap_at_natural_width():
         assert 'width="auto"' in module_source
         assert 'display="flex"' in module_source
         assert 'flex_flow="row wrap"' in module_source
-    assert 'layout=widgets.Layout(width="auto", flex="0 0 auto")' in controls
+    assert 'layout=widgets.Layout(width=width, flex=f"0 0 {width}"' in controls
 
 
 def test_chapters_two_and_four_parameter_panels_use_aligned_columns():

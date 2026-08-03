@@ -764,7 +764,7 @@ def run_app():
     layout = build_sort_panel(
         parameters,
         html_output,
-        title="Comparación de algoritmos de ordenamiento:",
+        title="Comparación de algoritmos de ordenamiento",
     )
     display(layout)
     redraw(force_static=True)

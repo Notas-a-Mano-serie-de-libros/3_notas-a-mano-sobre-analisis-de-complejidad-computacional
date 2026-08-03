@@ -27,12 +27,17 @@ try:
         next_order_of_magnitude,
         previous_order_of_magnitude,
     )
-    from common.widget_controls import button_control, compact_labeled_control, magnitude_stepper
+    from common.widget_controls import (
+        action_button_row,
+        button_control,
+        compact_labeled_control,
+        magnitude_stepper,
+    )
 except ImportError:
     def button_control(*, description, button_style, width, disabled=False):
         return widgets.Button(
             description=description,
-            button_style=button_style,
+            button_style="",
             disabled=disabled,
             layout=widgets.Layout(width=width),
         )
@@ -51,6 +56,15 @@ except ImportError:
         return widgets.HBox(
             [label_widget, control],
             layout=widgets.Layout(width=f"{group_width}px", align_items="center", gap="2px"),
+        )
+
+    def action_button_row(buttons, *, justify_content="flex-end"):
+        return widgets.HBox(
+            list(buttons),
+            layout=widgets.Layout(
+                width="100%", gap="0px", margin="16px 0 0 0",
+                flex_flow="row wrap", justify_content=justify_content, overflow="visible",
+            ),
         )
 
 try:
@@ -456,13 +470,7 @@ def run_app(
     apply_button.icon = "play"
     reset_button = button_control(description="Reiniciar", button_style="warning", width="150px")
     reset_button.icon = "refresh"
-    button_row = widgets.HBox(
-        [apply_button, reset_button],
-        layout=widgets.Layout(
-            width="100%", gap="10px", margin="16px 0 0 0",
-            flex_flow="row wrap", justify_content="flex-end", overflow="visible",
-        ),
-    )
+    button_row = action_button_row([apply_button, reset_button])
     button_row.add_class("experimental-action-row")
     warning_output = widgets.HTML()
     warning_output.layout = widgets.Layout(width="100%", max_width="100%", overflow="hidden")
@@ -877,7 +885,7 @@ def run_app(
           }
           .experimental-controls button {
             border: 1px solid #ccc !important;
-            border-radius: 3px !important;
+            border-radius: 0 !important;
             background: #f7f7f7 !important;
             color: #333 !important;
           }
@@ -888,7 +896,7 @@ def run_app(
             box-sizing: border-box !important;
             display: flex !important;
             width: 100% !important;
-            gap: 10px !important;
+            gap: 0 !important;
             margin: 16px 0 0 !important;
             padding: 0 !important;
             justify-content: flex-end !important;
@@ -903,7 +911,7 @@ def run_app(
             flex: 0 0 150px !important;
             margin: 0 !important;
             border: 1px solid #ccc !important;
-            border-radius: 3px !important;
+            border-radius: 0 !important;
             background: #f7f7f7 !important;
             color: #333 !important;
             box-shadow: none !important;

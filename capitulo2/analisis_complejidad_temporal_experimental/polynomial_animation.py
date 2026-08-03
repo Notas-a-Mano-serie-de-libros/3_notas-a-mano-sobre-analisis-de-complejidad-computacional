@@ -39,6 +39,7 @@ DEFAULT_MAXIMUM_N = 10
 DEFAULT_MAX_DEGREE = 4
 MAX_DEGREE = None
 TABLE_MAX_DEGREE = 5
+DISPLAY_DPI = 300
 STEPPER_FIELD_WIDTH = 188
 STEPPER_LABEL_WIDTH = 150
 STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 8
@@ -91,7 +92,7 @@ def render_polynomial_figure(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX
 
     plt.style.use("default")
     plt.rcParams.update(GRAPH_STYLE)
-    fig_main, ax1 = plt.subplots(1, 1, figsize=(8, 4))
+    fig_main, ax1 = plt.subplots(1, 1, figsize=(8, 4), dpi=DISPLAY_DPI)
     lines = {}
     for degree in range(max_degree + 1):
         (line,) = ax1.plot(
@@ -131,7 +132,13 @@ def render_polynomial_figure(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX
     fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)
 
     image_buffer = BytesIO()
-    fig_main.savefig(image_buffer, format="png", bbox_inches="tight", pad_inches=0.05)
+    fig_main.savefig(
+        image_buffer,
+        format="png",
+        dpi=DISPLAY_DPI,
+        bbox_inches="tight",
+        pad_inches=0.05,
+    )
     plt.close(fig_main)
     encoded_image = base64.b64encode(image_buffer.getvalue()).decode("ascii")
     return f'<img src="data:image/png;base64,{encoded_image}" style="display:block;max-width:100%;height:auto;">'
@@ -203,7 +210,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
         layout=widgets.Layout(
             width="auto",
             display="flex",
-            flex_flow="column nowrap",
+            flex_flow="row wrap",
             gap="12px",
             align_items="flex-start",
             overflow="hidden",
@@ -421,7 +428,8 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
             box-sizing: border-box !important;
             display: flex !important;
             width: auto !important;
-            flex-flow: column nowrap !important;
+            flex-flow: row wrap !important;
+            column-gap: 36px !important;
             row-gap: 12px !important;
             overflow: visible !important;
           }
@@ -435,7 +443,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
           }
           .experimental-controls button {
             border: 1px solid #ccc !important;
-            border-radius: 3px !important;
+            border-radius: 0 !important;
             background: #f7f7f7 !important;
             color: #333 !important;
           }

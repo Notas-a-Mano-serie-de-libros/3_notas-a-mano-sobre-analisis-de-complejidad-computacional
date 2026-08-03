@@ -205,6 +205,7 @@ def run_interpolation_visual():
 #iv-wrap .iv-subpanel{width:100%;margin:0;border:1px solid #e1e1e1;background:#fff}
 #iv-wrap .iv-subpanel+.iv-subpanel{border-top:0}
 #iv-wrap .iv-subpanel-title{padding:8px 12px;border-bottom-color:#e5e5e5}
+#iv-wrap summary.iv-subpanel-title{box-sizing:border-box;cursor:pointer;list-style-position:inside}
 #iv-wrap .iv-panel-content{width:100%;padding:12px;background:#fff}
 #iv-wrap .plot-wrap{position:relative;width:100%;height:390px}
 #iv-wrap canvas{display:block;width:100%;height:390px;
@@ -223,16 +224,16 @@ def run_interpolation_visual():
   color:#333;font-size:13px;text-align:center}
 #iv-wrap input[type=number]:focus,#iv-wrap select:focus{outline:none;border-color:#1976D2;
   box-shadow:0 0 0 1px #1976D2}
-#iv-wrap .stepper{display:inline-grid;grid-template-columns:34px 184px 34px;
+#iv-wrap .stepper{display:inline-grid;grid-template-columns:34px 120px 34px;
   gap:0;align-items:center}
-#iv-wrap .stepper-field{display:flex;align-items:center;justify-content:center;width:184px;
+#iv-wrap .stepper-field{display:flex;align-items:center;justify-content:center;width:120px;
   height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:0;
   background:#fff;text-align:center;font-size:14px;font-weight:400;white-space:nowrap}
-#iv-wrap button{width:34px;height:32px;border:1px solid #ccc;border-radius:3px;
+#iv-wrap button{width:34px;height:32px;border:1px solid #ccc;border-radius:0;
   background:#f7f7f7;color:#333;cursor:pointer;font-size:13px;line-height:1}
 #iv-wrap button:hover{background:#eee}
 #iv-wrap .stepper button{border-color:#ccc;border-radius:0;margin:0;padding:0}
-#iv-wrap button.active{background:#e3f2fd;border-color:#1976D2;color:#0D47A1}
+#iv-wrap button.active{background:#f7f7f7;border-color:#ccc;color:#333}
 #iv-wrap button:focus-visible{outline:2px solid #1976D2;outline-offset:1px}
 #iv-wrap .range-field{display:grid;grid-template-columns:52px 132px 54px;gap:8px;
   align-items:center}
@@ -241,8 +242,8 @@ def run_interpolation_visual():
   height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:3px;
   background:#fff;font-weight:400}
 #iv-wrap .ctrl .sep{width:1px;height:32px;background:#ddd;margin:0 2px}
-#iv-wrap .action-buttons{display:flex;gap:10px;margin-left:auto;padding-left:16px}
-#iv-wrap .action-buttons button{width:auto;min-width:92px;padding:0 10px}
+#iv-wrap .action-buttons{display:flex;gap:0;margin-left:auto;padding-left:16px}
+#iv-wrap .action-buttons button{width:auto;min-width:92px;height:38px;padding:0 10px;border-color:#ccc;border-radius:0;margin:0}
 #iv-wrap .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   gap:10px;margin-top:12px}
 #iv-wrap .card{background:#f7f7f7;border:1px solid #e8e8e8;border-radius:4px;padding:10px 14px}
@@ -255,10 +256,10 @@ def run_interpolation_visual():
 </style>
 <div id="iv-wrap">
  <div class="iv-main-panel">
-  <div class="iv-panel-title">Simulación de estimación por interpolación:</div>
+  <div class="iv-panel-title">Simulación de estimación por interpolación</div>
   <div class="iv-panel-body">
-  <section class="iv-subpanel">
-   <div class="iv-subpanel-title">Parámetros:</div>
+  <details class="iv-subpanel" open>
+   <summary class="iv-subpanel-title">Parámetros</summary>
    <div class="iv-panel-content">
     <div class="ctrl">
     <label><span class="label-text">\(\boldsymbol{f(x)}\)</span>
@@ -296,9 +297,9 @@ def run_interpolation_visual():
       <span class="range-value" id="iv-v1">\(8.5\)</span></label>
     </div>
    </div>
-  </section>
-  <section class="iv-subpanel">
-   <div class="iv-subpanel-title">Resultado:</div>
+  </details>
+  <details class="iv-subpanel" open>
+   <summary class="iv-subpanel-title">Resultado</summary>
    <div class="iv-panel-content iv-result-content">
     <div class="plot-wrap" id="iv-plot">
     <canvas id="iv-cv"></canvas>
@@ -321,7 +322,7 @@ def run_interpolation_visual():
     </div>
     <div class="fml" id="iv-fml-vals" style="display:none"></div>
    </div>
-  </section>
+  </details>
   </div>
  </div>
 </div>

@@ -113,7 +113,7 @@ def test_lab_uses_editable_input_right_aligned_actions_and_collapsible_panels():
     assert 'label_widget = widgets.HTMLMath(' in SOURCE
     assert 'r"\\(\\boldsymbol{n}\\)"' in SOURCE
     assert 'rf"\\(\\boldsymbol{{\\mathrm{{{label}}}}}\\)"' in SOURCE
-    assert SOURCE.count('layout=widgets.Layout(width="176px", height="32px")') == 4
+    assert SOURCE.count('layout=widgets.Layout(width="188px", height="32px")') == 4
     assert "Resultado del análisis" not in SOURCE
     assert 'description="Configuración"' in SOURCE
     assert 'add_class("lab-configuration-summary")' in SOURCE

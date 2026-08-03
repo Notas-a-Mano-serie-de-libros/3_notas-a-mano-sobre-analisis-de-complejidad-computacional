@@ -9,7 +9,13 @@ from IPython.display import display
 import ipywidgets as widgets
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
-from common.widget_controls import bounded_int_control, button_control, dropdown_control
+from common.widget_controls import (
+    action_button_row,
+    bounded_int_control,
+    button_control,
+    collapsible_panel,
+    dropdown_control,
+)
 
 try:
     from google.colab import output as colab_output
@@ -931,6 +937,9 @@ def sort_styles():
         padding: 8px 12px;
         border-bottom-color: #e5e5e5;
       }}
+      button.sort-subpanel-title {{height:44px!important;min-height:44px!important;border:0!important;
+        border-bottom:1px solid #e5e5e5!important;border-radius:0!important;background:#f7f7f7!important;
+        font-family:sans-serif!important;font-size:16px!important;text-align:left!important}}
       .sort-subpanel-content {{
         width: 100%;
         padding: 12px;
@@ -962,7 +971,7 @@ def sort_styles():
       }}
       .sort-simulation-root input {{
         border: 1px solid #cccccc !important;
-        border-radius: 3px !important;
+        border-radius: 0 !important;
         background: #ffffff !important;
         color: #333333 !important;
       }}
@@ -997,13 +1006,17 @@ def sort_styles():
       .sort-simulation-root .widget-button {{
         min-height: 38px;
         border: 1px solid #cccccc !important;
-        border-radius: 3px !important;
+        border-radius: 0 !important;
         background: #f7f7f7 !important;
         color: #333333 !important;
         box-shadow: none !important;
       }}
       .sort-simulation-root .widget-button:hover {{
         background: #eeeeee !important;
+      }}
+      .sort-simulation-root .simulation-action-row {{gap:0!important}}
+      .sort-simulation-root .simulation-action-row > .widget-button {{
+        margin:0!important;border-color:#cccccc!important;border-radius:0!important;
       }}
       .sort-app {{
         width: 100%;
@@ -1801,16 +1814,7 @@ def sort_action_button_row(buttons):
     }
     for button in buttons:
         button.icon = icon_by_description.get(button.description, button.icon)
-    return widgets.HBox(
-        list(buttons),
-        layout=widgets.Layout(
-            width="100%",
-            gap="10px",
-            margin="16px 0 0 0",
-            flex_flow="row wrap",
-            justify_content="flex-end",
-        ),
-    )
+    return action_button_row(buttons)
 
 
 def sort_controls_grid(groups):
@@ -1827,27 +1831,19 @@ def sort_controls_grid(groups):
     )
 
 
-def build_sort_panel(parameters, result, title="Simulación de ordenamiento:", procedure=None):
+def build_sort_panel(parameters, result, title="Simulación de ordenamiento", procedure=None):
     parameters.add_class("sort-subpanel-content")
     result.add_class("sort-subpanel-content")
     result.add_class("sort-result-content")
 
     def subpanel(heading, content):
-        container = widgets.VBox(
-            [
-                widgets.HTML(f'<div class="sort-subpanel-title">{escape(heading)}</div>'),
-                content,
-            ],
-            layout=widgets.Layout(width="100%", gap="0"),
-        )
-        container.add_class("sort-subpanel")
-        return container
+        return collapsible_panel(heading, content, prefix="sort")
 
-    sections = [subpanel("Parámetros:", parameters)]
+    sections = [subpanel("Parámetros", parameters)]
     if procedure is not None:
         procedure.add_class("sort-subpanel-content")
-        sections.append(subpanel("Procedimiento:", procedure))
-    sections.append(subpanel("Resultado:", result))
+        sections.append(subpanel("Procedimiento", procedure))
+    sections.append(subpanel("Resultado", result))
     panel_content = widgets.VBox(sections, layout=widgets.Layout(width="100%", gap="0"))
     panel_content.add_class("sort-panel-content")
     main_panel = widgets.VBox(
@@ -2237,28 +2233,20 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     html_output.add_class("sort-result-content")
 
     def panel(title, content):
-        container = widgets.VBox(
-            [
-                widgets.HTML(f'<div class="sort-subpanel-title">{escape(title)}</div>'),
-                content,
-            ],
-            layout=widgets.Layout(width="100%", gap="0"),
-        )
-        container.add_class("sort-subpanel")
-        return container
+        return collapsible_panel(title, content, prefix="sort")
 
     panel_content = widgets.VBox(
         [
-            panel("Parámetros:", controls_layout),
-            panel("Procedimiento:", formula_output),
-            panel("Resultado:", html_output),
+            panel("Parámetros", controls_layout),
+            panel("Procedimiento", formula_output),
+            panel("Resultado", html_output),
         ],
         layout=widgets.Layout(width="100%", gap="0"),
     )
     panel_content.add_class("sort-panel-content")
     main_panel = widgets.VBox(
         [
-            widgets.HTML('<div class="sort-panel-title">Simulación de ordenamiento:</div>'),
+            widgets.HTML('<div class="sort-panel-title">Simulación de ordenamiento</div>'),
             panel_content,
         ],
         layout=widgets.Layout(width="100%", gap="0"),

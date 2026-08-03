@@ -596,19 +596,29 @@ def run_gap_comparison_app():
     size_input.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
     order_dropdown.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
 
+    action_row = widgets.HBox(
+        [auto_button, finish_button, reset_button],
+        layout=widgets.Layout(
+            width="100%", gap="0px", margin="16px 0 0 0",
+            flex_flow="row wrap", overflow="visible",
+        ),
+    )
+    action_row.add_class("shell-comparison-actions")
+    action_style = widgets.HTML(
+        "<style>.shell-comparison-actions{gap:0!important}"
+        ".shell-comparison-actions>.widget-button{margin:0!important;"
+        "border:1px solid #ccc!important;border-radius:0!important;"
+        "background:#f7f7f7!important;color:#333!important}"
+        ".shell-comparison-actions>.widget-button:hover{background:#eee!important}</style>"
+    )
     layout = widgets.VBox(
         [
+            action_style,
             widgets.HBox(
                 [size_group, order_group],
                 layout=widgets.Layout(width="auto", gap="42px", flex_flow="row wrap", overflow="visible"),
             ),
-            widgets.HBox(
-                [auto_button, finish_button, reset_button],
-                layout=widgets.Layout(
-                    width="100%", gap="10px", margin="12px 0 0 0",
-                    flex_flow="row wrap", overflow="visible",
-                ),
-            ),
+            action_row,
             html_output,
         ],
         layout=widgets.Layout(width="100%", gap="10px"),

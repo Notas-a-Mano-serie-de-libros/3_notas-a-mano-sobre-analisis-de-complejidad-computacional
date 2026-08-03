@@ -74,7 +74,7 @@ class TestInterpolacionVisualDinamica(unittest.TestCase):
 
     def test_controles_y_puntos_de_referencia_conservan_el_formato(self):
         self.assertIn('class="stepper-field" id="iv-fn-field"', self.source)
-        self.assertIn("grid-template-columns:34px 184px 34px", self.source)
+        self.assertIn("grid-template-columns:34px 120px 34px", self.source)
         self.assertIn("gap:0;align-items:center", self.source)
         self.assertIn("border:1px solid #ccc;border-radius:0", self.source)
         self.assertIn(".stepper button{border-color:#ccc;border-radius:0", self.source)
@@ -163,7 +163,7 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         source = (PROJECT_ROOT / "capitulo7" / "domain" / "6_busqueda_ternaria_app.py").read_text()
         common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text()
         self.assertIn('description="Generar arreglo del libro"', common_source)
-        self.assertIn('justify_content="flex-end"', common_source)
+        self.assertIn("action_button_row(", common_source)
         self.assertIn('description="Elemento"', common_source)
         self.assertIn('description="Posición"', common_source)
         self.assertIn('description="Objetivo"', common_source)
@@ -1058,7 +1058,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
 
         self.assertEqual(module.DEFAULT_SIZE, 10)
         self.assertIn('description="Buscar"', source)
-        self.assertIn('justify_content="flex-end"', source)
+        self.assertIn("action_button_row([auto_button, finish_button, reset_button])", source)
         self.assertIn('description="Finalizar"', source)
         self.assertIn("disabled=True", source)
         self.assertIn("def set_running_buttons", source)

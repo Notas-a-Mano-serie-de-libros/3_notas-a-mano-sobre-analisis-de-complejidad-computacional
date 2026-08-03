@@ -509,7 +509,7 @@ def _equation_markup(
     )
     return (
         '<details class="recursion-info-section" open>'
-        '<summary>Expresión general:</summary>'
+        '<summary>Expresión general</summary>'
         f'<div class="recursion-equation">\\(\\displaystyle {recurrence}\\)</div>'
         "</details>"
     )
@@ -576,7 +576,7 @@ def _expanded_equation_markup(
 
     return (
         '<details class="recursion-info-section" open>'
-        '<summary>Expresión resultante:</summary>'
+        '<summary>Expresión resultante</summary>'
         f'<div class="recursion-equation">\\(\\displaystyle {recurrence}\\)</div>'
         "</details>"
     )
@@ -659,7 +659,7 @@ def _level_table_markup(
 
     return (
         '<details class="recursion-info-section" open>'
-        '<summary>Costo por nivel:</summary>'
+        '<summary>Costo por nivel</summary>'
         '<div class="recursion-level-table">'
         "<table><thead><tr>"
         "<th>Nivel</th><th>Nodos</th><th>Argumento</th><th>\\(f(n_i)\\)</th>"
@@ -953,7 +953,7 @@ def run_app(builder_only=False):
         layout=widgets.Layout(width="256px", gap="12px"),
     )
     parameter_controls.add_class("recursion-parameter-controls")
-    parameters_section = control_section("Parámetros:", [parameter_controls])
+    parameters_section = control_section("Parámetros", [parameter_controls])
 
     additional_controls = [labeled(r"\(\boldsymbol{h}\)", depth)]
     if builder_only:
@@ -989,7 +989,7 @@ def run_app(builder_only=False):
     controls.add_class("recursion-tree-controls")
     if builder_only:
         controls.children[2].children[0].value = (
-            '<div class="recursion-control-title">Parámetros adicionales:</div>'
+            '<div class="recursion-control-title">Parámetros adicionales</div>'
         )
         controls.children[2].children[1].layout.display = "none"
 
@@ -1077,13 +1077,13 @@ def run_app(builder_only=False):
         [builder_resolve, builder_reset],
         layout=widgets.Layout(
             width="100%", flex_flow="row wrap", align_items="center",
-            justify_content="flex-end", gap="10px",
+            justify_content="flex-end", gap="0px",
         ),
     )
     builder_actions.add_class("recursion-playback")
     configuration_header = widgets.HTML(
         '<button type="button" class="recursion-tree-panel-summary" '
-        'aria-expanded="true">Configuración:</button>',
+        'aria-expanded="true">Configuración</button>',
         layout=widgets.Layout(width="100%"),
     )
     configuration_content = widgets.VBox(
@@ -1119,7 +1119,7 @@ def run_app(builder_only=False):
         [previous_level, next_level, play, pause, reset],
         layout=widgets.Layout(
             width="100%", flex_flow="row wrap", align_items="center",
-            justify_content="flex-end", gap="10px",
+            justify_content="flex-end", gap="0px",
         ),
     )
     playback.add_class("recursion-playback")
@@ -1217,7 +1217,7 @@ def run_app(builder_only=False):
           .recursion-parameter-controls::-webkit-scrollbar,
           .recursion-parameter-controls *::-webkit-scrollbar{
             display:none!important;width:0!important;height:0!important}
-          .recursion-control-section button{border:1px solid #ccc;border-radius:3px;
+          .recursion-control-section button{border:1px solid #ccc;border-radius:0;
             box-sizing:border-box!important;margin:0!important;padding:0!important;
             background:#f7f7f7;color:#333;font-size:14px!important}
           .recursion-control-section button .fa,
@@ -1309,12 +1309,13 @@ def run_app(builder_only=False):
             overflow-wrap:anywhere;color:#b85450;font-size:12px;
             line-height:16px;padding-left:60px}
           .recursion-playback{box-sizing:border-box;width:100%;min-height:40px;padding:0;
-            margin:16px 0 0;border:0;border-radius:0;background:#fff;gap:10px!important;
+            margin:16px 0 0;border:0;border-radius:0;background:#fff;gap:0!important;
             display:flex!important;flex-flow:row wrap!important;justify-content:flex-end!important;
             align-items:center!important;height:auto!important;overflow:visible!important}
           .recursion-playback button{box-sizing:border-box!important;flex:0 0 auto!important;
-            width:auto!important;border:1px solid #bbb;border-radius:3px;
-            background:#fff;color:#333}
+            width:auto!important;height:38px!important;min-height:38px!important;
+            border:1px solid #bbb;border-radius:0!important;
+            background:#f7f7f7!important;color:#333!important}
           .recursion-info-sections,.recursion-info-sections>.widget-box{
             box-sizing:border-box;width:100%!important;gap:0!important}
           .recursion-builder-panel{box-sizing:border-box!important;width:100%!important;
@@ -1407,11 +1408,11 @@ def run_app(builder_only=False):
           .recursion-zoom-toolbar .widget-html-content{overflow:visible!important;background:transparent!important}
           .recursion-tree-plot-wrap{position:relative;box-sizing:border-box;width:100%;
             min-width:0;min-height:300px;overflow:hidden;border:1px solid #e0e0e0;background:#fff}
-          .recursion-zoom-controls{display:flex!important;gap:4px;visibility:visible!important}
+          .recursion-zoom-controls{display:flex!important;gap:0!important;visibility:visible!important}
           .recursion-zoom-btn{width:34px;height:32px;padding:0;border:1px solid #bbb;
-            border-radius:3px;background:rgba(255,255,255,.94);color:#333;cursor:pointer;
+            border-radius:0;background:#f7f7f7!important;color:#333;cursor:pointer;
             font-size:20px;line-height:1}
-          .recursion-zoom-btn:hover{background:#f1f1f1}
+          .recursion-zoom-btn:hover{background:#eee!important}
           .recursion-tree-figure{box-sizing:border-box;width:100%;max-width:100%;min-width:0;
             margin:0;overflow:hidden;color:#111;background:#fff}
           .recursion-tree-figure>svg{display:block;width:100%;min-width:0;max-width:100%;

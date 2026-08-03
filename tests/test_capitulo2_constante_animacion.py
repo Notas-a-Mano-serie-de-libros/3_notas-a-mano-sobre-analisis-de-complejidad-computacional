@@ -697,7 +697,7 @@ def test_simulacion_polinomial_comparte_medidas_con_los_demas_paneles():
     assert "STEPPER_LABEL_WIDTH = 150" in source
     assert "STEPPER_BUTTON_WIDTH = 34" in source
     assert "STEPPER_VALUE_WIDTH = 120" in source
-    assert 'flex_flow="column nowrap"' in source
+    assert 'flex_flow="row wrap"' in source
     assert ".polynomial-full-value" in source
     assert ".polynomial-stepper-value" in source
     assert "color: #333 !important" in source

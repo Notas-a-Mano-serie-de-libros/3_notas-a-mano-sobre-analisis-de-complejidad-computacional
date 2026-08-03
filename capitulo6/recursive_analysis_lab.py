@@ -484,19 +484,19 @@ STYLES = """
 .lab-controls{box-sizing:border-box!important;width:100%!important;padding:12px!important;border:0!important;background:#fff!important;margin:0!important}
 .lab-controls .widget-label{color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1}
 .lab-control-label{display:flex!important;align-items:center!important;justify-content:center!important;height:32px!important;min-height:32px!important;color:#333!important;font-size:13px!important;font-weight:700!important;text-align:center!important}.lab-control-label .widget-htmlmath-content{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;color:#333!important}.lab-control-label mjx-container,.lab-control-label mjx-container *{color:#333!important}
-.lab-controls select{box-sizing:border-box;width:176px!important;height:32px;padding:2px 4px;border:1px solid #ccc;border-radius:3px;background:#fff!important;color:#333;font-size:13px;text-align:center;text-align-last:center;appearance:auto!important}
+.lab-controls select{box-sizing:border-box;width:188px!important;height:32px;padding:2px 4px;border:1px solid #ccc;border-radius:3px;background:#fff!important;color:#333;font-size:13px;text-align:center;text-align-last:center;appearance:auto!important}
 .lab-controls select option{background:#fff;color:#333}
-.lab-controls input:not([type="range"]){box-sizing:border-box;width:176px!important;height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background:#fff!important;color:#333!important;font-size:13px!important;text-align:center!important}
-.lab-controls .lab-field{width:176px!important;height:32px!important}.lab-controls .lab-field input{width:176px!important;height:32px!important}
+.lab-controls input:not([type="range"]){box-sizing:border-box;width:188px!important;height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background:#fff!important;color:#333!important;font-size:13px!important;text-align:center!important}
+.lab-controls .lab-field{width:188px!important;height:32px!important}.lab-controls .lab-field input{width:188px!important;height:32px!important}
 .lab-controls .lab-field.widget-disabled{opacity:1!important}.lab-controls .lab-field input:disabled{opacity:1!important;background:#f7f7f7!important;color:#333!important;cursor:default!important}
-.lab-control-row{width:280px!important;min-width:280px!important;max-width:280px!important}.lab-control-row>.widget-html,.lab-control-row>.widget-htmlmath{flex:0 0 96px!important;width:96px!important}.lab-control-row>.widget-dropdown,.lab-control-row>.widget-text,.lab-control-row>.widget-int{flex:0 0 176px!important;width:176px!important}
+.lab-control-row{width:292px!important;min-width:292px!important;max-width:292px!important}.lab-control-row>.widget-html,.lab-control-row>.widget-htmlmath{flex:0 0 96px!important;width:96px!important}.lab-control-row>.widget-dropdown,.lab-control-row>.widget-text,.lab-control-row>.widget-int{flex:0 0 188px!important;width:188px!important}
 .lab-controls input[type="number"]{-moz-appearance:textfield!important;appearance:textfield!important}
 .lab-controls input[type="number"]::-webkit-inner-spin-button,.lab-controls input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none!important;margin:0!important}
 .lab-controls .widget-readout{background:#fff!important;color:#333!important;font-family:sans-serif!important}
-.lab-controls button{box-sizing:border-box;width:auto!important;height:32px;border:1px solid #bbb;border-radius:3px;background:#fff;color:#333;font-size:14px}
-.lab-controls button:hover{background:#f1f1f1}
+.lab-controls button{box-sizing:border-box;width:auto!important;height:38px;min-height:38px;border:1px solid #ccc;border-radius:0;background:#f7f7f7!important;color:#333!important;font-size:14px}.lab-actions>.widget-button{border-color:#ccc!important;border-radius:0!important;margin:0!important}.lab-controls .lab-configuration-summary{height:44px!important;min-height:44px!important}.lab-controls .lab-stepper button{height:32px!important;min-height:32px!important}
+.lab-controls button:hover{background:#eee!important}
 .lab-controls input[type="range"]{accent-color:#5f6368}
-.lab-parameter-controls{width:100%!important;column-gap:36px!important;row-gap:12px!important}.lab-actions{box-sizing:border-box!important;width:100%!important;margin:16px 0 0!important;padding:0!important;gap:10px!important;justify-content:flex-end!important}
+.lab-parameter-controls{width:100%!important;column-gap:36px!important;row-gap:12px!important}.lab-actions{box-sizing:border-box!important;width:100%!important;margin:16px 0 0!important;padding:0!important;gap:0!important;justify-content:flex-end!important}
 .lab-section{box-sizing:border-box;width:100%;margin:0;border:1px solid #dedede;border-bottom:0;border-radius:0;background:#fff;overflow:hidden}.lab-section:first-child{border-radius:5px 5px 0 0}.lab-section:last-child{border-bottom:1px solid #dedede;border-radius:0 0 5px 5px}
 .lab-section>summary{box-sizing:border-box;width:100%;padding:9px 12px;cursor:pointer;background:#f7f7f7;color:#333;font-size:16px;font-weight:700;line-height:1.45}.lab-section[open]>summary{border-bottom:1px solid #e2e2e2}.lab-section-content{box-sizing:border-box;width:100%;background:#fff}
 .lab-code-summary{position:relative;display:flex!important;height:44px!important;min-height:44px!important;max-height:44px!important;padding-left:32px!important;align-items:center;justify-content:space-between;overflow:hidden}.lab-code-summary::before{position:absolute;left:12px;top:50%;content:"▾";font-size:13px;line-height:1;transform:translateY(-50%)}.lab-code-panel:not([open])>.lab-code-summary::before{content:"▸"}.lab-language-logo{display:block;flex:0 0 26px;width:26px;height:26px;object-fit:contain}
@@ -531,12 +531,12 @@ def run_app():
     algorithm = widgets.Dropdown(
         options=[(value["name"], key) for key, value in ALGORITHMS.items()],
         value="factorial",
-        layout=widgets.Layout(width="176px", height="32px"),
+        layout=widgets.Layout(width="188px", height="32px"),
     )
     analysis_type = widgets.Dropdown(
         options=[("Temporal", "temporal"), ("Espacial", "espacial")],
         value="temporal",
-        layout=widgets.Layout(width="176px", height="32px"),
+        layout=widgets.Layout(width="188px", height="32px"),
     )
     language = widgets.Dropdown(
         options=[
@@ -544,12 +544,12 @@ def run_app():
             ("Java", "java"), ("C", "c"),
         ],
         value="pseudocode",
-        layout=widgets.Layout(width="176px", height="32px"),
+        layout=widgets.Layout(width="188px", height="32px"),
     )
     size = widgets.BoundedIntText(
         value=5, min=1, max=12, step=1,
         disabled=True,
-        layout=widgets.Layout(width="176px", height="32px"),
+        layout=widgets.Layout(width="188px", height="32px"),
     )
     size.add_class("lab-field")
     previous = widgets.Button(description="Anterior", icon="step-backward")
@@ -720,7 +720,7 @@ def run_app():
         label_widget.add_class("lab-control-label")
         row = widgets.HBox(
             [label_widget, control],
-            layout=widgets.Layout(width="280px", align_items="center", gap="8px"),
+            layout=widgets.Layout(width="292px", align_items="center", gap="8px"),
         )
         row.add_class("lab-control-row")
         return row
@@ -730,14 +730,14 @@ def run_app():
             labeled("Algoritmo", algorithm),
             labeled("Análisis", analysis_type),
         ],
-        layout=widgets.Layout(width="280px", gap="8px"),
+        layout=widgets.Layout(width="292px", gap="8px"),
     )
     input_controls = widgets.VBox(
         [
             labeled("Lenguaje", language),
             labeled("n", size),
         ],
-        layout=widgets.Layout(width="280px", gap="8px"),
+        layout=widgets.Layout(width="292px", gap="8px"),
     )
     parameter_controls = widgets.HBox(
         [analysis_controls, input_controls],
@@ -746,7 +746,7 @@ def run_app():
     parameter_controls.add_class("lab-parameter-controls")
     action_controls = widgets.HBox(
         [previous, following, play, reset],
-        layout=widgets.Layout(gap="10px", margin="16px 0 0 0", justify_content="flex-end"),
+        layout=widgets.Layout(gap="0px", margin="16px 0 0 0", justify_content="flex-end"),
     )
     action_controls.add_class("lab-actions")
     controls = widgets.VBox(
