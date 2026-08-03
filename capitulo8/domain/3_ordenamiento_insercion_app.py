@@ -450,7 +450,7 @@ def run_comparison_app():
     body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
     html_output = widgets.VBox(
         [style_output, body_output],
-        layout=widgets.Layout(width="100%", gap="0", margin="0", padding="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0", margin="0", padding="0"),
     )
     control_state = {"updating": False}
     execution_state = {"running": False, "finish_requested": False, "run_id": 0}

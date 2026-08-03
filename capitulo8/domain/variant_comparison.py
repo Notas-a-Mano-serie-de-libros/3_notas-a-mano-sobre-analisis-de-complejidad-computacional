@@ -276,7 +276,7 @@ def run_comparison_app(variants, state_factory):
             sort_controls_grid([size_group, order_group]),
             sort_action_button_row([auto, finish, reset]),
         ],
-        layout=widgets.Layout(width="100%", gap="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0"),
     )
     display(build_sort_panel(parameters, output, title="Comparación de variantes de ordenamiento"))
     redraw()

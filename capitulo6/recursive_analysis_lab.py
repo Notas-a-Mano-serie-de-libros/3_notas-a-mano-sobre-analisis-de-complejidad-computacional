@@ -12,6 +12,12 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import CLexer, JavaLexer, PythonLexer
 
+from common.widget_controls import (
+    STANDARD_CONTROL_COLUMN_GAP,
+    STANDARD_CONTROL_ROW_GAP,
+    STANDARD_LABEL_CONTROL_GAP,
+)
+
 
 @dataclass
 class Node:
@@ -462,7 +468,7 @@ def _code_panel(algorithm: str, language: str, active_line: int) -> str:
 
 STYLES = """
 <style>
-.recursive-analysis-lab{box-sizing:border-box;width:100%;padding:14px 4px;background:#fff;color:#333;font-family:sans-serif}
+.recursive-analysis-lab{box-sizing:border-box;width:100%;max-width:100%;min-width:0;padding:14px 4px;background:#fff;color:#333;font-family:sans-serif;overflow-x:hidden!important;overflow-y:visible!important}
 .recursive-analysis-lab *{box-sizing:border-box}
 .recursive-analysis-lab>.widget-box,
 .recursive-analysis-lab .widget-html-content,
@@ -481,22 +487,22 @@ STYLES = """
 .recursive-analysis-lab mjx-container svg *{fill:#333!important;color:#333!important}
 .lab-configuration-panel{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin:0!important;border:1px solid #dedede!important;border-bottom:0!important;border-radius:5px 5px 0 0!important;background:#fff!important;overflow:hidden!important}
 .lab-configuration-summary{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-bottom:1px solid #e2e2e2!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;font-family:sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:24px!important;text-align:left!important}.lab-configuration-summary:hover{background:#f7f7f7!important}.lab-configuration-summary .fa{color:#333!important}
-.lab-controls{box-sizing:border-box!important;width:100%!important;padding:12px!important;border:0!important;background:#fff!important;margin:0!important}
+.lab-controls{box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;padding:12px!important;border:0!important;background:#fff!important;margin:0!important;overflow-x:hidden!important}
 .lab-controls .widget-label{color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1}
-.lab-control-label{display:flex!important;align-items:center!important;justify-content:center!important;height:32px!important;min-height:32px!important;color:#333!important;font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;line-height:1.1!important;text-align:center!important}.lab-control-label .widget-htmlmath-content{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;color:#333!important}.lab-control-label mjx-container,.lab-control-label mjx-container *{color:#333!important;font-size:100%!important;font-weight:700!important}
+.lab-control-label{display:flex!important;align-items:center!important;justify-content:center!important;height:32px!important;min-height:32px!important;color:#333!important;font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;line-height:1.1!important;text-align:center!important}.lab-control-label .widget-htmlmath-content{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:32px!important;color:#333!important;font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;line-height:1.1!important}.lab-control-label mjx-container,.lab-control-label mjx-container *{color:#333!important;font-size:100%!important;font-weight:700!important}
 .lab-controls select{box-sizing:border-box;width:188px!important;height:32px;padding:2px 4px;border:1px solid #ccc;border-radius:3px;background:#fff!important;color:#333;font-size:13px;text-align:center;text-align-last:center;appearance:auto!important}
 .lab-controls select option{background:#fff;color:#333}
 .lab-controls input:not([type="range"]){box-sizing:border-box;width:188px!important;height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background:#fff!important;color:#333!important;font-size:13px!important;text-align:center!important}
 .lab-controls .lab-field{width:188px!important;height:32px!important}.lab-controls .lab-field input{width:188px!important;height:32px!important}
 .lab-controls .lab-field.widget-disabled{opacity:1!important}.lab-controls .lab-field input:disabled{opacity:1!important;background:#f7f7f7!important;color:#333!important;cursor:default!important}
-.lab-control-row{width:292px!important;min-width:292px!important;max-width:292px!important}.lab-control-row>.widget-html,.lab-control-row>.widget-htmlmath{flex:0 0 96px!important;width:96px!important}.lab-control-row>.widget-dropdown,.lab-control-row>.widget-text,.lab-control-row>.widget-int{flex:0 0 188px!important;width:188px!important}
+.lab-control-row{box-sizing:border-box!important;width:292px!important;min-width:0!important;max-width:100%!important;overflow-x:hidden!important}.lab-control-row>.widget-html,.lab-control-row>.widget-htmlmath{flex:0 0 96px!important;width:96px!important;min-width:96px!important;max-width:96px!important}.lab-control-row>.widget-dropdown,.lab-control-row>.widget-text,.lab-control-row>.widget-int{flex:0 0 188px!important;width:188px!important;min-width:188px!important;max-width:188px!important}
 .lab-controls input[type="number"]{-moz-appearance:textfield!important;appearance:textfield!important}
 .lab-controls input[type="number"]::-webkit-inner-spin-button,.lab-controls input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none!important;margin:0!important}
 .lab-controls .widget-readout{background:#fff!important;color:#333!important;font-family:sans-serif!important}
 .lab-controls button{box-sizing:border-box;width:auto!important;height:38px;min-height:38px;border:1px solid #ccc;border-radius:0;background:#f7f7f7!important;color:#333!important;font-size:14px}.lab-actions>.widget-button{border-color:#ccc!important;border-radius:0!important;margin:0!important}.lab-controls .lab-configuration-summary{height:44px!important;min-height:44px!important}.lab-controls .lab-stepper button{height:32px!important;min-height:32px!important}
 .lab-controls button:hover{background:#eee!important}
 .lab-controls input[type="range"]{accent-color:#5f6368}
-.lab-parameter-controls{width:100%!important;column-gap:36px!important;row-gap:12px!important}.lab-actions{box-sizing:border-box!important;width:100%!important;margin:16px 0 0!important;padding:0!important;gap:0!important;justify-content:flex-end!important}
+.lab-parameter-controls{box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;column-gap:36px!important;row-gap:12px!important;overflow-x:hidden!important}.lab-actions{box-sizing:border-box!important;width:100%!important;margin:16px 0 0!important;padding:0!important;gap:0!important;justify-content:flex-end!important}
 .lab-section{box-sizing:border-box;width:100%;margin:0;border:1px solid #dedede;border-bottom:0;border-radius:0;background:#fff;overflow:hidden}.lab-section:first-child{border-radius:5px 5px 0 0}.lab-section:last-child{border-bottom:1px solid #dedede;border-radius:0 0 5px 5px}
 .lab-section>summary{box-sizing:border-box;width:100%;padding:9px 12px;cursor:pointer;background:#f7f7f7;color:#333;font-size:16px;font-weight:700;line-height:1.45}.lab-section[open]>summary{border-bottom:1px solid #e2e2e2}.lab-section-content{box-sizing:border-box;width:100%;background:#fff}
 .lab-code-summary{position:relative;display:flex!important;height:44px!important;min-height:44px!important;max-height:44px!important;padding-left:32px!important;align-items:center;justify-content:space-between;overflow:hidden}.lab-code-summary::before{position:absolute;left:12px;top:50%;content:"▾";font-size:13px;line-height:1;transform:translateY(-50%)}.lab-code-panel:not([open])>.lab-code-summary::before{content:"▸"}.lab-language-logo{display:block;flex:0 0 26px;width:26px;height:26px;object-fit:contain}
@@ -572,7 +578,7 @@ def run_app():
         )
         summary.add_class("lab-widget-summary")
         header_children = [summary] + ([extra] if extra is not None else [])
-        header = widgets.HBox(header_children, layout=widgets.Layout(width="100%", gap="0"))
+        header = widgets.HBox(header_children, layout=widgets.Layout(width="100%", grid_gap="0"))
         header.add_class("lab-widget-header")
         content.add_class("lab-widget-content")
 
@@ -586,7 +592,7 @@ def run_app():
                 panel.remove_class("lab-collapsed")
 
         summary.on_click(toggle)
-        panel = widgets.VBox([header, content], layout=widgets.Layout(width="100%", gap="0"))
+        panel = widgets.VBox([header, content], layout=widgets.Layout(width="100%", grid_gap="0"))
         panel.add_class("lab-widget-panel")
         return panel
 
@@ -595,12 +601,12 @@ def run_app():
     stack_panel = collapsible_panel("Pila de recursión", stack_content)
     tree_panel = collapsible_panel("Árbol de recursión", tree_content)
     execution_panels = widgets.HBox(
-        [stack_panel, tree_panel], layout=widgets.Layout(width="100%", gap="0")
+        [stack_panel, tree_panel], layout=widgets.Layout(width="100%", grid_gap="0")
     )
     execution_panels.add_class("lab-widget-execution")
     visualization = widgets.VBox(
         [code_panel, state_panel, execution_panels],
-        layout=widgets.Layout(width="100%", gap="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0"),
     )
     visualization.add_class("lab-widget-panels")
 
@@ -708,6 +714,7 @@ def run_app():
     reset.on_click(lambda _: (stop_playback(), state.update(step=0), render()))
 
     def labeled(label, control):
+        control.layout.margin = "0"
         label_formula = (
             r"\(\boldsymbol{n}\)"
             if label == "n"
@@ -715,12 +722,16 @@ def run_app():
         )
         label_widget = widgets.HTMLMath(
             value=label_formula,
-            layout=widgets.Layout(width="96px"),
+            layout=widgets.Layout(width="96px", margin="0"),
         )
         label_widget.add_class("lab-control-label")
         row = widgets.HBox(
             [label_widget, control],
-            layout=widgets.Layout(width="292px", align_items="center", gap="8px"),
+            layout=widgets.Layout(
+                width="292px", align_items="center",
+                grid_gap=f"{STANDARD_LABEL_CONTROL_GAP}px",
+                overflow="hidden",
+            ),
         )
         row.add_class("lab-control-row")
         return row
@@ -730,29 +741,32 @@ def run_app():
             labeled("Algoritmo", algorithm),
             labeled("Análisis", analysis_type),
         ],
-        layout=widgets.Layout(width="292px", gap="12px"),
+        layout=widgets.Layout(width="292px", grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px"),
     )
     input_controls = widgets.VBox(
         [
             labeled("Lenguaje", language),
             labeled("n", size),
         ],
-        layout=widgets.Layout(width="292px", gap="12px"),
+        layout=widgets.Layout(width="292px", grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px"),
     )
     parameter_controls = widgets.HBox(
         [analysis_controls, input_controls],
-        layout=widgets.Layout(flex_flow="row wrap", gap="36px", align_items="flex-start"),
+        layout=widgets.Layout(
+            flex_flow="row wrap", grid_gap=f"{STANDARD_CONTROL_COLUMN_GAP}px",
+            align_items="flex-start",
+        ),
     )
     parameter_controls.add_class("lab-parameter-controls")
     action_controls = widgets.HBox(
         [previous, following, play, reset],
-        layout=widgets.Layout(gap="0px", margin="16px 0 0 0", justify_content="flex-end"),
+        layout=widgets.Layout(grid_gap="0px", margin="16px 0 0 0", justify_content="flex-end"),
     )
     action_controls.add_class("lab-actions")
     controls = widgets.VBox(
         [parameter_controls, action_controls],
         layout=widgets.Layout(
-            width="100%", align_items="stretch", gap="12px"
+            width="100%", align_items="stretch", grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px"
         ),
     )
     controls.add_class("lab-controls")
@@ -771,7 +785,7 @@ def run_app():
     configuration_summary.on_click(toggle_configuration)
     configuration_panel = widgets.VBox(
         [configuration_summary, controls],
-        layout=widgets.Layout(width="100%", gap="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0"),
     )
     configuration_panel.add_class("lab-configuration-panel")
     styles = widgets.HTML(
@@ -783,7 +797,7 @@ def run_app():
         configuration_panel,
         visualization,
         method,
-    ], layout=widgets.Layout(width="100%", gap="0"))
+    ], layout=widgets.Layout(width="100%", grid_gap="0"))
     app.add_class("recursive-analysis-lab")
     rebuild()
     clear_output(wait=True)

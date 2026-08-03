@@ -13,6 +13,8 @@ from common.animation_runtime import OutputCache, formula_iframe_height, pause, 
 from common.visual_roles import SEARCH_EXPONENTIAL_STYLES, SEARCH_RANGE_HIGHLIGHT_STYLES, SEARCH_ROLE_STYLES, SEARCH_SEQUENTIAL_STYLES, SEARCH_TERNARY_STYLES, TARGET
 from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
+    STANDARD_CONTROL_COLUMN_GAP,
+    STANDARD_CONTROL_ROW_GAP,
     action_button_row,
     bounded_int_control,
     button_control,
@@ -434,7 +436,8 @@ def _build_search_css() -> str:
   }}
   .search-simulation-root label,
   .search-simulation-root .widget-label,
-  .search-simulation-root .widget-checkbox .widget-label {{
+  .search-simulation-root .widget-checkbox .widget-label,
+  .search-simulation-root .compact-control-label {{
     font-family: sans-serif !important;
     font-size: 13px !important;
     font-weight: 700 !important;
@@ -1125,7 +1128,7 @@ def run_search_app(
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap="12px 36px",
+            grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px {STANDARD_CONTROL_COLUMN_GAP}px",
             align_items="center",
             overflow="visible",
         ),
@@ -1154,7 +1157,7 @@ def run_search_app(
             panel("Procedimiento", formula_output),
             panel("Resultado", html_output),
         ],
-        layout=widgets.Layout(width="100%", gap="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0"),
     )
     panel_content.add_class("search-panel-content")
     css_widget = widgets.HTML(_SEARCH_CSS)
@@ -1164,7 +1167,7 @@ def run_search_app(
         layout=widgets.Layout(
             width="100%",
             max_width="100%",
-            gap="0",
+            grid_gap="0",
             overflow="hidden",
         ),
     )

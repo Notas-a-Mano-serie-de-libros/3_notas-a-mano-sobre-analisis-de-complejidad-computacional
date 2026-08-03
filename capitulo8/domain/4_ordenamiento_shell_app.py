@@ -474,7 +474,7 @@ def run_gap_comparison_app():
     body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
     html_output = widgets.VBox(
         [style_output, body_output],
-        layout=widgets.Layout(width="100%", gap="0", margin="0", padding="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0", margin="0", padding="0"),
     )
     control_state = {"updating": False}
     execution_state = {"running": False, "finish_requested": False, "run_id": 0}
@@ -599,7 +599,7 @@ def run_gap_comparison_app():
     action_row = widgets.HBox(
         [auto_button, finish_button, reset_button],
         layout=widgets.Layout(
-            width="100%", gap="0px", margin="16px 0 0 0",
+            width="100%", grid_gap="0px", margin="16px 0 0 0",
             flex_flow="row wrap", overflow="visible",
         ),
     )
@@ -616,12 +616,12 @@ def run_gap_comparison_app():
             action_style,
             widgets.HBox(
                 [size_group, order_group],
-                layout=widgets.Layout(width="auto", gap="42px", flex_flow="row wrap", overflow="visible"),
+                layout=widgets.Layout(width="auto", grid_gap="42px", flex_flow="row wrap", overflow="visible"),
             ),
             action_row,
             html_output,
         ],
-        layout=widgets.Layout(width="100%", gap="10px"),
+        layout=widgets.Layout(width="100%", grid_gap="10px"),
     )
     display(layout)
     redraw(force_static=True)

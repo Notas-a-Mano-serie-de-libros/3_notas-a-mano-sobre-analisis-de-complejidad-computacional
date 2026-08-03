@@ -10,10 +10,14 @@ import ipywidgets as widgets
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
 from common.widget_controls import (
+    STANDARD_CONTROL_COLUMN_GAP,
+    STANDARD_CONTROL_ROW_GAP,
+    STANDARD_LABEL_CONTROL_GAP,
     action_button_row,
     bounded_int_control,
     button_control,
     collapsible_panel,
+    compact_labeled_control,
     dropdown_control,
 )
 
@@ -70,10 +74,10 @@ SORT_TREE_RESULT_OFFSET = 28
 SORT_CONTROL_STYLE = {"description_width": "0px"}
 SORT_CONTROL_LABEL_WIDTH = 96
 SORT_CONTROL_FIELD_WIDTH = 188
-SORT_CONTROL_GROUP_PADDING_RIGHT = 44
-SORT_CONTROL_GROUP_WIDTH = SORT_CONTROL_LABEL_WIDTH + SORT_CONTROL_FIELD_WIDTH + SORT_CONTROL_GROUP_PADDING_RIGHT + 4
-SORT_CONTROL_GAP = 2
-SORT_CONTROL_COLUMN_GAP = 42
+SORT_CONTROL_GROUP_PADDING_RIGHT = 0
+SORT_CONTROL_GROUP_WIDTH = SORT_CONTROL_LABEL_WIDTH + SORT_CONTROL_FIELD_WIDTH + STANDARD_LABEL_CONTROL_GAP
+SORT_CONTROL_GAP = STANDARD_LABEL_CONTROL_GAP
+SORT_CONTROL_COLUMN_GAP = STANDARD_CONTROL_COLUMN_GAP
 SORT_BAR_AREA_HEIGHT = 295
 SORT_BAR_MIN_HEIGHT = 18
 SORT_BAR_HEIGHT_RANGE = 250
@@ -972,7 +976,8 @@ def sort_styles():
       }}
       .sort-simulation-root label,
       .sort-simulation-root .widget-label,
-      .sort-simulation-root .widget-checkbox .widget-label {{
+      .sort-simulation-root .widget-checkbox .widget-label,
+      .sort-simulation-root .compact-control-label {{
         font-family: sans-serif !important;
         font-size: 13px !important;
         font-weight: 700 !important;
@@ -1011,6 +1016,9 @@ def sort_styles():
         text-align: center !important;
         appearance: auto !important;
         -webkit-appearance: menulist !important;
+      }}
+      .sort-algorithm-options-frame {{
+        background: #ffffff !important;
       }}
       .sort-simulation-root .widget-dropdown select:focus {{
         outline: none !important;
@@ -1788,22 +1796,12 @@ def render_state_html(state, include_styles=True):
 
 
 def labeled_control(label, control, field_width, group_width=None):
-    control.description = ""
-    control.layout.width = f"{field_width}px"
-    label_widget = widgets.HTML(
-        value=(
-            '<span class="compact-control-label" style="font-family:sans-serif;'
-            f'font-size:13px;font-weight:700;line-height:1.1;color:#333;">{escape(label)}</span>'
-        ),
-        layout=widgets.Layout(width=f"{SORT_CONTROL_LABEL_WIDTH}px"),
-    )
-    return widgets.HBox(
-        [label_widget, control],
-        layout=widgets.Layout(
-            width=f"{group_width or SORT_CONTROL_LABEL_WIDTH + SORT_CONTROL_GAP + field_width}px",
-            align_items="center",
-            gap=f"{SORT_CONTROL_GAP}px",
-        ),
+    return compact_labeled_control(
+        label,
+        control,
+        field_width=field_width,
+        group_width=group_width or SORT_CONTROL_LABEL_WIDTH + SORT_CONTROL_GAP + field_width,
+        label_width=SORT_CONTROL_LABEL_WIDTH,
     )
 
 
@@ -1814,7 +1812,7 @@ def controls_grid(groups, columns):
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap="14px 28px",
+            grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px {STANDARD_CONTROL_COLUMN_GAP}px",
             align_items="center",
             overflow="visible",
         ),
@@ -1842,7 +1840,7 @@ def sort_controls_grid(groups):
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap="14px 28px",
+            grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px {STANDARD_CONTROL_COLUMN_GAP}px",
             align_items="flex-start",
             overflow="visible",
         ),
@@ -1862,13 +1860,13 @@ def build_sort_panel(parameters, result, title="Simulación de ordenamiento", pr
         procedure.add_class("sort-subpanel-content")
         sections.append(subpanel("Procedimiento", procedure))
     sections.append(subpanel("Resultado", result))
-    panel_content = widgets.VBox(sections, layout=widgets.Layout(width="100%", gap="0"))
+    panel_content = widgets.VBox(sections, layout=widgets.Layout(width="100%", grid_gap="0"))
     panel_content.add_class("sort-panel-content")
     css_widget = widgets.HTML(sort_styles())
     css_widget.layout = widgets.Layout(width="0", height="0", margin="0", padding="0")
     layout = widgets.VBox(
         [css_widget, panel_content],
-        layout=widgets.Layout(width="100%", max_width="100%", gap="0", overflow="hidden"),
+        layout=widgets.Layout(width="100%", max_width="100%", grid_gap="0", overflow="hidden"),
     )
     layout.add_class("sort-simulation-root")
     return layout
@@ -2017,7 +2015,7 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         + [
             sort_action_button_row([step_button, auto_button, finish_button, reset_button, book_button]),
         ],
-        layout=widgets.Layout(width="100%", gap="12px"),
+        layout=widgets.Layout(width="100%", grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px"),
     )
     return controls, layout
 
@@ -2252,14 +2250,14 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             panel("Procedimiento", formula_output),
             panel("Resultado", html_output),
         ],
-        layout=widgets.Layout(width="100%", gap="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0"),
     )
     panel_content.add_class("sort-panel-content")
     css_widget = widgets.HTML(sort_styles())
     css_widget.layout = widgets.Layout(width="0", height="0", margin="0", padding="0")
     layout = widgets.VBox(
         [css_widget, panel_content],
-        layout=widgets.Layout(width="100%", max_width="100%", gap="0", overflow="hidden"),
+        layout=widgets.Layout(width="100%", max_width="100%", grid_gap="0", overflow="hidden"),
     )
     layout.add_class("sort-simulation-root")
     display(layout)

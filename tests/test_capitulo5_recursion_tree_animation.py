@@ -8,6 +8,15 @@ SOURCE = (
 ).read_text(encoding="utf-8")
 
 
+def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
+    bootstrap = (
+        Path(__file__).resolve().parents[1] / "capitulo5" / "colab_bootstrap.py"
+    ).read_text(encoding="utf-8")
+
+    assert "sys.path.insert(0, project_root)" in bootstrap
+    assert 'common/widget_controls.py' in bootstrap
+
+
 def test_general_expression_always_keeps_symbolic_external_cost():
     from capitulo5.recursion_tree_animation import _equation_markup
 
@@ -148,7 +157,9 @@ def test_term_count_stepper_visually_matches_parameter_text_width():
     assert "width:120px!important" in SOURCE
     assert ".recursion-stepper{" in SOURCE
     assert "gap:0!important" in SOURCE
-    assert SOURCE.count('layout=widgets.Layout(width="188px", align_items="center", gap="0px")') == 2
+    assert SOURCE.count('layout=widgets.Layout(width="188px", align_items="center", grid_gap="0px")') == 2
+    assert SOURCE.count('margin="0", flex="0 0 34px"') == 4
+    assert SOURCE.count('margin="0", flex="0 0 120px"') == 2
     assert "border-radius:0!important" in SOURCE
     assert "font-family:sans-serif!important;font-size:13px!important" in SOURCE
     assert "font-weight:700!important;line-height:1.1!important" in SOURCE

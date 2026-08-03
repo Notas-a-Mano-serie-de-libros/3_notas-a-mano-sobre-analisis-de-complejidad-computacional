@@ -27,7 +27,11 @@ from capitulo2.analisis_complejidad_temporal_experimental.theoretical_graphs imp
     polynomial_visible_ceiling,
     polynomial_values,
 )
-from common.widget_controls import compact_labeled_control  # noqa: E402
+from common.widget_controls import (  # noqa: E402
+    STANDARD_CONTROL_ROW_GAP,
+    STANDARD_LABEL_CONTROL_GAP,
+    compact_labeled_control,
+)
 
 try:
     from google.colab import output as colab_output
@@ -42,7 +46,7 @@ TABLE_MAX_DEGREE = 5
 DISPLAY_DPI = 300
 STEPPER_FIELD_WIDTH = 188
 STEPPER_LABEL_WIDTH = 150
-STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 8
+STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + STANDARD_LABEL_CONTROL_GAP
 STEPPER_BUTTON_WIDTH = 34
 STEPPER_VALUE_WIDTH = 120
 
@@ -156,7 +160,10 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
     maximum_n_value.layout = widgets.Layout(
         width="100%",
         height="32px",
-        border="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_top="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_right="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_bottom="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_left="1px solid var(--jp-border-color2, #bdbdbd)",
         display="flex",
         align_items="center",
         justify_content="center",
@@ -176,7 +183,10 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
     degree_value.layout = widgets.Layout(
         width="100%",
         height="32px",
-        border="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_top="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_right="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_bottom="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_left="1px solid var(--jp-border-color2, #bdbdbd)",
         display="flex",
         align_items="center",
         justify_content="center",
@@ -194,7 +204,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
     degree_up = widgets.Button(description="▶", tooltip="Grado siguiente", layout=degree_button_layout)
     degree_stepper = widgets.HBox(
         [degree_down, degree_value, degree_up],
-        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap="0px"),
+        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", grid_gap="0px"),
     )
     degree_stepper.add_class("experimental-stepper")
     degree_group = compact_labeled_control(
@@ -211,7 +221,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap="12px",
+            grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px",
             align_items="flex-start",
             overflow="hidden",
         ),
@@ -229,8 +239,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
             width="100%",
             max_width="100%",
             margin="0",
-            overflow_x="hidden",
-            overflow_y="hidden",
+            overflow="hidden",
         ),
     )
     figure_output = widgets.HTML(layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"))
@@ -267,7 +276,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
         header.add_class("experimental-subpanel-summary")
         content = widgets.VBox(
             children,
-            layout=widgets.Layout(width="100%", gap="0px"),
+            layout=widgets.Layout(width="100%", grid_gap="0px"),
         )
         content.add_class("experimental-subpanel-content")
 
@@ -279,7 +288,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
         header.on_click(toggle_content)
         panel = widgets.VBox(
             [header, content],
-            layout=widgets.Layout(width="100%", gap="0px"),
+            layout=widgets.Layout(width="100%", grid_gap="0px"),
         )
         panel.add_class("experimental-subpanel")
         return panel
@@ -292,13 +301,13 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
     result_spacer.add_class("experimental-result-spacer")
     result_content = widgets.VBox(
         [table_container, result_spacer, figure_output],
-        layout=widgets.Layout(width="100%", gap="0px", overflow_x="hidden"),
+        layout=widgets.Layout(width="100%", grid_gap="0px", overflow="hidden"),
     )
     result_content.add_class("experimental-result-content")
     result_panel = subpanel("Resultado", [result_content])
     main_panel = widgets.VBox(
         [configuration_panel, result_panel],
-        layout=widgets.Layout(width="100%", gap="0px"),
+        layout=widgets.Layout(width="100%", grid_gap="0px"),
     )
     main_panel.add_class("experimental-main-panel")
 
@@ -357,6 +366,13 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
           .constant-animation-root span {
             color: #333 !important;
             font-family: sans-serif !important;
+          }
+          .constant-animation-root .widget-label,
+          .constant-animation-root .compact-control-label {
+            font-family: sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            line-height: 1.1 !important;
           }
           .experimental-main-panel {
             box-sizing: border-box !important;

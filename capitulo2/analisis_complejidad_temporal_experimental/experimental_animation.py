@@ -28,6 +28,8 @@ from common.experimental_simulation import (
     previous_order_of_magnitude,
 )
 from common.widget_controls import (
+    STANDARD_CONTROL_ROW_GAP,
+    STANDARD_LABEL_CONTROL_GAP,
     action_button_row,
     button_control,
     compact_labeled_control,
@@ -48,7 +50,7 @@ except ImportError:
 EXPERIMENT_POINTS = 200
 STEPPER_FIELD_WIDTH = 188
 STEPPER_LABEL_WIDTH = 150
-STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 8
+STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + STANDARD_LABEL_CONTROL_GAP
 STEPPER_BUTTON_WIDTH = 34
 STEPPER_VALUE_WIDTH = 120
 STEPPER_GAP = 0
@@ -350,7 +352,10 @@ def run_app(profile, display_app=True, mode_selector=None):
         max_width=f"{STEPPER_VALUE_WIDTH}px",
         height="32px",
         flex=f"0 0 {STEPPER_VALUE_WIDTH}px",
-        border="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_top="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_right="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_bottom="1px solid var(--jp-border-color2, #bdbdbd)",
+        border_left="1px solid var(--jp-border-color2, #bdbdbd)",
         display="flex",
         align_items="center",
         justify_content="center",
@@ -368,7 +373,7 @@ def run_app(profile, display_app=True, mode_selector=None):
     maximum_up = widgets.Button(description="▶", tooltip="Potencia siguiente", layout=step_button_layout)
     maximum_stepper = widgets.HBox(
         [maximum_down, maximum_value, maximum_up],
-        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap=f"{STEPPER_GAP}px"),
+        layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", grid_gap=f"{STEPPER_GAP}px"),
     )
     maximum_stepper.add_class("experimental-stepper")
     maximum_group = compact_labeled_control(
@@ -433,7 +438,7 @@ def run_app(profile, display_app=True, mode_selector=None):
             width="auto",
             display="flex",
             flex_flow="column nowrap",
-            gap="12px",
+            grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px",
             align_items="flex-start",
             overflow="visible",
         ),
@@ -634,7 +639,7 @@ def run_app(profile, display_app=True, mode_selector=None):
 
     controls = widgets.VBox(
         [controls_row, button_row],
-        layout=widgets.Layout(width="100%", gap="0px"),
+        layout=widgets.Layout(width="100%", grid_gap="0px"),
     )
     controls.add_class("experimental-controls")
     def subpanel(title, children):
@@ -646,7 +651,7 @@ def run_app(profile, display_app=True, mode_selector=None):
         header.add_class("experimental-subpanel-summary")
         content = widgets.VBox(
             children,
-            layout=widgets.Layout(width="100%", gap="0px"),
+            layout=widgets.Layout(width="100%", grid_gap="0px"),
         )
         content.add_class("experimental-subpanel-content")
 
@@ -656,7 +661,7 @@ def run_app(profile, display_app=True, mode_selector=None):
             header.icon = "caret-right" if collapsed else "caret-down"
 
         header.on_click(toggle_content)
-        panel = widgets.VBox([header, content], layout=widgets.Layout(width="100%", gap="0px"))
+        panel = widgets.VBox([header, content], layout=widgets.Layout(width="100%", grid_gap="0px"))
         panel.add_class("experimental-subpanel")
         return panel
 
@@ -671,13 +676,13 @@ def run_app(profile, display_app=True, mode_selector=None):
     result_spacer.add_class("experimental-result-spacer")
     result_content = widgets.VBox(
         [table_output, result_spacer, figure_output],
-        layout=widgets.Layout(width="100%", gap="0px", overflow_x="hidden"),
+        layout=widgets.Layout(width="100%", grid_gap="0px", overflow="hidden"),
     )
     result_content.add_class("experimental-result-content")
     result_panel = subpanel("Resultado", [result_content])
     main_panel = widgets.VBox(
         [configuration_panel, result_panel],
-        layout=widgets.Layout(width="100%", gap="0px"),
+        layout=widgets.Layout(width="100%", grid_gap="0px"),
     )
     main_panel.add_class("experimental-main-panel")
     input_style = widgets.HTML(
@@ -751,7 +756,8 @@ def run_app(profile, display_app=True, mode_selector=None):
           }
           .constant-animation-root label,
           .constant-animation-root .widget-label,
-          .constant-animation-root .widget-checkbox .widget-label {
+          .constant-animation-root .widget-checkbox .widget-label,
+          .constant-animation-root .compact-control-label {
             font-family: sans-serif !important;
             font-size: 13px !important;
             font-weight: 700 !important;
@@ -1076,7 +1082,7 @@ def run_selectable_app(profile_factory, initial_mode="time"):
     update_mode()
     wrapper = widgets.VBox(
         [body],
-        layout=widgets.Layout(width="100%", max_width="100%", gap="0px"),
+        layout=widgets.Layout(width="100%", max_width="100%", grid_gap="0px"),
     )
     wrapper.add_class("constant-animation-root")
     display(wrapper)

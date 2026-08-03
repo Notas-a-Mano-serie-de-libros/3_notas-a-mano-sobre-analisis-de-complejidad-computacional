@@ -9,6 +9,12 @@ from functools import lru_cache
 import ipywidgets as widgets
 from IPython.display import Javascript, clear_output, display
 
+from common.widget_controls import (
+    STANDARD_CONTROL_COLUMN_GAP,
+    STANDARD_CONTROL_ROW_GAP,
+    STANDARD_LABEL_CONTROL_GAP,
+)
+
 
 try:
     from google.colab import output as _colab_output  # type: ignore
@@ -705,23 +711,33 @@ def run_app(builder_only=False):
     )
     function_previous = widgets.Button(
         description="◀", tooltip="Función anterior",
-        layout=widgets.Layout(width="34px", height="32px"),
+        layout=widgets.Layout(
+            width="34px", min_width="34px", max_width="34px", height="32px",
+            margin="0", flex="0 0 34px",
+        ),
     )
     function_readout = widgets.HTMLMath(
         layout=widgets.Layout(
-            width="120px", height="32px",
-            border="1px solid var(--jp-border-color2, #bdbdbd)",
+            width="120px", min_width="120px", max_width="120px", height="32px",
+            margin="0", flex="0 0 120px",
+            border_top="1px solid var(--jp-border-color2, #bdbdbd)",
+            border_right="1px solid var(--jp-border-color2, #bdbdbd)",
+            border_bottom="1px solid var(--jp-border-color2, #bdbdbd)",
+            border_left="1px solid var(--jp-border-color2, #bdbdbd)",
             display="flex", align_items="center", justify_content="center",
         ),
     )
     function_readout.add_class("recursion-function-readout")
     function_following = widgets.Button(
         description="▶", tooltip="Función siguiente",
-        layout=widgets.Layout(width="34px", height="32px"),
+        layout=widgets.Layout(
+            width="34px", min_width="34px", max_width="34px", height="32px",
+            margin="0", flex="0 0 34px",
+        ),
     )
     function_selector = widgets.HBox(
         [function_previous, function_readout, function_following],
-        layout=widgets.Layout(width="188px", align_items="center", gap="0px"),
+        layout=widgets.Layout(width="188px", align_items="center", grid_gap="0px"),
     )
     function_selector.add_class("recursion-function-selector")
     function_selector.add_class("recursion-stepper")
@@ -763,20 +779,30 @@ def run_app(builder_only=False):
     def parameter_stepper(name, minimum, maximum):
         previous = widgets.Button(
             description="◀", tooltip="Valor anterior",
-            layout=widgets.Layout(width="34px", height="32px"),
+            layout=widgets.Layout(
+                width="34px", min_width="34px", max_width="34px", height="32px",
+                margin="0", flex="0 0 34px",
+            ),
         )
         readout = widgets.HTMLMath(
             value=rf"\({parameter_state[name]}\)",
             layout=widgets.Layout(
-                width="120px", height="32px",
-                border="1px solid var(--jp-border-color2, #bdbdbd)",
+                width="120px", min_width="120px", max_width="120px", height="32px",
+                margin="0", flex="0 0 120px",
+                border_top="1px solid var(--jp-border-color2, #bdbdbd)",
+                border_right="1px solid var(--jp-border-color2, #bdbdbd)",
+                border_bottom="1px solid var(--jp-border-color2, #bdbdbd)",
+                border_left="1px solid var(--jp-border-color2, #bdbdbd)",
                 display="flex", align_items="center", justify_content="center",
             ),
         )
         readout.add_class("recursion-parameter-readout")
         following = widgets.Button(
             description="▶", tooltip="Valor siguiente",
-            layout=widgets.Layout(width="34px", height="32px"),
+            layout=widgets.Layout(
+                width="34px", min_width="34px", max_width="34px", height="32px",
+                margin="0", flex="0 0 34px",
+            ),
         )
         parameter_readouts[name] = readout
 
@@ -796,7 +822,7 @@ def run_app(builder_only=False):
         following.on_click(change(1))
         stepper = widgets.HBox(
             [previous, readout, following],
-            layout=widgets.Layout(width="188px", align_items="center", gap="0px"),
+            layout=widgets.Layout(width="188px", align_items="center", grid_gap="0px"),
         )
         stepper.add_class("recursion-stepper")
         return stepper
@@ -844,6 +870,7 @@ def run_app(builder_only=False):
         term_b_input.value = ", ".join(f"{value:g}" for value in next_b)
 
     def labeled(label, control, label_width=52, row_width=252):
+        control.layout.margin = "0"
         label_widget = widgets.HTMLMath(
             value=label,
             layout=widgets.Layout(
@@ -851,6 +878,7 @@ def run_app(builder_only=False):
                 min_width=f"{label_width}px",
                 max_width=f"{label_width}px",
                 flex=f"0 0 {label_width}px",
+                margin="0",
             ),
         )
         label_widget.add_class("recursion-control-label")
@@ -864,7 +892,8 @@ def run_app(builder_only=False):
                 min_width=f"{row_width}px",
                 max_width=f"{row_width}px",
                 align_items="center",
-                gap="8px",
+                grid_gap=f"{STANDARD_LABEL_CONTROL_GAP}px",
+                overflow="hidden",
             ),
         )
         row.add_class("recursion-labeled-control")
@@ -950,7 +979,7 @@ def run_app(builder_only=False):
             logarithmic_base_control,
             term_validation,
         ],
-        layout=widgets.Layout(width="256px", gap="12px"),
+        layout=widgets.Layout(width="256px", grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px"),
     )
     parameter_controls.add_class("recursion-parameter-controls")
     parameters_section = control_section("Parámetros", [parameter_controls])
@@ -983,7 +1012,7 @@ def run_app(builder_only=False):
         layout=widgets.Layout(
             width="auto", display="flex", flex_flow="row wrap",
             align_items="flex-start", justify_content="flex-start",
-            gap="12px 36px",
+            grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px {STANDARD_CONTROL_COLUMN_GAP}px",
         ),
     )
     controls.add_class("recursion-tree-controls")
@@ -1077,7 +1106,7 @@ def run_app(builder_only=False):
         [builder_resolve, builder_reset],
         layout=widgets.Layout(
             width="100%", flex_flow="row wrap", align_items="center",
-            justify_content="flex-end", gap="0px",
+            justify_content="flex-end", grid_gap="0px",
         ),
     )
     builder_actions.add_class("recursion-playback")
@@ -1087,13 +1116,13 @@ def run_app(builder_only=False):
         layout=widgets.Layout(width="100%"),
     )
     configuration_content = widgets.VBox(
-        [controls], layout=widgets.Layout(width="100%", gap="0")
+        [controls], layout=widgets.Layout(width="100%", grid_gap="0")
     )
     configuration_content.add_class("recursion-builder-panel-content")
     configuration_content.add_class("recursion-tree-panel-content")
     configuration_panel = widgets.VBox(
         [configuration_header, configuration_content],
-        layout=widgets.Layout(width="100%", gap="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0"),
     )
     configuration_panel.add_class("recursion-builder-panel")
     configuration_panel.add_class("recursion-tree-widget-panel")
@@ -1119,7 +1148,7 @@ def run_app(builder_only=False):
         [previous_level, next_level, play, pause, reset],
         layout=widgets.Layout(
             width="100%", flex_flow="row wrap", align_items="center",
-            justify_content="flex-end", gap="0px",
+            justify_content="flex-end", grid_gap="0px",
         ),
     )
     playback.add_class("recursion-playback")
@@ -1170,12 +1199,12 @@ def run_app(builder_only=False):
     )
     tree_panel_content = widgets.VBox(
         [plot_container, note] if not builder_only else [],
-        layout=widgets.Layout(width="100%", gap="0px"),
+        layout=widgets.Layout(width="100%", grid_gap="0px"),
     )
     tree_panel_content.add_class("recursion-tree-panel-content")
     tree_panel = widgets.VBox(
         [tree_panel_header, tree_panel_content],
-        layout=widgets.Layout(width="100%", gap="0px"),
+        layout=widgets.Layout(width="100%", grid_gap="0px"),
     )
     tree_panel.add_class("recursion-panel-output")
     tree_panel.add_class("recursion-tree-widget-panel")
@@ -1186,24 +1215,26 @@ def run_app(builder_only=False):
     )
     panels = widgets.VBox(
         panel_children,
-        layout=widgets.Layout(width="100%", gap="0px"),
+        layout=widgets.Layout(width="100%", grid_gap="0px"),
     )
     panels.add_class("recursion-info-sections")
     styles = widgets.HTML(
         """
         <style>
           @import url('https://fonts.googleapis.com/css2?family=STIX+Two+Math&display=swap');
-          .recursion-tree-root{box-sizing:border-box;width:100%;padding:14px 4px;
-            background:#fff;color:#333;font-family:sans-serif}
+          .recursion-tree-root{box-sizing:border-box;width:100%;max-width:100%;min-width:0;
+            padding:14px 4px;background:#fff;color:#333;font-family:sans-serif;
+            overflow-x:hidden!important;overflow-y:visible!important}
           .recursion-tree-root>.widget-box,.recursion-tree-root .widget-html-content,
           .recursion-tree-root .widget-htmlmath-content{background:#fff;color:#333}
-          .recursion-tree-controls{box-sizing:border-box!important;display:flex!important;width:auto!important;
+          .recursion-tree-controls{box-sizing:border-box!important;display:flex!important;width:100%!important;
+            max-width:100%!important;min-width:0!important;
             flex-flow:row wrap!important;
             column-gap:36px!important;row-gap:12px!important;
             justify-content:start!important;align-items:start!important;margin-bottom:12px;
-            overflow:visible!important}
+            overflow-x:hidden!important;overflow-y:visible!important}
           .recursion-control-section{box-sizing:border-box!important;display:flex;gap:12px;
-            width:auto!important;overflow:visible!important}
+            width:auto!important;max-width:100%!important;min-width:0!important;overflow-x:hidden!important}
           .recursion-control-title{margin-bottom:0;font-family:sans-serif;font-size:13px;font-weight:700;color:#333;line-height:1.1}
           .recursion-control-section .widget-hbox{min-height:32px}
           .recursion-labeled-control{box-sizing:border-box!important;
@@ -1211,10 +1242,14 @@ def run_app(builder_only=False):
           .recursion-control-label{box-sizing:border-box!important;flex-shrink:0!important;
             color:#333!important;font-family:sans-serif!important;font-size:13px!important;
             font-weight:700!important;line-height:1.1!important}
+          .recursion-control-label .widget-htmlmath-content{display:flex!important;
+            align-items:center!important;width:100%!important;height:32px!important;
+            color:#333!important;font-family:sans-serif!important;font-size:13px!important;
+            font-weight:700!important;line-height:1.1!important}
           .recursion-control-label mjx-container{font-size:100%!important;font-weight:700!important}
           .recursion-parameter-controls{
             box-sizing:border-box!important;width:256px!important;max-width:256px!important;
-            overflow:visible!important}
+            min-width:0!important;overflow-x:hidden!important;overflow-y:visible!important}
           .recursion-parameter-controls::-webkit-scrollbar,
           .recursion-parameter-controls *::-webkit-scrollbar{
             display:none!important;width:0!important;height:0!important}

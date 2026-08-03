@@ -9,13 +9,16 @@ import ipywidgets as widgets
 DEFAULT_DESCRIPTION_STYLE = {"description_width": "70px"}
 COMPACT_DESCRIPTION_STYLE = {"description_width": "0px"}
 COMPACT_LABEL_WIDTH = 96
-COMPACT_FIELD_WIDTH = 130
-COMPACT_GROUP_PADDING_RIGHT = 44
-COMPACT_GROUP_GAP = 2
-COMPACT_COLUMN_GAP = 42
+COMPACT_FIELD_WIDTH = 188
+COMPACT_GROUP_PADDING_RIGHT = 0
+COMPACT_GROUP_GAP = 8
+COMPACT_COLUMN_GAP = 36
 COMPACT_GROUP_WIDTH = COMPACT_LABEL_WIDTH + COMPACT_FIELD_WIDTH + COMPACT_GROUP_PADDING_RIGHT + COMPACT_GROUP_GAP
 STANDARD_FIELD_WIDTH = 188
 STANDARD_CONTROL_HEIGHT = 32
+STANDARD_LABEL_CONTROL_GAP = 8
+STANDARD_CONTROL_ROW_GAP = 12
+STANDARD_CONTROL_COLUMN_GAP = 36
 STANDARD_ACTION_HEIGHT = 38
 STANDARD_ACTION_GAP = 0
 STANDARD_ACTION_MARGIN_TOP = 16
@@ -44,7 +47,14 @@ def magnitude_stepper(
         value=str(value),
         description="",
         placeholder=accessible_name,
-        layout=widgets.Layout(width=f"{value_width}px", height="32px"),
+        layout=widgets.Layout(
+            width=f"{value_width}px",
+            min_width=f"{value_width}px",
+            max_width=f"{value_width}px",
+            height="32px",
+            margin="0",
+            flex=f"0 0 {value_width}px",
+        ),
     )
     text.add_class("constant-centered-input")
     button_layout = widgets.Layout(
@@ -67,7 +77,10 @@ def magnitude_stepper(
     )
     container = widgets.HBox(
         [previous, text, following],
-        layout=widgets.Layout(width=f"{width}px", align_items="center"),
+        layout=widgets.Layout(
+            width=f"{width}px", min_width=f"{width}px", max_width=f"{width}px",
+            align_items="center", grid_gap="0px", overflow="hidden",
+        ),
     )
     container.add_class(css_class)
     return MagnitudeStepper(container, text, previous, following)
@@ -126,17 +139,39 @@ def compact_labeled_control(
 ):
     if hasattr(control, "description"):
         control.description = ""
+    minimum_group_width = label_width + STANDARD_LABEL_CONTROL_GAP + field_width
+    resolved_group_width = max(group_width, minimum_group_width)
     control.layout.width = f"{field_width}px"
+    control.layout.min_width = f"{field_width}px"
+    control.layout.max_width = f"{field_width}px"
+    control.layout.flex = f"0 0 {field_width}px"
+    control.layout.margin = "0"
     label_widget = widgets.HTML(
         value=(
             '<span class="compact-control-label" style="font-family:sans-serif;'
             f'font-size:13px;font-weight:700;line-height:1.1;color:#333;">{escape(label)}</span>'
         ),
-        layout=widgets.Layout(width=f"{label_width}px"),
+        layout=widgets.Layout(
+            width=f"{label_width}px",
+            min_width=f"{label_width}px",
+            max_width=f"{label_width}px",
+            height=f"{STANDARD_CONTROL_HEIGHT}px",
+            flex=f"0 0 {label_width}px",
+            display="flex",
+            align_items="center",
+            margin="0",
+        ),
     )
+    label_widget.add_class("standard-control-label")
     return widgets.HBox(
         [label_widget, control],
-        layout=widgets.Layout(width=f"{group_width}px", align_items="center"),
+        layout=widgets.Layout(
+            width=f"{resolved_group_width}px",
+            min_width=f"{resolved_group_width}px",
+            align_items="center",
+            grid_gap=f"{STANDARD_LABEL_CONTROL_GAP}px",
+            overflow="hidden",
+        ),
     )
 
 
@@ -147,7 +182,7 @@ def action_button_row(buttons, *, justify_content="flex-end"):
         list(buttons),
         layout=widgets.Layout(
             width="100%",
-            gap=f"{STANDARD_ACTION_GAP}px",
+            grid_gap=f"{STANDARD_ACTION_GAP}px",
             margin=f"{STANDARD_ACTION_MARGIN_TOP}px 0 0 0",
             flex_flow="row wrap",
             justify_content=justify_content,
@@ -177,7 +212,7 @@ def collapsible_panel(title, content, *, prefix, open_by_default=True):
     header.on_click(toggle)
     panel = widgets.VBox(
         [header, content],
-        layout=widgets.Layout(width="100%", gap="0px"),
+        layout=widgets.Layout(width="100%", grid_gap="0px"),
     )
     panel.add_class(f"{prefix}-subpanel")
     return panel
@@ -190,7 +225,7 @@ def compact_controls_grid(groups, columns):
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap=f"12px {COMPACT_COLUMN_GAP}px",
+            grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px {STANDARD_CONTROL_COLUMN_GAP}px",
             align_items="center",
             overflow="visible",
         ),

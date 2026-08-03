@@ -19,8 +19,21 @@ def _local_module():
     for base in (Path.cwd(), *Path.cwd().parents):
         candidate = base / "capitulo6" / "recursive_analysis_lab.py"
         if candidate.exists():
+            project_root = str(base.resolve())
+            if project_root not in sys.path:
+                sys.path.insert(0, project_root)
             return candidate
     return None
+
+
+def _download_common_runtime(module_dir, repository_root):
+    common_dir = module_dir / "common"
+    common_dir.mkdir(parents=True, exist_ok=True)
+    urllib.request.urlretrieve(repository_root + "common/__init__.py", common_dir / "__init__.py")
+    urllib.request.urlretrieve(repository_root + "common/widget_controls.py", common_dir / "widget_controls.py")
+    runtime_root = str(module_dir.resolve())
+    if runtime_root not in sys.path:
+        sys.path.insert(0, runtime_root)
 
 
 def _load(path):
@@ -44,6 +57,11 @@ if module_path is None:
         "main/capitulo6/"
     )
     urllib.request.urlretrieve(base_url + "recursive_analysis_lab.py", module_path)
+    _download_common_runtime(
+        module_dir,
+        "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/"
+        "3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/",
+    )
 
 module = _load(module_path)
 module.run_app()

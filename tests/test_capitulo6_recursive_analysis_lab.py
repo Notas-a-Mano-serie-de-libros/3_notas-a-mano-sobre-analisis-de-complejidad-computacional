@@ -8,6 +8,15 @@ SOURCE = (
 ).read_text(encoding="utf-8")
 
 
+def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
+    bootstrap = (
+        Path(__file__).resolve().parents[1] / "capitulo6" / "colab_bootstrap.py"
+    ).read_text(encoding="utf-8")
+
+    assert "sys.path.insert(0, project_root)" in bootstrap
+    assert 'common/widget_controls.py' in bootstrap
+
+
 def test_recursive_lab_supports_requested_analysis_examples():
     from capitulo6.recursive_analysis_lab import ALGORITHMS
 

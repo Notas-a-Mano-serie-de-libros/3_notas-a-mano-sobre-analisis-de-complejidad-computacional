@@ -6,7 +6,16 @@ from html import escape
 from IPython.display import display
 import ipywidgets as widgets
 
-from common.widget_controls import COMPACT_GROUP_WIDTH, bounded_int_control, button_control, compact_labeled_control, dropdown_control
+from common.widget_controls import (
+    COMPACT_GROUP_WIDTH,
+    STANDARD_CONTROL_COLUMN_GAP,
+    STANDARD_CONTROL_ROW_GAP,
+    STANDARD_LABEL_CONTROL_GAP,
+    bounded_int_control,
+    button_control,
+    compact_labeled_control,
+    dropdown_control,
+)
 from sort_common import (
     build_sort_panel,
     colab_pause,
@@ -54,7 +63,7 @@ ALGORITHM_FIELD_PADDING_Y = 5
 ALGORITHM_FIELD_WIDTH = sum(ALGORITHM_COLUMN_WIDTHS) + (len(ALGORITHM_COLUMN_WIDTHS) - 1) * ALGORITHM_COLUMN_GAP + 2 * ALGORITHM_FIELD_PADDING_X + 2
 ALGORITHM_FIELD_HEIGHT = 2 * ALGORITHM_ROW_HEIGHT + ALGORITHM_ROW_GAP + 2 * ALGORITHM_FIELD_PADDING_Y + 2
 ALGORITHM_LABEL_WIDTH = 150
-ALGORITHM_GROUP_WIDTH = ALGORITHM_LABEL_WIDTH + ALGORITHM_FIELD_WIDTH + 2
+ALGORITHM_GROUP_WIDTH = ALGORITHM_LABEL_WIDTH + ALGORITHM_FIELD_WIDTH + STANDARD_LABEL_CONTROL_GAP
 ROW_HTML_CACHE_LIMIT = 512
 _ROW_HTML_CACHE = {}
 
@@ -564,7 +573,7 @@ def run_app():
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap=f"{ALGORITHM_ROW_GAP}px {ALGORITHM_COLUMN_GAP}px",
+            grid_gap=f"{ALGORITHM_ROW_GAP}px {ALGORITHM_COLUMN_GAP}px",
             align_items="center",
             overflow="visible",
         ),
@@ -574,13 +583,16 @@ def run_app():
         layout=widgets.Layout(
             width="auto",
             height="auto",
-            border="1px solid #767676",
+            border_top="1px solid #767676",
+            border_right="1px solid #767676",
+            border_bottom="1px solid #767676",
+            border_left="1px solid #767676",
             padding=f"{ALGORITHM_FIELD_PADDING_Y}px {ALGORITHM_FIELD_PADDING_X}px",
-            background_color="#ffffff",
             align_items="center",
             overflow="visible",
         ),
     )
+    algorithms_checks_frame.add_class("sort-algorithm-options-frame")
     algorithms_group = compact_labeled_control(
         "Algoritmos activos",
         algorithms_checks_frame,
@@ -588,7 +600,7 @@ def run_app():
         group_width=ALGORITHM_GROUP_WIDTH,
         label_width=ALGORITHM_LABEL_WIDTH,
     )
-    algorithms_group.layout.margin = "4px 0 0 0"
+    algorithms_group.layout.margin = "0"
     algorithms_group.layout.width = "auto"
     algorithms_group.layout.overflow = "visible"
     auto_button = button_control(description="Ordenar", button_style="success", width="150px")
@@ -599,7 +611,10 @@ def run_app():
     focus_group = compact_labeled_control("Enfoque", focus_dropdown)
     primary_controls = widgets.VBox(
         [size_group, order_group, focus_group],
-        layout=widgets.Layout(width=f"{COMPACT_GROUP_WIDTH}px", flex="0 0 auto", gap="18px"),
+        layout=widgets.Layout(
+            width=f"{COMPACT_GROUP_WIDTH}px", flex="0 0 auto",
+            grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px",
+        ),
     )
     style_output = widgets.HTML(
         value=render_comparison_styles(),
@@ -608,7 +623,7 @@ def run_app():
     body_output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0", padding="0"))
     html_output = widgets.VBox(
         [style_output, body_output],
-        layout=widgets.Layout(width="100%", gap="0", margin="0", padding="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0", margin="0", padding="0"),
     )
     control_state = {"updating": False}
     execution_state = {"running": False, "finish_requested": False, "run_id": 0}
@@ -751,7 +766,7 @@ def run_app():
                 [primary_controls, algorithms_group],
                 layout=widgets.Layout(
                     width="100%",
-                    gap="12px",
+                    grid_gap=f"{STANDARD_CONTROL_COLUMN_GAP}px",
                     align_items="flex-start",
                     justify_content="flex-start",
                     overflow="visible",
@@ -759,7 +774,7 @@ def run_app():
             ),
             sort_action_button_row([auto_button, finish_button, reset_button]),
         ],
-        layout=widgets.Layout(width="100%", gap="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0"),
     )
     layout = build_sort_panel(
         parameters,

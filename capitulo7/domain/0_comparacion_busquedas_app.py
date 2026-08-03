@@ -27,6 +27,8 @@ from search_common import (
 )
 from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
+    STANDARD_CONTROL_COLUMN_GAP,
+    STANDARD_CONTROL_ROW_GAP,
     action_button_row,
     bounded_int_control,
     button_control,
@@ -59,7 +61,7 @@ button.comparison-subpanel-title{height:44px!important;min-height:44px!important
 .comparison-result-content::-webkit-scrollbar,
 .comparison-result-content *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 .comparison-simulation-root .widget-label,.comparison-simulation-root label,.comparison-simulation-root .widget-readout,.comparison-simulation-root .widget-checkbox,.comparison-simulation-root .widget-checkbox .widget-label{color:#333!important}
-.comparison-simulation-root .widget-label,.comparison-simulation-root label,.comparison-simulation-root .widget-checkbox .widget-label{font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;line-height:1.1!important}
+.comparison-simulation-root .widget-label,.comparison-simulation-root label,.comparison-simulation-root .widget-checkbox .widget-label,.comparison-simulation-root .compact-control-label{font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;line-height:1.1!important}
 .comparison-simulation-root select,.comparison-simulation-root input{box-sizing:border-box!important;width:188px!important;height:32px!important;min-height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background:#fff!important;color:#333!important;font-size:13px!important;text-align:center!important}
 .comparison-simulation-root .widget-dropdown{width:188px!important;height:32px!important;min-height:32px!important;color-scheme:light!important}
 .comparison-simulation-root .widget-dropdown select{width:188px!important;height:32px!important;min-height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background-color:#fff!important;color:#333!important;color-scheme:light!important;font-size:13px!important;text-align:center!important;appearance:auto!important;-webkit-appearance:menulist!important}
@@ -762,7 +764,7 @@ def run_app():
     )
     html_output = widgets.VBox(
         [style_output, body_output],
-        layout=widgets.Layout(width="100%", gap="0", margin="0", padding="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0", margin="0", padding="0"),
     )
     control_state = {"updating": False}
     execution_state = {"running": False, "finish_requested": False, "run_id": 0}
@@ -934,7 +936,7 @@ def run_app():
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap="12px 36px",
+            grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px {STANDARD_CONTROL_COLUMN_GAP}px",
             align_items="center",
             justify_content="flex-start",
             overflow="visible",
@@ -963,7 +965,7 @@ def run_app():
             panel("Configuración", parameters_content),
             panel("Resultado", html_output),
         ],
-        layout=widgets.Layout(width="100%", gap="0"),
+        layout=widgets.Layout(width="100%", grid_gap="0"),
     )
     panel_content.add_class("comparison-panel-content")
     css_widget = widgets.HTML(
@@ -975,7 +977,7 @@ def run_app():
         layout=widgets.Layout(
             width="100%",
             max_width="100%",
-            gap="0",
+            grid_gap="0",
             overflow="hidden",
         ),
     )

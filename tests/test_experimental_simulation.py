@@ -1,3 +1,6 @@
+import ast
+from pathlib import Path
+
 import numpy as np
 
 from common.experimental_simulation import (
@@ -8,7 +11,13 @@ from common.experimental_simulation import (
     previous_order_of_magnitude,
 )
 from common.widget_controls import magnitude_stepper
-from common.widget_controls import compact_labeled_control
+from common.widget_controls import (
+    STANDARD_CONTROL_COLUMN_GAP,
+    STANDARD_CONTROL_ROW_GAP,
+    STANDARD_FIELD_WIDTH,
+    STANDARD_LABEL_CONTROL_GAP,
+    compact_labeled_control,
+)
 import ipywidgets as widgets
 
 
@@ -52,6 +61,11 @@ def test_control_visual_tiene_medidas_uniformes_y_etiquetas_accesibles():
 
     assert control.container.layout.width == "188px"
     assert control.value.layout.width == "120px"
+    assert control.value.layout.min_width == control.value.layout.max_width == "120px"
+    assert control.value.layout.margin == "0"
+    assert control.value.layout.flex == "0 0 120px"
+    assert control.container.layout.grid_gap == "0px"
+    assert control.container.layout.overflow == "hidden"
     assert control.previous.layout.width == control.following.layout.width == "34px"
     assert control.previous.layout.margin == control.following.layout.margin == "0"
     assert control.previous.layout.flex == control.following.layout.flex == "0 0 34px"
@@ -72,3 +86,90 @@ def test_etiqueta_compartida_sigue_tipografia_del_capitulo_tres():
     assert "font-weight:700" in label_html
     assert "line-height:1.1" in label_html
     assert "color:#333" in label_html
+    assert "standard-control-label" in group.children[0]._dom_classes
+    assert group.children[0].layout.height == "32px"
+    assert group.children[0].layout.display == "flex"
+    assert group.children[0].layout.align_items == "center"
+    assert group.children[0].layout.margin == "0"
+    assert group.children[1].layout.margin == "0"
+    assert group.layout.overflow == "hidden"
+
+
+def test_contrato_compartido_impide_que_labels_compriman_campos():
+    field = widgets.Text()
+    group = compact_labeled_control(
+        "Algoritmos activos",
+        field,
+        field_width=520,
+        group_width=100,
+        label_width=150,
+    )
+
+    assert STANDARD_FIELD_WIDTH == 188
+    assert STANDARD_LABEL_CONTROL_GAP == 8
+    assert STANDARD_CONTROL_ROW_GAP == 12
+    assert STANDARD_CONTROL_COLUMN_GAP == 36
+    assert group.layout.grid_gap == "8px"
+    assert group.layout.width == "678px"
+    assert group.layout.min_width == "678px"
+    assert group.children[0].layout.flex == "0 0 150px"
+    assert field.layout.flex == "0 0 520px"
+    assert field.layout.min_width == field.layout.max_width == "520px"
+
+
+def test_todos_los_layouts_usan_propiedades_admitidas_por_ipywidgets():
+    project_root = Path(__file__).resolve().parents[1]
+    valid_properties = set(widgets.Layout.class_traits())
+    invalid = []
+
+    for directory in ("common", *[f"capitulo{number}" for number in range(2, 9)]):
+        for path in (project_root / directory).rglob("*.py"):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not (
+                    isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Attribute)
+                    and node.func.attr == "Layout"
+                ):
+                    continue
+                invalid.extend(
+                    f"{path.relative_to(project_root)}:{node.lineno}:{keyword.arg}"
+                    for keyword in node.keywords
+                    if keyword.arg and keyword.arg not in valid_properties
+                )
+
+    assert invalid == []
+
+
+def test_capitulos_aplican_el_estilo_canonico_al_label_efectivo():
+    project_root = Path(__file__).resolve().parents[1]
+    compact_label_sources = (
+        "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py",
+        "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py",
+        "capitulo4/experiment_ui.py",
+        "capitulo7/domain/search_common.py",
+        "capitulo7/domain/0_comparacion_busquedas_app.py",
+        "capitulo8/domain/sort_common.py",
+    )
+    for relative_path in compact_label_sources:
+        source = (project_root / relative_path).read_text(encoding="utf-8")
+        assert ".compact-control-label" in source, relative_path
+
+    recursion_source = (project_root / "capitulo5/recursion_tree_animation.py").read_text(encoding="utf-8")
+    lab_source = (project_root / "capitulo6/recursive_analysis_lab.py").read_text(encoding="utf-8")
+    for source in (recursion_source, lab_source):
+        assert "font-family:sans-serif!important" in source
+        assert "font-size:13px!important" in source
+        assert "font-weight:700!important" in source
+        assert "line-height:1.1!important" in source
+
+
+def test_configuraciones_recursivas_no_generan_scroll_horizontal():
+    project_root = Path(__file__).resolve().parents[1]
+    recursion_source = (project_root / "capitulo5/recursion_tree_animation.py").read_text(encoding="utf-8")
+    lab_source = (project_root / "capitulo6/recursive_analysis_lab.py").read_text(encoding="utf-8")
+
+    assert ".recursion-tree-controls" in recursion_source
+    assert "overflow-x:hidden!important" in recursion_source
+    assert ".lab-parameter-controls" in lab_source
+    assert "overflow-x:hidden!important" in lab_source

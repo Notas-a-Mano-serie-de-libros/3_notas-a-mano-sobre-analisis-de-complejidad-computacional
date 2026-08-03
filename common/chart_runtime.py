@@ -218,7 +218,7 @@ def create_algorithm_controls(configs, *, checkbox_width, grid_template_columns)
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap="2px 10px",
+            grid_gap="2px 10px",
             overflow="visible",
         ),
     )

@@ -241,7 +241,7 @@ def build_examples_panel():
         layout=UI.widgets.Layout(height="0", min_height="0", overflow="hidden"),
     )
     return UI.widgets.VBox(
-        [wide_controls_style, body], layout=UI.widgets.Layout(width="100%", gap="0"),
+        [wide_controls_style, body], layout=UI.widgets.Layout(width="100%", grid_gap="0"),
     )
 
 
