@@ -419,7 +419,10 @@ def _build_search_css() -> str:
   .search-simulation-root label,
   .search-simulation-root .widget-label,
   .search-simulation-root .widget-checkbox .widget-label {{
+    font-family: sans-serif !important;
+    font-size: 13px !important;
     font-weight: 700 !important;
+    line-height: 1.1 !important;
   }}
   .search-simulation-root select,
   .search-simulation-root input {{

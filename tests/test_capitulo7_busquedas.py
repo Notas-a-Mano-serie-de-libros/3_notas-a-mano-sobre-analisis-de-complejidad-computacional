@@ -74,6 +74,13 @@ class TestInterpolacionVisualDinamica(unittest.TestCase):
 
     def test_controles_y_puntos_de_referencia_conservan_el_formato(self):
         self.assertIn('class="stepper-field" id="iv-fn-field"', self.source)
+        self.assertIn("grid-template-columns:34px 184px 34px", self.source)
+        self.assertIn("gap:0;align-items:center", self.source)
+        self.assertIn("border:1px solid #ccc;border-radius:0", self.source)
+        self.assertIn(".stepper button{border-color:#ccc;border-radius:0", self.source)
+        self.assertIn(r"\boldsymbol{f(x)}", self.source)
+        self.assertIn(r"\boldsymbol{x_{\max}}", self.source)
+        self.assertIn(r"\boldsymbol{x_0}", self.source)
         self.assertIn('class="range-value" id="iv-v0"', self.source)
         self.assertIn("renderDynamicMath('iv-fn-field'", self.source)
         self.assertIn(r"\((x_0,y_0)\)", self.source)

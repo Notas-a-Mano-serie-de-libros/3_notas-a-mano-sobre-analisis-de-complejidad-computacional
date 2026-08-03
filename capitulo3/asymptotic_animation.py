@@ -70,20 +70,20 @@ _BIG_O_HTML = r"""
 #bo-wrap .ctrl.vertical{flex-direction:column;align-items:flex-start;gap:8px}
 #bo-wrap .ctrl.vertical.additional{min-height:72px}
 #bo-wrap .controls-grid .ctrl{margin-bottom:0}
-#bo-wrap .ctrl label{display:flex;align-items:center;gap:8px;font-weight:700;min-height:32px}
+#bo-wrap .ctrl label{display:flex;align-items:center;gap:8px;color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1;min-height:32px}
 #bo-wrap .ctrl .label-text{display:inline-flex;align-items:center;justify-content:center;width:48px;min-width:48px;text-align:center}
 #bo-wrap .mode-section{display:__MODE_SELECTOR_DISPLAY__}
 #bo-wrap .theta-c{display:none}
 #bo-wrap .row-title{font-weight:700;color:#333;line-height:1.1}
 #bo-wrap select,#bo-wrap input[type=number],#bo-wrap input[type=text]{width:112px;height:32px;box-sizing:border-box;padding:2px 4px;border:1px solid #ccc;border-radius:3px;font-size:13px;text-align:center}
-#bo-wrap .stepper{display:inline-grid;grid-template-columns:34px 112px 34px;gap:4px;align-items:center}
-#bo-wrap .stepper-field{display:flex;align-items:center;justify-content:center;width:112px;height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:3px;background:#fff;text-align:center;font-size:14px}
-#bo-wrap .function-stepper{grid-template-columns:34px 176px 34px}
-#bo-wrap .function-stepper .stepper-field{width:176px;white-space:nowrap}
+#bo-wrap .stepper{display:inline-grid;grid-template-columns:34px 120px 34px;gap:0;align-items:center}
+#bo-wrap .stepper-field{display:flex;align-items:center;justify-content:center;width:120px;height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:0;background:#fff;text-align:center;font-size:14px}
+#bo-wrap .function-stepper{grid-template-columns:34px 184px 34px}
+#bo-wrap .function-stepper .stepper-field{width:184px;white-space:nowrap}
 #bo-wrap .editable-field{outline:none;cursor:text;font-weight:400}
 #bo-wrap .editable-field:focus{border-color:#1976D2;box-shadow:0 0 0 1px #1976D2}
-#bo-wrap .stepper input{width:112px}
-#bo-wrap .stepper button{width:34px;height:32px;border:1px solid #ccc;border-radius:3px;background:#f7f7f7;color:#333;cursor:pointer;font-size:13px;line-height:1}
+#bo-wrap .stepper input{width:120px}
+#bo-wrap .stepper button{width:34px;height:32px;border:1px solid #ccc;border-radius:0;background:#f7f7f7;color:#333;cursor:pointer;font-size:13px;line-height:1;margin:0;padding:0}
 #bo-wrap .stepper button:hover{background:#eeeeee}
 #bo-wrap .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
 #bo-wrap .card{background:#f7f7f7;border:1px solid #e8e8e8;border-radius:4px;padding:10px 14px}
@@ -142,7 +142,7 @@ _BIG_O_HTML = r"""
   <div class="control-section mode-section">
     <div class="row-title">Notación:</div>
     <div class="ctrl vertical">
-      <label><span class="label-text">\(\mathcal{F}\)</span>
+      <label><span class="label-text">\(\boldsymbol{\mathcal{F}}\)</span>
         <select id="bo-mode" __MODE_SELECTOR_DISABLED__>
           <option value="big_o">Big-O</option>
           <option value="little_o">little-o</option>
@@ -151,7 +151,7 @@ _BIG_O_HTML = r"""
           <option value="theta">Theta</option>
         </select>
       </label>
-      <label><span class="label-text">\(\text{Escala}\)</span>
+      <label><span class="label-text">\(\boldsymbol{\text{Escala}}\)</span>
         <select id="bo-scale">
           <option value="linear" selected>Lineal</option>
           <option value="log">Logarítmica</option>
@@ -162,7 +162,7 @@ _BIG_O_HTML = r"""
   <div class="control-section">
     <div class="row-title">Funciones de referencia:</div>
     <div class="ctrl">
-    <label><span class="label-text">\(C(n)\)</span>
+    <label><span class="label-text">\(\boldsymbol{C(n)}\)</span>
       <span class="stepper function-stepper">
         <button type="button" id="bo-cfn-dec">◀</button>
         <span class="stepper-field" id="bo-cfn">—</span>
@@ -171,7 +171,7 @@ _BIG_O_HTML = r"""
     </label>
     </div>
     <div class="ctrl">
-    <label><span class="label-text">\(g(n)\)</span>
+    <label><span class="label-text">\(\boldsymbol{g(n)}\)</span>
       <span class="stepper function-stepper">
         <button type="button" id="bo-gfn-dec">◀</button>
         <span class="stepper-field" id="bo-gfn">—</span>
@@ -183,14 +183,14 @@ _BIG_O_HTML = r"""
   <div class="control-section">
     <div class="row-title">Intervalo:</div>
     <div class="ctrl vertical">
-    <label><span class="label-text">\(a\)</span>
+    <label><span class="label-text">\(\boldsymbol{a}\)</span>
       <span class="stepper">
         <button type="button" id="bo-a-dec">◀</button>
         <span class="stepper-field editable-field" id="bo-a" role="textbox" contenteditable="true" data-raw="0">\(0\)</span>
         <button type="button" id="bo-a-inc">▶</button>
       </span>
     </label>
-    <label><span class="label-text">\(b\)</span>
+    <label><span class="label-text">\(\boldsymbol{b}\)</span>
       <span class="stepper">
         <button type="button" id="bo-b-dec">◀</button>
         <span class="stepper-field editable-field" id="bo-b" role="textbox" contenteditable="true" data-raw="10**20">\(10^{20}\)</span>
@@ -202,10 +202,10 @@ _BIG_O_HTML = r"""
   <div class="control-section">
     <div class="row-title">Parámetros adicionales:</div>
     <div class="ctrl vertical additional">
-    <label class="single-c"><span class="label-text">\(c\)</span><input type="number" id="bo-c" min="0.1" max="1000" value="1" step="0.1"></label>
-    <label class="theta-c"><span class="label-text">\(c_1\)</span><input type="number" id="bo-c1" min="0.1" max="1000" value="0.1" step="0.1"></label>
-    <label class="theta-c"><span class="label-text">\(c_2\)</span><input type="number" id="bo-c2" min="0.1" max="1000" value="1.1" step="0.1"></label>
-    <label class="little-c"><span class="label-text">\(\varepsilon\)</span><input type="number" id="bo-epsilon" min="0.000001" max="1000" value="0.01" step="0.01"></label>
+    <label class="single-c"><span class="label-text">\(\boldsymbol{c}\)</span><input type="number" id="bo-c" min="0.1" max="1000" value="1" step="0.1"></label>
+    <label class="theta-c"><span class="label-text">\(\boldsymbol{c_1}\)</span><input type="number" id="bo-c1" min="0.1" max="1000" value="0.1" step="0.1"></label>
+    <label class="theta-c"><span class="label-text">\(\boldsymbol{c_2}\)</span><input type="number" id="bo-c2" min="0.1" max="1000" value="1.1" step="0.1"></label>
+    <label class="little-c"><span class="label-text">\(\boldsymbol{\varepsilon}\)</span><input type="number" id="bo-epsilon" min="0.000001" max="1000" value="0.01" step="0.01"></label>
     </div>
   </div>
   </div>

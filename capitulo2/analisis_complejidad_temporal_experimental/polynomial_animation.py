@@ -43,7 +43,7 @@ STEPPER_FIELD_WIDTH = 188
 STEPPER_LABEL_WIDTH = 150
 STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 8
 STEPPER_BUTTON_WIDTH = 34
-STEPPER_VALUE_WIDTH = 112
+STEPPER_VALUE_WIDTH = 120
 
 
 def scientific_latex(value):
@@ -312,10 +312,10 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
             flex: 0 0 188px !important;
           }
           .polynomial-stepper-value {
-            width: 112px !important;
-            min-width: 112px !important;
-            max-width: 112px !important;
-            flex: 0 0 112px !important;
+            width: 120px !important;
+            min-width: 120px !important;
+            max-width: 120px !important;
+            flex: 0 0 120px !important;
           }
           .constant-centered-math .widget-htmlmath-content,
           .constant-centered-math .widget-html-content {
@@ -450,7 +450,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
             max-width: 188px !important;
             flex: 0 0 188px !important;
             flex-wrap: nowrap !important;
-            gap: 4px !important;
+            gap: 0 !important;
             margin: 0 !important;
             padding: 0 !important;
             overflow: visible !important;
@@ -473,6 +473,13 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
             text-overflow: clip !important;
             font-size: 13px !important;
             line-height: 1 !important;
+            border: 1px solid #ccc !important;
+            border-radius: 0 !important;
+          }
+          .experimental-stepper .constant-centered-math,
+          .experimental-stepper .constant-centered-input input {
+            border: 1px solid #ccc !important;
+            border-radius: 0 !important;
           }
           .experimental-result-content iframe,
           .experimental-result-content img {

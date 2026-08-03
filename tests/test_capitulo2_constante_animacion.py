@@ -218,11 +218,10 @@ def test_controles_comparten_medidas_espaciado_y_flecha_del_resto_de_la_obra():
 
     assert "STEPPER_FIELD_WIDTH = 188" in source
     assert "STEPPER_BUTTON_WIDTH = 34" in source
-    assert "STEPPER_VALUE_WIDTH = 112" in source
-    assert "STEPPER_GAP = 4" in source
-    assert source.count("width: 112px !important") >= 2
-    assert "width: 120px !important" not in source
-    assert 34 + 4 + 112 + 4 + 34 == 188
+    assert "STEPPER_VALUE_WIDTH = 120" in source
+    assert "STEPPER_GAP = 0" in source
+    assert source.count("width: 120px !important") >= 2
+    assert 34 + 120 + 34 == 188
     assert "gap: 0 !important" in source
     assert "flex-flow: column nowrap !important" in source
     assert "column-gap: 0 !important" in source
@@ -697,7 +696,7 @@ def test_simulacion_polinomial_comparte_medidas_con_los_demas_paneles():
     assert "STEPPER_FIELD_WIDTH = 188" in source
     assert "STEPPER_LABEL_WIDTH = 150" in source
     assert "STEPPER_BUTTON_WIDTH = 34" in source
-    assert "STEPPER_VALUE_WIDTH = 112" in source
+    assert "STEPPER_VALUE_WIDTH = 120" in source
     assert 'flex_flow="column nowrap"' in source
     assert ".polynomial-full-value" in source
     assert ".polynomial-stepper-value" in source

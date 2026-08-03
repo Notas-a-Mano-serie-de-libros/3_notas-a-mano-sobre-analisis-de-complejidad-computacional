@@ -144,8 +144,13 @@ def test_term_count_stepper_visually_matches_parameter_text_width():
     assert 'term_count.add_class("recursion-term-count-control")' in SOURCE
     assert 'r"\\(\\boldsymbol{m}\\)", term_count, row_width=256' in SOURCE
     assert ".recursion-term-count-control{" in SOURCE
-    assert "width:192px!important" in SOURCE
-    assert "width:116px!important" in SOURCE
+    assert "width:188px!important" in SOURCE
+    assert "width:120px!important" in SOURCE
+    assert ".recursion-stepper{" in SOURCE
+    assert "gap:0!important" in SOURCE
+    assert "border-radius:0!important" in SOURCE
+    assert "font-family:sans-serif!important;font-size:13px!important" in SOURCE
+    assert "font-weight:700!important;line-height:1.1!important" in SOURCE
     assert 'term_a_input.add_class("recursion-term-value-control")' in SOURCE
     assert 'term_b_input.add_class("recursion-term-value-control")' in SOURCE
     assert ".recursion-tree-root .recursion-term-value-control{" in SOURCE

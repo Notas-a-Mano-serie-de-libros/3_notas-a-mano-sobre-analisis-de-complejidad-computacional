@@ -28,7 +28,7 @@ def magnitude_stepper(
     *,
     value,
     width=188,
-    value_width=112,
+    value_width=120,
     button_width=34,
     css_class="experimental-stepper",
     accessible_name="Valor",
@@ -121,7 +121,10 @@ def compact_labeled_control(
         control.description = ""
     control.layout.width = f"{field_width}px"
     label_widget = widgets.HTML(
-        value=f'<span style="font-weight:700;">{escape(label)}</span>',
+        value=(
+            '<span class="compact-control-label" style="font-family:sans-serif;'
+            f'font-size:13px;font-weight:700;line-height:1.1;color:#333;">{escape(label)}</span>'
+        ),
         layout=widgets.Layout(width=f"{label_width}px"),
     )
     return widgets.HBox(

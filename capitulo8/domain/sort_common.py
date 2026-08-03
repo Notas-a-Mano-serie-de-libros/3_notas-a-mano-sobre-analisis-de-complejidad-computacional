@@ -955,7 +955,10 @@ def sort_styles():
       .sort-simulation-root label,
       .sort-simulation-root .widget-label,
       .sort-simulation-root .widget-checkbox .widget-label {{
+        font-family: sans-serif !important;
+        font-size: 13px !important;
         font-weight: 700 !important;
+        line-height: 1.1 !important;
       }}
       .sort-simulation-root input {{
         border: 1px solid #cccccc !important;
@@ -1757,7 +1760,10 @@ def labeled_control(label, control, field_width, group_width=None):
     control.description = ""
     control.layout.width = f"{field_width}px"
     label_widget = widgets.HTML(
-        value=f'<span style="font-weight:700;">{escape(label)}</span>',
+        value=(
+            '<span class="compact-control-label" style="font-family:sans-serif;'
+            f'font-size:13px;font-weight:700;line-height:1.1;color:#333;">{escape(label)}</span>'
+        ),
         layout=widgets.Layout(width=f"{SORT_CONTROL_LABEL_WIDTH}px"),
     )
     return widgets.HBox(

@@ -42,7 +42,10 @@ except ImportError:
             control.description = ""
         control.layout.width = f"{field_width}px"
         label_widget = widgets.HTML(
-            value=f'<span style="font-weight:700;">{escape(label)}</span>',
+            value=(
+                '<span class="compact-control-label" style="font-family:sans-serif;'
+                f'font-size:13px;font-weight:700;line-height:1.1;color:#333;">{escape(label)}</span>'
+            ),
             layout=widgets.Layout(width=f"{label_width}px"),
         )
         return widgets.HBox(
@@ -66,8 +69,8 @@ STEPPER_FIELD_WIDTH = 188
 STEPPER_LABEL_WIDTH = 150
 STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 8
 STEPPER_BUTTON_WIDTH = 34
-STEPPER_VALUE_WIDTH = 112
-STEPPER_GAP = 4
+STEPPER_VALUE_WIDTH = 120
+STEPPER_GAP = 0
 DEFAULT_MAXIMUM_EXPONENT = 5
 DEFAULT_EXECUTIONS = 10
 STATUS_PENDING = "pending"
@@ -456,10 +459,11 @@ def run_app(
     button_row = widgets.HBox(
         [apply_button, reset_button],
         layout=widgets.Layout(
-            width="100%", gap="10px", margin="12px 0 0 0",
+            width="100%", gap="10px", margin="16px 0 0 0",
             flex_flow="row wrap", justify_content="flex-end", overflow="visible",
         ),
     )
+    button_row.add_class("experimental-action-row")
     warning_output = widgets.HTML()
     warning_output.layout = widgets.Layout(width="100%", max_width="100%", overflow="hidden")
     warning_output.add_class("experimental-warning-output")
@@ -650,7 +654,7 @@ def run_app(
 
     controls = widgets.VBox(
         [controls_row, button_row],
-        layout=widgets.Layout(width="100%", gap="10px"),
+        layout=widgets.Layout(width="100%", gap="0px"),
     )
     controls.add_class("experimental-controls")
 
@@ -697,9 +701,9 @@ def run_app(
           .constant-centered-input input {
             text-align: center !important;
             box-sizing: border-box !important;
-            width: 112px !important;
-            min-width: 112px !important;
-            max-width: 112px !important;
+            width: 120px !important;
+            min-width: 120px !important;
+            max-width: 120px !important;
             height: 32px !important;
             min-height: 32px !important;
             max-height: 32px !important;
@@ -708,9 +712,9 @@ def run_app(
           .constant-centered-input,
           .constant-centered-math {
             box-sizing: border-box !important;
-            width: 112px !important;
-            min-width: 112px !important;
-            max-width: 112px !important;
+            width: 120px !important;
+            min-width: 120px !important;
+            max-width: 120px !important;
             height: 32px !important;
             min-height: 32px !important;
             max-height: 32px !important;
@@ -763,7 +767,10 @@ def run_app(
           .constant-animation-root label,
           .constant-animation-root .widget-label,
           .constant-animation-root .widget-checkbox .widget-label {
+            font-family: sans-serif !important;
+            font-size: 13px !important;
             font-weight: 700 !important;
+            line-height: 1.1 !important;
           }
           .experimental-main-panel {
             box-sizing: border-box !important;
@@ -877,6 +884,30 @@ def run_app(
           .experimental-controls button:hover {
             background: #eee !important;
           }
+          .experimental-action-row {
+            box-sizing: border-box !important;
+            display: flex !important;
+            width: 100% !important;
+            gap: 10px !important;
+            margin: 16px 0 0 !important;
+            padding: 0 !important;
+            justify-content: flex-end !important;
+            overflow: visible !important;
+          }
+          .experimental-action-row > .widget-button {
+            box-sizing: border-box !important;
+            width: 150px !important;
+            min-width: 150px !important;
+            max-width: 150px !important;
+            min-height: 38px !important;
+            flex: 0 0 150px !important;
+            margin: 0 !important;
+            border: 1px solid #ccc !important;
+            border-radius: 3px !important;
+            background: #f7f7f7 !important;
+            color: #333 !important;
+            box-shadow: none !important;
+          }
           .experimental-stepper {
             box-sizing: border-box !important;
             display: flex !important;
@@ -885,7 +916,7 @@ def run_app(
             max-width: 188px !important;
             flex: 0 0 188px !important;
             flex-wrap: nowrap !important;
-            gap: 4px !important;
+            gap: 0 !important;
             margin: 0 !important;
             padding: 0 !important;
             overflow: visible !important;
@@ -905,6 +936,13 @@ def run_app(
             text-overflow: clip !important;
             font-size: 13px !important;
             line-height: 1 !important;
+            border: 1px solid #ccc !important;
+            border-radius: 0 !important;
+          }
+          .experimental-stepper .constant-centered-math,
+          .experimental-stepper .constant-centered-input input {
+            border: 1px solid #ccc !important;
+            border-radius: 0 !important;
           }
           .experimental-controls input {
             border: 1px solid #ccc !important;

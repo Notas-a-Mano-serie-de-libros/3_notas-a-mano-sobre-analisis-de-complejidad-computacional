@@ -33,6 +33,27 @@ def load_animation_module():
     return module
 
 
+def test_steppers_usan_el_contrato_visual_global():
+    html = load_animation_module()._BIG_O_HTML
+
+    assert ".stepper{display:inline-grid;grid-template-columns:34px 120px 34px;gap:0" in html
+    assert "width:120px;height:32px" in html
+    assert "border:1px solid #ccc;border-radius:0" in html
+    assert ".stepper button{width:34px;height:32px;border:1px solid #ccc;border-radius:0" in html
+    assert ".ctrl label{display:flex;align-items:center;gap:8px;color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1" in html
+    for label in (
+        r"\boldsymbol{\mathcal{F}}",
+        r"\boldsymbol{\text{Escala}}",
+        r"\boldsymbol{C(n)}",
+        r"\boldsymbol{g(n)}",
+        r"\boldsymbol{a}",
+        r"\boldsymbol{b}",
+        r"\boldsymbol{c}",
+        r"\boldsymbol{\varepsilon}",
+    ):
+        assert label in html
+
+
 def run_math_engine(mode: str, expression: str):
     if shutil.which("node") is None:
         pytest.skip("Node.js no está disponible para validar el motor JavaScript")
@@ -567,9 +588,9 @@ def test_solo_la_comparacion_permite_cambiar_la_notacion(monkeypatch):
     assert ".mode-section{display:grid}" in rendered[0]
     assert '<select id="' in rendered[0]
     assert '" >' in rendered[0]
-    assert '<span class="label-text">\\(\\mathcal{F}\\)</span>' in rendered[0]
-    assert rendered[0].index("\\(\\mathcal{F}\\)") < rendered[0].index(
-        "\\(\\text{Escala}\\)"
+    assert '<span class="label-text">\\(\\boldsymbol{\\mathcal{F}}\\)</span>' in rendered[0]
+    assert rendered[0].index("\\(\\boldsymbol{\\mathcal{F}}\\)") < rendered[0].index(
+        "\\(\\boldsymbol{\\text{Escala}}\\)"
     ) < rendered[0].index("Funciones de referencia:")
     assert "var MODE='big_o';" in rendered[0]
     assert "var MODE_SELECTABLE=false;" in rendered[1]

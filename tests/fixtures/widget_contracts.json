@@ -2,7 +2,7 @@
   "magnitude_stepper": {
     "button_width": "34px",
     "container_width": "188px",
-    "field_width": "112px",
+    "field_width": "120px",
     "following_tooltip": "Aumentar puntos de muestreo un orden de magnitud",
     "placeholder": "Puntos de muestreo",
     "previous_tooltip": "Disminuir puntos de muestreo un orden de magnitud"

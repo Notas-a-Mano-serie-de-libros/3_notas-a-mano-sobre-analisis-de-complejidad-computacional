@@ -215,7 +215,7 @@ def run_interpolation_visual():
 #iv-wrap .function-label{left:68px;top:12px;transform:none;color:#1565C0}
 #iv-wrap .ctrl{display:flex;column-gap:20px;row-gap:12px;flex-wrap:wrap;margin:0 0 14px;
   align-items:center;font-size:13px;color:#333}
-#iv-wrap .ctrl label{display:flex;align-items:center;gap:8px;font-weight:700;min-height:32px}
+#iv-wrap .ctrl label{display:flex;align-items:center;gap:8px;color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1;min-height:32px}
 #iv-wrap .label-text{display:inline-flex;align-items:center;justify-content:center;
   width:52px;min-width:52px;text-align:center}
 #iv-wrap select,#iv-wrap input[type=number]{width:112px;height:32px;box-sizing:border-box;
@@ -223,14 +223,15 @@ def run_interpolation_visual():
   color:#333;font-size:13px;text-align:center}
 #iv-wrap input[type=number]:focus,#iv-wrap select:focus{outline:none;border-color:#1976D2;
   box-shadow:0 0 0 1px #1976D2}
-#iv-wrap .stepper{display:inline-grid;grid-template-columns:34px 176px 34px;
-  gap:4px;align-items:center}
-#iv-wrap .stepper-field{display:flex;align-items:center;justify-content:center;width:176px;
-  height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:3px;
+#iv-wrap .stepper{display:inline-grid;grid-template-columns:34px 184px 34px;
+  gap:0;align-items:center}
+#iv-wrap .stepper-field{display:flex;align-items:center;justify-content:center;width:184px;
+  height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:0;
   background:#fff;text-align:center;font-size:14px;font-weight:400;white-space:nowrap}
 #iv-wrap button{width:34px;height:32px;border:1px solid #ccc;border-radius:3px;
   background:#f7f7f7;color:#333;cursor:pointer;font-size:13px;line-height:1}
 #iv-wrap button:hover{background:#eee}
+#iv-wrap .stepper button{border-color:#ccc;border-radius:0;margin:0;padding:0}
 #iv-wrap button.active{background:#e3f2fd;border-color:#1976D2;color:#0D47A1}
 #iv-wrap button:focus-visible{outline:2px solid #1976D2;outline-offset:1px}
 #iv-wrap .range-field{display:grid;grid-template-columns:52px 132px 54px;gap:8px;
@@ -240,7 +241,7 @@ def run_interpolation_visual():
   height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:3px;
   background:#fff;font-weight:400}
 #iv-wrap .ctrl .sep{width:1px;height:32px;background:#ddd;margin:0 2px}
-#iv-wrap .action-buttons{display:flex;gap:8px;margin-left:auto}
+#iv-wrap .action-buttons{display:flex;gap:10px;margin-left:auto;padding-left:16px}
 #iv-wrap .action-buttons button{width:auto;min-width:92px;padding:0 10px}
 #iv-wrap .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   gap:10px;margin-top:12px}
@@ -260,7 +261,7 @@ def run_interpolation_visual():
    <div class="iv-subpanel-title">Parámetros:</div>
    <div class="iv-panel-content">
     <div class="ctrl">
-    <label><span class="label-text">\(f(x)\)</span>
+    <label><span class="label-text">\(\boldsymbol{f(x)}\)</span>
       <span class="stepper">
         <button type="button" id="iv-fn-dec" aria-label="Función anterior">◀</button>
         <span class="stepper-field" id="iv-fn-field">\(0.8x+1\)</span>
@@ -273,7 +274,7 @@ def run_interpolation_visual():
         <option value="sqrt">3·√x</option>
       </select>
     </label>
-    <label><span class="label-text">\(x_{\max}\)</span>
+    <label><span class="label-text">\(\boldsymbol{x_{\max}}\)</span>
       <input type="number" id="iv-n" min="2" max="200" value="10" step="1">
     </label>
     <div class="action-buttons">
@@ -282,15 +283,15 @@ def run_interpolation_visual():
     </div>
     </div>
     <div class="ctrl">
-    <label class="range-field"><span class="label-text">\(x_0\)</span>
+    <label class="range-field"><span class="label-text">\(\boldsymbol{x_0}\)</span>
       <input type="range" id="iv-s0" min="0" max="75" value="15" step="1">
       <span class="range-value" id="iv-v0">\(1.5\)</span></label>
     <div class="sep"></div>
-    <label class="range-field"><span class="label-text">\(x\)</span>
+    <label class="range-field"><span class="label-text">\(\boldsymbol{x}\)</span>
       <input type="range" id="iv-sx" min="15" max="85" value="50" step="1">
       <span class="range-value" id="iv-vx">\(5.0\)</span></label>
     <div class="sep"></div>
-    <label class="range-field"><span class="label-text">\(x_1\)</span>
+    <label class="range-field"><span class="label-text">\(\boldsymbol{x_1}\)</span>
       <input type="range" id="iv-s1" min="25" max="100" value="85" step="1">
       <span class="range-value" id="iv-v1">\(8.5\)</span></label>
     </div>

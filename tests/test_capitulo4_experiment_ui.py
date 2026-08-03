@@ -15,16 +15,19 @@ C2_UI_SOURCE = (
 def test_interfaz_comparte_paneles_y_medidas_del_capitulo_dos():
     assert "STEPPER_FIELD_WIDTH = 188" in UI_SOURCE
     assert "STEPPER_BUTTON_WIDTH = 34" in UI_SOURCE
-    assert "STEPPER_VALUE_WIDTH = 112" in UI_SOURCE
-    assert "STEPPER_GAP = 4" in UI_SOURCE
+    assert "STEPPER_VALUE_WIDTH = 120" in UI_SOURCE
+    assert "STEPPER_GAP = 0" in UI_SOURCE
     assert "margin: 0 !important" in UI_SOURCE
-    assert "gap: 4px !important" in UI_SOURCE
+    assert "gap: 0 !important" in UI_SOURCE
     assert "font-size: 13px !important" in UI_SOURCE
-    assert UI_SOURCE.count("width: 112px !important") >= 2
-    assert "width: 120px !important" not in UI_SOURCE
-    assert 34 + 4 + 112 + 4 + 34 == 188
+    assert UI_SOURCE.count("width: 120px !important") >= 2
+    assert 34 + 120 + 34 == 188
     assert "flex: 0 0 188px !important" in UI_SOURCE
     assert ".experimental-stepper > *" in UI_SOURCE
+    assert ".experimental-stepper .constant-centered-math" in UI_SOURCE
+    assert ".experimental-stepper .constant-centered-input input" in UI_SOURCE
+    assert "border: 1px solid #ccc !important" in UI_SOURCE
+    assert "border-radius: 0 !important" in UI_SOURCE
     assert 'configuration_panel = subpanel("Configuración"' in UI_SOURCE
     assert 'result_panel = subpanel("Resultado"' in UI_SOURCE
     assert "experimental-subpanel-summary" in UI_SOURCE

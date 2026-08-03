@@ -8,6 +8,8 @@ from common.experimental_simulation import (
     previous_order_of_magnitude,
 )
 from common.widget_controls import magnitude_stepper
+from common.widget_controls import compact_labeled_control
+import ipywidgets as widgets
 
 
 def test_puntos_de_muestreo_predeterminados_son_mil():
@@ -49,7 +51,7 @@ def test_control_visual_tiene_medidas_uniformes_y_etiquetas_accesibles():
     control = magnitude_stepper(value=30, accessible_name="Puntos de muestreo")
 
     assert control.container.layout.width == "188px"
-    assert control.value.layout.width == "112px"
+    assert control.value.layout.width == "120px"
     assert control.previous.layout.width == control.following.layout.width == "34px"
     assert control.previous.layout.margin == control.following.layout.margin == "0"
     assert control.previous.layout.flex == control.following.layout.flex == "0 0 34px"
@@ -59,3 +61,14 @@ def test_control_visual_tiene_medidas_uniformes_y_etiquetas_accesibles():
     assert "Disminuir puntos de muestreo" in control.previous.tooltip
     assert "Aumentar puntos de muestreo" in control.following.tooltip
     assert control.value.placeholder == "Puntos de muestreo"
+
+
+def test_etiqueta_compartida_sigue_tipografia_del_capitulo_tres():
+    group = compact_labeled_control("Máximo n", widgets.Text())
+    label_html = group.children[0].value
+
+    assert "font-family:sans-serif" in label_html
+    assert "font-size:13px" in label_html
+    assert "font-weight:700" in label_html
+    assert "line-height:1.1" in label_html
+    assert "color:#333" in label_html

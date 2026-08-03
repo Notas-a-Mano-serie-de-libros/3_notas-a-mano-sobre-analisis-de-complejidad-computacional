@@ -482,7 +482,7 @@ STYLES = """
 .lab-configuration-panel{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin:0!important;border:1px solid #dedede!important;border-bottom:0!important;border-radius:5px 5px 0 0!important;background:#fff!important;overflow:hidden!important}
 .lab-configuration-summary{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-bottom:1px solid #e2e2e2!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;font-family:sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:24px!important;text-align:left!important}.lab-configuration-summary:hover{background:#f7f7f7!important}.lab-configuration-summary .fa{color:#333!important}
 .lab-controls{box-sizing:border-box!important;width:100%!important;padding:12px!important;border:0!important;background:#fff!important;margin:0!important}
-.lab-controls .widget-label{color:#333;font-weight:700}
+.lab-controls .widget-label{color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1}
 .lab-control-label{display:flex!important;align-items:center!important;justify-content:center!important;height:32px!important;min-height:32px!important;color:#333!important;font-size:13px!important;font-weight:700!important;text-align:center!important}.lab-control-label .widget-htmlmath-content{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;color:#333!important}.lab-control-label mjx-container,.lab-control-label mjx-container *{color:#333!important}
 .lab-controls select{box-sizing:border-box;width:176px!important;height:32px;padding:2px 4px;border:1px solid #ccc;border-radius:3px;background:#fff!important;color:#333;font-size:13px;text-align:center;text-align-last:center;appearance:auto!important}
 .lab-controls select option{background:#fff;color:#333}
@@ -496,7 +496,7 @@ STYLES = """
 .lab-controls button{box-sizing:border-box;width:auto!important;height:32px;border:1px solid #bbb;border-radius:3px;background:#fff;color:#333;font-size:14px}
 .lab-controls button:hover{background:#f1f1f1}
 .lab-controls input[type="range"]{accent-color:#5f6368}
-.lab-parameter-controls{width:100%!important;column-gap:36px!important;row-gap:12px!important}.lab-actions{box-sizing:border-box!important;width:100%!important;margin:0!important;padding-top:4px!important;justify-content:flex-end!important}
+.lab-parameter-controls{width:100%!important;column-gap:36px!important;row-gap:12px!important}.lab-actions{box-sizing:border-box!important;width:100%!important;margin:16px 0 0!important;padding:0!important;gap:10px!important;justify-content:flex-end!important}
 .lab-section{box-sizing:border-box;width:100%;margin:0;border:1px solid #dedede;border-bottom:0;border-radius:0;background:#fff;overflow:hidden}.lab-section:first-child{border-radius:5px 5px 0 0}.lab-section:last-child{border-bottom:1px solid #dedede;border-radius:0 0 5px 5px}
 .lab-section>summary{box-sizing:border-box;width:100%;padding:9px 12px;cursor:pointer;background:#f7f7f7;color:#333;font-size:16px;font-weight:700;line-height:1.45}.lab-section[open]>summary{border-bottom:1px solid #e2e2e2}.lab-section-content{box-sizing:border-box;width:100%;background:#fff}
 .lab-code-summary{position:relative;display:flex!important;height:44px!important;min-height:44px!important;max-height:44px!important;padding-left:32px!important;align-items:center;justify-content:space-between;overflow:hidden}.lab-code-summary::before{position:absolute;left:12px;top:50%;content:"▾";font-size:13px;line-height:1;transform:translateY(-50%)}.lab-code-panel:not([open])>.lab-code-summary::before{content:"▸"}.lab-language-logo{display:block;flex:0 0 26px;width:26px;height:26px;object-fit:contain}
@@ -746,7 +746,7 @@ def run_app():
     parameter_controls.add_class("lab-parameter-controls")
     action_controls = widgets.HBox(
         [previous, following, play, reset],
-        layout=widgets.Layout(gap="6px", justify_content="flex-end"),
+        layout=widgets.Layout(gap="10px", margin="16px 0 0 0", justify_content="flex-end"),
     )
     action_controls.add_class("lab-actions")
     controls = widgets.VBox(

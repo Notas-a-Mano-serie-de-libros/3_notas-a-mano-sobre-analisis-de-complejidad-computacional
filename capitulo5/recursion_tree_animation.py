@@ -704,26 +704,27 @@ def run_app(builder_only=False):
         layout=widgets.Layout(display="none"),
     )
     function_previous = widgets.Button(
-        description="", icon="caret-left", tooltip="Función anterior",
+        description="◀", tooltip="Función anterior",
         layout=widgets.Layout(width="34px", height="32px"),
     )
     function_readout = widgets.HTMLMath(
         layout=widgets.Layout(
-            width="110px", height="32px",
+            width="120px", height="32px",
             border="1px solid var(--jp-border-color2, #bdbdbd)",
             display="flex", align_items="center", justify_content="center",
         ),
     )
     function_readout.add_class("recursion-function-readout")
     function_following = widgets.Button(
-        description="", icon="caret-right", tooltip="Función siguiente",
+        description="▶", tooltip="Función siguiente",
         layout=widgets.Layout(width="34px", height="32px"),
     )
     function_selector = widgets.HBox(
         [function_previous, function_readout, function_following],
-        layout=widgets.Layout(width="188px", align_items="center", gap="4px"),
+        layout=widgets.Layout(width="188px", align_items="center"),
     )
     function_selector.add_class("recursion-function-selector")
+    function_selector.add_class("recursion-stepper")
 
     def select_function(delta):
         def handler(_):
@@ -761,20 +762,20 @@ def run_app(builder_only=False):
 
     def parameter_stepper(name, minimum, maximum):
         previous = widgets.Button(
-            description="", icon="caret-left", tooltip="Valor anterior",
+            description="◀", tooltip="Valor anterior",
             layout=widgets.Layout(width="34px", height="32px"),
         )
         readout = widgets.HTMLMath(
             value=rf"\({parameter_state[name]}\)",
             layout=widgets.Layout(
-                width="112px", height="32px",
+                width="120px", height="32px",
                 border="1px solid var(--jp-border-color2, #bdbdbd)",
                 display="flex", align_items="center", justify_content="center",
             ),
         )
         readout.add_class("recursion-parameter-readout")
         following = widgets.Button(
-            description="", icon="caret-right", tooltip="Valor siguiente",
+            description="▶", tooltip="Valor siguiente",
             layout=widgets.Layout(width="34px", height="32px"),
         )
         parameter_readouts[name] = readout
@@ -793,10 +794,12 @@ def run_app(builder_only=False):
 
         previous.on_click(change(-1))
         following.on_click(change(1))
-        return widgets.HBox(
+        stepper = widgets.HBox(
             [previous, readout, following],
-            layout=widgets.Layout(width="188px", align_items="center", gap="4px"),
+            layout=widgets.Layout(width="188px", align_items="center"),
         )
+        stepper.add_class("recursion-stepper")
+        return stepper
 
     depth = parameter_stepper("h", 1, 7)
     polynomial_degree = parameter_stepper("k", 1, 8)
@@ -1074,7 +1077,7 @@ def run_app(builder_only=False):
         [builder_resolve, builder_reset],
         layout=widgets.Layout(
             width="100%", flex_flow="row wrap", align_items="center",
-            justify_content="flex-end", gap="8px",
+            justify_content="flex-end", gap="10px",
         ),
     )
     builder_actions.add_class("recursion-playback")
@@ -1116,7 +1119,7 @@ def run_app(builder_only=False):
         [previous_level, next_level, play, pause, reset],
         layout=widgets.Layout(
             width="100%", flex_flow="row wrap", align_items="center",
-            justify_content="flex-end", gap="8px",
+            justify_content="flex-end", gap="10px",
         ),
     )
     playback.add_class("recursion-playback")
@@ -1201,11 +1204,13 @@ def run_app(builder_only=False):
             overflow:visible!important}
           .recursion-control-section{box-sizing:border-box!important;display:flex;gap:12px;
             width:auto!important;overflow:visible!important}
-          .recursion-control-title{margin-bottom:4px;font-weight:700;color:#333;line-height:1.1}
+          .recursion-control-title{margin-bottom:4px;font-family:sans-serif;font-size:13px;font-weight:700;color:#333;line-height:1.1}
           .recursion-control-section .widget-hbox{min-height:32px}
           .recursion-labeled-control{box-sizing:border-box!important;
             flex:none!important}
-          .recursion-control-label{box-sizing:border-box!important;flex-shrink:0!important}
+          .recursion-control-label{box-sizing:border-box!important;flex-shrink:0!important;
+            color:#333!important;font-family:sans-serif!important;font-size:13px!important;
+            font-weight:700!important;line-height:1.1!important}
           .recursion-parameter-controls{
             box-sizing:border-box!important;width:256px!important;max-width:256px!important;
             overflow:visible!important}
@@ -1221,30 +1226,31 @@ def run_app(builder_only=False):
             line-height:1!important;text-align:center!important}
           .recursion-control-section button:hover{background:#eee}
           .recursion-parameter-readout{
-            box-sizing:border-box!important;width:112px!important;height:32px!important;
+            box-sizing:border-box!important;width:120px!important;height:32px!important;
             min-height:32px!important;max-height:32px!important;display:flex!important;
             align-items:center!important;justify-content:center!important;padding:0!important}
           .recursion-term-count-control{
-            box-sizing:border-box!important;width:192px!important;
-            min-width:192px!important;max-width:192px!important;margin-left:2px!important}
+            box-sizing:border-box!important;width:188px!important;
+            min-width:188px!important;max-width:188px!important;margin-left:0!important}
           .recursion-parameter-value-control{
-            box-sizing:border-box!important;width:192px!important;
-            min-width:192px!important;max-width:192px!important;margin-left:2px!important}
+            box-sizing:border-box!important;width:188px!important;
+            min-width:188px!important;max-width:188px!important;margin-left:0!important}
           .recursion-term-count-control .recursion-parameter-readout,
           .recursion-parameter-value-control .recursion-parameter-readout{
-            width:116px!important;min-width:116px!important;max-width:116px!important}
+            width:120px!important;min-width:120px!important;max-width:120px!important}
           .recursion-tree-root .recursion-term-value-control{
-            box-sizing:border-box!important;width:192px!important;
-            min-width:192px!important;max-width:192px!important;margin-left:2px!important}
+            box-sizing:border-box!important;width:188px!important;
+            min-width:188px!important;max-width:188px!important;margin-left:0!important}
           .recursion-control-disabled{opacity:.5!important}
           .recursion-control-disabled .widget-button,
           .recursion-control-disabled .recursion-parameter-readout{
             cursor:not-allowed!important}
           .recursion-function-readout{
-            box-sizing:border-box!important;width:110px!important;height:32px!important;
+            box-sizing:border-box!important;width:120px!important;height:32px!important;
             min-height:32px!important;max-height:32px!important;display:flex!important;
             align-items:center!important;justify-content:center!important;padding:0!important;
-            background:#fff!important;color:#333!important;border-radius:3px!important}
+            background:#fff!important;color:#333!important;border:1px solid #ccc!important;
+            border-radius:0!important}
           .recursion-parameter-readout .widget-htmlmath-content,
           .recursion-parameter-readout .widget-html-content,
           .recursion-function-readout .widget-htmlmath-content,
@@ -1265,13 +1271,26 @@ def run_app(builder_only=False):
           .recursion-function-selector{
             box-sizing:border-box!important;display:flex!important;
             width:188px!important;min-width:188px!important;max-width:188px!important;
-            gap:4px!important;overflow:visible!important}
+            gap:0!important;overflow:visible!important}
           .recursion-function-selector .widget-button{
             box-sizing:border-box!important;flex:0 0 34px!important;
             width:34px!important;min-width:34px!important;max-width:34px!important}
           .recursion-function-selector .recursion-function-readout{
-            box-sizing:border-box!important;flex:0 0 110px!important;
-            width:110px!important;min-width:110px!important;max-width:110px!important}
+            box-sizing:border-box!important;flex:0 0 120px!important;
+            width:120px!important;min-width:120px!important;max-width:120px!important}
+          .recursion-stepper{
+            box-sizing:border-box!important;display:flex!important;width:188px!important;
+            min-width:188px!important;max-width:188px!important;flex:0 0 188px!important;
+            gap:0!important;margin:0!important;padding:0!important;overflow:visible!important}
+          .recursion-stepper>.widget-button{
+            box-sizing:border-box!important;width:34px!important;min-width:34px!important;
+            max-width:34px!important;flex:0 0 34px!important;margin:0!important;
+            padding:0!important;border:1px solid #ccc!important;border-radius:0!important;
+            font-size:13px!important;line-height:1!important}
+          .recursion-stepper .recursion-parameter-readout{
+            box-sizing:border-box!important;width:120px!important;min-width:120px!important;
+            max-width:120px!important;flex:0 0 120px!important;margin:0!important;
+            border:1px solid #ccc!important;border-radius:0!important}
           .recursion-tree-root .widget-text{
             box-sizing:border-box!important;width:188px!important;height:32px!important;
             min-width:0!important;overflow:visible!important}
@@ -1289,8 +1308,8 @@ def run_app(builder_only=False):
           .recursion-term-validation{box-sizing:border-box;width:100%;min-height:18px;
             overflow-wrap:anywhere;color:#b85450;font-size:12px;
             line-height:16px;padding-left:60px}
-          .recursion-playback{box-sizing:border-box;width:100%;min-height:40px;padding:4px 0;
-            margin:0 0 10px;border:0;border-radius:0;background:#fff;
+          .recursion-playback{box-sizing:border-box;width:100%;min-height:40px;padding:0;
+            margin:16px 0 0;border:0;border-radius:0;background:#fff;gap:10px!important;
             display:flex!important;flex-flow:row wrap!important;justify-content:flex-end!important;
             align-items:center!important;height:auto!important;overflow:visible!important}
           .recursion-playback button{box-sizing:border-box!important;flex:0 0 auto!important;

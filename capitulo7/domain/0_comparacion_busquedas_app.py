@@ -50,7 +50,7 @@ COMPARISON_PANEL_CSS = """
 .comparison-result-content::-webkit-scrollbar,
 .comparison-result-content *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 .comparison-simulation-root .widget-label,.comparison-simulation-root label,.comparison-simulation-root .widget-readout,.comparison-simulation-root .widget-checkbox,.comparison-simulation-root .widget-checkbox .widget-label{color:#333!important}
-.comparison-simulation-root .widget-label,.comparison-simulation-root label,.comparison-simulation-root .widget-checkbox .widget-label{font-weight:700!important}
+.comparison-simulation-root .widget-label,.comparison-simulation-root label,.comparison-simulation-root .widget-checkbox .widget-label{font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;line-height:1.1!important}
 .comparison-simulation-root select,.comparison-simulation-root input{background:#fff!important;color:#333!important}
 .comparison-simulation-root input{height:32px!important;min-height:32px!important}
 .comparison-simulation-root .widget-dropdown{width:140px!important;height:32px!important;min-height:32px!important;color-scheme:light!important}
