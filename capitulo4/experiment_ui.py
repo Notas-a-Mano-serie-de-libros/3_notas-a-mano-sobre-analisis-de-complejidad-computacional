@@ -51,11 +51,11 @@ except ImportError:
                 '<span class="compact-control-label" style="font-family:sans-serif;'
                 f'font-size:13px;font-weight:700;line-height:1.1;color:#333;">{escape(label)}</span>'
             ),
-            layout=widgets.Layout(width=f"{label_width}px"),
+            layout=widgets.Layout(width=f"{label_width}px", margin="0 8px 0 0"),
         )
         return widgets.HBox(
             [label_widget, control],
-            layout=widgets.Layout(width=f"{group_width}px", align_items="center", gap="2px"),
+            layout=widgets.Layout(width=f"{group_width}px", align_items="center"),
         )
 
     def action_button_row(buttons, *, justify_content="flex-end"):
@@ -459,7 +459,7 @@ def run_app(
             width="auto",
             display="flex",
             flex_flow="column nowrap",
-            column_gap="0px",
+            column_gap="36px",
             row_gap="12px",
             align_items="flex-start",
             overflow="visible",
@@ -872,7 +872,7 @@ def run_app(
             display: flex !important;
             width: auto !important;
             flex-flow: column nowrap !important;
-            column-gap: 0 !important;
+            column-gap: 36px !important;
             row-gap: 12px !important;
             overflow: visible !important;
           }

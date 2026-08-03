@@ -483,7 +483,7 @@ STYLES = """
 .lab-configuration-summary{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-bottom:1px solid #e2e2e2!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;font-family:sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:24px!important;text-align:left!important}.lab-configuration-summary:hover{background:#f7f7f7!important}.lab-configuration-summary .fa{color:#333!important}
 .lab-controls{box-sizing:border-box!important;width:100%!important;padding:12px!important;border:0!important;background:#fff!important;margin:0!important}
 .lab-controls .widget-label{color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1}
-.lab-control-label{display:flex!important;align-items:center!important;justify-content:center!important;height:32px!important;min-height:32px!important;color:#333!important;font-size:13px!important;font-weight:700!important;text-align:center!important}.lab-control-label .widget-htmlmath-content{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;color:#333!important}.lab-control-label mjx-container,.lab-control-label mjx-container *{color:#333!important}
+.lab-control-label{display:flex!important;align-items:center!important;justify-content:center!important;height:32px!important;min-height:32px!important;color:#333!important;font-family:sans-serif!important;font-size:13px!important;font-weight:700!important;line-height:1.1!important;text-align:center!important}.lab-control-label .widget-htmlmath-content{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;color:#333!important}.lab-control-label mjx-container,.lab-control-label mjx-container *{color:#333!important;font-size:100%!important;font-weight:700!important}
 .lab-controls select{box-sizing:border-box;width:188px!important;height:32px;padding:2px 4px;border:1px solid #ccc;border-radius:3px;background:#fff!important;color:#333;font-size:13px;text-align:center;text-align-last:center;appearance:auto!important}
 .lab-controls select option{background:#fff;color:#333}
 .lab-controls input:not([type="range"]){box-sizing:border-box;width:188px!important;height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background:#fff!important;color:#333!important;font-size:13px!important;text-align:center!important}
@@ -730,14 +730,14 @@ def run_app():
             labeled("Algoritmo", algorithm),
             labeled("Análisis", analysis_type),
         ],
-        layout=widgets.Layout(width="292px", gap="8px"),
+        layout=widgets.Layout(width="292px", gap="12px"),
     )
     input_controls = widgets.VBox(
         [
             labeled("Lenguaje", language),
             labeled("n", size),
         ],
-        layout=widgets.Layout(width="292px", gap="8px"),
+        layout=widgets.Layout(width="292px", gap="12px"),
     )
     parameter_controls = widgets.HBox(
         [analysis_controls, input_controls],

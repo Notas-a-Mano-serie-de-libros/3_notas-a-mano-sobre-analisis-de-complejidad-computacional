@@ -58,7 +58,7 @@ PHASE_RUNNING = "en ejecución"
 PHASE_DONE = "terminado"
 PHASE_INACTIVE = "inactiva"
 MAX_FORMULA_PROBE_STEPS = 512
-SEARCH_CONTROL_GRID_COLUMNS = "repeat(auto-fit, minmax(270px, 1fr))"
+SEARCH_CONTROL_GRID_COLUMNS = "repeat(auto-fit, minmax(318px, 1fr))"
 TARGET_ROLE = "target"
 TARGET_ROLE_STYLE = TARGET
 BASE_ROLE_STYLES = SEARCH_ROLE_STYLES
@@ -328,11 +328,10 @@ def search_labeled_control(label, control):
     group = compact_labeled_control(
         label,
         control,
-        field_width=140,
-        group_width=246,
+        field_width=188,
+        group_width=294,
         label_width=92,
     )
-    group.layout.gap = "10px"
     return group
 
 
@@ -385,7 +384,7 @@ def _build_search_css() -> str:
   }}
   .search-panel-content {{
     width: 100%;
-    padding: 12px;
+    padding: 0;
     background: #ffffff;
   }}
   .search-subpanel {{
@@ -411,7 +410,13 @@ def _build_search_css() -> str:
     background: #ffffff;
   }}
   .search-formula-content {{
-    padding: 12px !important;
+    box-sizing: border-box !important;
+    padding: 30px 12px 12px !important;
+  }}
+  .search-formula-content > .widget-html-content {{
+    box-sizing: border-box !important;
+    width: 100% !important;
+    padding: 0 !important;
   }}
   .search-result-content {{
     padding: 0 !important;
@@ -437,17 +442,26 @@ def _build_search_css() -> str:
   }}
   .search-simulation-root select,
   .search-simulation-root input {{
+    box-sizing: border-box !important;
+    width: 188px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 2px 4px !important;
+    border: 1px solid #cccccc !important;
+    border-radius: 3px !important;
     background: #ffffff !important;
     color: #333333 !important;
+    font-size: 13px !important;
+    text-align: center !important;
   }}
   .search-simulation-root .widget-dropdown {{
-    width: 140px !important;
+    width: 188px !important;
     height: 32px !important;
     min-height: 32px !important;
     color-scheme: light !important;
   }}
   .search-simulation-root .widget-dropdown select {{
-    width: 140px !important;
+    width: 188px !important;
     height: 32px !important;
     min-height: 32px !important;
     padding: 2px 4px !important;
@@ -907,7 +921,7 @@ def run_search_app(
         layout=widgets.Layout(
             width="100%",
             min_height="0px",
-            padding="30px 0 0 0",
+            padding="30px 12px 12px 12px",
             margin="0",
             overflow="visible",
         )
@@ -1111,7 +1125,7 @@ def run_search_app(
             width="auto",
             display="flex",
             flex_flow="row wrap",
-            gap="14px 28px",
+            gap="12px 36px",
             align_items="center",
             overflow="visible",
         ),
@@ -1136,25 +1150,17 @@ def run_search_app(
 
     panel_content = widgets.VBox(
         [
-            panel("Parámetros", parameters_content),
+            panel("Configuración", parameters_content),
             panel("Procedimiento", formula_output),
             panel("Resultado", html_output),
         ],
         layout=widgets.Layout(width="100%", gap="0"),
     )
     panel_content.add_class("search-panel-content")
-    main_panel = widgets.VBox(
-        [
-            widgets.HTML('<div class="search-panel-title">Simulación de búsqueda</div>'),
-            panel_content,
-        ],
-        layout=widgets.Layout(width="100%", gap="0"),
-    )
-    main_panel.add_class("search-main-panel")
     css_widget = widgets.HTML(_SEARCH_CSS)
     css_widget.layout = widgets.Layout(width="0", height="0", margin="0", padding="0")
     layout = widgets.VBox(
-        [css_widget, main_panel],
+        [css_widget, panel_content],
         layout=widgets.Layout(
             width="100%",
             max_width="100%",

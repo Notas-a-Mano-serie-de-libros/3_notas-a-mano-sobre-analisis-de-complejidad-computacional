@@ -849,7 +849,7 @@ def run_app(profile, display_app=True, mode_selector=None):
             display: flex !important;
             width: auto !important;
             flex-flow: column nowrap !important;
-            column-gap: 0 !important;
+            column-gap: 36px !important;
             row-gap: 12px !important;
             overflow: visible !important;
           }

@@ -348,7 +348,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertNotIn("AUTO_RENDER_EVERY", source)
         config_source = (DOMAIN_DIR / "sort_config.py").read_text(encoding="utf-8")
         self.assertIn('FORMULA_OUTPUT_HEIGHT = "0px"', config_source)
-        self.assertIn('FORMULA_OUTPUT_PADDING = "30px 0 0 0"', config_source)
+        self.assertIn('FORMULA_OUTPUT_PADDING = "30px 12px 12px 12px"', config_source)
         self.assertIn("min_height=FORMULA_OUTPUT_HEIGHT", source)
         self.assertIn("padding=FORMULA_OUTPUT_PADDING", source)
         self.assertIn("displaystyle_formula", source)

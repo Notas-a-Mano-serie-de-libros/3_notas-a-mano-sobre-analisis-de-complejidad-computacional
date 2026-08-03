@@ -69,7 +69,7 @@ SORT_BOX_RESULT_OFFSET = 29
 SORT_TREE_RESULT_OFFSET = 28
 SORT_CONTROL_STYLE = {"description_width": "0px"}
 SORT_CONTROL_LABEL_WIDTH = 96
-SORT_CONTROL_FIELD_WIDTH = 130
+SORT_CONTROL_FIELD_WIDTH = 188
 SORT_CONTROL_GROUP_PADDING_RIGHT = 44
 SORT_CONTROL_GROUP_WIDTH = SORT_CONTROL_LABEL_WIDTH + SORT_CONTROL_FIELD_WIDTH + SORT_CONTROL_GROUP_PADDING_RIGHT + 4
 SORT_CONTROL_GAP = 2
@@ -921,7 +921,7 @@ def sort_styles():
       }}
       .sort-panel-content {{
         width: 100%;
-        padding: 12px;
+        padding: 0;
         background: #ffffff;
       }}
       .sort-subpanel {{
@@ -945,6 +945,15 @@ def sort_styles():
         padding: 12px;
         background: #ffffff;
         overflow-x: hidden;
+      }}
+      .sort-formula-content {{
+        box-sizing: border-box !important;
+        padding: 30px 12px 12px !important;
+      }}
+      .sort-formula-content > .widget-html-content {{
+        box-sizing: border-box !important;
+        width: 100% !important;
+        padding: 0 !important;
       }}
       .sort-result-content {{
         padding: 0 !important;
@@ -970,17 +979,26 @@ def sort_styles():
         line-height: 1.1 !important;
       }}
       .sort-simulation-root input {{
+        box-sizing: border-box !important;
+        width: 188px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        padding: 2px 4px !important;
         border: 1px solid #cccccc !important;
-        border-radius: 0 !important;
+        border-radius: 3px !important;
         background: #ffffff !important;
         color: #333333 !important;
+        font-size: 13px !important;
+        text-align: center !important;
       }}
       .sort-simulation-root .widget-dropdown {{
+        width: 188px !important;
         height: 32px !important;
         min-height: 32px !important;
         color-scheme: light !important;
       }}
       .sort-simulation-root .widget-dropdown select {{
+        width: 188px !important;
         height: 32px !important;
         min-height: 32px !important;
         padding: 2px 4px !important;
@@ -1839,25 +1857,17 @@ def build_sort_panel(parameters, result, title="Simulación de ordenamiento", pr
     def subpanel(heading, content):
         return collapsible_panel(heading, content, prefix="sort")
 
-    sections = [subpanel("Parámetros", parameters)]
+    sections = [subpanel("Configuración", parameters)]
     if procedure is not None:
         procedure.add_class("sort-subpanel-content")
         sections.append(subpanel("Procedimiento", procedure))
     sections.append(subpanel("Resultado", result))
     panel_content = widgets.VBox(sections, layout=widgets.Layout(width="100%", gap="0"))
     panel_content.add_class("sort-panel-content")
-    main_panel = widgets.VBox(
-        [
-            widgets.HTML(f'<div class="sort-panel-title">{escape(title)}</div>'),
-            panel_content,
-        ],
-        layout=widgets.Layout(width="100%", gap="0"),
-    )
-    main_panel.add_class("sort-main-panel")
     css_widget = widgets.HTML(sort_styles())
     css_widget.layout = widgets.Layout(width="0", height="0", margin="0", padding="0")
     layout = widgets.VBox(
-        [css_widget, main_panel],
+        [css_widget, panel_content],
         layout=widgets.Layout(width="100%", max_width="100%", gap="0", overflow="hidden"),
     )
     layout.add_class("sort-simulation-root")
@@ -2229,6 +2239,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
 
     controls_layout.add_class("sort-subpanel-content")
     formula_output.add_class("sort-subpanel-content")
+    formula_output.add_class("sort-formula-content")
     html_output.add_class("sort-subpanel-content")
     html_output.add_class("sort-result-content")
 
@@ -2237,25 +2248,17 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
 
     panel_content = widgets.VBox(
         [
-            panel("Parámetros", controls_layout),
+            panel("Configuración", controls_layout),
             panel("Procedimiento", formula_output),
             panel("Resultado", html_output),
         ],
         layout=widgets.Layout(width="100%", gap="0"),
     )
     panel_content.add_class("sort-panel-content")
-    main_panel = widgets.VBox(
-        [
-            widgets.HTML('<div class="sort-panel-title">Simulación de ordenamiento</div>'),
-            panel_content,
-        ],
-        layout=widgets.Layout(width="100%", gap="0"),
-    )
-    main_panel.add_class("sort-main-panel")
     css_widget = widgets.HTML(sort_styles())
     css_widget.layout = widgets.Layout(width="0", height="0", margin="0", padding="0")
     layout = widgets.VBox(
-        [css_widget, main_panel],
+        [css_widget, panel_content],
         layout=widgets.Layout(width="100%", max_width="100%", gap="0", overflow="hidden"),
     )
     layout.add_class("sort-simulation-root")

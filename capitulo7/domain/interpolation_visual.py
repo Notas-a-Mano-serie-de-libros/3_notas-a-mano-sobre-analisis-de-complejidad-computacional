@@ -214,9 +214,10 @@ def run_interpolation_visual():
   padding:2px 5px;border:1px solid transparent;background:transparent;white-space:nowrap;
   font-size:13px;line-height:1}
 #iv-wrap .function-label{left:68px;top:12px;transform:none;color:#1565C0}
-#iv-wrap .ctrl{display:flex;column-gap:20px;row-gap:12px;flex-wrap:wrap;margin:0 0 14px;
+#iv-wrap .ctrl{display:flex;column-gap:36px;row-gap:12px;flex-wrap:wrap;margin:0 0 12px;
   align-items:center;font-size:13px;color:#333}
 #iv-wrap .ctrl label{display:flex;align-items:center;gap:8px;color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1;min-height:32px}
+#iv-wrap .ctrl label mjx-container{font-size:100%!important;font-weight:700!important}
 #iv-wrap .label-text{display:inline-flex;align-items:center;justify-content:center;
   width:52px;min-width:52px;text-align:center}
 #iv-wrap select,#iv-wrap input[type=number]{width:112px;height:32px;box-sizing:border-box;

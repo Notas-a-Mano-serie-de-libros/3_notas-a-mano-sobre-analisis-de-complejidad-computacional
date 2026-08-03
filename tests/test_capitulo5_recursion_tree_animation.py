@@ -148,6 +148,7 @@ def test_term_count_stepper_visually_matches_parameter_text_width():
     assert "width:120px!important" in SOURCE
     assert ".recursion-stepper{" in SOURCE
     assert "gap:0!important" in SOURCE
+    assert SOURCE.count('layout=widgets.Layout(width="188px", align_items="center", gap="0px")') == 2
     assert "border-radius:0!important" in SOURCE
     assert "font-family:sans-serif!important;font-size:13px!important" in SOURCE
     assert "font-weight:700!important;line-height:1.1!important" in SOURCE

@@ -783,7 +783,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         runtime_source = (PROJECT_ROOT / "common" / "animation_runtime.py").read_text(encoding="utf-8")
 
         self.assertIn('min_height="0px"', common_source)
-        self.assertIn('padding="30px 0 0 0"', common_source)
+        self.assertIn('padding="30px 12px 12px 12px"', common_source)
         self.assertIn('margin="0"', common_source)
         self.assertIn('overflow="visible"', common_source)
         self.assertIn("widget.layout.min_height", runtime_source)

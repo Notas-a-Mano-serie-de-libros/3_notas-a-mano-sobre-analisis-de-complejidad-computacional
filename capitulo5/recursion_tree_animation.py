@@ -721,7 +721,7 @@ def run_app(builder_only=False):
     )
     function_selector = widgets.HBox(
         [function_previous, function_readout, function_following],
-        layout=widgets.Layout(width="188px", align_items="center"),
+        layout=widgets.Layout(width="188px", align_items="center", gap="0px"),
     )
     function_selector.add_class("recursion-function-selector")
     function_selector.add_class("recursion-stepper")
@@ -796,7 +796,7 @@ def run_app(builder_only=False):
         following.on_click(change(1))
         stepper = widgets.HBox(
             [previous, readout, following],
-            layout=widgets.Layout(width="188px", align_items="center"),
+            layout=widgets.Layout(width="188px", align_items="center", gap="0px"),
         )
         stepper.add_class("recursion-stepper")
         return stepper
@@ -983,7 +983,7 @@ def run_app(builder_only=False):
         layout=widgets.Layout(
             width="auto", display="flex", flex_flow="row wrap",
             align_items="flex-start", justify_content="flex-start",
-            gap="16px 36px",
+            gap="12px 36px",
         ),
     )
     controls.add_class("recursion-tree-controls")
@@ -1199,18 +1199,19 @@ def run_app(builder_only=False):
           .recursion-tree-root .widget-htmlmath-content{background:#fff;color:#333}
           .recursion-tree-controls{box-sizing:border-box!important;display:flex!important;width:auto!important;
             flex-flow:row wrap!important;
-            column-gap:36px!important;row-gap:16px!important;
+            column-gap:36px!important;row-gap:12px!important;
             justify-content:start!important;align-items:start!important;margin-bottom:12px;
             overflow:visible!important}
           .recursion-control-section{box-sizing:border-box!important;display:flex;gap:12px;
             width:auto!important;overflow:visible!important}
-          .recursion-control-title{margin-bottom:4px;font-family:sans-serif;font-size:13px;font-weight:700;color:#333;line-height:1.1}
+          .recursion-control-title{margin-bottom:0;font-family:sans-serif;font-size:13px;font-weight:700;color:#333;line-height:1.1}
           .recursion-control-section .widget-hbox{min-height:32px}
           .recursion-labeled-control{box-sizing:border-box!important;
             flex:none!important}
           .recursion-control-label{box-sizing:border-box!important;flex-shrink:0!important;
             color:#333!important;font-family:sans-serif!important;font-size:13px!important;
             font-weight:700!important;line-height:1.1!important}
+          .recursion-control-label mjx-container{font-size:100%!important;font-weight:700!important}
           .recursion-parameter-controls{
             box-sizing:border-box!important;width:256px!important;max-width:256px!important;
             overflow:visible!important}
