@@ -1253,9 +1253,18 @@ def run_app(builder_only=False):
           .recursion-parameter-controls::-webkit-scrollbar,
           .recursion-parameter-controls *::-webkit-scrollbar{
             display:none!important;width:0!important;height:0!important}
-          .recursion-control-section button{border:1px solid #ccc;border-radius:0;
-            box-sizing:border-box!important;margin:0!important;padding:0!important;
-            background:#f7f7f7;color:#333;font-size:14px!important}
+          .recursion-tree-root .widget-button{
+            box-sizing:border-box!important;margin:0!important;
+            border:1px solid #ccc!important;border-radius:0!important;
+            background:#f7f7f7!important;color:#333!important;
+            box-shadow:none!important;font-family:sans-serif!important}
+          .recursion-tree-root .widget-button:hover{
+            background:#eee!important;color:#333!important}
+          .recursion-tree-root .widget-button:disabled{
+            background:#f7f7f7!important;color:#333!important;
+            cursor:not-allowed!important;opacity:.45!important}
+          .recursion-control-section button{
+            padding:0!important;font-size:13px!important;line-height:1!important}
           .recursion-control-section button .fa,
           .recursion-control-section button i{
             width:14px!important;margin:0!important;font-size:14px!important;
@@ -1322,7 +1331,8 @@ def run_app(builder_only=False):
             box-sizing:border-box!important;width:34px!important;min-width:34px!important;
             max-width:34px!important;flex:0 0 34px!important;margin:0!important;
             padding:0!important;border:1px solid #ccc!important;border-radius:0!important;
-            font-size:13px!important;line-height:1!important}
+            background:#f7f7f7!important;color:#333!important;box-shadow:none!important;
+            font-family:sans-serif!important;font-size:13px!important;line-height:1!important}
           .recursion-stepper .recursion-parameter-readout{
             box-sizing:border-box!important;width:120px!important;min-width:120px!important;
             max-width:120px!important;flex:0 0 120px!important;margin:0!important;

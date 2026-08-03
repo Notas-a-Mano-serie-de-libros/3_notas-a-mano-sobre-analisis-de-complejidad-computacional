@@ -983,7 +983,7 @@ def sort_styles():
         font-weight: 700 !important;
         line-height: 1.1 !important;
       }}
-      .sort-simulation-root input {{
+      .sort-simulation-root input:not([type="checkbox"]) {{
         box-sizing: border-box !important;
         width: 188px !important;
         height: 32px !important;
@@ -1020,6 +1020,33 @@ def sort_styles():
       .sort-algorithm-options-frame {{
         background: #ffffff !important;
       }}
+      .sort-algorithm-options-frame .widget-checkbox {{
+        box-sizing: border-box !important;
+        height: 34px !important;
+        min-height: 34px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+      }}
+      .sort-algorithm-options-frame .widget-checkbox input[type="checkbox"] {{
+        box-sizing: border-box !important;
+        width: 16px !important;
+        min-width: 16px !important;
+        max-width: 16px !important;
+        height: 16px !important;
+        min-height: 16px !important;
+        max-height: 16px !important;
+        margin: 0 6px 0 0 !important;
+        padding: 0 !important;
+      }}
+      .sort-algorithm-options-frame .widget-checkbox .widget-label {{
+        margin: 0 !important;
+        font-family: sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 400 !important;
+        line-height: 1.1 !important;
+      }}
       .sort-simulation-root .widget-dropdown select:focus {{
         outline: none !important;
         border-color: #1976d2 !important;
@@ -1030,15 +1057,24 @@ def sort_styles():
         color: #333333 !important;
       }}
       .sort-simulation-root .widget-button {{
-        min-height: 38px;
+        min-height: 38px !important;
         border: 1px solid #cccccc !important;
         border-radius: 0 !important;
         background: #f7f7f7 !important;
         color: #333333 !important;
         box-shadow: none !important;
+        font-family: sans-serif !important;
+        font-size: 14px !important;
       }}
       .sort-simulation-root .widget-button:hover {{
         background: #eeeeee !important;
+        color: #333333 !important;
+      }}
+      .sort-simulation-root .widget-button:disabled {{
+        background: #f7f7f7 !important;
+        color: #333333 !important;
+        cursor: not-allowed !important;
+        opacity: .45 !important;
       }}
       .sort-simulation-root .simulation-action-row {{gap:0!important}}
       .sort-simulation-root .simulation-action-row > .widget-button {{

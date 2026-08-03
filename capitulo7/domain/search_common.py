@@ -488,19 +488,28 @@ def _build_search_css() -> str:
     color: #333333 !important;
   }}
   .search-simulation-root .widget-button {{
-    min-height: 38px;
-    border: 1px solid #cfcfcf;
-    border-radius: 0;
-    background: #f7f7f7;
-    color: #333333;
-    box-shadow: none;
+    min-height: 38px !important;
+    border: 1px solid #cccccc !important;
+    border-radius: 0 !important;
+    background: #f7f7f7 !important;
+    color: #333333 !important;
+    box-shadow: none !important;
+    font-family: sans-serif !important;
+    font-size: 14px !important;
   }}
   .search-simulation-root .widget-button:hover {{
-    background: #eeeeee;
+    background: #eeeeee !important;
+    color: #333333 !important;
+  }}
+  .search-simulation-root .widget-button:disabled {{
+    background: #f7f7f7 !important;
+    color: #333333 !important;
+    cursor: not-allowed !important;
+    opacity: .45 !important;
   }}
   .search-simulation-root .simulation-action-row {{gap:0!important}}
   .search-simulation-root .simulation-action-row > .widget-button {{
-    margin:0!important;border-color:#cfcfcf!important;border-radius:0!important;
+    margin:0!important;border-color:#cccccc!important;border-radius:0!important;
   }}
   .search-app {{
     width: 100%;

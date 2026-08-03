@@ -216,6 +216,15 @@ def test_base_case_field_is_below_function_selector():
     assert "function_control" in recurrence_controls
 
 
+def test_all_chapter_five_buttons_use_the_shared_visual_style():
+    assert ".recursion-tree-root .widget-button{" in SOURCE
+    assert "background:#f7f7f7!important;color:#333!important;" in SOURCE
+    assert "border:1px solid #ccc!important;border-radius:0!important;" in SOURCE
+    assert "box-shadow:none!important;font-family:sans-serif!important" in SOURCE
+    assert ".recursion-tree-root .widget-button:hover{" in SOURCE
+    assert "background:#eee!important;color:#333!important" in SOURCE
+
+
 def test_master_variant_selection_does_not_import_symbolic_solver():
     variant_update = SOURCE.split(
         "def update_master_variant_options", 1

@@ -1255,6 +1255,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
 
         self.assertIn('"Algoritmos activos"', source)
         self.assertIn("widgets.Checkbox", source)
+        self.assertNotIn('widgets.Layout(width="100%")', source)
+        self.assertIn("column_width = ALGORITHM_COLUMN_WIDTHS", source)
+        self.assertIn('width=f"{column_width}px"', source)
         self.assertIn("widgets.Box", source)
         self.assertIn("ALGORITHM_COLUMN_WIDTHS = (116, 128, 118, 82)", source)
         self.assertNotIn("GAP_SEQUENCE_OPTIONS", source)

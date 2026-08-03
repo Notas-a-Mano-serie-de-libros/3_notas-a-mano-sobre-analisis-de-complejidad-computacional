@@ -563,10 +563,22 @@ def run_app():
         width="210px",
         description_style={},
     )
-    algorithm_checks = {
-        value: widgets.Checkbox(value=True, description=label, indent=False, layout=widgets.Layout(width="100%"))
-        for label, value in ALGORITHM_OPTIONS
-    }
+    algorithm_checks = {}
+    for index, (label, value) in enumerate(ALGORITHM_OPTIONS):
+        column_width = ALGORITHM_COLUMN_WIDTHS[index % len(ALGORITHM_COLUMN_WIDTHS)]
+        algorithm_checks[value] = widgets.Checkbox(
+            value=True,
+            description=label,
+            indent=False,
+            layout=widgets.Layout(
+                width=f"{column_width}px",
+                min_width=f"{column_width}px",
+                max_width=f"{column_width}px",
+                height=f"{ALGORITHM_ROW_HEIGHT}px",
+                margin="0",
+                flex=f"0 0 {column_width}px",
+            ),
+        )
     algorithms_checks_box = widgets.Box(
         list(algorithm_checks.values()),
         layout=widgets.Layout(

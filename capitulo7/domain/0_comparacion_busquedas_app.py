@@ -67,8 +67,9 @@ button.comparison-subpanel-title{height:44px!important;min-height:44px!important
 .comparison-simulation-root .widget-dropdown select{width:188px!important;height:32px!important;min-height:32px!important;padding:2px 4px!important;border:1px solid #ccc!important;border-radius:3px!important;background-color:#fff!important;color:#333!important;color-scheme:light!important;font-size:13px!important;text-align:center!important;appearance:auto!important;-webkit-appearance:menulist!important}
 .comparison-simulation-root .widget-dropdown select:focus{outline:none!important;border-color:#1976d2!important;box-shadow:0 0 0 1px #1976d2!important}
 .comparison-simulation-root .widget-dropdown option{background:#fff!important;color:#333!important}
-.comparison-simulation-root .widget-button{min-height:38px;border:1px solid #ccc;border-radius:0;background:#f7f7f7;color:#333;box-shadow:none}
-.comparison-simulation-root .widget-button:hover{background:#eee}
+.comparison-simulation-root .widget-button{min-height:38px!important;border:1px solid #ccc!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;box-shadow:none!important;font-family:sans-serif!important;font-size:14px!important}
+.comparison-simulation-root .widget-button:hover{background:#eee!important;color:#333!important}
+.comparison-simulation-root .widget-button:disabled{background:#f7f7f7!important;color:#333!important;cursor:not-allowed!important;opacity:.45!important}
 .comparison-control-group,
 .comparison-control-group > .widget-html,
 .comparison-control-group > .widget-int,

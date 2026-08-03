@@ -7,7 +7,7 @@ from IPython.display import display
 import ipywidgets as widgets
 
 from common.widget_controls import bounded_int_control, button_control, compact_labeled_control, dropdown_control
-from sort_common import colab_pause, copy_sort_state, create_state as create_sort_state, generate_values, normalized_bar_height, render_multi_sort_legend, render_state_html, run_sort_app, step_sort
+from sort_common import build_sort_panel, colab_pause, copy_sort_state, create_state as create_sort_state, generate_values, normalized_bar_height, render_multi_sort_legend, render_state_html, run_sort_app, sort_action_button_row, sort_controls_grid, step_sort
 from sort_config import DEFAULT_BAR_SIZE, GAP_SEQUENCE_OPTIONS, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES, SORT_THEME_CSS
 
 try:
@@ -596,34 +596,24 @@ def run_gap_comparison_app():
     size_input.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
     order_dropdown.observe(lambda change: reset_comparison() if change["name"] == "value" else None, names="value")
 
-    action_row = widgets.HBox(
-        [auto_button, finish_button, reset_button],
-        layout=widgets.Layout(
-            width="100%", grid_gap="0px", margin="16px 0 0 0",
-            flex_flow="row wrap", overflow="visible",
-        ),
+    action_row = sort_action_button_row(
+        [auto_button, finish_button, reset_button]
     )
     action_row.add_class("shell-comparison-actions")
-    action_style = widgets.HTML(
-        "<style>.shell-comparison-actions{gap:0!important}"
-        ".shell-comparison-actions>.widget-button{margin:0!important;"
-        "border:1px solid #ccc!important;border-radius:0!important;"
-        "background:#f7f7f7!important;color:#333!important}"
-        ".shell-comparison-actions>.widget-button:hover{background:#eee!important}</style>"
-    )
-    layout = widgets.VBox(
+    parameters = widgets.VBox(
         [
-            action_style,
-            widgets.HBox(
-                [size_group, order_group],
-                layout=widgets.Layout(width="auto", grid_gap="42px", flex_flow="row wrap", overflow="visible"),
-            ),
+            sort_controls_grid([size_group, order_group]),
             action_row,
-            html_output,
         ],
-        layout=widgets.Layout(width="100%", grid_gap="10px"),
+        layout=widgets.Layout(width="100%", grid_gap="0"),
     )
-    display(layout)
+    display(
+        build_sort_panel(
+            parameters,
+            html_output,
+            title="Comparación de secuencias de Shell",
+        )
+    )
     redraw(force_static=True)
 
 

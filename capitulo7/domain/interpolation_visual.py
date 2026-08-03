@@ -231,8 +231,10 @@ def run_interpolation_visual():
   height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:0;
   background:#fff;text-align:center;font-size:14px;font-weight:400;white-space:nowrap}
 #iv-wrap button{width:34px;height:32px;border:1px solid #ccc;border-radius:0;
-  background:#f7f7f7;color:#333;cursor:pointer;font-size:13px;line-height:1}
+  background:#f7f7f7;color:#333;box-shadow:none;cursor:pointer;
+  font-family:sans-serif;font-size:13px;line-height:1;margin:0}
 #iv-wrap button:hover{background:#eee}
+#iv-wrap button:disabled{background:#f7f7f7;color:#333;cursor:not-allowed;opacity:.45}
 #iv-wrap .stepper button{border-color:#ccc;border-radius:0;margin:0;padding:0}
 #iv-wrap button.active{background:#f7f7f7;border-color:#ccc;color:#333}
 #iv-wrap button:focus-visible{outline:2px solid #1976D2;outline-offset:1px}
