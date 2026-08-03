@@ -118,7 +118,8 @@ pip install jupyterlab voila ipywidgets numpy pandas matplotlib networkx
 ```
 
 <p><b>Verificar versiones:</b></p>
-```javapython --version
+```bash
+python --version
 pip --version
 jupyter lab --version
 ```
@@ -128,8 +129,16 @@ jupyter lab --version
 <h2>🚀 Ejecución</h2>
 
 <p style="text-align:justify;">
-Para abrir los notebooks, basta con ejecutar el siguiente comando desde la carpeta raíz del proyecto:
+Para preparar un entorno aislado y reproducible desde la carpeta raíz:
 </p>
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+make install
+```
+
+Para abrir los notebooks:
 
 ```bash
 jupyter lab
@@ -142,19 +151,25 @@ Los resultados pueden reproducirse sin dependencias externas.
 
 <h3>Preparación del repositorio para desarrollo</h3>
 
+<p>La separación entre notebooks, módulos de dominio y componentes compartidos se documenta en <a href="./ARCHITECTURE.md">ARCHITECTURE.md</a>.</p>
+
 <p style="text-align:justify;">
 Las imágenes producidas por notebooks y simulaciones se guardan en carpetas <code>graficas/</code>, pero no forman parte del repositorio. Para instalar los hooks que limpian notebooks y eliminan estas imágenes antes de cada push, ejecute una vez:
 </p>
 
 ```bash
-python3 scripts/install_git_hooks.py
+make install
 ```
 
 <p>La limpieza también puede ejecutarse manualmente:</p>
 
 ```bash
-python3 scripts/clean_generated_graphics.py
+make clean-notebooks
+make clean-graphics
+make check
 ```
+
+<p><code>make check</code> ejecuta lint, pruebas y validadores usando el mismo intérprete activo. Para elegir otro intérprete use, por ejemplo, <code>make check PYTHON=.venv/bin/python</code>.</p>
 
 <p style="text-align:justify;">
 Para abrir las simulaciones interactivas del capítulo 7 en local con el código oculto, use el lanzador basado en Voilà:

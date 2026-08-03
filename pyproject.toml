@@ -7,6 +7,10 @@ extend-exclude = [
   "__pycache__",
 ]
 
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
 [tool.ruff.lint]
 select = [
   "E9",

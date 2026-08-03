@@ -15,8 +15,16 @@ C2_UI_SOURCE = (
 def test_interfaz_comparte_paneles_y_medidas_del_capitulo_dos():
     assert "STEPPER_FIELD_WIDTH = 188" in UI_SOURCE
     assert "STEPPER_BUTTON_WIDTH = 34" in UI_SOURCE
-    assert "STEPPER_VALUE_WIDTH = 120" in UI_SOURCE
-    assert "STEPPER_GAP = 0" in UI_SOURCE
+    assert "STEPPER_VALUE_WIDTH = 112" in UI_SOURCE
+    assert "STEPPER_GAP = 4" in UI_SOURCE
+    assert "margin: 0 !important" in UI_SOURCE
+    assert "gap: 4px !important" in UI_SOURCE
+    assert "font-size: 13px !important" in UI_SOURCE
+    assert UI_SOURCE.count("width: 112px !important") >= 2
+    assert "width: 120px !important" not in UI_SOURCE
+    assert 34 + 4 + 112 + 4 + 34 == 188
+    assert "flex: 0 0 188px !important" in UI_SOURCE
+    assert ".experimental-stepper > *" in UI_SOURCE
     assert 'configuration_panel = subpanel("Configuración"' in UI_SOURCE
     assert 'result_panel = subpanel("Resultado"' in UI_SOURCE
     assert "experimental-subpanel-summary" in UI_SOURCE
@@ -41,14 +49,14 @@ def test_no_restringir_elimina_el_limite_en_lugar_de_cambiarlo_por_otro():
 
 
 def test_interfaz_comun_expone_puntos_de_muestreo_configurables():
-    assert "DEFAULT_SAMPLING_POINTS = 30" in UI_SOURCE
+    assert "from common.experimental_simulation import (" in UI_SOURCE
+    assert "magnitude_stepper(" in UI_SOURCE
     assert '"Puntos de muestreo"' in UI_SOURCE
-    assert "sampling_value = widgets.Text(" in UI_SOURCE
-    assert "[sampling_down, sampling_value, sampling_up]" in UI_SOURCE
-    assert "value = max(10, min(1000, value))" in UI_SOURCE
+    assert "sampling_value = sampling_control.value" in UI_SOURCE
+    assert "clamp_sampling_points(value)" in UI_SOURCE
     assert "previous_order_of_magnitude(sampling_point_count())" in UI_SOURCE
     assert "next_order_of_magnitude(sampling_point_count())" in UI_SOURCE
-    assert "points=sampling_point_count()" in UI_SOURCE
+    assert "points=config.sampling_points" in UI_SOURCE
     assert '"Ejecuciones"' not in UI_SOURCE
     assert "return max(1, int(profile.default_executions))" in UI_SOURCE
 
@@ -61,6 +69,10 @@ def test_tabla_es_nativa_formateada_y_la_medicion_no_bloquea_la_vista():
     assert "await asyncio.to_thread(" in UI_SOURCE
     assert "await asyncio.sleep(0)" in UI_SOURCE
     assert 'margin="16px 0 0 0"' in UI_SOURCE
+    assert 'figure_output.add_class("experimental-figure-output")' in UI_SOURCE
+    assert "[table_output, result_spacer, figure_output]" in UI_SOURCE
+    assert "experimental-result-spacer" in UI_SOURCE
+    assert "flex: 0 0 16px !important" in UI_SOURCE
 
 
 def test_bloque_css_es_identico_al_del_capitulo_dos():

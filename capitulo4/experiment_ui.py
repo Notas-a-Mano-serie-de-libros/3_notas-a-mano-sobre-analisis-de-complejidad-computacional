@@ -18,7 +18,16 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 try:
-    from common.widget_controls import button_control, compact_labeled_control
+    from common.experimental_simulation import (
+        DEFAULT_SAMPLING_POINTS,
+        SimulationConfig,
+        build_experiment_sizes,
+        clamp_sampling_points,
+        effective_execution_limit,
+        next_order_of_magnitude,
+        previous_order_of_magnitude,
+    )
+    from common.widget_controls import button_control, compact_labeled_control, magnitude_stepper
 except ImportError:
     def button_control(*, description, button_style, width, disabled=False):
         return widgets.Button(
@@ -57,11 +66,10 @@ STEPPER_FIELD_WIDTH = 188
 STEPPER_LABEL_WIDTH = 150
 STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 8
 STEPPER_BUTTON_WIDTH = 34
-STEPPER_VALUE_WIDTH = 120
-STEPPER_GAP = 0
+STEPPER_VALUE_WIDTH = 112
+STEPPER_GAP = 4
 DEFAULT_MAXIMUM_EXPONENT = 5
 DEFAULT_EXECUTIONS = 10
-DEFAULT_SAMPLING_POINTS = 30
 STATUS_PENDING = "pending"
 STATUS_LOADING = "loading"
 STATUS_COMPLETE = "complete"
@@ -96,28 +104,6 @@ def measure_profile_point(profile, n, executions):
     if profile.prepare is not None and profile.measure_prepared is not None:
         return profile.measure_prepared(profile.prepare(n), executions)
     return profile.measure(n, executions)
-
-
-def next_order_of_magnitude(value):
-    value = max(1, int(value))
-    return 10 ** (int(np.floor(np.log10(value))) + 1)
-
-
-def previous_order_of_magnitude(value):
-    value = max(1, int(value))
-    exponent = int(np.ceil(np.log10(value))) - 1
-    return 10 ** max(0, exponent)
-
-
-def build_experiment_sizes(maximum_n, max_safe_elements, points=EXPERIMENT_POINTS):
-    safe_maximum = min(maximum_n, max_safe_elements)
-    dense_sizes = np.linspace(1, safe_maximum, num=min(points, safe_maximum), dtype=np.int64)
-    checkpoints = np.array(
-        [10**exponent for exponent in range(1, int(np.log10(maximum_n)) + 1)],
-        dtype=np.int64,
-    )
-    execution_sizes = np.unique(np.concatenate((dense_sizes, checkpoints)))
-    return execution_sizes, checkpoints
 
 
 def figure_placeholder_html(width=800, aspect_ratio="2/1"):
@@ -342,9 +328,7 @@ def pending_table_html(maximum_n, profile):
 
 
 def effective_max_safe_elements(profile, force_full_execution=False):
-    if force_full_execution:
-        return 10**10
-    return profile.max_safe_elements
+    return effective_execution_limit(profile.max_safe_elements, not force_full_execution)
 
 
 def profile_warning_html(profile, maximum_n, executions, force_full_execution=False):
@@ -397,9 +381,10 @@ def run_app(
         width=f"{STEPPER_BUTTON_WIDTH}px", min_width=f"{STEPPER_BUTTON_WIDTH}px",
         max_width=f"{STEPPER_BUTTON_WIDTH}px", height="32px",
         flex=f"0 0 {STEPPER_BUTTON_WIDTH}px",
+        margin="0",
     )
-    maximum_down = widgets.Button(description="", icon="caret-left", tooltip="Potencia anterior", layout=step_button_layout)
-    maximum_up = widgets.Button(description="", icon="caret-right", tooltip="Potencia siguiente", layout=step_button_layout)
+    maximum_down = widgets.Button(description="◀", tooltip="Potencia anterior", layout=step_button_layout)
+    maximum_up = widgets.Button(description="▶", tooltip="Potencia siguiente", layout=step_button_layout)
     maximum_stepper = widgets.HBox(
         [maximum_down, maximum_value, maximum_up],
         layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap=f"{STEPPER_GAP}px"),
@@ -412,30 +397,17 @@ def run_app(
         group_width=STEPPER_GROUP_WIDTH,
         label_width=STEPPER_LABEL_WIDTH,
     )
-    sampling_value = widgets.Text(
-        value=str(DEFAULT_SAMPLING_POINTS),
-        layout=widgets.Layout(
-        width=f"{STEPPER_VALUE_WIDTH}px", min_width=f"{STEPPER_VALUE_WIDTH}px",
-        max_width=f"{STEPPER_VALUE_WIDTH}px", height="32px",
-        flex=f"0 0 {STEPPER_VALUE_WIDTH}px",
-        ),
+    sampling_control = magnitude_stepper(
+        value=DEFAULT_SAMPLING_POINTS,
+        width=STEPPER_FIELD_WIDTH,
+        value_width=STEPPER_VALUE_WIDTH,
+        button_width=STEPPER_BUTTON_WIDTH,
+        accessible_name="Puntos de muestreo",
     )
-    sampling_value.add_class("constant-centered-input")
-    sampling_down = widgets.Button(
-        description="", icon="caret-left", tooltip="Reducir puntos de muestreo",
-        layout=step_button_layout,
-    )
-    sampling_up = widgets.Button(
-        description="", icon="caret-right", tooltip="Aumentar puntos de muestreo",
-        layout=step_button_layout,
-    )
-    sampling_stepper = widgets.HBox(
-        [sampling_down, sampling_value, sampling_up],
-        layout=widgets.Layout(
-            width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap=f"{STEPPER_GAP}px"
-        ),
-    )
-    sampling_stepper.add_class("experimental-stepper")
+    sampling_value = sampling_control.value
+    sampling_down = sampling_control.previous
+    sampling_up = sampling_control.following
+    sampling_stepper = sampling_control.container
     sampling_stepper.add_class("experimental-sampling-points")
     sampling_group = compact_labeled_control(
         "Puntos de muestreo", sampling_stepper,
@@ -514,12 +486,12 @@ def run_app(
             value = int(sampling_value.value)
         except ValueError:
             value = DEFAULT_SAMPLING_POINTS
-        value = max(10, min(1000, value))
+        value = clamp_sampling_points(value)
         sampling_value.value = str(value)
         return value
 
     def update_sampling_points(value):
-        sampling_value.value = str(max(10, min(1000, int(value))))
+        sampling_value.value = str(clamp_sampling_points(value))
 
     def placeholder_html():
         selected_maximum = maximum_n()
@@ -587,13 +559,19 @@ def run_app(
         execution_state["reset_requested"] = False
         set_controls_enabled(False)
         try:
-            selected_maximum = maximum_n()
-            executions = execution_value()
+            config = SimulationConfig(
+                maximum_n=maximum_n(),
+                sampling_points=sampling_point_count(),
+                restrict_maximum=not force_execution.value,
+                executions=execution_value(),
+            ).normalized()
+            selected_maximum = config.maximum_n
+            executions = config.executions
             execution_limit = effective_max_safe_elements(profile, force_execution.value)
             sizes, checkpoints = build_experiment_sizes(
                 selected_maximum,
                 execution_limit,
-                points=sampling_point_count(),
+                points=config.sampling_points,
             )
             experimental = np.full(len(sizes), np.nan)
             checkpoint_times = np.full(len(checkpoints), np.nan)
@@ -633,6 +611,10 @@ def run_app(
             if execution_state["reset_requested"]:
                 reset_app()
             else:
+                checkpoint_statuses = [
+                    status if np.isfinite(value) else STATUS_SKIPPED
+                    for status, value in zip(checkpoint_statuses, checkpoint_times)
+                ]
                 table_html, figure_html = profile.render_result(
                     sizes,
                     experimental,
@@ -693,8 +675,13 @@ def run_app(
         return panel
 
     configuration_panel = subpanel("Configuración", [controls, *configuration_extras, warning_output])
+    result_spacer = widgets.HTML(
+        value='<div aria-hidden="true" style="height:16px"></div>',
+        layout=widgets.Layout(width="100%", height="16px", min_height="16px"),
+    )
+    result_spacer.add_class("experimental-result-spacer")
     result_content = widgets.VBox(
-        [table_output, figure_output],
+        [table_output, result_spacer, figure_output],
         layout=widgets.Layout(width="100%", gap="0px", overflow_x="hidden"),
     )
     result_content.add_class("experimental-result-content")
@@ -710,9 +697,9 @@ def run_app(
           .constant-centered-input input {
             text-align: center !important;
             box-sizing: border-box !important;
-            width: 120px !important;
-            min-width: 120px !important;
-            max-width: 120px !important;
+            width: 112px !important;
+            min-width: 112px !important;
+            max-width: 112px !important;
             height: 32px !important;
             min-height: 32px !important;
             max-height: 32px !important;
@@ -721,9 +708,9 @@ def run_app(
           .constant-centered-input,
           .constant-centered-math {
             box-sizing: border-box !important;
-            width: 120px !important;
-            min-width: 120px !important;
-            max-width: 120px !important;
+            width: 112px !important;
+            min-width: 112px !important;
+            max-width: 112px !important;
             height: 32px !important;
             min-height: 32px !important;
             max-height: 32px !important;
@@ -891,10 +878,20 @@ def run_app(
             background: #eee !important;
           }
           .experimental-stepper {
+            box-sizing: border-box !important;
             display: flex !important;
+            width: 188px !important;
+            min-width: 188px !important;
+            max-width: 188px !important;
+            flex: 0 0 188px !important;
             flex-wrap: nowrap !important;
-            gap: 0 !important;
+            gap: 4px !important;
+            margin: 0 !important;
+            padding: 0 !important;
             overflow: visible !important;
+          }
+          .experimental-stepper > * {
+            margin: 0 !important;
           }
           .experimental-stepper button {
             box-sizing: border-box !important;
@@ -902,13 +899,12 @@ def run_app(
             min-width: 34px !important;
             max-width: 34px !important;
             flex: 0 0 34px !important;
+            margin: 0 !important;
             padding: 0 !important;
             overflow: hidden !important;
             text-overflow: clip !important;
-          }
-          .experimental-stepper button .fa {
-            width: auto !important;
-            margin: 0 !important;
+            font-size: 13px !important;
+            line-height: 1 !important;
           }
           .experimental-controls input {
             border: 1px solid #ccc !important;
@@ -921,10 +917,12 @@ def run_app(
             width: 188px !important;
             min-width: 188px !important;
             max-width: 188px !important;
+            flex: 0 0 188px !important;
             height: 32px !important;
             min-height: 32px !important;
             max-height: 32px !important;
             padding: 0 !important;
+            margin: 0 !important;
             background: transparent !important;
             border: 0 !important;
             border-radius: 0 !important;
@@ -975,6 +973,13 @@ def run_app(
             width: 100% !important;
             max-width: 100% !important;
             overflow-x: hidden !important;
+          }
+          .experimental-result-spacer {
+            display: block !important;
+            width: 100% !important;
+            min-height: 16px !important;
+            height: 16px !important;
+            flex: 0 0 16px !important;
           }
           .experimental-figure-frame {
             box-sizing: border-box !important;

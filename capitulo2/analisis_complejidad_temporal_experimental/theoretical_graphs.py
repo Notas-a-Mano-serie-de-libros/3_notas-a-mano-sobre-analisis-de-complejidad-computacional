@@ -13,6 +13,9 @@ GRAPH_STYLE = {
     "axes.facecolor": "white",
     "savefig.facecolor": "white",
     "savefig.edgecolor": "white",
+    "font.family": "STIXGeneral",
+    "mathtext.fontset": "stix",
+    "axes.formatter.use_mathtext": True,
     "figure.dpi": 600,
     "savefig.dpi": 600,
 }

@@ -218,8 +218,11 @@ def test_controles_comparten_medidas_espaciado_y_flecha_del_resto_de_la_obra():
 
     assert "STEPPER_FIELD_WIDTH = 188" in source
     assert "STEPPER_BUTTON_WIDTH = 34" in source
-    assert "STEPPER_VALUE_WIDTH = 120" in source
-    assert "STEPPER_GAP = 0" in source
+    assert "STEPPER_VALUE_WIDTH = 112" in source
+    assert "STEPPER_GAP = 4" in source
+    assert source.count("width: 112px !important") >= 2
+    assert "width: 120px !important" not in source
+    assert 34 + 4 + 112 + 4 + 34 == 188
     assert "gap: 0 !important" in source
     assert "flex-flow: column nowrap !important" in source
     assert "column-gap: 0 !important" in source
@@ -249,7 +252,7 @@ def test_resultado_muestra_tabla_y_plantilla_antes_de_ejecutar():
     assert "table_output.value = pending_table_html" in source
     assert "figure_output.value = placeholder_html()" in source
     assert "profile.render_template(selected_maximum)" in source
-    assert "[table_output, figure_output]" in source
+    assert "[table_output, result_spacer, figure_output]" in source
 
 
 def test_simulacion_incluye_selector_para_restringir_n_maximo():
@@ -271,14 +274,14 @@ def test_simulacion_incluye_selector_para_restringir_n_maximo():
 def test_simulacion_permite_configurar_los_puntos_de_muestreo():
     source = Path(EXPERIMENT_DIR / "experimental_animation.py").read_text(encoding="utf-8")
 
-    assert "DEFAULT_SAMPLING_POINTS = 30" in source
+    assert "from common.experimental_simulation import (" in source
+    assert "magnitude_stepper(" in source
     assert '"Puntos de muestreo"' in source
-    assert "sampling_value = widgets.Text(" in source
-    assert "[sampling_down, sampling_value, sampling_up]" in source
-    assert "value = max(10, min(1000, value))" in source
+    assert "sampling_value = sampling_control.value" in source
+    assert "clamp_sampling_points(value)" in source
     assert "previous_order_of_magnitude(sampling_point_count())" in source
     assert "next_order_of_magnitude(sampling_point_count())" in source
-    assert "points=sampling_point_count()" in source
+    assert "points=config.sampling_points" in source
     assert "update_sampling_points(DEFAULT_SAMPLING_POINTS)" in source
     assert "sampling_down.disabled = not enabled" in source
     assert "sampling_value.disabled = not enabled" in source
@@ -302,6 +305,13 @@ def test_simulacion_declara_defaults_y_estados():
     assert STATUS_COMPLETE == "complete"
     assert STATUS_SKIPPED == "skipped"
     assert pending_table_html(10**DEFAULT_MAXIMUM_EXPONENT).count("Pendiente") == DEFAULT_MAXIMUM_EXPONENT
+
+
+def test_titulos_experimentales_no_reiteran_la_complejidad_del_notebook():
+    source = Path(EXPERIMENT_DIR / "complexity_animations.py").read_text(encoding="utf-8")
+
+    assert source.count('f"{symbol}(n) teórico vs {symbol}(n) calculado"') == 2
+    assert "calculado - Complejidad" not in source
 
 
 def test_bootstrap_remoto_descarga_motor_comun_y_perfiles():
@@ -409,7 +419,7 @@ def test_perfiles_generales_usan_estilo_visual_de_constante():
         assert style_line in polynomial_source
     assert "plt.rcParams.update(GRAPH_STYLE)" in polynomial_source
     assert "figsize=(8, 4)" in polynomial_source
-    assert "ax1.grid(True)" in polynomial_source
+    assert 'ax1.grid(True, color="#CFD8DC"' in polynomial_source
 
 
 def test_graficas_teoricas_definen_todas_las_complejidades_y_limites_seguros():
@@ -654,6 +664,19 @@ def test_simulacion_polinomial_renderiza_una_figura_embebida():
     assert "max-width:100%" in figure_html
 
 
+def test_grafica_polinomial_usa_tipografia_y_ejes_del_motor_experimental():
+    polynomial_source = Path(EXPERIMENT_DIR / "polynomial_animation.py").read_text(encoding="utf-8")
+
+    assert GRAPH_STYLE["font.family"] == "STIXGeneral"
+    assert GRAPH_STYLE["mathtext.fontset"] == "stix"
+    assert 'fontsize=13' in polynomial_source
+    assert 'fontsize=15' in polynomial_source
+    assert 'labelsize=10' in polynomial_source
+    assert 'color="#CFD8DC"' in polynomial_source
+    assert 'spine.set_linewidth(0.8)' in polynomial_source
+    assert 'fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)' in polynomial_source
+
+
 def test_simulacion_polinomial_usa_stepper_no_campo_editable_para_k():
     source = Path(EXPERIMENT_DIR / "polynomial_animation.py").read_text(encoding="utf-8")
 
@@ -662,7 +685,36 @@ def test_simulacion_polinomial_usa_stepper_no_campo_editable_para_k():
     assert "[degree_down, degree_value, degree_up]" in source
     assert "degree_down.on_click(decrease_degree)" in source
     assert "degree_up.on_click(increase_degree)" in source
+    assert 'degree_stepper.add_class("experimental-stepper")' in source
+    assert ".experimental-stepper button" in source
+    assert "flex: 0 0 34px !important" in source
     assert "BoundedIntText" not in source
+
+
+def test_simulacion_polinomial_comparte_medidas_con_los_demas_paneles():
+    source = Path(EXPERIMENT_DIR / "polynomial_animation.py").read_text(encoding="utf-8")
+
+    assert "STEPPER_FIELD_WIDTH = 188" in source
+    assert "STEPPER_LABEL_WIDTH = 150" in source
+    assert "STEPPER_BUTTON_WIDTH = 34" in source
+    assert "STEPPER_VALUE_WIDTH = 112" in source
+    assert 'flex_flow="column nowrap"' in source
+    assert ".polynomial-full-value" in source
+    assert ".polynomial-stepper-value" in source
+    assert "color: #333 !important" in source
+    assert "overflow-y: visible !important" in source
+    assert 'configuration_panel = subpanel("Configuración", [controls])' in source
+    assert 'result_panel = subpanel("Resultado", [result_content])' in source
+    assert "experimental-subpanel-summary" in source
+    assert 'icon="caret-down"' in source
+    assert "header.on_click(toggle_content)" in source
+    assert "Parámetros:" not in source
+    assert "Resultados por grado:" not in source
+    assert "Resultado:" not in source
+    assert "table_title" not in source
+    assert "figure_title" not in source
+    assert '[table_container, result_spacer, figure_output]' in source
+    assert 'figure_output.add_class("experimental-figure-output")' in source
 
 
 def test_simulacion_polinomial_muestra_tabla_fija_y_actualiza_figura_automaticamente():
@@ -683,7 +735,9 @@ def test_simulacion_polinomial_muestra_tabla_fija_y_actualiza_figura_automaticam
     assert "threading.Thread" not in source
     assert "run_sequence_button" not in source
     assert 'description="Ejecutar desde 0 hasta 20"' not in source
-    assert 'margin="18px 0 0 0"' in source
+    assert 'figure_output.add_class("experimental-figure-output")' in source
+    assert "experimental-result-spacer" in source
+    assert "flex: 0 0 16px !important" in source
     assert 'table_container.layout.overflow_y = "hidden"' in source
     assert "[style, main_panel]" in source
 
@@ -952,9 +1006,9 @@ def test_rango_experimental_conserva_puntos_intermedios_y_potencias():
 def test_motor_comun_respeta_limite_seguro_y_checkpoints():
     sizes, checkpoints = build_profile_sizes(10_000, max_safe_elements=1_000, points=50)
 
-    assert sizes[-1] == 10_000
+    assert sizes[-1] == 1_000
     assert checkpoints.tolist() == [10, 100, 1_000, 10_000]
-    assert 10_000 in set(sizes)
+    assert 10_000 not in set(sizes)
 
 
 def test_motor_comun_permite_saltar_limite_seguro_bajo_demanda():

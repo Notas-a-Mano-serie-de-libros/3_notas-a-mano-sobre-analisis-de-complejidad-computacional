@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from html import escape
+from dataclasses import dataclass
 
 import ipywidgets as widgets
 
@@ -13,6 +14,58 @@ COMPACT_GROUP_PADDING_RIGHT = 44
 COMPACT_GROUP_GAP = 2
 COMPACT_COLUMN_GAP = 42
 COMPACT_GROUP_WIDTH = COMPACT_LABEL_WIDTH + COMPACT_FIELD_WIDTH + COMPACT_GROUP_PADDING_RIGHT + COMPACT_GROUP_GAP
+
+
+@dataclass(frozen=True)
+class MagnitudeStepper:
+    container: widgets.HBox
+    value: widgets.Text
+    previous: widgets.Button
+    following: widgets.Button
+
+
+def magnitude_stepper(
+    *,
+    value,
+    width=188,
+    value_width=112,
+    button_width=34,
+    css_class="experimental-stepper",
+    accessible_name="Valor",
+):
+    """Crea un campo editable con botones para cambiar órdenes de magnitud."""
+
+    text = widgets.Text(
+        value=str(value),
+        description="",
+        placeholder=accessible_name,
+        layout=widgets.Layout(width=f"{value_width}px", height="32px"),
+    )
+    text.add_class("constant-centered-input")
+    button_layout = widgets.Layout(
+        width=f"{button_width}px",
+        min_width=f"{button_width}px",
+        max_width=f"{button_width}px",
+        height="32px",
+        margin="0",
+        flex=f"0 0 {button_width}px",
+    )
+    previous = widgets.Button(
+        description="◀",
+        tooltip=f"Disminuir {accessible_name.lower()} un orden de magnitud",
+        layout=button_layout,
+    )
+    following = widgets.Button(
+        description="▶",
+        tooltip=f"Aumentar {accessible_name.lower()} un orden de magnitud",
+        layout=button_layout,
+    )
+    container = widgets.HBox(
+        [previous, text, following],
+        layout=widgets.Layout(width=f"{width}px", align_items="center"),
+    )
+    container.add_class(css_class)
+    return MagnitudeStepper(container, text, previous, following)
 
 
 def bounded_int_control(

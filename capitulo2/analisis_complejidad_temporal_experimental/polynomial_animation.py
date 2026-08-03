@@ -39,8 +39,11 @@ DEFAULT_MAXIMUM_N = 10
 DEFAULT_MAX_DEGREE = 4
 MAX_DEGREE = None
 TABLE_MAX_DEGREE = 5
-STEPPER_FIELD_WIDTH = 184
-STEPPER_GROUP_WIDTH = 326
+STEPPER_FIELD_WIDTH = 188
+STEPPER_LABEL_WIDTH = 150
+STEPPER_GROUP_WIDTH = STEPPER_LABEL_WIDTH + STEPPER_FIELD_WIDTH + 8
+STEPPER_BUTTON_WIDTH = 34
+STEPPER_VALUE_WIDTH = 112
 
 
 def scientific_latex(value):
@@ -97,8 +100,8 @@ def render_polynomial_figure(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX
             label=rf"$n^{{{degree}}}$",
         )
         lines[degree] = line
-    ax1.set_xlabel("Tamaño de la entrada ($n$)")
-    ax1.set_ylabel("Función de complejidad teórica")
+    ax1.set_xlabel(r"$\mathrm{Tamaño\ de\ la\ entrada}\ (n)$", fontsize=13)
+    ax1.set_ylabel(r"$\mathrm{Función\ de\ complejidad\ teórica}$", fontsize=13)
     if max_degree <= 4:
         ax1.set_xlim([1, maximum_n + 0.6])
         ax1.set_ylim([0, maximum_n])
@@ -107,12 +110,25 @@ def render_polynomial_figure(maximum_n=DEFAULT_MAXIMUM_N, max_degree=DEFAULT_MAX
         ax1.set_xlim([2, maximum_n + 0.8])
         apply_polynomial_y_axis(ax1, visible_ceiling)
         ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
-    ax1.set_title(rf"$C(n)=n^k$ para $k \in [0, {max_degree}]$")
+    ax1.set_title(rf"$C(n)=n^k$ para $k \in [0, {max_degree}]$", fontsize=15)
     label_polynomial_curves(ax1, max_degree, lines, n_values, maximum_n)
-    ax1.grid(True)
-    ax1.xaxis.set_major_formatter(plt.ScalarFormatter(useMathText=True))
-    ax1.yaxis.set_major_formatter(plt.ScalarFormatter(useMathText=True))
-    fig_main.tight_layout()
+    ax1.xaxis.set_label_coords(0.5, -0.12)
+    ax1.yaxis.set_label_coords(-0.075, 0.5)
+    ax1.title.set_position((0.5, 1.02))
+    for axis in (ax1.xaxis, ax1.yaxis):
+        formatter = plt.ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)
+        formatter.set_powerlimits((0, 0))
+        axis.set_major_formatter(formatter)
+        axis.get_offset_text().set_fontfamily("STIXGeneral")
+    ax1.tick_params(axis="both", labelsize=10)
+    for tick_label in (*ax1.get_xticklabels(), *ax1.get_yticklabels()):
+        tick_label.set_fontfamily("STIXGeneral")
+    ax1.grid(True, color="#CFD8DC", linestyle="-", linewidth=0.6, alpha=0.55)
+    for spine in ax1.spines.values():
+        spine.set_color("#000000")
+        spine.set_linewidth(0.8)
+    fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)
 
     image_buffer = BytesIO()
     fig_main.savefig(image_buffer, format="png", bbox_inches="tight", pad_inches=0.05)
@@ -139,11 +155,13 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
         justify_content="center",
     )
     maximum_n_value.add_class("constant-centered-math")
+    maximum_n_value.add_class("polynomial-full-value")
     maximum_n_group = compact_labeled_control(
         "Máximo n",
         maximum_n_value,
         field_width=STEPPER_FIELD_WIDTH,
         group_width=STEPPER_GROUP_WIDTH,
+        label_width=STEPPER_LABEL_WIDTH,
     )
 
     degree_state = {"value": max(0, default_max_degree)}
@@ -157,17 +175,27 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
         justify_content="center",
     )
     degree_value.add_class("constant-centered-math")
-    degree_down = widgets.Button(description="◀", tooltip="Grado anterior", layout=widgets.Layout(width="100%", height="32px"))
-    degree_up = widgets.Button(description="▶", tooltip="Grado siguiente", layout=widgets.Layout(width="100%", height="32px"))
+    degree_value.add_class("polynomial-stepper-value")
+    degree_button_layout = widgets.Layout(
+        width=f"{STEPPER_BUTTON_WIDTH}px",
+        min_width=f"{STEPPER_BUTTON_WIDTH}px",
+        max_width=f"{STEPPER_BUTTON_WIDTH}px",
+        height="32px",
+        flex=f"0 0 {STEPPER_BUTTON_WIDTH}px",
+    )
+    degree_down = widgets.Button(description="◀", tooltip="Grado anterior", layout=degree_button_layout)
+    degree_up = widgets.Button(description="▶", tooltip="Grado siguiente", layout=degree_button_layout)
     degree_stepper = widgets.HBox(
         [degree_down, degree_value, degree_up],
         layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", gap="0px"),
     )
+    degree_stepper.add_class("experimental-stepper")
     degree_group = compact_labeled_control(
         "Máximo k",
         degree_stepper,
         field_width=STEPPER_FIELD_WIDTH,
         group_width=STEPPER_GROUP_WIDTH,
+        label_width=STEPPER_LABEL_WIDTH,
     )
 
     controls_row = widgets.Box(
@@ -175,24 +203,31 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
         layout=widgets.Layout(
             width="auto",
             display="flex",
-            flex_flow="row wrap",
-            gap="12px 42px",
-            align_items="center",
-            overflow="visible",
+            flex_flow="column nowrap",
+            gap="12px",
+            align_items="flex-start",
+            overflow="hidden",
         ),
     )
+    controls_row.add_class("experimental-parameters-grid")
+    controls = widgets.VBox(
+        [controls_row],
+        layout=widgets.Layout(width="100%", margin="0", padding="0"),
+    )
+    controls.add_class("experimental-controls")
     table_output = widgets.HTML(layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"))
     table_container = widgets.VBox(
         [table_output],
         layout=widgets.Layout(
             width="100%",
             max_width="100%",
-            margin="18px 0 0 0",
+            margin="0",
             overflow_x="hidden",
             overflow_y="hidden",
         ),
     )
     figure_output = widgets.HTML(layout=widgets.Layout(width="100%", max_width="100%", overflow="hidden"))
+    figure_output.add_class("experimental-figure-output")
 
     def refresh(*_):
         max_degree = int(degree_state["value"])
@@ -216,36 +251,46 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
     table_container.layout.overflow_y = "hidden"
     refresh()
 
-    panel_header = widgets.HTML(
-        value='<div class="experimental-panel-title">Análisis teórico interactivo:</div>',
-        layout=widgets.Layout(width="100%"),
+    def subpanel(title, children):
+        header = widgets.Button(
+            description=title,
+            icon="caret-down",
+            layout=widgets.Layout(width="100%", height="44px"),
+        )
+        header.add_class("experimental-subpanel-summary")
+        content = widgets.VBox(
+            children,
+            layout=widgets.Layout(width="100%", gap="0px"),
+        )
+        content.add_class("experimental-subpanel-content")
+
+        def toggle_content(_):
+            collapsed = content.layout.display != "none"
+            content.layout.display = "none" if collapsed else "flex"
+            header.icon = "caret-right" if collapsed else "caret-down"
+
+        header.on_click(toggle_content)
+        panel = widgets.VBox(
+            [header, content],
+            layout=widgets.Layout(width="100%", gap="0px"),
+        )
+        panel.add_class("experimental-subpanel")
+        return panel
+
+    configuration_panel = subpanel("Configuración", [controls])
+    result_spacer = widgets.HTML(
+        value='<div aria-hidden="true" style="height:16px"></div>',
+        layout=widgets.Layout(width="100%", height="16px", min_height="16px"),
     )
-    parameters_title = widgets.HTML(
-        value='<div class="experimental-section-title">Parámetros:</div>',
-        layout=widgets.Layout(width="100%"),
+    result_spacer.add_class("experimental-result-spacer")
+    result_content = widgets.VBox(
+        [table_container, result_spacer, figure_output],
+        layout=widgets.Layout(width="100%", gap="0px", overflow_x="hidden"),
     )
-    table_title = widgets.HTML(
-        value='<div class="experimental-section-title">Resultados por grado:</div>',
-        layout=widgets.Layout(width="100%"),
-    )
-    figure_title = widgets.HTML(
-        value='<div class="experimental-section-title">Resultado:</div>',
-        layout=widgets.Layout(width="100%"),
-    )
-    panel_content = widgets.VBox(
-        [
-            parameters_title,
-            controls_row,
-            table_title,
-            table_container,
-            figure_title,
-            figure_output,
-        ],
-        layout=widgets.Layout(width="100%", gap="0px"),
-    )
-    panel_content.add_class("experimental-panel-content")
+    result_content.add_class("experimental-result-content")
+    result_panel = subpanel("Resultado", [result_content])
     main_panel = widgets.VBox(
-        [panel_header, panel_content],
+        [configuration_panel, result_panel],
         layout=widgets.Layout(width="100%", gap="0px"),
     )
     main_panel.add_class("experimental-main-panel")
@@ -253,26 +298,24 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
     style = widgets.HTML(
         """
         <style>
-          .constant-centered-input input {
-            text-align: center !important;
+          .constant-centered-math {
             box-sizing: border-box !important;
-            width: 100px !important;
-            min-width: 100px !important;
-            max-width: 100px !important;
             height: 32px !important;
             min-height: 32px !important;
             max-height: 32px !important;
             margin: 0 !important;
           }
-          .constant-centered-math {
-            box-sizing: border-box !important;
-            width: 100px !important;
-            min-width: 100px !important;
-            max-width: 100px !important;
-            height: 32px !important;
-            min-height: 32px !important;
-            max-height: 32px !important;
-            margin: 0 !important;
+          .polynomial-full-value {
+            width: 188px !important;
+            min-width: 188px !important;
+            max-width: 188px !important;
+            flex: 0 0 188px !important;
+          }
+          .polynomial-stepper-value {
+            width: 112px !important;
+            min-width: 112px !important;
+            max-width: 112px !important;
+            flex: 0 0 112px !important;
           }
           .constant-centered-math .widget-htmlmath-content,
           .constant-centered-math .widget-html-content {
@@ -302,66 +345,169 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
             color: #333 !important;
             font-family: sans-serif !important;
           }
+          .constant-animation-root .widget-html-content,
+          .constant-animation-root .widget-label,
+          .constant-animation-root span {
+            color: #333 !important;
+            font-family: sans-serif !important;
+          }
           .experimental-main-panel {
             box-sizing: border-box !important;
             width: 100% !important;
             margin: 0 !important;
-            border: 1px solid #dedede !important;
-            border-radius: 5px !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+            background: #fff !important;
+          }
+          .experimental-subpanel {
+            box-sizing: border-box !important;
+            width: 100% !important;
+            margin: 0 !important;
+            border: 1px solid #e1e1e1 !important;
+            border-radius: 0 !important;
             overflow: hidden !important;
             background: #fff !important;
           }
-          .experimental-panel-title {
+          .experimental-subpanel + .experimental-subpanel {
+            border-top: 0 !important;
+          }
+          .experimental-main-panel > .experimental-subpanel:first-child {
+            border-radius: 5px 5px 0 0 !important;
+          }
+          .experimental-main-panel > .experimental-subpanel:last-child {
+            border-radius: 0 0 5px 5px !important;
+          }
+          .experimental-subpanel-summary {
             box-sizing: border-box !important;
             width: 100% !important;
+            height: 44px !important;
+            min-height: 44px !important;
+            margin: 0 !important;
             padding: 10px 14px !important;
-            border-bottom: 1px solid #e2e2e2 !important;
+            border: 0 !important;
+            border-bottom: 1px solid #e5e5e5 !important;
+            border-radius: 0 !important;
             background: #f7f7f7 !important;
             color: #333 !important;
+            font-family: sans-serif !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
+            line-height: 24px !important;
             text-align: left !important;
           }
-          .experimental-panel-content {
+          .experimental-subpanel-summary:hover {
+            background: #f7f7f7 !important;
+          }
+          .experimental-subpanel-summary .fa {
+            color: #333 !important;
+          }
+          .experimental-subpanel-content {
             box-sizing: border-box !important;
             width: 100% !important;
             padding: 12px !important;
             background: #fff !important;
+            overflow-x: hidden !important;
           }
-          .experimental-section-title {
+          .experimental-controls {
             box-sizing: border-box !important;
             width: 100% !important;
             margin: 0 !important;
-            padding: 10px 0 8px !important;
-            color: #333 !important;
-            font-weight: 700 !important;
-            text-align: left !important;
+            padding: 0 !important;
+            background: #fff !important;
+            overflow-x: hidden !important;
           }
-          .experimental-panel-content button {
+          .experimental-parameters-grid {
+            box-sizing: border-box !important;
+            display: flex !important;
+            width: auto !important;
+            flex-flow: column nowrap !important;
+            row-gap: 12px !important;
+            overflow: visible !important;
+          }
+          .experimental-parameters-grid > .widget-box {
+            box-sizing: border-box !important;
+            width: 346px !important;
+            min-width: 346px !important;
+            max-width: 346px !important;
+            margin: 0 !important;
+            overflow: visible !important;
+          }
+          .experimental-controls button {
             border: 1px solid #ccc !important;
             border-radius: 3px !important;
             background: #f7f7f7 !important;
             color: #333 !important;
           }
-          .experimental-panel-content button:hover {
+          .experimental-controls button:hover {
             background: #eee !important;
           }
-          .experimental-panel-content iframe,
-          .experimental-panel-content img {
+          .experimental-stepper {
+            box-sizing: border-box !important;
+            display: flex !important;
+            width: 188px !important;
+            min-width: 188px !important;
+            max-width: 188px !important;
+            flex: 0 0 188px !important;
+            flex-wrap: nowrap !important;
+            gap: 4px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+          }
+          .experimental-stepper > * {
+            margin: 0 !important;
+          }
+          .experimental-stepper button {
+            box-sizing: border-box !important;
+            width: 34px !important;
+            min-width: 34px !important;
+            max-width: 34px !important;
+            height: 32px !important;
+            min-height: 32px !important;
+            max-height: 32px !important;
+            flex: 0 0 34px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            text-overflow: clip !important;
+            font-size: 13px !important;
+            line-height: 1 !important;
+          }
+          .experimental-result-content iframe,
+          .experimental-result-content img {
             box-sizing: border-box !important;
             width: 100% !important;
             max-width: 100% !important;
             margin: 0 auto !important;
             background: #fff !important;
           }
+          .experimental-result-spacer {
+            display: block !important;
+            width: 100% !important;
+            min-height: 16px !important;
+            height: 16px !important;
+            flex: 0 0 16px !important;
+          }
           .constant-animation-root .output_scroll {
             height: auto !important;
             max-height: none !important;
             box-shadow: none !important;
           }
+          .constant-animation-root .widget-box,
+          .constant-animation-root .widget-hbox,
+          .constant-animation-root .widget-vbox,
+          .constant-animation-root .experimental-panel-content,
+          .constant-animation-root .experimental-subpanel-content,
+          .constant-animation-root .experimental-main-panel {
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+          }
           .output_scroll:has(.constant-animation-root),
           .output_area:has(.constant-animation-root),
           .jp-OutputArea-output:has(.constant-animation-root) {
             overflow-x: hidden !important;
+            overflow-y: visible !important;
             height: auto !important;
             max-height: none !important;
             box-shadow: none !important;

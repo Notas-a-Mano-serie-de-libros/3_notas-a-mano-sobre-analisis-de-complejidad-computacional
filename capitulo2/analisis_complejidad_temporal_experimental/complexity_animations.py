@@ -439,7 +439,7 @@ def render_profile_result(config, profile, shape_function, label, filename, size
     style_experiment_axis(
         ax1,
         profile.mode,
-        f"{symbol}(n) teórico vs {symbol}(n) calculado - Complejidad {config['title']}",
+        f"{symbol}(n) teórico vs {symbol}(n) calculado",
     )
     fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)
 
@@ -466,7 +466,7 @@ def render_profile_template(config, profile, label, maximum_n):
     style_experiment_axis(
         ax1,
         profile.mode,
-        f"{symbol}(n) teórico vs {symbol}(n) calculado - Complejidad {config['title']}",
+        f"{symbol}(n) teórico vs {symbol}(n) calculado",
         legend_handles=legend_handles,
     )
     fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)
