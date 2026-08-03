@@ -13,6 +13,7 @@ def _run_app(mode: str, allow_mode_selection: bool = False):
         .replace("__MODE_SELECTABLE__", str(allow_mode_selection).lower())
         .replace("__MODE_SELECTOR_DISPLAY__", "grid")
         .replace("__MODE_SELECTOR_DISABLED__", "" if allow_mode_selection else "disabled")
+        .replace("__GROWTH_PLAY_DISPLAY__", "inline-flex")
         .replace("bo-", instance_prefix)
     )
     display(HTML(html))
@@ -55,6 +56,7 @@ _BIG_O_HTML = r"""
 #bo-wrap .zoom-btn:hover{background:#f1f1f1}
 #bo-wrap .zoom-btn.active{background:#e3f2fd;border-color:#1976D2;color:#0D47A1}
 #bo-wrap .zoom-btn:disabled{cursor:not-allowed;opacity:.45;background:rgba(245,245,245,.94)}
+#bo-wrap .growth-play{display:__GROWTH_PLAY_DISPLAY__;width:104px;align-items:center;justify-content:center;gap:5px;padding:0 8px;font-size:12px;font-weight:700;white-space:nowrap}
 #bo-wrap .zoom-n0{width:46px;font-size:13px;font-weight:700}
 #bo-wrap .zoom-small{width:38px;font-size:11px;font-weight:700}
 #bo-wrap .zoom-selection{position:absolute;display:none;z-index:1;border:1px dashed #1565C0;background:rgba(21,101,192,.12);pointer-events:none}
@@ -219,6 +221,7 @@ _BIG_O_HTML = r"""
       <button type="button" class="zoom-btn" id="bo-zoom-trackpad" title="Activar o desactivar el zoom con trackpad" aria-label="Activar o desactivar el zoom con trackpad" aria-pressed="false" style="font-size:11px;font-weight:700">TP</button>
       <button type="button" class="zoom-btn" id="bo-zoom-select" title="Seleccionar un área" aria-label="Seleccionar un área">□</button>
       <button type="button" class="zoom-btn" id="bo-zoom-reset" title="Restablecer el zoom" aria-label="Restablecer el zoom">↺</button>
+      <button type="button" class="zoom-btn growth-play" id="bo-growth-play" title="Mostrar el crecimiento desde n₀" aria-label="Reproducir crecimiento desde n₀"><span id="bo-growth-icon">▶</span><span id="bo-growth-label">Reproducir</span></button>
     </div>
     <div class="zoom-selection" id="bo-zoom-selection"></div>
     <canvas id="bo-cv"></canvas>
@@ -292,7 +295,7 @@ _BIG_O_HTML = r"""
   var root=document.getElementById('bo-wrap');
   var cv=document.getElementById('bo-cv'),ctx=cv.getContext('2d');
   var staticBackground=document.createElement('canvas'),staticCurves=document.createElement('canvas');
-  var W=0,H=0,DPR=1,PAD={l:82,r:32,t:58,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,Y_RANGE_OVERRIDE=null,lastYRange=null,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,n0FocusActive=false,lockX=false,lockY=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null,staticLayerKey='',historyUndo=[],historyRedo=[],historyCapturePending=false,dynamicMathState={};
+  var W=0,H=0,DPR=1,PAD={l:82,r:32,t:58,b:58},drag=null,panStart=null,pinchDistance=null,gestureScale=1,Y_OFFSET=0,Y_SCALE=1,Y_RANGE_OVERRIDE=null,lastYRange=null,selectionMode=false,selectionStart=null,trackpadZoomEnabled=false,n0FocusActive=false,lockX=false,lockY=false,drawFramePending=false,sampleCacheKey='',sampleCacheValue=null,staticLayerKey='',historyUndo=[],historyRedo=[],historyCapturePending=false,dynamicMathState={},growthPlaying=false,growthProgress=1,growthStartedAt=null,growthElapsed=0,growthFrame=null,growthSignature='';
   var FNS={
     one:{label:'1',latex:'1',rank:0,fn:function(n){return 1;}},
     log:{label:'log₂(n)',latex:'\\log_2(n)',rank:1,fn:function(n){return n<=1?0:Math.log2(n);}},
@@ -1248,6 +1251,62 @@ _BIG_O_HTML = r"""
   function drawStaticLayer(layer){
     ctx.drawImage(layer,0,0,layer.width,layer.height,0,0,W,H);
   }
+  function growthConfigurationSignature(a,b,n0){
+    return [MODE,scaleMode(),a,b,cKey(),gKey(),n0,el('bo-c').value,el('bo-c1').value,el('bo-c2').value].join('|');
+  }
+  function growthCurrentN(n0,b){
+    if(n0===null)return null;
+    if(isLogScale() && n0>0 && b>n0)return n0*Math.pow(b/n0,growthProgress);
+    return n0+(b-n0)*growthProgress;
+  }
+  function drawGrowthGuide(n0,a,b){
+    if(growthProgress>=1 || n0===null)return;
+    var currentN=growthCurrentN(n0,b),x=tx(currentN,a,b);
+    ctx.save();ctx.strokeStyle='#5f6368';ctx.lineWidth=1.4;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,H-PAD.b);ctx.stroke();ctx.restore();
+  }
+  function drawGrowthLayers(data,a,b,yrange,n0){
+    if(growthProgress>=1 || n0===null){
+      drawValidArea(data,a,b,yrange,n0);drawStaticLayer(staticCurves);return;
+    }
+    ctx.save();ctx.globalAlpha=0.18;drawStaticLayer(staticCurves);ctx.restore();
+    var startX=Math.max(PAD.l,tx(n0,a,b));
+    var endX=Math.min(W-PAD.r,tx(growthCurrentN(n0,b),a,b));
+    if(endX>startX){
+      ctx.save();ctx.beginPath();ctx.rect(startX,PAD.t,endX-startX,H-PAD.t-PAD.b);ctx.clip();
+      drawValidArea(data,a,b,yrange,n0);drawStaticLayer(staticCurves);ctx.restore();
+    }
+    drawGrowthGuide(n0,a,b);
+  }
+  function setGrowthButton(playing){
+    el('bo-growth-icon').textContent=playing?'Ⅱ':'▶';
+    el('bo-growth-label').textContent=playing?'Pausar':'Reproducir';
+    el('bo-growth-play').setAttribute('aria-pressed',playing?'true':'false');
+  }
+  function stopGrowthAnimation(reset){
+    growthPlaying=false;if(growthFrame!==null)cancelAnimationFrame(growthFrame);
+    growthFrame=null;growthStartedAt=null;
+    if(reset){growthProgress=1;growthElapsed=0;}
+    setGrowthButton(false);
+  }
+  function growthAnimationStep(timestamp){
+    if(!growthPlaying || !root.isConnected)return;
+    if(growthStartedAt===null)growthStartedAt=timestamp-growthElapsed;
+    growthElapsed=timestamp-growthStartedAt;
+    growthProgress=Math.min(1,growthElapsed/5000);
+    draw();
+    if(growthProgress<1)growthFrame=requestAnimationFrame(growthAnimationStep);
+    else{growthPlaying=false;growthFrame=null;growthStartedAt=null;growthElapsed=0;setGrowthButton(false);}
+  }
+  function toggleGrowthAnimation(){
+    if(growthPlaying){growthPlaying=false;if(growthFrame!==null)cancelAnimationFrame(growthFrame);growthFrame=null;setGrowthButton(false);return;}
+    var ck=cKey(),gk=gKey(),c=enforceC(ck,gk),ab=interval(),n0=selectedN0(estimateN0(ck,gk,c));
+    if(n0===null)return;
+    if(growthProgress>=1){growthProgress=0;growthElapsed=0;}
+    growthSignature=growthConfigurationSignature(ab[0],ab[1],n0);
+    growthPlaying=true;growthStartedAt=null;setGrowthButton(true);
+    growthFrame=requestAnimationFrame(growthAnimationStep);
+  }
   function draw(){
     resize();
     var ck=cKey(),gk=gKey(),c=enforceC(ck,gk);
@@ -1256,6 +1315,7 @@ _BIG_O_HTML = r"""
     var yrange=Y_RANGE_OVERRIDE||automaticYRange;
     lastYRange={min:yrange.min,max:yrange.max};
     var threshold=estimateN0(ck,gk,c),n0=selectedN0(threshold),lim=limitValue(ck,gk);
+    if(growthProgress<1 && growthSignature!==growthConfigurationSignature(a,b,n0))stopGrowthAnimation(true);
     var layerKey=[MODE,scaleMode(),W,H,DPR,a,b,ck,gk,JSON.stringify(c),yrange.min,yrange.max,Y_SCALE,Y_OFFSET].join('|');
     renderStaticLayers(layerKey,data,a,b,yrange);
     ctx.clearRect(0,0,W,H);
@@ -1264,8 +1324,7 @@ _BIG_O_HTML = r"""
     ctx.beginPath();
     ctx.rect(PAD.l,PAD.t,W-PAD.l-PAD.r,H-PAD.t-PAD.b);
     ctx.clip();
-    drawValidArea(data,a,b,yrange,n0);
-    drawStaticLayer(staticCurves);
+    drawGrowthLayers(data,a,b,yrange,n0);
     drawN0DisplacementFade(threshold,n0,a,b);
     drawThresholdAndCrossings(threshold,a,b,ck,gk,c,yrange);
     drawN0(n0,a,b,ck,yrange);
@@ -1286,6 +1345,7 @@ _BIG_O_HTML = r"""
   }
   function updateText(a,b,ck,gk,c,threshold,lim){
     var n0=selectedN0(threshold),cls=relationClass(ck,gk);
+    el('bo-growth-play').disabled=n0===null || n0<a || n0>b || (isLogScale() && n0===0);
     el('bo-result-main').innerHTML=resultSummaryHtml(ck,gk,c,threshold);
     el('bo-result-n0').innerHTML=n0===null?tex('n_0\\text{ no existe}'):tex('n_0='+thresholdNumber(n0));
     el('bo-n0').innerHTML=n0===null?tex('\\text{No existe}') : tex('n_0='+thresholdNumber(n0));
@@ -1667,6 +1727,7 @@ _BIG_O_HTML = r"""
     this.classList.toggle('active',selectionMode);cv.style.cursor=selectionMode?'crosshair':'grab';
   });
   el('bo-zoom-reset').addEventListener('click',function(){selectionMode=false;cancelSelection();el('bo-zoom-select').classList.remove('active');cv.style.cursor='grab';resetZoom();});
+  el('bo-growth-play').addEventListener('click',toggleGrowthAnimation);
   el('bo-mode').value=MODE;
   if(MODE_SELECTABLE){
     el('bo-mode').addEventListener('change',function(){

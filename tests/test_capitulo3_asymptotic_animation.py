@@ -161,9 +161,12 @@ def test_grafica_separa_capas_estaticas_de_elementos_dinamicos():
     assert "drawStaticLayer(staticBackground);" in html
     assert "drawValidArea(data,a,b,yrange,n0);" in html
     assert "drawStaticLayer(staticCurves);" in html
-    assert html.index("drawStaticLayer(staticBackground);") < html.index(
-        "drawValidArea(data,a,b,yrange,n0);"
-    ) < html.index("drawStaticLayer(staticCurves);")
+    draw_source = html.split("  function draw(){", 1)[1].split(
+        "  function requestDraw()", 1
+    )[0]
+    assert draw_source.index("drawStaticLayer(staticBackground);") < draw_source.index(
+        "drawGrowthLayers(data,a,b,yrange,n0);"
+    )
     assert "drawN0DisplacementFade(threshold,n0,a,b);" in html
     assert "drawN0(n0,a,b,ck,yrange);" in html
 
@@ -583,6 +586,39 @@ def test_notebook_comparativo_usa_el_mismo_motor_compartido():
     assert "0_comparacion_notaciones_asintoticas.ipynb" in (
         PROJECT_ROOT / "capitulo3" / "README.md"
     ).read_text(encoding="utf-8")
+
+
+def test_reproduccion_de_crecimiento_aparece_en_animacion_general_e_individuales():
+    module = load_animation_module()
+    rendered = []
+    module.display = lambda value: rendered.append(value.data)
+
+    module.run_comparison_app()
+    comparison_html = rendered.pop()
+    module.run_big_o_app()
+    individual_html = rendered.pop()
+
+    assert 'id="asym-' in comparison_html
+    assert ".growth-play{display:inline-flex" in comparison_html
+    assert ".growth-play{display:inline-flex" in individual_html
+    assert ".growth-play{display:none" not in individual_html
+    assert "__GROWTH_PLAY_DISPLAY__" not in comparison_html
+    assert "__GROWTH_PLAY_DISPLAY__" not in individual_html
+
+
+def test_reproduccion_revela_curvas_desde_n0_sin_mover_los_ejes():
+    html = load_animation_module()._BIG_O_HTML
+
+    assert 'id="bo-growth-play"' in html
+    assert "function toggleGrowthAnimation()" in html
+    assert "function growthAnimationStep(timestamp)" in html
+    assert "growthProgress=Math.min(1,growthElapsed/5000);" in html
+    assert "ctx.globalAlpha=0.18" in html
+    assert "ctx.rect(startX,PAD.t,endX-startX,H-PAD.t-PAD.b)" in html
+    assert "drawGrowthGuide(n0,a,b);" in html
+    assert "drawGrowthLayers(data,a,b,yrange,n0);" in html
+    assert "el('bo-growth-play').addEventListener('click',toggleGrowthAnimation);" in html
+    assert "Y_RANGE_OVERRIDE=" not in html.split("function toggleGrowthAnimation()", 1)[1].split("function draw()", 1)[0]
 
 
 def test_no_quedan_residuos_de_terminos_menores_ni_eventos_duplicados():
