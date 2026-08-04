@@ -4,6 +4,7 @@ import asyncio
 import html
 import builtins
 import math
+import time
 from fractions import Fraction
 from functools import lru_cache
 
@@ -1766,6 +1767,16 @@ def run_app(builder_only=False):
             update()
         play.disabled = True
         pause.disabled = False
+        if RUNNING_IN_COLAB:
+            try:
+                while animation_state["level"] < parameter_state["h"]:
+                    time.sleep(0.35)
+                    change_level(1)
+            finally:
+                playback_state["task"] = None
+                play.disabled = False
+                pause.disabled = True
+            return
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:

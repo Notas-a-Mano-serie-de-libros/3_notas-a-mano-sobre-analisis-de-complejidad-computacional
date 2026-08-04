@@ -4,6 +4,7 @@ import asyncio
 import html
 import math
 import re
+import time
 from dataclasses import dataclass, field
 
 import ipywidgets as widgets
@@ -18,6 +19,15 @@ from common.widget_controls import (
     STANDARD_LABEL_CONTROL_GAP,
 )
 from common.simulation_views import standard_view_styles
+
+
+try:
+    from google.colab import output as _colab_output  # type: ignore
+except (ImportError, ModuleNotFoundError):
+    _colab_output = None
+
+
+RUNNING_IN_COLAB = _colab_output is not None
 
 
 @dataclass
@@ -763,6 +773,17 @@ def run_app():
             render()
         play.description = "Pausar"
         play.icon = "pause"
+        if RUNNING_IN_COLAB:
+            try:
+                while state["step"] < len(state["events"]) - 1:
+                    next_event = state["events"][state["step"] + 1]
+                    time.sleep(_event_delay(next_event, state["nodes"]))
+                    move_step(1)
+            finally:
+                state["play_task"] = None
+                play.description = "Reproducir"
+                play.icon = "play"
+            return
         state["play_task"] = asyncio.get_running_loop().create_task(play_process())
 
     previous.on_click(lambda _: (stop_playback(), move_step(-1)))

@@ -305,6 +305,8 @@ def test_playback_uses_event_specific_transition_delays():
     assert delays["resume"] < delays["line"]
     assert delays["resume"] == 0.3
     assert "await asyncio.sleep(_event_delay(next_event, state[\"nodes\"]))" in SOURCE
+    assert "if RUNNING_IN_COLAB:" in SOURCE
+    assert "time.sleep(_event_delay(next_event, state[\"nodes\"]))" in SOURCE
     assert ".lab-call-frame.waiting{opacity:.62}" in SOURCE
 
 

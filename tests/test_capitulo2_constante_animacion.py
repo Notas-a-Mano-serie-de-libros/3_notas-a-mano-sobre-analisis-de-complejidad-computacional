@@ -186,12 +186,10 @@ def test_simulacion_incluye_boton_reiniciar_junto_a_ejecutar():
     assert 'description="Reiniciar"' in source
     assert "[apply_button, reset_button]" in source
     assert "reset_button.on_click(reset_app)" in source
-    assert "def schedule_task(coro):" in source
-    assert "loop.create_task(coro)" in source
-    assert "asyncio.run(coro)" in source
-    assert "task = schedule_task(run_experiment())" in source
-    assert "await asyncio.to_thread(" in source
-    assert "await asyncio.sleep(0)" in source
+    assert "def run_experiment():" in source
+    assert "run_experiment()" in source
+    assert "create_task" not in source
+    assert "asyncio.to_thread" not in source
 
 
 def test_simulacion_unifica_configuracion_resultado_y_tipo_de_analisis():
@@ -293,7 +291,7 @@ def test_simulacion_habilita_widgets_en_colab():
 
     assert "from google.colab import output as colab_output" in source
     assert "colab_output.enable_custom_widget_manager()" in source
-    assert "nest_asyncio.apply()" in source
+    assert "nest_asyncio" not in source
 
 
 def test_simulacion_declara_defaults_y_estados():

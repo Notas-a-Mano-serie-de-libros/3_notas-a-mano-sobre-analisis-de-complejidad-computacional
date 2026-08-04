@@ -26,6 +26,8 @@ def test_playback_buttons_use_kernel_callbacks_instead_of_injected_javascript():
     assert "play.on_click(start_playback)" in SOURCE
     assert "pause.on_click(stop_playback)" in SOURCE
     assert "loop.create_task(play_levels())" in SOURCE
+    assert "if RUNNING_IN_COLAB:" in SOURCE
+    assert "time.sleep(0.35)" in SOURCE
     assert "playbackTimer" not in SOURCE
 
 

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
 from html import escape
 from pathlib import Path
@@ -37,11 +36,6 @@ from common.widget_controls import (
     magnitude_stepper,
 )
 from common.simulation_views import standard_view_styles
-
-try:
-    import nest_asyncio
-except ImportError:
-    nest_asyncio = None
 
 try:
     from google.colab import output as colab_output
@@ -341,8 +335,6 @@ def profile_warning_html(profile, maximum_n, executions, force_full_execution=Fa
 def run_app(profile, display_app=True, mode_selector=None):
     if profile.mode not in {"time", "memory"}:
         raise ValueError("mode debe ser 'time' o 'memory'")
-    if nest_asyncio is not None:
-        nest_asyncio.apply()
     if colab_output is not None:
         colab_output.enable_custom_widget_manager()
 
@@ -536,15 +528,7 @@ def run_app(profile, display_app=True, mode_selector=None):
     def increase_sampling_points(_):
         update_sampling_points(next_order_of_magnitude(sampling_point_count()))
 
-    def schedule_task(coro):
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            asyncio.run(coro)
-            return None
-        return loop.create_task(coro)
-
-    async def run_experiment():
+    def run_experiment():
         execution_state["reset_requested"] = False
         set_controls_enabled(False)
         try:
@@ -579,8 +563,8 @@ def run_app(profile, display_app=True, mode_selector=None):
                 if execution_state["reset_requested"]:
                     break
                 if n <= execution_limit:
-                    experimental[index] = await asyncio.to_thread(
-                        measure_profile_point, profile, int(n), executions
+                    experimental[index] = measure_profile_point(
+                        profile, int(n), executions
                     )
                 checkpoint_index = checkpoint_indexes.get(int(n))
                 if checkpoint_index is not None:
@@ -595,8 +579,6 @@ def run_app(profile, display_app=True, mode_selector=None):
                         pending=True,
                         statuses=checkpoint_statuses,
                     )
-                if index % max(1, profile.yield_every) == 0 or checkpoint_index is not None:
-                    await asyncio.sleep(0)
             if execution_state["reset_requested"]:
                 reset_app()
             else:
@@ -626,9 +608,7 @@ def run_app(profile, display_app=True, mode_selector=None):
         if execution_state["task"] is not None:
             return
         execution_state["task"] = "running"
-        task = schedule_task(run_experiment())
-        if task is not None:
-            execution_state["task"] = task
+        run_experiment()
 
     force_execution.observe(refresh_warning, names="value")
     maximum_down.on_click(decrease_maximum)

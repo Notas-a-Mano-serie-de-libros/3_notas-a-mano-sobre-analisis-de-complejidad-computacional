@@ -72,13 +72,14 @@ def test_interfaz_comun_expone_puntos_de_muestreo_configurables():
     assert "return max(1, int(profile.default_executions))" in UI_SOURCE
 
 
-def test_tabla_es_nativa_formateada_y_la_medicion_no_bloquea_la_vista():
+def test_tabla_es_nativa_y_la_medicion_es_sincrona_para_colab():
     assert "constant-native-table" in UI_SOURCE
     assert "constant-equation" in UI_SOURCE
     assert "'STIX Two Math','STIXGeneral','Cambria Math','Latin Modern Math'" in UI_SOURCE
     assert "return mathjax_frame(table" not in UI_SOURCE
-    assert "await asyncio.to_thread(" in UI_SOURCE
-    assert "await asyncio.sleep(0)" in UI_SOURCE
+    assert "def run_experiment():" in UI_SOURCE
+    assert "asyncio.to_thread" not in UI_SOURCE
+    assert "create_task" not in UI_SOURCE
     assert 'margin="16px 0 0 0"' in UI_SOURCE
     assert 'figure_output.add_class("experimental-figure-output")' in UI_SOURCE
     assert "[table_output, result_spacer, figure_output]" in UI_SOURCE
