@@ -534,6 +534,58 @@ STYLES = """
 """
 
 
+def _mathjax_frame(content: str, height: int) -> str:
+    """Renderiza fórmulas de forma estable en Jupyter local y Google Colab."""
+
+    srcdoc = f"""<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+html,body{{box-sizing:border-box;width:100%;height:100%;margin:0;padding:0;background:#fff;color:#333;font-family:sans-serif;overflow:auto;}}
+*,*::before,*::after{{box-sizing:border-box;}}
+#content{{width:100%;visibility:hidden;}}
+body.math-ready #content{{visibility:visible;}}
+.lab-section{{width:100%;margin:0;border:0;background:#fff;}}
+.lab-section>summary{{box-sizing:border-box;width:100%;padding:9px 12px;background:#f7f7f7;border-bottom:1px solid #e2e2e2;color:#333;font-size:16px;font-weight:700;line-height:1.45;cursor:pointer;}}
+.lab-section-content{{width:100%;background:#fff;}}
+.lab-analysis-steps{{padding:10px 18px 14px;font-size:16px;line-height:1.55;}}
+.lab-analysis-step{{margin:8px 0 14px;line-height:1.55;}}
+.lab-analysis-step-title{{font-weight:700;text-align:left;}}
+.lab-analysis-step-solution{{width:100%;padding:4px 12px 0;text-align:center;}}
+.lab-analysis-result{{margin:16px 0 2px;}}
+.lab-analysis-equation{{padding:6px 0 4px;font-size:18px;}}
+.lab-call-stack{{display:flex;height:100%;min-height:400px;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:14px 18px 0;overflow:auto;background:#fff;}}
+.lab-call-frame{{display:flex;width:min(100%,330px);align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border:1px solid #202124;background:#f7f7f7;}}
+.lab-call-frame+.lab-call-frame{{border-top:0;}}
+.lab-call-frame b{{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;}}
+.lab-call-frame span{{font-size:12px;color:#5f6368;}}
+.lab-call-frame.waiting{{opacity:.62;}}.lab-call-frame.current-call{{background:#f4e8bd;opacity:1;}}.lab-call-frame.current-return{{background:#e8f5e9;opacity:1;}}.lab-call-frame.completed{{opacity:1;}}
+.lab-completed-row{{position:relative;width:min(100%,330px);}}.lab-completed-row .lab-call-frame{{width:100%;}}
+.lab-finish-check{{position:absolute;left:calc(100% + 8px);top:50%;width:28px;font-family:serif;font-size:28px;font-weight:700;color:#2d7d32;text-align:center;transform:translateY(-50%);}}
+.lab-stack-base{{width:min(100%,360px);margin-top:5px;padding:6px 10px;border-top:2px solid #202124;text-align:center;color:#5f6368;font-size:12px;}}
+mjx-container{{color:#333!important;}}
+</style>
+<script>
+window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],processEscapes:true}},svg:{{fontCache:'none'}},startup:{{typeset:false}}}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body><div id="content">{content}</div>
+<script>
+window.addEventListener('load',function(){{
+  if(window.MathJax&&MathJax.typesetPromise){{MathJax.typesetPromise([document.getElementById('content')]).then(function(){{document.body.classList.add('math-ready');}});}}
+  else{{document.body.classList.add('math-ready');}}
+}});
+</script></body></html>"""
+    return (
+        '<iframe class="lab-mathjax-frame" '
+        f'srcdoc="{html.escape(srcdoc, quote=True)}" '
+        f'style="display:block;width:100%;height:{height}px;border:0;overflow:hidden;background:#fff;" '
+        'scrolling="no"></iframe>'
+    )
+
+
 def run_app():
     algorithm = widgets.Dropdown(
         options=[(value["name"], key) for key, value in ALGORITHMS.items()],
@@ -563,11 +615,11 @@ def run_app():
     following = widgets.Button(description="Siguiente", icon="step-forward")
     play = widgets.Button(description="Reproducir", icon="play")
     reset = widgets.Button(description="Reiniciar", icon="refresh")
-    method = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
-    code_content = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
-    state_content = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
-    stack_content = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
-    tree_content = widgets.HTMLMath(layout=widgets.Layout(width="100%"))
+    method = widgets.HTML(layout=widgets.Layout(width="100%"))
+    code_content = widgets.HTML(layout=widgets.Layout(width="100%"))
+    state_content = widgets.HTML(layout=widgets.Layout(width="100%"))
+    stack_content = widgets.HTML(layout=widgets.Layout(width="100%"))
+    tree_content = widgets.HTML(layout=widgets.Layout(width="100%"))
     language_logo = widgets.HTML(layout=widgets.Layout(width="42px", height="44px"))
     language_logo.add_class("lab-widget-logo")
     state = {"nodes": [], "events": [], "step": 0, "play_task": None}
@@ -628,7 +680,9 @@ def run_app():
         nodes, events = build_trace(algorithm.value, size.value)
         state["nodes"], state["events"] = nodes, events
         state["step"] = 0
-        method.value = _method_panel(algorithm.value, data, analysis_type.value)
+        method.value = _mathjax_frame(
+            _method_panel(algorithm.value, data, analysis_type.value), 550
+        )
         render()
 
     def render(*_):
@@ -651,7 +705,9 @@ def run_app():
             f'<div class="lab-metric"><b>{maximum_depth}</b>Profundidad máxima</div>'
             '</div>'
         )
-        stack_content.value = _call_stack_panel(algorithm.value, nodes, events, step)
+        stack_content.value = _mathjax_frame(
+            _call_stack_panel(algorithm.value, nodes, events, step), 426
+        )
         tree_content.value = _tree_svg(nodes, events, step)
 
     def select_algorithm(change):
@@ -716,13 +772,9 @@ def run_app():
 
     def labeled(label, control):
         control.layout.margin = "0"
-        label_formula = (
-            r"\(\boldsymbol{n}\)"
-            if label == "n"
-            else rf"\(\boldsymbol{{\mathrm{{{label}}}}}\)"
-        )
-        label_widget = widgets.HTMLMath(
-            value=label_formula,
+        label_markup = "<i>n</i>" if label == "n" else html.escape(label)
+        label_widget = widgets.HTML(
+            value=f'<span class="compact-control-label">{label_markup}</span>',
             layout=widgets.Layout(width="96px", margin="0"),
         )
         label_widget.add_class("lab-control-label")

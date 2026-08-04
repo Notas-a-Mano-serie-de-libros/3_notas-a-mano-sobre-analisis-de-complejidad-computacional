@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import sys
 import tempfile
 import urllib.request
 
 
 RAW_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/capitulo3/runtime/asymptotic_animation.py"
+REPOSITORY_RAW_ROOT = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/"
 
 APP_FUNCTIONS = {
     "comparison": "run_comparison_app",
@@ -24,9 +26,23 @@ def find_animation_module():
     candidates = []
     if Path(".git").is_dir():
         candidates.append(Path("capitulo3/runtime/asymptotic_animation.py"))
-    candidates.append(Path(__file__).resolve().with_name("asymptotic_animation.py"))
+    explicit_bootstrap = globals().get("ASYMPTOTIC_BOOTSTRAP_PATH")
+    if explicit_bootstrap:
+        candidates.append(
+            Path(explicit_bootstrap).resolve().with_name("asymptotic_animation.py")
+        )
+    bootstrap_file = globals().get("__file__")
+    if bootstrap_file:
+        candidates.append(
+            Path(bootstrap_file).resolve().with_name("asymptotic_animation.py")
+        )
     module_path = next((candidate for candidate in candidates if candidate.exists()), None)
     if module_path is not None:
+        repository_root = module_path.resolve().parents[2]
+        if (repository_root / "common").is_dir():
+            root_text = str(repository_root)
+            if root_text not in sys.path:
+                sys.path.insert(0, root_text)
         return module_path
 
     module_path = Path(tempfile.gettempdir()) / "cap3_asymptotic_animation.py"
@@ -36,6 +52,16 @@ def find_animation_module():
     )
     with urllib.request.urlopen(request, timeout=30) as response:
         module_path.write_bytes(response.read())
+    common_dir = module_path.parent / "common"
+    common_dir.mkdir(parents=True, exist_ok=True)
+    for filename in ("__init__.py", "widget_controls.py", "simulation_views.py"):
+        urllib.request.urlretrieve(
+            REPOSITORY_RAW_ROOT + "common/" + filename,
+            common_dir / filename,
+        )
+    runtime_root = str(module_path.parent.resolve())
+    if runtime_root not in sys.path:
+        sys.path.insert(0, runtime_root)
     return module_path
 
 

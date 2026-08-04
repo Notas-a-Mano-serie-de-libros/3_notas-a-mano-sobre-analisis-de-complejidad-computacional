@@ -119,9 +119,10 @@ def test_lab_uses_editable_input_right_aligned_actions_and_collapsible_panels():
     assert 'labeled("n", size)' in SOURCE
     assert 'labeled("Entrada n", size)' not in SOURCE
     assert 'add_class("lab-control-label")' in SOURCE
-    assert 'label_widget = widgets.HTMLMath(' in SOURCE
-    assert 'r"\\(\\boldsymbol{n}\\)"' in SOURCE
-    assert 'rf"\\(\\boldsymbol{{\\mathrm{{{label}}}}}\\)"' in SOURCE
+    assert 'label_widget = widgets.HTML(' in SOURCE
+    assert 'label_markup = "<i>n</i>"' in SOURCE
+    assert 'class="compact-control-label"' in SOURCE
+    assert "_mathjax_frame(" in SOURCE
     assert SOURCE.count('layout=widgets.Layout(width="188px", height="32px")') == 4
     assert "Resultado del análisis" not in SOURCE
     assert 'description="Configuración"' in SOURCE
@@ -359,11 +360,31 @@ def test_widget_panels_preserve_original_fixed_heights_without_outer_scroll():
 
 
 def test_all_configuration_field_titles_are_bold():
-    assert ".lab-control-label .widget-htmlmath-content" in SOURCE
-    assert SOURCE.count(r"\boldsymbol") >= 2
-    assert r"\mathrm" in SOURCE
     assert ".lab-control-label{display:flex!important" in SOURCE
     assert "font-size:13px!important;font-weight:700!important" in SOURCE
+    assert 'class="compact-control-label"' in SOURCE
+
+
+def test_remote_examples_bootstrap_downloads_the_complete_common_contract():
+    bootstrap = (
+        Path(__file__).resolve().parents[1]
+        / "capitulo6"
+        / "runtime"
+        / "examples_bootstrap.py"
+    ).read_text(encoding="utf-8")
+
+    for dependency in (
+        "common/experimental_simulation.py",
+        "common/widget_controls.py",
+        "common/simulation_views.py",
+    ):
+        assert dependency in bootstrap
+
+
+def test_recursive_lab_uses_self_contained_mathjax_in_remote_frontends():
+    assert "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" in SOURCE
+    assert "MathJax.typesetPromise" in SOURCE
+    assert "widgets.HTMLMath" not in SOURCE
 
 
 def test_chapter_six_reference_notebooks_are_separated():

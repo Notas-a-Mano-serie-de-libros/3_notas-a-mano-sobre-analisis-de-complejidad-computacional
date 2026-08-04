@@ -100,6 +100,37 @@ except ImportError:
             ),
         )
 
+    def magnitude_stepper(
+        *, value, width=188, value_width=120, button_width=34,
+        css_class="experimental-stepper", accessible_name="Valor",
+    ):
+        text = widgets.Text(
+            value=str(value), description="",
+            layout=widgets.Layout(
+                width=f"{value_width}px", min_width=f"{value_width}px",
+                max_width=f"{value_width}px", height="32px", margin="0",
+            ),
+        )
+        button_layout = widgets.Layout(
+            width=f"{button_width}px", min_width=f"{button_width}px",
+            max_width=f"{button_width}px", height="32px", margin="0",
+        )
+        previous = widgets.Button(description="◀", layout=button_layout)
+        following = widgets.Button(description="▶", layout=button_layout)
+        container = widgets.HBox(
+            [previous, text, following],
+            layout=widgets.Layout(
+                width=f"{width}px", min_width=f"{width}px",
+                max_width=f"{width}px", grid_gap="0px", overflow="hidden",
+            ),
+        )
+        container.add_class(css_class)
+        return type(
+            "MagnitudeStepperFallback", (),
+            {"container": container, "value": text,
+             "previous": previous, "following": following},
+        )()
+
 try:
     import nest_asyncio
 except ImportError:

@@ -28,6 +28,10 @@ def _project_root():
 def _download_runtime():
     root = Path(tempfile.gettempdir()) / "capitulo6_examples_runtime"
     files = {
+        "common/__init__.py": "common/__init__.py",
+        "common/experimental_simulation.py": "common/experimental_simulation.py",
+        "common/widget_controls.py": "common/widget_controls.py",
+        "common/simulation_views.py": "common/simulation_views.py",
         "capitulo6/runtime/recursive_examples_analysis.py": "capitulo6/runtime/recursive_examples_analysis.py",
         "capitulo4/runtime/experimental_analysis.py": "capitulo4/runtime/experimental_analysis.py",
         "capitulo4/runtime/experiment_ui.py": "capitulo4/runtime/experiment_ui.py",

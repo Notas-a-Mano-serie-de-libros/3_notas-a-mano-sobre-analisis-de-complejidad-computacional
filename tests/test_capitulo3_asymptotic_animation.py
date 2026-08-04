@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 
 import pytest
 
@@ -31,6 +32,43 @@ def load_animation_module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def test_bootstrap_can_run_from_exec_without_file_name():
+    source = BOOTSTRAP_PATH.read_text(encoding="utf-8")
+    assert 'globals().get("__file__")' in source
+    assert 'globals().get("ASYMPTOTIC_BOOTSTRAP_PATH")' in source
+    assert "Path(__file__)" not in source
+
+
+def test_notebook_launchers_resolve_runtime_from_notebooks_directory():
+    for notebook_path in [COMPARISON_NOTEBOOK, *ASYMPTOTIC_NOTEBOOKS]:
+        notebook = json.loads(notebook_path.read_text(encoding="utf-8"))
+        source = "".join(
+            cell_source
+            for cell in notebook["cells"]
+            if cell["cell_type"] == "code"
+            for cell_source in cell["source"]
+        )
+        assert 'Path("../runtime/asymptotic_bootstrap.py")' in source
+        assert "ASYMPTOTIC_BOOTSTRAP_PATH = bootstrap_path.resolve()" in source
+
+
+def test_local_bootstrap_adds_project_root_for_common_imports(monkeypatch):
+    namespace = {
+        "ASYMPTOTIC_BOOTSTRAP_PATH": BOOTSTRAP_PATH,
+        "ASYMPTOTIC_APP": "comparison",
+    }
+    project_root_text = str(PROJECT_ROOT)
+    monkeypatch.setattr(sys, "path", [entry for entry in sys.path if entry != project_root_text])
+
+    source = BOOTSTRAP_PATH.read_text(encoding="utf-8")
+    prefix = source.rsplit("app_name =", 1)[0]
+    exec(prefix, namespace)
+    module_path = namespace["find_animation_module"]()
+
+    assert module_path.resolve() == ANIMATION_PATH.resolve()
+    assert sys.path[0] == project_root_text
 
 
 def test_steppers_usan_el_contrato_visual_global():

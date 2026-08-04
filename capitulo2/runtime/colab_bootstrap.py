@@ -15,6 +15,7 @@ RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3
 REQUIRED_FILES = (
     "common/__init__.py",
     "common/animation_runtime.py",
+    "common/experimental_simulation.py",
     "common/graphics.py",
     "common/widget_controls.py",
     "common/simulation_views.py",
