@@ -16,6 +16,7 @@ REQUIRED_FILES = (
     "common/__init__.py",
     "common/animation_runtime.py",
     "common/widget_controls.py",
+    "common/simulation_views.py",
     "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py",
     "capitulo2/analisis_complejidad_temporal_experimental/constant_animation.py",
     "capitulo2/analisis_complejidad_temporal_experimental/complexity_animations.py",

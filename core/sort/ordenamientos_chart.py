@@ -1,5 +1,5 @@
 """
-Comparación de pasos promedio por tamaño de arreglo — algoritmos de búsqueda.
+Comparación de pasos promedio por tamaño de arreglo — algoritmos de ordenamiento.
 
 El archivo se carga desde los notebooks con importlib para que funcione igual
 en local y en Colab sin depender del directorio actual.
@@ -39,70 +39,69 @@ except ModuleNotFoundError:
             "savefig.dpi": dpi,
         })
 
+from sort_common import generate_values
 _DOMAIN = Path(__file__).resolve().parent
-_RAW_DOMAIN_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/capitulo7/domain"
+_RAW_DOMAIN_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/core/sort"
 
 
-def _ensure_search_metrics():
+def _ensure_sort_metrics():
     if str(_DOMAIN) not in sys.path:
         sys.path.insert(0, str(_DOMAIN))
-    metrics_path = _DOMAIN / "search_metrics.py"
+    metrics_path = _DOMAIN / "sort_metrics.py"
     if not metrics_path.exists():
         metrics_path.write_text(
-            urllib.request.urlopen(f"{_RAW_DOMAIN_URL}/search_metrics.py").read().decode("utf-8"),
+            urllib.request.urlopen(f"{_RAW_DOMAIN_URL}/sort_metrics.py").read().decode("utf-8"),
             encoding="utf-8",
         )
 
 
-_ensure_search_metrics()
-from search_metrics import count_search_steps
+_ensure_sort_metrics()
+from sort_metrics import count_sort_operations
 
 apply_plot_style(matplotlib)
 
 # ── Constantes de simulación ─────────────────────────────────────────────────
-_MAX_EMP = 5_000
-_TRIALS  = 50
-_EMP_N   = sorted({int(x) for x in np.round(np.geomspace(2, _MAX_EMP, 50))})
-_AN_N    = np.geomspace(_MAX_EMP, 1e7, 300)
-_FAST_MAX_EMP = 1_000
-_FAST_TRIALS = 10
-_FAST_EMP_N = sorted({int(x) for x in np.round(np.geomspace(2, _FAST_MAX_EMP, 20))})
-_FAST_AN_N = np.geomspace(_FAST_MAX_EMP, 1e6, 160)
+_MAX_EMP = 100   # límite superior de la simulación real
+_TRIALS  = 5     # ensayos por tamaño
+_EMP_N   = sorted({int(x) for x in np.round(np.geomspace(2, _MAX_EMP, 25))})
+_AN_N    = np.geomspace(_MAX_EMP, 1e5, 200)
+_FAST_MAX_EMP = 50
+_FAST_TRIALS = 2
+_FAST_EMP_N = sorted({int(x) for x in np.round(np.geomspace(2, _FAST_MAX_EMP, 14))})
+_FAST_AN_N = np.geomspace(_FAST_MAX_EMP, 5e4, 160)
 _CACHE = {}
 
 # ── Configuración de algoritmos ──────────────────────────────────────────────
 _CONFIGS = [
-    ("Binaria",       "2_busqueda_binaria_app.py",       "_ch_bin", "step_binary_search",        {},               "#1565C0"),
-    ("Ternaria",      "6_busqueda_ternaria_app.py",      "_ch_ter", "step_ternary_search",       {},               "#6A1B9A"),
-    ("Exponencial",   "5_busqueda_exponencial_app.py",   "_ch_exp", "step_exponential_search",   {},               "#E65100"),
-    ("Interpolación", "3_busqueda_interpolacion_app.py", "_ch_itp", "step_interpolation_search", {"uniform": True}, "#2E7D32"),
-    ("Saltos",        "4_busqueda_saltos_app.py",        "_ch_sal", "step_jump_search",          {},               "#C62828"),
-    ("Secuencial",    "1_busqueda_secuencial_app.py",    "_ch_seq", "step_linear_search",        {},               "#37474F"),
+    ("Burbuja",   "burbuja",   "#C62828"),
+    ("Selección", "seleccion", "#37474F"),
+    ("Inserción", "insercion", "#2E7D32"),
+    ("Shell",     "shell",     "#00897B"),
+    ("Mezcla",    "mezcla",    "#1565C0"),
+    ("Rápido",    "rapido",    "#6A1B9A"),
+    ("Radix",     "radix",     "#E65100"),
 ]
+_SINGLE_CONFIGS = _CONFIGS
 
 _FORMULAS = {
-    "Binaria":       lambda n: math.log2(n),
-    "Ternaria":      lambda n: math.log(n, 3) * 2,
-    "Exponencial":   lambda n: math.log2(n) * 1.6,
-    "Interpolación": lambda n: math.log2(math.log2(max(n, 3))) + 1,
-    "Saltos":        lambda n: 2.0 * math.sqrt(n),
-    "Secuencial":    lambda n: n / 2,
+    "Mezcla":    lambda n: n * math.log2(max(n, 2)),
+    "Rápido":    lambda n: n * math.log2(max(n, 2)),
+    "Inserción": lambda n: n * n / 4,
+    "Shell":     lambda n: n * n / 2,
+    "Burbuja":   lambda n: n * n / 2,
+    "Selección": lambda n: n * (n - 1) / 2,
+    "Radix":      lambda n: n * max(1, math.log10(max(n, 10))),
 }
 
 _THEORY_LABELS = {
-    "Binaria":       r"$\log_2 n$",
-    "Ternaria":      r"$2\,\log_3 n$",
-    "Exponencial":   r"$\log_2 n$",
-    "Interpolación": r"$\log \log n$",
-    "Saltos":        r"$\sqrt{n}$",
-    "Secuencial":    r"$n/2$",
+    "Mezcla":    r"$n\,\log_2 n$",
+    "Rápido":    r"$n\,\log_2 n$",
+    "Inserción": r"$n^2/4$",
+    "Shell":     r"$n^2/2$",
+    "Burbuja":   r"$n^2/2$",
+    "Selección": r"$n^2/2$",
+    "Radix":      r"$n\,d$",
 }
-
-def _load_algorithms():
-    return [
-        (name, None, step_fn, kwargs, color)
-        for name, filename, alias, step_fn, kwargs, color in _CONFIGS
-    ]
 
 
 # ── Simulación empírica ──────────────────────────────────────────────────────
@@ -112,20 +111,18 @@ def _profile(fast=False):
     return _EMP_N, _AN_N, _MAX_EMP, _TRIALS
 
 
-def _simulate(algorithms: list, emp_n: list[int], trials: int) -> dict[str, list[float]]:
-    emp_avg: dict[str, list[float]] = {name: [] for name, *_ in algorithms}
+def _simulate(emp_n: list[int], trials: int) -> dict[str, list[float]]:
+    emp_avg: dict[str, list[float]] = {name: [] for name, *_ in _CONFIGS}
     print(f"Simulando {len(emp_n)} tamaños × {trials} ensayos…")
     for idx, n in enumerate(emp_n, 1):
-        pool = min(n * 20, 10_000_000)
-        acc: dict[str, float] = {name: 0 for name, *_ in algorithms}
+        acc: dict[str, float] = {name: 0 for name, *_ in _CONFIGS}
         for _ in range(trials):
-            values = sorted(random.sample(range(pool), n))
-            target = random.choice(values)
-            for name, mod, step_fn, kwargs, _ in algorithms:
-                acc[name] += count_search_steps(name, values, target)
+            values = list(generate_values(n))
+            for name, key, _ in _CONFIGS:
+                acc[name] += count_sort_operations(key, values, descending=False)
         for name in emp_avg:
             emp_avg[name].append(acc[name] / trials)
-        if idx % 10 == 0 or idx == len(emp_n):
+        if idx % 8 == 0 or idx == len(emp_n):
             print(f"  {idx}/{len(emp_n)} completados…")
     return emp_avg
 
@@ -139,11 +136,11 @@ def _theory_curves(emp_avg: dict, emp_n: list[int]) -> dict[str, list[float]]:
     return theory_curves(emp_avg, emp_n, _FORMULAS)
 
 
-def _compute_series(algorithms: list, fast=False):
+def _compute_series(fast=False):
     emp_n, an_n, max_emp, trials = _profile(fast)
-    cache_key = ("fast" if fast else "full", tuple(name for name, *_ in algorithms))
+    cache_key = "fast" if fast else "full"
     if cache_key not in _CACHE:
-        emp_avg = _simulate(algorithms, emp_n, trials)
+        emp_avg = _simulate(emp_n, trials)
         _CACHE[cache_key] = {
             "emp_n": emp_n,
             "an_n": an_n,
@@ -157,7 +154,6 @@ def _compute_series(algorithms: list, fast=False):
 
 # ── Renderizado ───────────────────────────────────────────────────────────────
 def _render(
-    algorithms: list,
     emp_n,
     an_n,
     max_emp: int,
@@ -169,7 +165,7 @@ def _render(
     out: widgets.Output,
 ) -> None:
     render_multi_chart(
-        configs=algorithms,
+        configs=_CONFIGS,
         theory_labels=_THEORY_LABELS,
         emp_n=emp_n,
         an_n=an_n,
@@ -180,22 +176,21 @@ def _render(
         selected=selected,
         show_theory=show_theory,
         out=out,
-        title_prefix="Operaciones promedio por tamaño de arreglo · target siempre presente",
-        x_limit=1e7,
+        title_prefix="Operaciones promedio por tamaño de arreglo · arreglo aleatorio",
+        x_limit=1e5,
     )
 
 
 # ── Punto de entrada ─────────────────────────────────────────────────────────
 def run_chart(fast=False) -> None:
     """Ejecuta la simulación y muestra la gráfica interactiva."""
-    algorithms = _load_algorithms()
-    series = _compute_series(algorithms, fast=fast)
+    series = _compute_series(fast=fast)
     clear_output(wait=True)
 
     theory_check, algo_checks, algo_label, algo_grid = create_algorithm_controls(
-        algorithms,
-        checkbox_width="170px",
-        grid_template_columns="repeat(3, 180px)",
+        _CONFIGS,
+        checkbox_width="150px",
+        grid_template_columns="repeat(5, 160px)",
     )
     out = widgets.Output()
 
@@ -203,9 +198,17 @@ def run_chart(fast=False) -> None:
         return {name for name, chk in algo_checks.items() if chk.value}
 
     def redraw(*_):
-        _render(algorithms, series["emp_n"], series["an_n"], series["max_emp"],
-                series["emp_avg"], series["an_avg"], series["theory"],
-                selected_names(), theory_check.value, out)
+        _render(
+            series["emp_n"],
+            series["an_n"],
+            series["max_emp"],
+            series["emp_avg"],
+            series["an_avg"],
+            series["theory"],
+            selected_names(),
+            theory_check.value,
+            out,
+        )
 
     theory_check.observe(redraw, names="value")
     for chk in algo_checks.values():
@@ -222,75 +225,73 @@ def run_chart(fast=False) -> None:
 
 # ── run_single_chart ──────────────────────────────────────────────────────────
 
-# Perfiles por algoritmo: max_emp, n_pts, trials, an_max
+# O(n²) → max 400; O(n log n) → max 2000
 _SINGLE_PROFILES: dict[str, dict] = {
-    "Secuencial":    {"max_emp": 2_000, "n_pts": 40, "trials": 30, "an_max": 1e6},
-    "Binaria":       {"max_emp": 5_000, "n_pts": 50, "trials": 50, "an_max": 1e7},
-    "Ternaria":      {"max_emp": 5_000, "n_pts": 50, "trials": 50, "an_max": 1e7},
-    "Exponencial":   {"max_emp": 5_000, "n_pts": 50, "trials": 50, "an_max": 1e7},
-    "Interpolación": {"max_emp": 5_000, "n_pts": 50, "trials": 50, "an_max": 1e7},
-    "Saltos":        {"max_emp": 5_000, "n_pts": 50, "trials": 50, "an_max": 1e7},
+    "Mezcla":    {"max_emp": 2_000, "n_pts": 45, "trials": 5,  "an_max": 1e6},
+    "Rápido":    {"max_emp": 2_000, "n_pts": 45, "trials": 5,  "an_max": 1e6},
+    "Inserción": {"max_emp":   400, "n_pts": 30, "trials": 5,  "an_max": 5e4},
+    "Shell":     {"max_emp":   500, "n_pts": 30, "trials": 5,  "an_max": 5e4},
+    "Burbuja":   {"max_emp":   400, "n_pts": 30, "trials": 5,  "an_max": 5e4},
+    "Selección": {"max_emp":   400, "n_pts": 30, "trials": 5,  "an_max": 5e4},
+    "Radix":     {"max_emp":   600, "n_pts": 30, "trials": 3,  "an_max": 1e5},
 }
 
 _SINGLE_CACHE: dict[str, dict] = {}
 def _simulate_single(
-    display_name: str,
-    emp_n: list[int], trials: int,
+    key: str,
+    emp_n: list[int],
+    trials: int,
 ) -> tuple[list[float], list[float]]:
-    """Devuelve (ops_avg, time_avg) por cada n en emp_n."""
+    """Devuelve (ops_avg, time_avg) usando len(trace)-1 como conteo de pasos."""
     ops_avg: list[float] = []
     time_avg: list[float] = []
     print(f"  Simulando {len(emp_n)} tamaños × {trials} ensayos…")
     for idx, n in enumerate(emp_n, 1):
-        pool = min(n * 20, 10_000_000)
         total_ops = 0
         total_time = 0.0
         for _ in range(trials):
-            values = sorted(random.sample(range(pool), n))
-            target = random.choice(values)
+            values = list(generate_values(n))
             t0 = _time.perf_counter()
-            steps = count_search_steps(display_name, values, target)
+            steps = count_sort_operations(key, values, descending=False)
             total_time += _time.perf_counter() - t0
             total_ops += steps
         ops_avg.append(total_ops / trials)
         time_avg.append(total_time / trials)
-        if idx % 10 == 0 or idx == len(emp_n):
+        if idx % 8 == 0 or idx == len(emp_n):
             print(f"    {idx}/{len(emp_n)} completados…")
     return ops_avg, time_avg
 
 
 def run_single_chart(name: str) -> None:
     """
-    Muestra la gráfica de eficiencia para un único algoritmo de búsqueda.
+    Muestra la gráfica de eficiencia para un único algoritmo de ordenamiento.
 
     Parámetros
     ----------
     name : str
-        Nombre del algoritmo. Uno de: "Secuencial", "Binaria", "Ternaria",
-        "Exponencial", "Interpolación", "Saltos".
+        Nombre del algoritmo. Uno de: "Mezcla", "Rápido", "Inserción",
+        "Burbuja", "Selección".
     """
-    # Buscar config del algoritmo
-    cfg = next((c for c in _CONFIGS if c[0] == name), None)
+    cfg = next((c for c in _SINGLE_CONFIGS if c[0] == name), None)
     if cfg is None:
-        raise ValueError(f"Algoritmo desconocido: {name!r}. Opciones: {[c[0] for c in _CONFIGS]}")
-    _, _filename, _alias, _step_fn, _kwargs, color = cfg
+        raise ValueError(f"Algoritmo desconocido: {name!r}. Opciones: {[c[0] for c in _SINGLE_CONFIGS]}")
+    _, key, color = cfg
 
     profile = _SINGLE_PROFILES[name]
-    max_emp  = profile["max_emp"]
-    n_pts    = profile["n_pts"]
-    trials   = profile["trials"]
-    an_max   = profile["an_max"]
+    max_emp = profile["max_emp"]
+    n_pts   = profile["n_pts"]
+    trials  = profile["trials"]
+    an_max  = profile["an_max"]
 
     emp_n = sorted({int(x) for x in np.round(np.geomspace(2, max_emp, n_pts))})
     an_n  = np.geomspace(max_emp, an_max, 300)
 
-    # Simulación (con caché)
     if name not in _SINGLE_CACHE:
-        print(f"Búsqueda {name}:")
-        ops_avg, time_avg = _simulate_single(name, emp_n, trials)
+        print(f"Ordenamiento {name}:")
+        ops_avg, time_avg = _simulate_single(key, emp_n, trials)
         f = _FORMULAS[name]
         raw_emp = [f(n) for n in emp_n]
-        # theory_raw: f(n) cruda — para la tabla (valores reales de la fórmula)
+        # theory_raw: f(n) cruda — para la tabla
         theory_raw = raw_emp
         # theory: f(n) normalizada al primer punto empírico — para la gráfica
         scale_emp = ops_avg[0] / raw_emp[0] if raw_emp[0] > 0 else 1.0
@@ -323,7 +324,7 @@ def run_single_chart(name: str) -> None:
     # Controles
     theory_check = create_theory_checkbox(
         f"Superponer función teórica ({_THEORY_LABELS[name]})",
-        "360px",
+        "380px",
     )
     out = widgets.Output()
 
@@ -341,7 +342,7 @@ def run_single_chart(name: str) -> None:
             show_theory=theory_check.value,
             an_max=an_max,
             out=out,
-            title_prefix=f"Búsqueda {name} — operaciones promedio por tamaño de arreglo",
+            title_prefix=f"Ordenamiento {name} — operaciones promedio por tamaño de arreglo",
         )
 
     theory_check.observe(redraw, names="value")

@@ -31,6 +31,7 @@ def _download_common_runtime(module_dir, repository_root):
     common_dir.mkdir(parents=True, exist_ok=True)
     urllib.request.urlretrieve(repository_root + "common/__init__.py", common_dir / "__init__.py")
     urllib.request.urlretrieve(repository_root + "common/widget_controls.py", common_dir / "widget_controls.py")
+    urllib.request.urlretrieve(repository_root + "common/simulation_views.py", common_dir / "simulation_views.py")
     runtime_root = str(module_dir.resolve())
     if runtime_root not in sys.path:
         sys.path.insert(0, runtime_root)

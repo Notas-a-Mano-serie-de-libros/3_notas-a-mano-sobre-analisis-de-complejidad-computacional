@@ -35,8 +35,8 @@ from common.widget_controls import (
     collapsible_panel,
     compact_labeled_control,
     magnitude_stepper,
-    shared_ui_styles,
 )
+from common.simulation_views import standard_view_styles
 
 try:
     import nest_asyncio
@@ -1026,7 +1026,7 @@ def run_app(profile, display_app=True, mode_selector=None):
             box-shadow: none !important;
           }
         </style>
-        """ + shared_ui_styles(".constant-animation-root"),
+        """ + standard_view_styles(".constant-animation-root"),
         layout=widgets.Layout(height="0px", min_height="0px", overflow="hidden"),
     )
     app = widgets.VBox(

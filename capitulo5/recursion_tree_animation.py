@@ -13,8 +13,8 @@ from common.widget_controls import (
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
     STANDARD_LABEL_CONTROL_GAP,
-    shared_ui_styles,
 )
+from common.simulation_views import standard_view_styles
 
 
 try:
@@ -1514,7 +1514,7 @@ def run_app(builder_only=False):
           .recursion-tree-note{box-sizing:border-box;width:100%;min-height:30px;padding:6px 10px;
             color:#555;background:#fff;text-align:center;font-size:13px}
         </style>
-        """ + shared_ui_styles(".recursion-tree-root")
+        """ + standard_view_styles(".recursion-tree-root")
     )
 
     def parse_term_parameters():

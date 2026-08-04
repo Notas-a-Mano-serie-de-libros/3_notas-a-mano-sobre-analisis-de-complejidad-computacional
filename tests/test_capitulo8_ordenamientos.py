@@ -7,7 +7,7 @@ import unittest
 from tests.helpers import PROJECT_ROOT, load_module_from_path
 
 
-DOMAIN_DIR = PROJECT_ROOT / "capitulo8" / "domain"
+DOMAIN_DIR = PROJECT_ROOT / "core" / "sort"
 NOTEBOOK_DIR = PROJECT_ROOT / "capitulo8" / "notebooks"
 if str(DOMAIN_DIR) not in sys.path:
     sys.path.insert(0, str(DOMAIN_DIR))
@@ -238,13 +238,14 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
     def test_controls_use_dropdowns_for_view_and_order(self):
         source = (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8")
         config_source = (DOMAIN_DIR / "sort_config.py").read_text(encoding="utf-8")
+        view_source = (PROJECT_ROOT / "common" / "simulation_views.py").read_text(encoding="utf-8")
 
         self.assertIn("VIEW_OPTIONS", config_source)
         self.assertIn("TREE_VIEW_OPTIONS", config_source)
         self.assertIn("ORDER_OPTIONS", config_source)
         self.assertIn('description="Vista"', source)
         self.assertIn('description="Orden"', source)
-        self.assertIn("action_button_row", source)
+        self.assertIn("actions", source)
         self.assertIn("bounded_int_control", source)
         self.assertIn("button_control", source)
         self.assertIn("dropdown_control", source)
@@ -252,16 +253,17 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("bounded_int_control(", source)
         self.assertNotIn("Orden descendente", source)
         self.assertNotIn("widgets.Checkbox", source)
-        self.assertIn('description="Finalizar"', source)
+        self.assertIn('"Finalizar"', view_source)
         self.assertIn("def finish_without_animation", source)
 
     def test_buttons_keep_chapter7_color_conventions(self):
-        source = (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "common" / "simulation_views.py").read_text(encoding="utf-8")
 
-        self.assertIn('button_style="info"', source)
-        self.assertIn('button_style="success"', source)
-        self.assertIn('button_style="warning"', source)
-        self.assertIn('button_style="primary"', source)
+        self.assertIn('button_style=""', source)
+        self.assertNotIn('button_style="info"', source)
+        self.assertNotIn('button_style="success"', source)
+        self.assertNotIn('button_style="warning"', source)
+        self.assertNotIn('button_style="primary"', source)
 
     def test_default_view_is_bars_and_controls_have_tree_where_needed(self):
         source = (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8")
@@ -298,8 +300,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("def quick_trace", algorithms_source)
         self.assertIn("def quick_tree", tree_source)
         self.assertIn('"common/animation_runtime.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
-        self.assertIn('"capitulo8/domain/sort_tree.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
-        self.assertIn('"capitulo8/domain/sort_messages.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
+        self.assertIn('"core/sort/sort_tree.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
+        self.assertIn('"core/sort/sort_messages.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
         self.assertIn("project_root", (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
         self.assertNotIn("def bubble_trace", common_source)
         self.assertNotIn("def quick_trace", common_source)
@@ -352,10 +354,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("min_height=FORMULA_OUTPUT_HEIGHT", source)
         self.assertIn("padding=FORMULA_OUTPUT_PADDING", source)
         self.assertIn("displaystyle_formula", source)
-        self.assertIn("css_widget = widgets.HTML(sort_styles())", source)
+        self.assertIn("build_simulation_view(", source)
         self.assertIn("render_state_html(state, include_styles=False)", source)
-        self.assertIn('panel("Procedimiento", formula_output)', source)
-        self.assertIn('panel("Resultado", html_output)', source)
+        self.assertIn("procedure=formula_output", source)
+        self.assertIn("html_output", source)
         for module in self.modules.values():
             state = module.create_state(size=5, values=[5, 1, 4, 2, 8])
             getattr(module, SORT_MODULES[state["algorithm"]][1])(state)

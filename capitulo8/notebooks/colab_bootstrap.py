@@ -14,23 +14,26 @@ REQUIRED_FILES = (
     "common/plot_style.py",
     "common/visual_roles.py",
     "common/widget_controls.py",
+    "common/simulation_views.py",
+    "core/__init__.py",
+    "core/sort/__init__.py",
     "capitulo8/notebooks/launchers.py",
-    "capitulo8/domain/sort_config.py",
-    "capitulo8/domain/sort_messages.py",
-    "capitulo8/domain/sort_algorithms.py",
-    "capitulo8/domain/sort_tree.py",
-    "capitulo8/domain/sort_common.py",
-    "capitulo8/domain/variant_comparison.py",
-    "capitulo8/domain/0_comparacion_ordenamientos_app.py",
-    "capitulo8/domain/1_ordenamiento_burbuja_app.py",
-    "capitulo8/domain/2_ordenamiento_seleccion_app.py",
-    "capitulo8/domain/3_ordenamiento_insercion_app.py",
-    "capitulo8/domain/4_ordenamiento_shell_app.py",
-    "capitulo8/domain/5_ordenamiento_mezcla_app.py",
-    "capitulo8/domain/6_ordenamiento_rapido_app.py",
-    "capitulo8/domain/7_ordenamiento_radix_app.py",
-    "capitulo8/domain/ordenamientos_chart.py",
-    "capitulo8/domain/sort_metrics.py",
+    "core/sort/sort_config.py",
+    "core/sort/sort_messages.py",
+    "core/sort/sort_algorithms.py",
+    "core/sort/sort_tree.py",
+    "core/sort/sort_common.py",
+    "core/sort/variant_comparison.py",
+    "core/sort/0_comparacion_ordenamientos_app.py",
+    "core/sort/1_ordenamiento_burbuja_app.py",
+    "core/sort/2_ordenamiento_seleccion_app.py",
+    "core/sort/3_ordenamiento_insercion_app.py",
+    "core/sort/4_ordenamiento_shell_app.py",
+    "core/sort/5_ordenamiento_mezcla_app.py",
+    "core/sort/6_ordenamiento_rapido_app.py",
+    "core/sort/7_ordenamiento_radix_app.py",
+    "core/sort/ordenamientos_chart.py",
+    "core/sort/sort_metrics.py",
 )
 
 SIMULATION_LAUNCHERS = {
@@ -77,9 +80,9 @@ def resolve_launcher_path():
         launcher_path = base / "capitulo8" / "notebooks" / "launchers.py"
         if launcher_path.exists():
             project_root = str(launcher_path.parent.parent.parent.resolve())
-            domain_dir = str((launcher_path.parent.parent / "domain").resolve())
+            core_dir = str((launcher_path.parent.parent.parent / "core" / "sort").resolve())
             launcher_dir = str(launcher_path.parent.resolve())
-            for path in (project_root, domain_dir, launcher_dir):
+            for path in (project_root, core_dir, launcher_dir):
                 if path not in sys.path:
                     sys.path.insert(0, path)
             return launcher_path

@@ -32,8 +32,8 @@ from common.widget_controls import (  # noqa: E402
     STANDARD_LABEL_CONTROL_GAP,
     collapsible_panel,
     compact_labeled_control,
-    shared_ui_styles,
 )
+from common.simulation_views import standard_view_styles  # noqa: E402
 
 try:
     from google.colab import output as colab_output
@@ -528,7 +528,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
             box-shadow: none !important;
           }
         </style>
-        """ + shared_ui_styles(".constant-animation-root"),
+        """ + standard_view_styles(".constant-animation-root"),
         layout=widgets.Layout(height="0px", min_height="0px", overflow="hidden"),
     )
     app = widgets.VBox(

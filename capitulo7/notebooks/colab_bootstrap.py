@@ -14,17 +14,20 @@ REQUIRED_FILES = (
     "common/plot_style.py",
     "common/visual_roles.py",
     "common/widget_controls.py",
+    "common/simulation_views.py",
+    "core/__init__.py",
+    "core/search/__init__.py",
     "capitulo7/notebooks/launchers.py",
-    "capitulo7/domain/search_common.py",
-    "capitulo7/domain/0_comparacion_busquedas_app.py",
-    "capitulo7/domain/1_busqueda_secuencial_app.py",
-    "capitulo7/domain/2_busqueda_binaria_app.py",
-    "capitulo7/domain/3_busqueda_interpolacion_app.py",
-    "capitulo7/domain/4_busqueda_saltos_app.py",
-    "capitulo7/domain/5_busqueda_exponencial_app.py",
-    "capitulo7/domain/6_busqueda_ternaria_app.py",
-    "capitulo7/domain/busquedas_chart.py",
-    "capitulo7/domain/search_metrics.py",
+    "core/search/search_common.py",
+    "core/search/0_comparacion_busquedas_app.py",
+    "core/search/1_busqueda_secuencial_app.py",
+    "core/search/2_busqueda_binaria_app.py",
+    "core/search/3_busqueda_interpolacion_app.py",
+    "core/search/4_busqueda_saltos_app.py",
+    "core/search/5_busqueda_exponencial_app.py",
+    "core/search/6_busqueda_ternaria_app.py",
+    "core/search/busquedas_chart.py",
+    "core/search/search_metrics.py",
 )
 
 SIMULATION_LAUNCHERS = {
@@ -65,9 +68,9 @@ def resolve_launcher_path():
         launcher_path = base / "capitulo7" / "notebooks" / "launchers.py"
         if launcher_path.exists():
             project_root = str(launcher_path.parent.parent.parent.resolve())
-            domain_dir  = str((launcher_path.parent.parent / "domain").resolve())
+            core_dir = str((launcher_path.parent.parent.parent / "core" / "search").resolve())
             launcher_dir = str(launcher_path.parent.resolve())
-            for path in (project_root, domain_dir, launcher_dir):
+            for path in (project_root, core_dir, launcher_dir):
                 if path not in sys.path:
                     sys.path.insert(0, path)
             return launcher_path

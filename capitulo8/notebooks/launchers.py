@@ -4,23 +4,30 @@ import importlib
 import sys
 
 
-def _resolve_domain():
-    candidates = [
-        Path.cwd() / "capitulo8" / "domain",
-        Path.cwd() / "domain",
-        Path.cwd().parent / "domain",
-    ]
-    for candidate in candidates:
-        if candidate.exists():
+def _resolve_core():
+    launcher_dir = Path(__file__).resolve().parent
+    bases = (launcher_dir, *launcher_dir.parents, Path.cwd(), *Path.cwd().parents)
+    seen = set()
+    for base in bases:
+        candidate = (base / "core" / "sort").resolve()
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if candidate.is_dir():
             return candidate
-    raise FileNotFoundError("No se pudo localizar capitulo8/domain")
+    raise FileNotFoundError("No se pudo localizar core/sort")
 
 
 def _load_module(relative_path: str, module_name: str):
-    domain_dir = _resolve_domain()
-    module_path = domain_dir / relative_path
-    if str(domain_dir) not in sys.path:
-        sys.path.insert(0, str(domain_dir))
+    core_dir = _resolve_core()
+    module_path = core_dir / relative_path
+    if not module_path.is_file():
+        raise FileNotFoundError(f"No se pudo localizar {module_path}")
+    project_root = core_dir.parents[1]
+    for import_path in (project_root, core_dir):
+        path_string = str(import_path)
+        if path_string not in sys.path:
+            sys.path.insert(0, path_string)
     importlib.invalidate_caches()
     unique_name = f"{module_name}_{module_path.stat().st_mtime_ns}"
     spec = spec_from_file_location(unique_name, module_path)

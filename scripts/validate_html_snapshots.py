@@ -10,8 +10,8 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT_PATH = PROJECT_ROOT / "tests" / "fixtures" / "html_snapshots.json"
-CAP7_DOMAIN = PROJECT_ROOT / "capitulo7" / "domain"
-CAP8_DOMAIN = PROJECT_ROOT / "capitulo8" / "domain"
+CAP7_DOMAIN = PROJECT_ROOT / "core" / "search"
+CAP8_DOMAIN = PROJECT_ROOT / "core" / "sort"
 
 
 def load_module(name: str, path: Path, extra_paths=()):

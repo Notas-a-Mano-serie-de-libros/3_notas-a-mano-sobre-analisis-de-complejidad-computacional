@@ -48,11 +48,11 @@ def test_chapter_three_control_sections_use_flex_wrap():
 
 def test_search_and_sort_control_families_wrap_without_fixed_grids():
     paths = (
-        "capitulo7/domain/search_common.py",
-        "capitulo7/domain/0_comparacion_busquedas_app.py",
-        "capitulo8/domain/sort_common.py",
-        "capitulo8/domain/0_comparacion_ordenamientos_app.py",
-        "capitulo8/domain/4_ordenamiento_shell_app.py",
+        "core/search/search_common.py",
+        "core/search/0_comparacion_busquedas_app.py",
+        "core/sort/sort_common.py",
+        "core/sort/0_comparacion_ordenamientos_app.py",
+        "core/sort/4_ordenamiento_shell_app.py",
     )
     for path in paths:
         module_source = source(path)
@@ -65,9 +65,9 @@ def test_search_and_sort_control_families_wrap_without_fixed_grids():
 
 def test_chapters_seven_and_eight_buttons_share_the_same_visual_contract():
     widget_sources = (
-        source("capitulo7/domain/search_common.py"),
-        source("capitulo7/domain/0_comparacion_busquedas_app.py"),
-        source("capitulo8/domain/sort_common.py"),
+        source("core/search/search_common.py"),
+        source("core/search/0_comparacion_busquedas_app.py"),
+        source("core/sort/sort_common.py"),
     )
     for module_source in widget_sources:
         assert "background: #f7f7f7 !important" in module_source or "background:#f7f7f7!important" in module_source
@@ -76,16 +76,16 @@ def test_chapters_seven_and_eight_buttons_share_the_same_visual_contract():
         assert "font-family: sans-serif !important" in module_source or "font-family:sans-serif!important" in module_source
         assert ".widget-button:disabled" in module_source
 
-    interpolation = source("capitulo7/domain/interpolation_visual.py")
+    interpolation = source("core/search/interpolation_visual.py")
     assert "background:#f7f7f7;color:#333;box-shadow:none" in interpolation
     assert "font-family:sans-serif;font-size:13px" in interpolation
     assert "#iv-wrap button:disabled" in interpolation
 
 
 def test_chapter_eight_preserves_compact_algorithm_checks_and_shell_theme():
-    common = source("capitulo8/domain/sort_common.py")
-    comparison = source("capitulo8/domain/0_comparacion_ordenamientos_app.py")
-    shell = source("capitulo8/domain/4_ordenamiento_shell_app.py")
+    common = source("core/sort/sort_common.py")
+    comparison = source("core/sort/0_comparacion_ordenamientos_app.py")
+    shell = source("core/sort/4_ordenamiento_shell_app.py")
 
     assert 'input:not([type="checkbox"])' in common
     assert '.widget-checkbox input[type="checkbox"]' in common
@@ -109,14 +109,17 @@ def test_every_simulation_family_loads_the_shared_visual_system():
         "capitulo4/experiment_ui.py": '.constant-animation-root',
         "capitulo5/recursion_tree_animation.py": '.recursion-tree-root',
         "capitulo6/recursive_analysis_lab.py": '.recursive-analysis-lab',
-        "capitulo7/domain/search_common.py": '.search-simulation-root',
-        "capitulo7/domain/0_comparacion_busquedas_app.py": '.comparison-simulation-root',
-        "capitulo7/domain/interpolation_visual.py": '#iv-wrap',
-        "capitulo8/domain/sort_common.py": '.sort-simulation-root',
+        "core/search/search_common.py": '.search-simulation-root',
+        "core/search/0_comparacion_busquedas_app.py": '.comparison-simulation-root',
+        "core/search/interpolation_visual.py": '#iv-wrap',
+        "core/sort/sort_common.py": '.sort-simulation-root',
     }
     for path, root_selector in expected_contracts.items():
         module_source = source(path)
-        assert "shared_ui_styles" in module_source, path
+        assert (
+            "standard_view_styles" in module_source
+            or "build_simulation_view" in module_source
+        ), path
         assert root_selector in module_source, path
 
 

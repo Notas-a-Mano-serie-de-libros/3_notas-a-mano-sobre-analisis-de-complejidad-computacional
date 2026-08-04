@@ -9,6 +9,16 @@ from IPython.display import display
 import ipywidgets as widgets
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
+from common.simulation_views import (
+    SECTION_CONFIGURATION,
+    SECTION_PROCEDURE,
+    SECTION_RESULT,
+    SimulationViewSpec,
+    ViewSection,
+    action_button,
+    actions,
+    build_simulation_view,
+)
 from common.widget_controls import (
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
@@ -1715,7 +1725,7 @@ def sort_styles():
         white-space: nowrap;
       }}
     </style>
-    """ + shared_ui_styles(".sort-simulation-root")
+    """
     return _SORT_STYLES
 
 
@@ -1857,17 +1867,7 @@ def controls_grid(groups, columns):
 
 
 def sort_action_button_row(buttons):
-    icon_by_description = {
-        "Paso siguiente": "step-forward",
-        "Ejecución automática": "play",
-        "Ordenar": "play",
-        "Finalizar": "fast-forward",
-        "Generar nuevo arreglo": "refresh",
-        "Generar arreglo del libro": "book",
-    }
-    for button in buttons:
-        button.icon = icon_by_description.get(button.description, button.icon)
-    return action_button_row(buttons)
+    return actions(buttons)
 
 
 def sort_controls_grid(groups):
@@ -1885,28 +1885,25 @@ def sort_controls_grid(groups):
 
 
 def build_sort_panel(parameters, result, title="Simulación de ordenamiento", procedure=None):
-    parameters.add_class("sort-subpanel-content")
-    result.add_class("sort-subpanel-content")
     result.add_class("sort-result-content")
-
-    def subpanel(heading, content):
-        return collapsible_panel(heading, content, prefix="sort")
-
-    sections = [subpanel("Configuración", parameters)]
+    sections = [
+        ViewSection(SECTION_CONFIGURATION, parameters, ("sort-subpanel-content",))
+    ]
     if procedure is not None:
-        procedure.add_class("sort-subpanel-content")
-        sections.append(subpanel("Procedimiento", procedure))
-    sections.append(subpanel("Resultado", result))
-    panel_content = widgets.VBox(sections, layout=widgets.Layout(width="100%", grid_gap="0"))
-    panel_content.add_class("sort-panel-content")
-    css_widget = widgets.HTML(sort_styles())
-    css_widget.layout = widgets.Layout(width="0", height="0", margin="0", padding="0")
-    layout = widgets.VBox(
-        [css_widget, panel_content],
-        layout=widgets.Layout(width="100%", max_width="100%", grid_gap="0", overflow="hidden"),
+        sections.append(
+            ViewSection(SECTION_PROCEDURE, procedure, ("sort-subpanel-content",))
+        )
+    sections.append(
+        ViewSection(SECTION_RESULT, result, ("sort-subpanel-content",))
     )
-    layout.add_class("sort-simulation-root")
-    return layout
+    return build_simulation_view(
+        SimulationViewSpec(
+            root_class="sort-simulation-root",
+            panel_prefix="sort",
+            styles=sort_styles(),
+            sections=tuple(sections),
+        )
+    )
 
 
 def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_partition=False, has_radix_max=False):
@@ -1984,16 +1981,11 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         width="220px",
         description_style=SORT_CONTROL_STYLE,
     )
-    step_button = button_control(description="Paso siguiente", button_style="info", width="150px")
-    auto_button = button_control(description="Ejecución automática", button_style="success", width="190px")
-    finish_button = button_control(description="Finalizar", button_style="", width="120px")
-    reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
-    book_button = button_control(description="Generar arreglo del libro", button_style="primary", width="210px")
-    step_button.icon = "step-forward"
-    auto_button.icon = "play"
-    finish_button.icon = "fast-forward"
-    reset_button.icon = "refresh"
-    book_button.icon = "book"
+    step_button = action_button("step")
+    auto_button = action_button("play")
+    finish_button = action_button("finish")
+    reset_button = action_button("reset")
+    book_button = action_button("book")
     controls = {
         "size": size_input,
         "view": view_dropdown,
@@ -2278,25 +2270,11 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     html_output.add_class("sort-subpanel-content")
     html_output.add_class("sort-result-content")
 
-    def panel(title, content):
-        return collapsible_panel(title, content, prefix="sort")
-
-    panel_content = widgets.VBox(
-        [
-            panel("Configuración", controls_layout),
-            panel("Procedimiento", formula_output),
-            panel("Resultado", html_output),
-        ],
-        layout=widgets.Layout(width="100%", grid_gap="0"),
+    layout = build_sort_panel(
+        controls_layout,
+        html_output,
+        procedure=formula_output,
     )
-    panel_content.add_class("sort-panel-content")
-    css_widget = widgets.HTML(sort_styles())
-    css_widget.layout = widgets.Layout(width="0", height="0", margin="0", padding="0")
-    layout = widgets.VBox(
-        [css_widget, panel_content],
-        layout=widgets.Layout(width="100%", max_width="100%", grid_gap="0", overflow="hidden"),
-    )
-    layout.add_class("sort-simulation-root")
     display(layout)
     update_radix_control_visibility()
     redraw()

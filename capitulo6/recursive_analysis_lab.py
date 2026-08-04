@@ -16,8 +16,8 @@ from common.widget_controls import (
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
     STANDARD_LABEL_CONTROL_GAP,
-    shared_ui_styles,
 )
+from common.simulation_views import standard_view_styles
 
 
 @dataclass
@@ -790,7 +790,7 @@ def run_app():
     )
     configuration_panel.add_class("lab-configuration-panel")
     styles = widgets.HTML(
-        STYLES + shared_ui_styles(".recursive-analysis-lab"),
+        STYLES + standard_view_styles(".recursive-analysis-lab"),
         layout=widgets.Layout(height="0px", min_height="0px", overflow="hidden"),
     )
     app = widgets.VBox([

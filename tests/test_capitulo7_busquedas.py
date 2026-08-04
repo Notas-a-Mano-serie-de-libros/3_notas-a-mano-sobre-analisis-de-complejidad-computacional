@@ -34,7 +34,7 @@ class TestInterpolacionVisualDinamica(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.source = (
-            PROJECT_ROOT / "capitulo7" / "domain" / "interpolation_visual.py"
+            PROJECT_ROOT / "core" / "search" / "interpolation_visual.py"
         ).read_text(encoding="utf-8")
 
     def test_valores_y_formula_se_componen_sin_reemplazo_sin_formato(self):
@@ -82,7 +82,7 @@ class TestInterpolacionVisualDinamica(unittest.TestCase):
         self.assertIn(r"\mathbf{x}_{\max}", self.source)
         self.assertIn(r"\mathbf{x}_{0}", self.source)
         self.assertNotIn(r"\boldsymbol", self.source)
-        self.assertIn('_HTML = shared_ui_styles("#iv-wrap") + r"""', self.source)
+        self.assertIn('_HTML = standard_view_styles("#iv-wrap") + r"""', self.source)
         self.assertIn("width:96px;min-width:96px", self.source)
         self.assertIn("input[type=number]{width:188px", self.source)
         self.assertIn("grid-template-columns:96px 126px 54px", self.source)
@@ -165,10 +165,11 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         self.assertIn("background:#e8fce9", self.module.render_state_html(state))
 
     def test_original_ui_features_are_present(self):
-        source = (PROJECT_ROOT / "capitulo7" / "domain" / "6_busqueda_ternaria_app.py").read_text()
-        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text()
-        self.assertIn('description="Generar arreglo del libro"', common_source)
-        self.assertIn("action_button_row(", common_source)
+        source = (PROJECT_ROOT / "core" / "search" / "6_busqueda_ternaria_app.py").read_text()
+        common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text()
+        view_source = (PROJECT_ROOT / "common" / "simulation_views.py").read_text()
+        self.assertIn('"Generar arreglo del libro"', view_source)
+        self.assertIn("actions(", common_source)
         self.assertIn('description="Elemento"', common_source)
         self.assertIn('description="Posición"', common_source)
         self.assertIn('description="Objetivo"', common_source)
@@ -231,7 +232,7 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         self.assertNotIn("_node_html_cache", first)
 
     def test_search_states_are_copied_without_deepcopy(self):
-        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
+        common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
         state = {
             "arr": [
                 {"index": 0, "value": 3, "role": "default", "label": ""},
@@ -470,12 +471,13 @@ class TestCapitulo7BusquedaExponencial(unittest.TestCase):
         self.assertIn("background:#e8fce9", self.module.render_state_html(state))
 
     def test_exponential_ui_features_are_present(self):
-        source = (PROJECT_ROOT / "capitulo7" / "domain" / "5_busqueda_exponencial_app.py").read_text()
-        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text()
+        source = (PROJECT_ROOT / "core" / "search" / "5_busqueda_exponencial_app.py").read_text()
+        common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text()
         bootstrap = (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text()
         notebook = (PROJECT_ROOT / "capitulo7" / "notebooks" / "5_busqueda_exponencial.ipynb").read_text()
 
-        self.assertIn('description="Generar arreglo del libro"', common_source)
+        view_source = (PROJECT_ROOT / "common" / "simulation_views.py").read_text()
+        self.assertIn('"Generar arreglo del libro"', view_source)
         self.assertNotIn("Objetivo automático", source)
         self.assertNotIn("auto_target_checkbox", source)
         self.assertIn("render_cache = OutputCache()", common_source)
@@ -678,7 +680,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         }
         all_legend_labels = {"objetivo", "actual", "comparación", "encontrado", "descartado", "rango"}
 
-        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
+        common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
         for name, module in self.modules.items():
             with self.subTest(name=name):
                 self.assertEqual(module.ROLE_STYLES["range"], expected[name]["range"])
@@ -748,28 +750,29 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
     def test_no_remaining_search_uses_automatic_target_checkbox(self):
         for name, (path, _step, _launcher) in SEARCH_MODULES.items():
             with self.subTest(name=name):
-                source = (PROJECT_ROOT / "capitulo7" / "domain" / path).read_text(encoding="utf-8")
+                source = (PROJECT_ROOT / "core" / "search" / path).read_text(encoding="utf-8")
                 self.assertNotIn("Objetivo automático", source)
                 self.assertNotIn("auto_target_checkbox", source)
 
     def test_individual_searches_share_default_size(self):
         expected_default_size = "DEFAULT_SIZE = 10"
-        for path in sorted((PROJECT_ROOT / "capitulo7" / "domain").glob("*_busqueda_*_app.py")):
+        for path in sorted((PROJECT_ROOT / "core" / "search").glob("*_busqueda_*_app.py")):
             with self.subTest(path=path.name):
                 source = path.read_text(encoding="utf-8")
                 self.assertIn(expected_default_size, source)
 
     def test_search_apps_use_common_runner(self):
-        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
+        common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
+        view_source = (PROJECT_ROOT / "common" / "simulation_views.py").read_text(encoding="utf-8")
 
         self.assertIn("def run_search_app", common_source)
-        self.assertIn('description="Paso siguiente"', common_source)
-        self.assertIn('description="Ejecución automática"', common_source)
-        self.assertIn('description="Generar nuevo arreglo"', common_source)
-        self.assertIn('description="Generar arreglo del libro"', common_source)
-        self.assertIn('"capitulo7/domain/search_common.py"', (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8"))
+        self.assertIn('"Paso siguiente"', view_source)
+        self.assertIn('"Ejecución automática"', view_source)
+        self.assertIn('"Generar nuevo arreglo"', view_source)
+        self.assertIn('"Generar arreglo del libro"', view_source)
+        self.assertIn('"core/search/search_common.py"', (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8"))
 
-        for path in sorted((PROJECT_ROOT / "capitulo7" / "domain").glob("*_busqueda_*_app.py")):
+        for path in sorted((PROJECT_ROOT / "core" / "search").glob("*_busqueda_*_app.py")):
             with self.subTest(path=path.name):
                 source = path.read_text(encoding="utf-8")
                 self.assertIn("from search_common import (", source)
@@ -778,7 +781,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                 self.assertIn("run_search_app(", source)
 
     def test_interpolation_imports_extra_widget_dependency(self):
-        source = (PROJECT_ROOT / "capitulo7" / "domain" / "3_busqueda_interpolacion_app.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "core" / "search" / "3_busqueda_interpolacion_app.py").read_text(encoding="utf-8")
 
         self.assertNotIn("dropdown_control", source)
         self.assertNotIn("Distribución uniforme", source)
@@ -786,7 +789,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn("widgets.Checkbox", source)
 
     def test_formula_output_reserves_stable_space(self):
-        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
+        common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
         runtime_source = (PROJECT_ROOT / "common" / "animation_runtime.py").read_text(encoding="utf-8")
 
         self.assertIn('min_height="0px"', common_source)
@@ -812,7 +815,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
             self.assertIn(constant, common_source)
         for filename in ("4_busqueda_saltos_app.py", "5_busqueda_exponencial_app.py"):
             with self.subTest(filename=filename):
-                source = (PROJECT_ROOT / "capitulo7" / "domain" / filename).read_text(encoding="utf-8")
+                source = (PROJECT_ROOT / "core" / "search" / filename).read_text(encoding="utf-8")
                 self.assertIn(r"\begin{{array}}{{l}}", source)
                 self.assertNotIn(r"\begin{{gathered}}", source)
 
@@ -835,10 +838,10 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertEqual(reserved, max(heights))
 
     def test_search_math_text_uses_same_font_as_array_values(self):
-        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
+        common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
         self.assertIn("font-family: '{FONT_FAMILY}', serif;", common_source)
 
-        for path in sorted((PROJECT_ROOT / "capitulo7" / "domain").glob("*_busqueda_*_app.py")):
+        for path in sorted((PROJECT_ROOT / "core" / "search").glob("*_busqueda_*_app.py")):
             with self.subTest(path=path.name):
                 source = path.read_text(encoding="utf-8")
                 self.assertIn("FONT_FAMILY = \"Scheherazade New\"", source)
@@ -850,7 +853,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                 self.assertNotIn("display(HTML(", source)
 
     def test_search_nodes_reserve_compact_label_height(self):
-        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
+        common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
 
         self.assertIn("SEARCH_NODES_PER_ROW = 10", common_source)
         self.assertIn("SEARCH_NODE_WIDTH = 54", common_source)
@@ -891,7 +894,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("white-space: nowrap;", common_source)
         self.assertIn("label-separator", common_source)
 
-        for path in sorted((PROJECT_ROOT / "capitulo7" / "domain").glob("*_busqueda_*_app.py")):
+        for path in sorted((PROJECT_ROOT / "core" / "search").glob("*_busqueda_*_app.py")):
             with self.subTest(path=path.name):
                 source = path.read_text(encoding="utf-8")
                 self.assertIn("render_search_state_html(state, ROLE_STYLES, LABEL_HTML)", source)
@@ -937,7 +940,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn(">✓</span>", found_html)
         self.assertIn(
             "transition: background-color 100ms ease",
-            (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8"),
+            (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8"),
         )
         self.assertIn("search-step-strip", found_html)
         self.assertNotIn(r"$\checkmark$", found_html)
@@ -951,13 +954,13 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn('role="img" aria-label="No encontrado"', missing_html)
         self.assertIn(
             "color: #b85450;",
-            (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8"),
+            (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8"),
         )
         self.assertIn(">×</span>", missing_html)
         self.assertNotIn(r"$\times$", missing_html)
 
     def test_search_auto_execution_stays_disabled_after_completion(self):
-        common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
+        common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
 
         self.assertIn("def sync_execution_buttons():", common_source)
         self.assertIn('complete = state["search_complete"]', common_source)
@@ -977,8 +980,8 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
 
         self.assertEqual(module.BOOK_ARRAY, [0, 1, 2, 3, 4, 5, 6, 7])
         self.assertEqual(module.BOOK_TARGET, 6)
-        source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")
-        self.assertIn('description="Generar arreglo del libro"', source)
+        source = (PROJECT_ROOT / "common" / "simulation_views.py").read_text(encoding="utf-8")
+        self.assertIn('"Generar arreglo del libro"', source)
 
     def test_sequential_search_labels_current_index(self):
         module = self.modules["secuencial"]
@@ -1058,14 +1061,14 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
             "0_comparacion_busquedas_app.py",
             "capitulo7_comparacion_test_app",
         )
-        source = (PROJECT_ROOT / "capitulo7" / "domain" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "core" / "search" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
         notebook_source = (PROJECT_ROOT / "capitulo7" / "notebooks" / "0_comparacion_busquedas.ipynb").read_text(encoding="utf-8")
         values = [1, 2, 3, 4, 5, 6, 7, 8]
         state = module.create_comparison_state(size=len(values), target=6, values=values)
 
         self.assertEqual(module.DEFAULT_SIZE, 10)
         self.assertIn('description="Buscar"', source)
-        self.assertIn("action_button_row([auto_button, finish_button, reset_button])", source)
+        self.assertIn("actions([auto_button, finish_button, reset_button])", source)
         self.assertIn('description="Finalizar"', source)
         self.assertIn("disabled=True", source)
         self.assertIn("def set_running_buttons", source)
@@ -1206,7 +1209,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn(r"$\times$", missing_html)
         self.assertNotIn('comparison-result-symbol found', missing_html)
 
-        source = (PROJECT_ROOT / "capitulo7" / "domain" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "core" / "search" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
         self.assertNotIn("Generar arreglo del libro", source)
         self.assertNotIn("book_button", source)
 
@@ -1228,7 +1231,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
             "0_comparacion_busquedas_app.py",
             "capitulo7_comparacion_target_mode_test_app",
         )
-        source = (PROJECT_ROOT / "capitulo7" / "domain" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "core" / "search" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
         values = [1, 2, 3, 4, 5, 6, 7, 8]
 
         exists_state = module.create_comparison_state(

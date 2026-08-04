@@ -36,13 +36,13 @@ try:
         collapsible_panel,
         compact_labeled_control,
         magnitude_stepper,
-        shared_ui_styles,
     )
+    from common.simulation_views import standard_view_styles
 except ImportError:
     STANDARD_CONTROL_COLUMN_GAP = 36
     STANDARD_CONTROL_ROW_GAP = 12
     STANDARD_LABEL_CONTROL_GAP = 8
-    shared_ui_styles = lambda _root: ""
+    standard_view_styles = lambda _root: ""
     def collapsible_panel(title, content, *, prefix, open_by_default=True):
         header = widgets.Button(
             description=title.rstrip(":"),
@@ -1077,7 +1077,7 @@ def run_app(
             box-shadow: none !important;
           }
         </style>
-        """ + shared_ui_styles(".constant-animation-root"),
+        """ + standard_view_styles(".constant-animation-root"),
         layout=widgets.Layout(height="0px", min_height="0px", overflow="hidden"),
     )
     app = widgets.VBox(

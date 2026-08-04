@@ -6,8 +6,8 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CAP7_DOMAIN = PROJECT_ROOT / "capitulo7" / "domain"
-CAP8_DOMAIN = PROJECT_ROOT / "capitulo8" / "domain"
+CAP7_DOMAIN = PROJECT_ROOT / "core" / "search"
+CAP8_DOMAIN = PROJECT_ROOT / "core" / "sort"
 MAX_NOTEBOOK_BYTES = 1_500_000
 MAX_RENDER_HTML_BYTES = 250_000
 

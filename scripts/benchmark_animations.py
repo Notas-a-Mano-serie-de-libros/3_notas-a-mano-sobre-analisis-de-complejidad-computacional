@@ -9,8 +9,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CAP7_DOMAIN = ROOT / "capitulo7" / "domain"
-CAP8_DOMAIN = ROOT / "capitulo8" / "domain"
+CAP7_DOMAIN = ROOT / "core" / "search"
+CAP8_DOMAIN = ROOT / "core" / "sort"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 

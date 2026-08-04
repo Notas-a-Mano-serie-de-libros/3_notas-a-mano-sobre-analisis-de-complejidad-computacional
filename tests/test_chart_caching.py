@@ -13,7 +13,7 @@ class TestChartCaching(unittest.TestCase):
     def test_search_metrics_are_available_without_chart_runtime(self):
         module = load_module_from_path(
             "capitulo7_search_metrics_test",
-            PROJECT_ROOT / "capitulo7" / "domain" / "search_metrics.py",
+            PROJECT_ROOT / "core" / "search" / "search_metrics.py",
         )
 
         values = [1, 3, 5, 7, 9]
@@ -24,7 +24,7 @@ class TestChartCaching(unittest.TestCase):
     def test_sort_metrics_are_available_without_chart_runtime(self):
         module = load_module_from_path(
             "capitulo8_sort_metrics_test",
-            PROJECT_ROOT / "capitulo8" / "domain" / "sort_metrics.py",
+            PROJECT_ROOT / "core" / "sort" / "sort_metrics.py",
         )
 
         self.assertGreater(module.count_sort_operations("burbuja", [3, 2, 1]), 0)
@@ -34,9 +34,9 @@ class TestChartCaching(unittest.TestCase):
     def test_search_chart_caches_computed_series_by_profile(self):
         module = load_module_from_path(
             "capitulo7_busquedas_chart_test",
-            PROJECT_ROOT / "capitulo7" / "domain" / "busquedas_chart.py",
+            PROJECT_ROOT / "core" / "search" / "busquedas_chart.py",
         )
-        source = (PROJECT_ROOT / "capitulo7" / "domain" / "busquedas_chart.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "core" / "search" / "busquedas_chart.py").read_text(encoding="utf-8")
 
         self.assertIn("from search_metrics import count_search_steps", source)
         self.assertIn("from common.plot_style import apply_plot_style", source)
@@ -64,8 +64,8 @@ class TestChartCaching(unittest.TestCase):
         self.assertIn("theory", first)
 
     def test_search_chart_downloads_metrics_when_missing_next_to_runtime_file(self):
-        chart_source = (PROJECT_ROOT / "capitulo7" / "domain" / "busquedas_chart.py").read_text(encoding="utf-8")
-        metrics_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_metrics.py").read_text(encoding="utf-8")
+        chart_source = (PROJECT_ROOT / "core" / "search" / "busquedas_chart.py").read_text(encoding="utf-8")
+        metrics_source = (PROJECT_ROOT / "core" / "search" / "search_metrics.py").read_text(encoding="utf-8")
 
         with tempfile.TemporaryDirectory() as tmpdir:
             runtime_dir = Path(tmpdir)
@@ -83,7 +83,7 @@ class TestChartCaching(unittest.TestCase):
             self.assertEqual(module.count_search_steps("Secuencial", [1, 2, 3], 3), 3)
 
     def test_sort_chart_caches_computed_series_by_profile(self):
-        domain_dir = PROJECT_ROOT / "capitulo8" / "domain"
+        domain_dir = PROJECT_ROOT / "core" / "sort"
         sys.path.insert(0, str(domain_dir))
         try:
             module = load_module_from_path(
@@ -120,7 +120,7 @@ class TestChartCaching(unittest.TestCase):
         self.assertIn("theory", first)
 
     def test_sort_chart_downloads_metrics_when_missing_next_to_runtime_file(self):
-        domain_dir = PROJECT_ROOT / "capitulo8" / "domain"
+        domain_dir = PROJECT_ROOT / "core" / "sort"
         chart_source = (domain_dir / "ordenamientos_chart.py").read_text(encoding="utf-8")
         metrics_source = (domain_dir / "sort_metrics.py").read_text(encoding="utf-8")
 

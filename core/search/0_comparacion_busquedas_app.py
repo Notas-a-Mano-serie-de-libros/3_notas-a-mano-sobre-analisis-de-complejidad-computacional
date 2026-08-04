@@ -25,17 +25,22 @@ from search_common import (
     generate_sorted_values,
     resolve_node_style,
 )
+from common.simulation_views import (
+    SECTION_CONFIGURATION,
+    SECTION_RESULT,
+    SimulationViewSpec,
+    ViewSection,
+    actions,
+    build_simulation_view,
+)
 from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
-    action_button_row,
     bounded_int_control,
     button_control,
-    collapsible_panel,
     compact_labeled_control,
     dropdown_control,
-    shared_ui_styles,
 )
 
 
@@ -947,7 +952,7 @@ def run_app():
     first_row_box.add_class("comparison-controls-grid")
     ui_state["first_row"] = first_row_box
     update_target_position_visibility()
-    button_row = action_button_row([auto_button, finish_button, reset_button])
+    button_row = actions([auto_button, finish_button, reset_button])
     for button in (auto_button, finish_button, reset_button):
         button.layout.height = "38px"
     button_row.add_class("comparison-action-row")
@@ -959,31 +964,17 @@ def run_app():
     html_output.add_class("comparison-subpanel-content")
     html_output.add_class("comparison-result-content")
 
-    def panel(title, content):
-        return collapsible_panel(title, content, prefix="comparison")
-
-    panel_content = widgets.VBox(
-        [
-            panel("Configuración", parameters_content),
-            panel("Resultado", html_output),
-        ],
-        layout=widgets.Layout(width="100%", grid_gap="0"),
+    controls = build_simulation_view(
+        SimulationViewSpec(
+            root_class="comparison-simulation-root",
+            panel_prefix="comparison",
+            styles=COMPARISON_PANEL_CSS,
+            sections=(
+                ViewSection(SECTION_CONFIGURATION, parameters_content, ("comparison-subpanel-content",)),
+                ViewSection(SECTION_RESULT, html_output, ("comparison-subpanel-content", "comparison-result-content")),
+            ),
+        )
     )
-    panel_content.add_class("comparison-panel-content")
-    css_widget = widgets.HTML(
-        COMPARISON_PANEL_CSS + shared_ui_styles(".comparison-simulation-root"),
-        layout=widgets.Layout(width="0", height="0", margin="0", padding="0"),
-    )
-    controls = widgets.VBox(
-        [css_widget, panel_content],
-        layout=widgets.Layout(
-            width="100%",
-            max_width="100%",
-            grid_gap="0",
-            overflow="hidden",
-        ),
-    )
-    controls.add_class("comparison-simulation-root")
     display(controls)
     state = build_state()
     redraw(force_static=True)

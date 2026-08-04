@@ -10,6 +10,16 @@ from IPython.display import display
 import ipywidgets as widgets
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
+from common.simulation_views import (
+    SECTION_CONFIGURATION,
+    SECTION_PROCEDURE,
+    SECTION_RESULT,
+    SimulationViewSpec,
+    ViewSection,
+    action_button,
+    actions,
+    build_simulation_view,
+)
 from common.visual_roles import SEARCH_EXPONENTIAL_STYLES, SEARCH_RANGE_HIGHLIGHT_STYLES, SEARCH_ROLE_STYLES, SEARCH_SEQUENTIAL_STYLES, SEARCH_TERNARY_STYLES, TARGET
 from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
@@ -723,7 +733,7 @@ def _build_search_css() -> str:
 
 
 # CSS inyectado una sola vez; las dimensiones dinámicas van como inline styles en el HTML
-_SEARCH_CSS = _build_search_css() + shared_ui_styles(".search-simulation-root")
+_SEARCH_CSS = _build_search_css()
 
 
 def render_result_symbol(state):
@@ -869,16 +879,11 @@ def create_search_controls(default_size=DEFAULT_SIZE, max_size=MAX_SIZE, default
         description="Posición",
         width="190px",
     )
-    step_button = button_control(description="Paso siguiente", button_style="info", width="150px")
-    auto_button = button_control(description="Ejecución automática", button_style="success", width="190px")
-    finish_button = button_control(description="Finalizar", button_style="", width="120px")
-    reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
-    book_button = button_control(description="Generar arreglo del libro", button_style="primary", width="210px")
-    step_button.icon = "step-forward"
-    auto_button.icon = "play"
-    finish_button.icon = "fast-forward"
-    reset_button.icon = "refresh"
-    book_button.icon = "book"
+    step_button = action_button("step")
+    auto_button = action_button("play")
+    finish_button = action_button("finish")
+    reset_button = action_button("reset")
+    book_button = action_button("book")
     return {
         "size": size_input,
         "target_mode": target_mode_input,
@@ -1145,43 +1150,27 @@ def run_search_app(
     )
     ui_state["first_row"] = first_row_box
     update_target_position_visibility()
-    button_row = action_button_row(
+    button_row = actions(
         [step_button, auto_button, finish_button, reset_button, book_button]
     )
     parameters_content = widgets.VBox(
         [first_row_box, button_row],
         layout=widgets.Layout(width="100%"),
     )
-    parameters_content.add_class("search-subpanel-content")
-    formula_output.add_class("search-subpanel-content")
     formula_output.add_class("search-formula-content")
-    html_output.add_class("search-subpanel-content")
     html_output.add_class("search-result-content")
-
-    def panel(title, content):
-        return collapsible_panel(title, content, prefix="search")
-
-    panel_content = widgets.VBox(
-        [
-            panel("Configuración", parameters_content),
-            panel("Procedimiento", formula_output),
-            panel("Resultado", html_output),
-        ],
-        layout=widgets.Layout(width="100%", grid_gap="0"),
+    layout = build_simulation_view(
+        SimulationViewSpec(
+            root_class="search-simulation-root",
+            panel_prefix="search",
+            styles=_SEARCH_CSS,
+            sections=(
+                ViewSection(SECTION_CONFIGURATION, parameters_content, ("search-subpanel-content",)),
+                ViewSection(SECTION_PROCEDURE, formula_output, ("search-subpanel-content",)),
+                ViewSection(SECTION_RESULT, html_output, ("search-subpanel-content",)),
+            ),
+        )
     )
-    panel_content.add_class("search-panel-content")
-    css_widget = widgets.HTML(_SEARCH_CSS)
-    css_widget.layout = widgets.Layout(width="0", height="0", margin="0", padding="0")
-    layout = widgets.VBox(
-        [css_widget, panel_content],
-        layout=widgets.Layout(
-            width="100%",
-            max_width="100%",
-            grid_gap="0",
-            overflow="hidden",
-        ),
-    )
-    layout.add_class("search-simulation-root")
     display(layout)
     state = build_state()
     redraw()

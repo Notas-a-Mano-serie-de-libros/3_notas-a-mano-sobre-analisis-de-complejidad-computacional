@@ -3,13 +3,13 @@ from __future__ import annotations
 from uuid import uuid4
 
 from IPython.display import HTML, display
-from common.widget_controls import shared_ui_styles
+from common.simulation_views import standard_view_styles
 
 
 def _run_app(mode: str, allow_mode_selection: bool = False):
     instance_prefix = f"asym-{uuid4().hex}-"
     html = (
-        (shared_ui_styles("#bo-wrap") + _BIG_O_HTML)
+        (standard_view_styles("#bo-wrap") + _BIG_O_HTML)
         .replace("__MODE__", mode)
         .replace("__MODE_SELECTABLE__", str(allow_mode_selection).lower())
         .replace("__MODE_SELECTOR_DISPLAY__", "grid")

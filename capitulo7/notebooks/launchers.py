@@ -4,29 +4,32 @@ from pathlib import Path
 import sys
 
 
-def _resolve_domain():
-    for base in (Path.cwd(), Path(__file__).resolve().parent, *Path.cwd().parents):
-        candidates = (
-            base / "capitulo7" / "domain",
-            base / "domain",
-            base.parent / "domain",
-        )
-        for candidate in candidates:
-            if candidate.exists():
-                return candidate
-    raise FileNotFoundError("No se pudo localizar la carpeta capitulo7/domain")
+def _resolve_core():
+    launcher_dir = Path(__file__).resolve().parent
+    bases = (launcher_dir, *launcher_dir.parents, Path.cwd(), *Path.cwd().parents)
+    seen = set()
+    for base in bases:
+        candidate = (base / "core" / "search").resolve()
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if candidate.is_dir():
+            return candidate
+    raise FileNotFoundError("No se pudo localizar la carpeta core/search")
 
 
 def _load_module(relative_path: str, module_name: str):
     importlib.invalidate_caches()
-    domain_dir = _resolve_domain()
-    module_path = domain_dir / relative_path
+    core_dir = _resolve_core()
+    module_path = core_dir / relative_path
     if not module_path.exists():
         raise FileNotFoundError(f"No se pudo localizar {module_path}")
 
-    module_dir = str(module_path.parent)
-    if module_dir not in sys.path:
-        sys.path.insert(0, module_dir)
+    project_root = core_dir.parents[1]
+    for import_path in (project_root, core_dir):
+        path_string = str(import_path)
+        if path_string not in sys.path:
+            sys.path.insert(0, path_string)
 
     sys.modules.pop("search_common", None)
     runtime_module_name = f"{module_name}_{module_path.stat().st_mtime_ns}"

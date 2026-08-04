@@ -147,9 +147,9 @@ def test_capitulos_aplican_el_estilo_canonico_al_label_efectivo():
         "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py",
         "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py",
         "capitulo4/experiment_ui.py",
-        "capitulo7/domain/search_common.py",
-        "capitulo7/domain/0_comparacion_busquedas_app.py",
-        "capitulo8/domain/sort_common.py",
+        "core/search/search_common.py",
+        "core/search/0_comparacion_busquedas_app.py",
+        "core/sort/sort_common.py",
     )
     for relative_path in compact_label_sources:
         source = (project_root / relative_path).read_text(encoding="utf-8")

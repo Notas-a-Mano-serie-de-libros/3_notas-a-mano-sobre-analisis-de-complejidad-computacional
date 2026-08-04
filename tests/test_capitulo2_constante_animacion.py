@@ -704,7 +704,7 @@ def test_simulacion_polinomial_comparte_medidas_con_los_demas_paneles():
     assert 'configuration_panel = subpanel("Configuración", [controls])' in source
     assert 'result_panel = subpanel("Resultado", [result_content])' in source
     assert 'collapsible_panel(title, content, prefix="experimental")' in source
-    assert 'shared_ui_styles(".constant-animation-root")' in source
+    assert 'standard_view_styles(".constant-animation-root")' in source
     assert "header.on_click(toggle_content)" not in source
     assert "Parámetros:" not in source
     assert "Resultados por grado:" not in source
