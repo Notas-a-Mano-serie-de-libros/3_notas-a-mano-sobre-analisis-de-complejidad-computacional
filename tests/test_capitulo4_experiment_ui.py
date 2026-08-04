@@ -12,6 +12,12 @@ C2_UI_SOURCE = (
 ).read_text(encoding="utf-8")
 
 
+def test_colab_bootstrap_reloads_the_active_common_runtime():
+    source = (ROOT / "capitulo4" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
+    assert "def _activate_runtime(root):" in source
+    assert 'module_name.startswith("common.")' in source
+
+
 def test_interfaz_comparte_paneles_y_medidas_del_capitulo_dos():
     assert "STEPPER_FIELD_WIDTH = 188" in UI_SOURCE
     assert "STEPPER_BUTTON_WIDTH = 34" in UI_SOURCE

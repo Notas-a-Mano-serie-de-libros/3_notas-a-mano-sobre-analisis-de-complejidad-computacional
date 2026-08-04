@@ -80,6 +80,11 @@ def prepare_imports():
         sys.path.insert(0, root_string)
 
     importlib.invalidate_caches()
+    # Un kernel puede ejecutar varios capítulos y conservar ``common`` desde
+    # otro runtime. Se recarga siempre desde la raíz activa de este capítulo.
+    for loaded_module in tuple(sys.modules):
+        if loaded_module == "common" or loaded_module.startswith("common."):
+            sys.modules.pop(loaded_module, None)
     for loaded_module in RELOADABLE_MODULES:
         sys.modules.pop(loaded_module, None)
 

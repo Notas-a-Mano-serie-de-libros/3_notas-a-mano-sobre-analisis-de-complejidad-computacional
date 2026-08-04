@@ -1779,7 +1779,7 @@ def run_app(builder_only=False):
             method_solution.value = ""
             method_solution.layout.display = "none"
             return
-        from capitulo5.recurrence_solution_methods import (
+        from capitulo5.runtime.recurrence_solution_methods import (
             SOLUTION_STYLES,
             solve_selected_method,
         )

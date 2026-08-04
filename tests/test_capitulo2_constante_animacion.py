@@ -342,6 +342,8 @@ def test_bootstrap_prioriza_simulacion_y_limpia_estado_del_kernel():
     graph_branch = source.index('elif "THEORETICAL_GRAPH" in globals():')
     assert simulation_branch < graph_branch
     assert 'globals().pop(control_name, None)' in source
+    assert 'loaded_module == "common"' in source
+    assert 'loaded_module.startswith("common.")' in source
 
 
 def test_perfiles_generales_se_pueden_construir():

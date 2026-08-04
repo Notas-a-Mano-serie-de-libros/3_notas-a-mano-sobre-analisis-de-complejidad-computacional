@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import importlib.util
 import sys
 import tempfile
@@ -32,9 +33,31 @@ def _download_common_runtime(module_dir, repository_root):
     urllib.request.urlretrieve(repository_root + "common/__init__.py", common_dir / "__init__.py")
     urllib.request.urlretrieve(repository_root + "common/widget_controls.py", common_dir / "widget_controls.py")
     urllib.request.urlretrieve(repository_root + "common/simulation_views.py", common_dir / "simulation_views.py")
-    runtime_root = str(module_dir.resolve())
-    if runtime_root not in sys.path:
-        sys.path.insert(0, runtime_root)
+    domain_dir = module_dir / "capitulo5" / "runtime"
+    domain_dir.mkdir(parents=True, exist_ok=True)
+    (domain_dir.parent / "__init__.py").touch(exist_ok=True)
+    (domain_dir / "__init__.py").touch(exist_ok=True)
+    urllib.request.urlretrieve(
+        repository_root + "capitulo5/runtime/recurrence_solution_methods.py",
+        domain_dir / "recurrence_solution_methods.py",
+    )
+
+
+def _activate_runtime(root):
+    root_text = str(Path(root).resolve())
+    if root_text in sys.path:
+        sys.path.remove(root_text)
+    sys.path.insert(0, root_text)
+    for module_name in tuple(sys.modules):
+        if (
+            module_name == "common"
+            or module_name.startswith("common.")
+            or module_name == "capitulo5"
+            or module_name.startswith("capitulo5.")
+            or module_name == "capitulo5_recursion_tree_animation"
+        ):
+            sys.modules.pop(module_name, None)
+    importlib.invalidate_caches()
 
 
 def _load(path):
@@ -63,6 +86,10 @@ if module_path is None:
         "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/"
         "3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/",
     )
+    runtime_root = module_dir
+else:
+    runtime_root = module_path.resolve().parents[2]
 
+_activate_runtime(runtime_root)
 module = _load(module_path)
 module.run_app()

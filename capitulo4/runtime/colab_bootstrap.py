@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import importlib.util
 import sys
 import tempfile
@@ -21,6 +22,24 @@ def _load(path):
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def _activate_runtime(root):
+    root_text = str(Path(root).resolve())
+    if root_text in sys.path:
+        sys.path.remove(root_text)
+    sys.path.insert(0, root_text)
+    for module_name in tuple(sys.modules):
+        if (
+            module_name == "common"
+            or module_name.startswith("common.")
+            or module_name == "capitulo4"
+            or module_name.startswith("capitulo4.")
+            or module_name == "capitulo4_experimental_analysis"
+            or module_name == "capitulo4_experiment_ui"
+        ):
+            sys.modules.pop(module_name, None)
+    importlib.invalidate_caches()
 
 
 module_path = _local_module()
@@ -53,9 +72,10 @@ if module_path is None:
             repository_root + "common/" + filename,
             common_dir / filename,
         )
-    runtime_root = str(module_dir.resolve())
-    if runtime_root not in sys.path:
-        sys.path.insert(0, runtime_root)
+    runtime_root = module_dir
+else:
+    runtime_root = module_path.resolve().parents[2]
 
+_activate_runtime(runtime_root)
 module = _load(module_path)
 module.run_experiment(globals()["EXAMPLE_NAME"], None)

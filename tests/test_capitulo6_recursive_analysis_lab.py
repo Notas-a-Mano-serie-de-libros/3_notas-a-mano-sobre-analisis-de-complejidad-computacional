@@ -15,6 +15,8 @@ def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
 
     assert "sys.path.insert(0, project_root)" in bootstrap
     assert 'common/widget_controls.py' in bootstrap
+    assert "def _activate_runtime(root):" in bootstrap
+    assert 'module_name.startswith("common.")' in bootstrap
 
 
 def test_recursive_lab_supports_requested_analysis_examples():
