@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 from html import escape
 from pathlib import Path
@@ -528,87 +529,122 @@ def run_app(profile, display_app=True, mode_selector=None):
     def increase_sampling_points(_):
         update_sampling_points(next_order_of_magnitude(sampling_point_count()))
 
-    def run_experiment():
+    def begin_experiment():
         execution_state["reset_requested"] = False
         set_controls_enabled(False)
-        try:
-            config = SimulationConfig(
-                maximum_n=maximum_n(),
-                sampling_points=sampling_point_count(),
-                restrict_maximum=not force_execution.value,
-                executions=execution_value(),
-            ).normalized()
-            selected_maximum = config.maximum_n
-            executions = config.executions
-            execution_limit = effective_max_safe_elements(profile, force_execution.value)
-            sizes, checkpoints = build_experiment_sizes(
-                selected_maximum,
-                execution_limit,
-                points=config.sampling_points,
+        config = SimulationConfig(
+            maximum_n=maximum_n(), sampling_points=sampling_point_count(),
+            restrict_maximum=not force_execution.value, executions=execution_value(),
+        ).normalized()
+        execution_limit = effective_max_safe_elements(profile, force_execution.value)
+        sizes, checkpoints = build_experiment_sizes(
+            config.maximum_n, execution_limit, points=config.sampling_points,
+        )
+        context = {
+            "sizes": sizes,
+            "checkpoints": checkpoints,
+            "experimental": np.full(len(sizes), np.nan),
+            "checkpoint_times": np.full(len(checkpoints), np.nan),
+            "statuses": [STATUS_PENDING] * len(checkpoints),
+            "indexes": {int(n): index for index, n in enumerate(checkpoints)},
+            "execution_limit": execution_limit,
+            "executions": config.executions,
+        }
+        if context["statuses"]:
+            context["statuses"][0] = STATUS_LOADING
+        table_output.value = results_table_html(
+            checkpoints, context["checkpoint_times"], profile,
+            pending=True, statuses=context["statuses"],
+        )
+        return context
+
+    def record_point(context, index, n, value):
+        context["experimental"][index] = value
+        checkpoint_index = context["indexes"].get(int(n))
+        if checkpoint_index is not None:
+            context["checkpoint_times"][checkpoint_index] = value
+            context["statuses"][checkpoint_index] = (
+                STATUS_COMPLETE if np.isfinite(value) else STATUS_SKIPPED
             )
-            experimental = np.full(len(sizes), np.nan)
-            checkpoint_times = np.full(len(checkpoints), np.nan)
-            checkpoint_statuses = [STATUS_PENDING] * len(checkpoints)
-            if checkpoint_statuses:
-                checkpoint_statuses[0] = STATUS_LOADING
-            checkpoint_indexes = {int(n): index for index, n in enumerate(checkpoints)}
+            if checkpoint_index + 1 < len(context["statuses"]):
+                context["statuses"][checkpoint_index + 1] = STATUS_LOADING
             table_output.value = results_table_html(
-                checkpoints,
-                checkpoint_times,
-                profile,
-                pending=True,
-                statuses=checkpoint_statuses,
+                context["checkpoints"], context["checkpoint_times"], profile,
+                pending=True, statuses=context["statuses"],
             )
-            for index, n in enumerate(sizes):
+
+    def complete_experiment(context):
+        if execution_state["reset_requested"]:
+            reset_app()
+            return
+        statuses = [
+            status if np.isfinite(value) else STATUS_SKIPPED
+            for status, value in zip(context["statuses"], context["checkpoint_times"])
+        ]
+        table_html, figure_html = profile.render_result(
+            context["sizes"], context["experimental"], context["checkpoints"],
+            context["checkpoint_times"], statuses,
+        )
+        table_output.value = table_html
+        figure_output.value = figure_frame_html(
+            figure_html, profile.figure_width, profile.figure_aspect_ratio,
+        )
+
+    def release_experiment():
+        execution_state["reset_requested"] = False
+        execution_state["task"] = None
+        set_controls_enabled(True)
+
+    def run_experiment_sync():
+        context = begin_experiment()
+        try:
+            for index, n in enumerate(context["sizes"]):
                 if execution_state["reset_requested"]:
                     break
-                if n <= execution_limit:
-                    experimental[index] = measure_profile_point(
-                        profile, int(n), executions
-                    )
-                checkpoint_index = checkpoint_indexes.get(int(n))
-                if checkpoint_index is not None:
-                    checkpoint_times[checkpoint_index] = experimental[index]
-                    checkpoint_statuses[checkpoint_index] = STATUS_COMPLETE if np.isfinite(experimental[index]) else STATUS_SKIPPED
-                    if checkpoint_index + 1 < len(checkpoint_statuses):
-                        checkpoint_statuses[checkpoint_index + 1] = STATUS_LOADING
-                    table_output.value = results_table_html(
-                        checkpoints,
-                        checkpoint_times,
-                        profile,
-                        pending=True,
-                        statuses=checkpoint_statuses,
-                    )
-            if execution_state["reset_requested"]:
-                reset_app()
-            else:
-                checkpoint_statuses = [
-                    status if np.isfinite(value) else STATUS_SKIPPED
-                    for status, value in zip(checkpoint_statuses, checkpoint_times)
-                ]
-                table_html, figure_html = profile.render_result(
-                    sizes,
-                    experimental,
-                    checkpoints,
-                    checkpoint_times,
-                    checkpoint_statuses,
-                )
-                table_output.value = table_html
-                figure_output.value = figure_frame_html(
-                    figure_html,
-                    profile.figure_width,
-                    profile.figure_aspect_ratio,
-                )
+                value = np.nan
+                if n <= context["execution_limit"]:
+                    value = measure_profile_point(profile, int(n), context["executions"])
+                record_point(context, index, n, value)
+            complete_experiment(context)
         finally:
-            execution_state["reset_requested"] = False
-            execution_state["task"] = None
-            set_controls_enabled(True)
+            release_experiment()
+
+    async def run_experiment_async():
+        context = begin_experiment()
+        try:
+            for index, n in enumerate(context["sizes"]):
+                if execution_state["reset_requested"]:
+                    break
+                value = np.nan
+                if n <= context["execution_limit"]:
+                    value = await asyncio.to_thread(
+                        measure_profile_point, profile, int(n), context["executions"]
+                    )
+                record_point(context, index, n, value)
+                if index % max(1, profile.yield_every) == 0:
+                    await asyncio.sleep(0)
+            complete_experiment(context)
+        finally:
+            release_experiment()
+
+    def schedule_task(coro):
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(coro)
+            return None
+        return loop.create_task(coro)
 
     def apply(_):
         if execution_state["task"] is not None:
             return
         execution_state["task"] = "running"
-        run_experiment()
+        if colab_output is not None:
+            run_experiment_sync()
+            return
+        task = schedule_task(run_experiment_async())
+        if task is not None:
+            execution_state["task"] = task
 
     force_execution.observe(refresh_warning, names="value")
     maximum_down.on_click(decrease_maximum)

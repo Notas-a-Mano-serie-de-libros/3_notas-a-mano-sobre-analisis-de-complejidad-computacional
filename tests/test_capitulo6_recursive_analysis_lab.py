@@ -138,6 +138,7 @@ def test_lab_uses_editable_input_right_aligned_actions_and_collapsible_panels():
     assert "disabled=True" in SOURCE
     assert 'description="Reproducir"' in SOURCE
     assert "async def play_process" in SOURCE
+    assert "def play_process_sync():" in SOURCE
     assert "[analysis_controls, input_controls]" in SOURCE
     assert ".recursive-analysis-lab .widget-box," not in SOURCE
     assert 'controls = widgets.VBox(' in SOURCE
@@ -306,6 +307,7 @@ def test_playback_uses_event_specific_transition_delays():
     assert delays["resume"] == 0.3
     assert "await asyncio.sleep(_event_delay(next_event, state[\"nodes\"]))" in SOURCE
     assert "if RUNNING_IN_COLAB:" in SOURCE
+    assert "play_process_sync()" in SOURCE
     assert "time.sleep(_event_delay(next_event, state[\"nodes\"]))" in SOURCE
     assert ".lab-call-frame.waiting{opacity:.62}" in SOURCE
 

@@ -25,8 +25,11 @@ def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
 def test_playback_buttons_use_kernel_callbacks_instead_of_injected_javascript():
     assert "play.on_click(start_playback)" in SOURCE
     assert "pause.on_click(stop_playback)" in SOURCE
-    assert "loop.create_task(play_levels())" in SOURCE
+    assert "async def play_levels_async():" in SOURCE
+    assert "def play_levels_sync():" in SOURCE
+    assert "loop.create_task(play_levels_async())" in SOURCE
     assert "if RUNNING_IN_COLAB:" in SOURCE
+    assert "play_levels_sync()" in SOURCE
     assert "time.sleep(0.35)" in SOURCE
     assert "playbackTimer" not in SOURCE
 

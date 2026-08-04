@@ -1748,13 +1748,23 @@ def run_app(builder_only=False):
         )
         update()
 
-    async def play_levels():
+    async def play_levels_async():
         try:
             while animation_state["level"] < parameter_state["h"]:
                 await asyncio.sleep(0.35)
                 change_level(1)
         except asyncio.CancelledError:
             return
+        finally:
+            playback_state["task"] = None
+            play.disabled = False
+            pause.disabled = True
+
+    def play_levels_sync():
+        try:
+            while animation_state["level"] < parameter_state["h"]:
+                time.sleep(0.35)
+                change_level(1)
         finally:
             playback_state["task"] = None
             play.disabled = False
@@ -1768,21 +1778,14 @@ def run_app(builder_only=False):
         play.disabled = True
         pause.disabled = False
         if RUNNING_IN_COLAB:
-            try:
-                while animation_state["level"] < parameter_state["h"]:
-                    time.sleep(0.35)
-                    change_level(1)
-            finally:
-                playback_state["task"] = None
-                play.disabled = False
-                pause.disabled = True
+            play_levels_sync()
             return
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
-            asyncio.run(play_levels())
+            asyncio.run(play_levels_async())
         else:
-            playback_state["task"] = loop.create_task(play_levels())
+            playback_state["task"] = loop.create_task(play_levels_async())
 
     previous_level.on_click(lambda _: (stop_playback(), change_level(-1)))
     next_level.on_click(lambda _: (stop_playback(), change_level(1)))

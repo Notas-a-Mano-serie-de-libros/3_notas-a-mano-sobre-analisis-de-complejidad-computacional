@@ -186,10 +186,12 @@ def test_simulacion_incluye_boton_reiniciar_junto_a_ejecutar():
     assert 'description="Reiniciar"' in source
     assert "[apply_button, reset_button]" in source
     assert "reset_button.on_click(reset_app)" in source
-    assert "def run_experiment():" in source
-    assert "run_experiment()" in source
-    assert "create_task" not in source
-    assert "asyncio.to_thread" not in source
+    assert "def run_experiment_sync():" in source
+    assert "async def run_experiment_async():" in source
+    assert "if colab_output is not None:" in source
+    assert "run_experiment_sync()" in source
+    assert "schedule_task(run_experiment_async())" in source
+    assert "await asyncio.to_thread(" in source
 
 
 def test_simulacion_unifica_configuracion_resultado_y_tipo_de_analisis():
