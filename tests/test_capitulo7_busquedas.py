@@ -78,9 +78,14 @@ class TestInterpolacionVisualDinamica(unittest.TestCase):
         self.assertIn("gap:0;align-items:center", self.source)
         self.assertIn("border:1px solid #ccc;border-radius:0", self.source)
         self.assertIn(".stepper button{border-color:#ccc;border-radius:0", self.source)
-        self.assertIn(r"\boldsymbol{f(x)}", self.source)
-        self.assertIn(r"\boldsymbol{x_{\max}}", self.source)
-        self.assertIn(r"\boldsymbol{x_0}", self.source)
+        self.assertIn(r"\mathbf{f}(x)", self.source)
+        self.assertIn(r"\mathbf{x}_{\max}", self.source)
+        self.assertIn(r"\mathbf{x}_{0}", self.source)
+        self.assertNotIn(r"\boldsymbol", self.source)
+        self.assertIn('_HTML = shared_ui_styles("#iv-wrap") + r"""', self.source)
+        self.assertIn("width:96px;min-width:96px", self.source)
+        self.assertIn("input[type=number]{width:188px", self.source)
+        self.assertIn("grid-template-columns:96px 126px 54px", self.source)
         self.assertIn('class="range-value" id="iv-v0"', self.source)
         self.assertIn("renderDynamicMath('iv-fn-field'", self.source)
         self.assertIn(r"\((x_0,y_0)\)", self.source)
@@ -775,8 +780,10 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
     def test_interpolation_imports_extra_widget_dependency(self):
         source = (PROJECT_ROOT / "capitulo7" / "domain" / "3_busqueda_interpolacion_app.py").read_text(encoding="utf-8")
 
-        self.assertIn("import ipywidgets as widgets", source)
-        self.assertIn("widgets.Checkbox", source)
+        self.assertNotIn("dropdown_control", source)
+        self.assertNotIn("Distribución uniforme", source)
+        self.assertNotIn('extra_controls={"uniform"', source)
+        self.assertNotIn("widgets.Checkbox", source)
 
     def test_formula_output_reserves_stable_space(self):
         common_source = (PROJECT_ROOT / "capitulo7" / "domain" / "search_common.py").read_text(encoding="utf-8")

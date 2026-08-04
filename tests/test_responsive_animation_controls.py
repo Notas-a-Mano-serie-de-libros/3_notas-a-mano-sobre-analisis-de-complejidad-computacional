@@ -129,7 +129,7 @@ def test_shared_visual_system_defines_all_control_contracts_once():
         "--simulation-row-gap",
         "--simulation-column-gap",
         ".standard-control-label",
-        'input:not([type="checkbox"]):not([type="radio"])',
+        'input:not([type="checkbox"]):not([type="radio"]):not([type="range"])',
         ".widget-checkbox input[type=\"checkbox\"]",
         ".widget-button",
         ".simulation-action-row",

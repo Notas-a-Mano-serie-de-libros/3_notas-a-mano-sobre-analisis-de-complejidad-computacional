@@ -1,7 +1,6 @@
 import math
 import random
 
-import ipywidgets as widgets
 from search_common import (
     BASE_ROLE_STYLES,
     create_search_base_state,
@@ -262,11 +261,6 @@ def render_state_html(state):
 
 
 def run_app():
-    uniform_checkbox = widgets.Checkbox(
-        value=False,
-        description="Distribución uniforme",
-        layout=widgets.Layout(width="230px"),
-    )
     run_search_app(
         create_state=create_state,
         step_search=step_interpolation_search,
@@ -276,7 +270,6 @@ def run_app():
         default_target=DEFAULT_TARGET,
         book_array=BOOK_ARRAY,
         book_target=60,
-        extra_controls={"uniform": uniform_checkbox},
     )
 
 

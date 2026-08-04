@@ -68,7 +68,7 @@ def shared_ui_styles(root_selector):
   min-height: var(--simulation-field-height) !important;
   margin: 0 !important;
 }}
-{root} input:not([type="checkbox"]):not([type="radio"]),
+{root} input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 {root} select {{
   height: var(--simulation-field-height) !important;
   min-height: var(--simulation-field-height) !important;
@@ -80,7 +80,7 @@ def shared_ui_styles(root_selector):
   font-family: sans-serif !important;
   font-size: 13px !important;
 }}
-{root} input:not([type="checkbox"]):not([type="radio"]):focus,
+{root} input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
 {root} select:focus {{
   outline: none !important;
   border-color: var(--simulation-focus) !important;

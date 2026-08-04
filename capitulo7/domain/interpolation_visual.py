@@ -190,20 +190,22 @@ def draw_interpolation_visual(values, target, uniform=True):
 
 
 def run_interpolation_visual():
-    _HTML = shared_ui_styles("#iv-wrap") + """
+    _HTML = shared_ui_styles("#iv-wrap") + r"""
 <style>
 #iv-wrap{width:100%;max-width:100%;overflow-x:hidden;background:#ffffff;color:#333;
   padding:14px 4px;font-family:sans-serif;box-sizing:border-box}
 #iv-wrap,#iv-wrap *{box-sizing:border-box}
 #iv-wrap label,#iv-wrap .label-text,#iv-wrap .stepper-field,#iv-wrap .range-value,
 #iv-wrap .card,#iv-wrap .fml{color:#333}
-#iv-wrap .iv-main-panel{width:100%;border:1px solid #dedede;border-radius:5px;
+#iv-wrap .iv-main-panel{width:100%;border:0;border-radius:0;
   overflow:hidden;background:#fff}
 #iv-wrap .iv-panel-title,#iv-wrap .iv-subpanel-title{width:100%;margin:0;padding:10px 14px;
   border-bottom:1px solid #e2e2e2;background:#f7f7f7;color:#333;font-weight:700;
   line-height:1.35;text-align:left}
-#iv-wrap .iv-panel-body{width:100%;padding:12px;background:#fff}
-#iv-wrap .iv-subpanel{width:100%;margin:0;border:1px solid #e1e1e1;background:#fff}
+#iv-wrap .iv-panel-body{width:100%;padding:0;background:#fff}
+#iv-wrap .iv-subpanel{width:100%;margin:0;border:1px solid #dedede;background:#fff}
+#iv-wrap .iv-subpanel:first-child{border-radius:5px 5px 0 0}
+#iv-wrap .iv-subpanel:last-child{border-radius:0 0 5px 5px}
 #iv-wrap .iv-subpanel+.iv-subpanel{border-top:0}
 #iv-wrap .iv-subpanel-title{padding:8px 12px;border-bottom-color:#e5e5e5}
 #iv-wrap summary.iv-subpanel-title{box-sizing:border-box;cursor:pointer;list-style-position:inside}
@@ -220,8 +222,8 @@ def run_interpolation_visual():
 #iv-wrap .ctrl label{display:flex;align-items:center;gap:8px;color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1;min-height:32px}
 #iv-wrap .ctrl label mjx-container{font-size:100%!important;font-weight:700!important}
 #iv-wrap .label-text{display:inline-flex;align-items:center;justify-content:center;
-  width:52px;min-width:52px;text-align:center}
-#iv-wrap select,#iv-wrap input[type=number]{width:112px;height:32px;box-sizing:border-box;
+  width:96px;min-width:96px;text-align:left}
+#iv-wrap select,#iv-wrap input[type=number]{width:188px;height:32px;box-sizing:border-box;
   padding:2px 6px;border:1px solid #ccc;border-radius:3px;background:#fff;
   color:#333;font-size:13px;text-align:center}
 #iv-wrap input[type=number]:focus,#iv-wrap select:focus{outline:none;border-color:#1976D2;
@@ -239,15 +241,20 @@ def run_interpolation_visual():
 #iv-wrap .stepper button{border-color:#ccc;border-radius:0;margin:0;padding:0}
 #iv-wrap button.active{background:#f7f7f7;border-color:#ccc;color:#333}
 #iv-wrap button:focus-visible{outline:2px solid #1976D2;outline-offset:1px}
-#iv-wrap .range-field{display:grid;grid-template-columns:52px 132px 54px;gap:8px;
+#iv-wrap .range-field{display:grid;grid-template-columns:96px 126px 54px;gap:8px;
   align-items:center}
-#iv-wrap input[type=range]{width:132px;margin:0;accent-color:#1976D2;cursor:pointer}
+#iv-wrap input[type=range]{width:126px;margin:0;accent-color:#1976D2;cursor:pointer}
 #iv-wrap .range-value{display:flex;align-items:center;justify-content:center;width:54px;
   height:32px;box-sizing:border-box;border:1px solid #ccc;border-radius:3px;
   background:#fff;font-weight:400}
-#iv-wrap .ctrl .sep{width:1px;height:32px;background:#ddd;margin:0 2px}
-#iv-wrap .action-buttons{display:flex;gap:0;margin-left:auto;padding-left:16px}
-#iv-wrap .action-buttons button{width:auto;min-width:92px;height:38px;padding:0 10px;border-color:#ccc;border-radius:0;margin:0}
+#iv-wrap .ctrl .sep{display:none}
+#iv-wrap .action-buttons{display:flex;width:100%;gap:0;margin:16px 0 0;padding:0;
+  justify-content:flex-end;align-items:center}
+#iv-wrap .action-buttons button{display:inline-flex;align-items:center;justify-content:center;
+  gap:6px;width:auto;min-width:150px;height:38px;padding:0 12px;
+  border-color:#ccc;border-radius:0;margin:0;font-size:14px}
+#iv-wrap .action-buttons .button-icon{display:inline-flex;width:14px;align-items:center;
+  justify-content:center;font-family:sans-serif;font-size:14px;line-height:1}
 #iv-wrap .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   gap:10px;margin-top:12px}
 #iv-wrap .card{background:#f7f7f7;border:1px solid #e8e8e8;border-radius:4px;padding:10px 14px}
@@ -265,7 +272,7 @@ def run_interpolation_visual():
    <summary class="iv-subpanel-title">Configuración</summary>
    <div class="iv-panel-content">
     <div class="ctrl">
-    <label><span class="label-text">\(\boldsymbol{f(x)}\)</span>
+    <label><span class="label-text">\(\mathbf{f}(x)\)</span>
       <span class="stepper">
         <button type="button" id="iv-fn-dec" aria-label="Función anterior">◀</button>
         <span class="stepper-field" id="iv-fn-field">\(0.8x+1\)</span>
@@ -278,26 +285,26 @@ def run_interpolation_visual():
         <option value="sqrt">3·√x</option>
       </select>
     </label>
-    <label><span class="label-text">\(\boldsymbol{x_{\max}}\)</span>
+    <label><span class="label-text">\(\mathbf{x}_{\max}\)</span>
       <input type="number" id="iv-n" min="2" max="200" value="10" step="1">
     </label>
-    <div class="action-buttons">
-      <button type="button" id="iv-play" aria-pressed="false">▶ Reproducir</button>
-      <button type="button" id="iv-reset">↺ Restablecer</button>
-    </div>
     </div>
     <div class="ctrl">
-    <label class="range-field"><span class="label-text">\(\boldsymbol{x_0}\)</span>
+    <label class="range-field"><span class="label-text">\(\mathbf{x}_{0}\)</span>
       <input type="range" id="iv-s0" min="0" max="75" value="15" step="1">
       <span class="range-value" id="iv-v0">\(1.5\)</span></label>
     <div class="sep"></div>
-    <label class="range-field"><span class="label-text">\(\boldsymbol{x}\)</span>
+    <label class="range-field"><span class="label-text">\(\mathbf{x}\)</span>
       <input type="range" id="iv-sx" min="15" max="85" value="50" step="1">
       <span class="range-value" id="iv-vx">\(5.0\)</span></label>
     <div class="sep"></div>
-    <label class="range-field"><span class="label-text">\(\boldsymbol{x_1}\)</span>
+    <label class="range-field"><span class="label-text">\(\mathbf{x}_{1}\)</span>
       <input type="range" id="iv-s1" min="25" max="100" value="85" step="1">
       <span class="range-value" id="iv-v1">\(8.5\)</span></label>
+    </div>
+    <div class="action-buttons">
+      <button type="button" id="iv-play" aria-pressed="false"><span class="button-icon" aria-hidden="true">▶</span><span class="button-label">Reproducir</span></button>
+      <button type="button" id="iv-reset"><span class="button-icon" aria-hidden="true">↻</span><span class="button-label">Restablecer</span></button>
     </div>
    </div>
   </details>
@@ -641,13 +648,13 @@ def run_interpolation_visual():
     if(playTimer!==null){clearInterval(playTimer);playTimer=null;}
     var button=document.getElementById('iv-play');
     button.classList.remove('active');button.setAttribute('aria-pressed','false');
-    button.textContent='▶ Reproducir';
+    button.innerHTML='<span class="button-icon" aria-hidden="true">▶</span><span class="button-label">Reproducir</span>';
   }
   function togglePlayback(){
     if(playTimer!==null){stopPlayback();return;}
     var button=document.getElementById('iv-play');
     button.classList.add('active');button.setAttribute('aria-pressed','true');
-    button.textContent='❚❚ Pausar';
+    button.innerHTML='<span class="button-icon" aria-hidden="true">❚❚</span><span class="button-label">Pausar</span>';
     playTimer=setInterval(function(){
       var s=gs(),step=Math.max((s.x1-s.x0)/120,0.01);
       selX+=step;
