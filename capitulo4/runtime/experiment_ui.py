@@ -39,6 +39,53 @@ try:
     )
     from common.simulation_views import standard_view_styles
 except ImportError:
+    # Un kernel remoto puede conservar un paquete ``common`` incompleto de una
+    # simulación anterior. El fallback mantiene íntegro el contrato experimental.
+    DEFAULT_SAMPLING_POINTS = 1_000
+
+    @dataclass(frozen=True)
+    class SimulationConfig:
+        maximum_n: int
+        sampling_points: int = DEFAULT_SAMPLING_POINTS
+        restrict_maximum: bool = True
+        executions: int = 10
+
+        def normalized(self):
+            return SimulationConfig(
+                maximum_n=max(1, int(self.maximum_n)),
+                sampling_points=clamp_sampling_points(self.sampling_points),
+                restrict_maximum=bool(self.restrict_maximum),
+                executions=max(1, int(self.executions)),
+            )
+
+    def clamp_sampling_points(value):
+        return max(10, min(1_000, int(value)))
+
+    def next_order_of_magnitude(value):
+        value = max(1, int(value))
+        return 10 ** (int(np.floor(np.log10(value))) + 1)
+
+    def previous_order_of_magnitude(value):
+        value = max(1, int(value))
+        exponent = int(np.ceil(np.log10(value))) - 1
+        return 10 ** max(0, exponent)
+
+    def effective_execution_limit(safe_maximum, restrict_maximum):
+        return max(1, int(safe_maximum)) if restrict_maximum else 10**10
+
+    def build_experiment_sizes(maximum_n, max_safe_elements, points=DEFAULT_SAMPLING_POINTS):
+        maximum_n = max(1, int(maximum_n))
+        safe_maximum = max(1, min(maximum_n, int(max_safe_elements)))
+        point_count = min(clamp_sampling_points(points), safe_maximum)
+        dense_sizes = np.linspace(1, safe_maximum, num=point_count, dtype=np.int64)
+        maximum_exponent = int(np.log10(maximum_n)) if maximum_n >= 10 else 0
+        checkpoints = np.array(
+            [10**exponent for exponent in range(1, maximum_exponent + 1)],
+            dtype=np.int64,
+        )
+        executable = checkpoints[checkpoints <= safe_maximum]
+        return np.unique(np.concatenate((dense_sizes, executable))), checkpoints
+
     STANDARD_CONTROL_COLUMN_GAP = 36
     STANDARD_CONTROL_ROW_GAP = 12
     STANDARD_LABEL_CONTROL_GAP = 8

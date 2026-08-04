@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import sys
 import tempfile
 import urllib.request
@@ -48,10 +49,37 @@ def _download_runtime():
     return root
 
 
+def _activate_runtime(root):
+    """Prioriza este runtime frente a paquetes temporales de otra simulación."""
+    root = Path(root).resolve()
+    root_text = str(root)
+    if root_text in sys.path:
+        sys.path.remove(root_text)
+    sys.path.insert(0, root_text)
+
+    temporary_root = Path(tempfile.gettempdir()).resolve()
+    for module_name, module in list(sys.modules.items()):
+        if not (
+            module_name == "common"
+            or module_name.startswith("common.")
+            or module_name == "capitulo4"
+            or module_name.startswith("capitulo4.")
+            or module_name == "capitulo6"
+            or module_name.startswith("capitulo6.")
+        ):
+            continue
+        module_file = getattr(module, "__file__", None)
+        if not module_file:
+            continue
+        resolved_file = Path(module_file).resolve()
+        if temporary_root in resolved_file.parents and root not in resolved_file.parents:
+            del sys.modules[module_name]
+    importlib.invalidate_caches()
+
+
 _enable_colab_widgets()
 runtime_root = _project_root() or _download_runtime()
-if str(runtime_root) not in sys.path:
-    sys.path.insert(0, str(runtime_root))
+_activate_runtime(runtime_root)
 
 from capitulo6.runtime.recursive_examples_analysis import build_examples_panel
 

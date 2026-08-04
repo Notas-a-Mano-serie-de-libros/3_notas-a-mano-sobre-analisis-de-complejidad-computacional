@@ -379,6 +379,21 @@ def test_remote_examples_bootstrap_downloads_the_complete_common_contract():
         "common/simulation_views.py",
     ):
         assert dependency in bootstrap
+    assert "def _activate_runtime(root):" in bootstrap
+    assert "importlib.invalidate_caches()" in bootstrap
+
+
+def test_experiment_ui_fallback_defines_complete_sampling_contract():
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "capitulo4"
+        / "runtime"
+        / "experiment_ui.py"
+    ).read_text(encoding="utf-8")
+
+    assert "DEFAULT_SAMPLING_POINTS = 1_000" in source
+    assert "class SimulationConfig:" in source
+    assert "def build_experiment_sizes(" in source
 
 
 def test_recursive_lab_uses_self_contained_mathjax_in_remote_frontends():
