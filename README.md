@@ -154,7 +154,7 @@ Los resultados pueden reproducirse sin dependencias externas.
 <p>La separación entre notebooks, módulos de dominio y componentes compartidos se documenta en <a href="./ARCHITECTURE.md">ARCHITECTURE.md</a>.</p>
 
 <p style="text-align:justify;">
-Las imágenes producidas por notebooks y simulaciones se guardan en carpetas <code>graficas/</code>, pero no forman parte del repositorio. Para instalar los hooks que limpian notebooks y eliminan estas imágenes antes de cada push, ejecute una vez:
+Las imágenes de cada capítulo se guardan en su carpeta <code>images/</code>. Los recursos editoriales permanecen en <code>images/recursos/</code> y los resultados producidos por simulaciones se escriben en <code>images/generadas/</code>; estos últimos no forman parte del repositorio. Para instalar los hooks que limpian notebooks y eliminan las imágenes generadas antes de cada push, ejecute una vez:
 </p>
 
 ```bash
@@ -176,12 +176,12 @@ Para abrir las simulaciones interactivas del capítulo 7 en local con el código
 </p>
 
 ```bash
-python3 capitulo7/abrir_busqueda.py secuencial
-python3 capitulo7/abrir_busqueda.py binaria
-python3 capitulo7/abrir_busqueda.py interpolacion
-python3 capitulo7/abrir_busqueda.py saltos
-python3 capitulo7/abrir_busqueda.py exponencial
-python3 capitulo7/abrir_busqueda.py ternaria
+python3 capitulo7/runtime/abrir_busqueda.py secuencial
+python3 capitulo7/runtime/abrir_busqueda.py binaria
+python3 capitulo7/runtime/abrir_busqueda.py interpolacion
+python3 capitulo7/runtime/abrir_busqueda.py saltos
+python3 capitulo7/runtime/abrir_busqueda.py exponencial
+python3 capitulo7/runtime/abrir_busqueda.py ternaria
 ```
 
 <hr/>

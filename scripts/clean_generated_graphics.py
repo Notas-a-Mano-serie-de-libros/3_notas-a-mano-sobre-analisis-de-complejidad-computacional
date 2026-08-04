@@ -8,22 +8,24 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 KEEP_FILE = ".gitkeep"
 
 
+def graphics_roots() -> list[Path]:
+    return sorted(PROJECT_ROOT.glob("capitulo[0-9]*/images/generadas"))
+
+
 def generated_graphics() -> list[Path]:
     files: list[Path] = []
-    for graphics_dir in PROJECT_ROOT.rglob("graficas"):
-        if not graphics_dir.is_dir() or ".git" in graphics_dir.parts:
-            continue
+    for graphics_root in graphics_roots():
         files.extend(
             path
-            for path in graphics_dir.rglob("*")
-            if path.is_file() and path.name != KEEP_FILE
+            for path in graphics_root.rglob("*")
+            if path.is_file() and path.name not in {KEEP_FILE, "README.md"}
         )
     return sorted(files)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Elimina las imágenes generadas dentro de carpetas graficas/."
+        description="Elimina las imágenes generadas dentro de images/generadas de cada capítulo."
     )
     parser.add_argument(
         "--check",

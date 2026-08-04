@@ -21,8 +21,8 @@ def test_shared_widget_control_grids_wrap_at_natural_width():
 
 def test_chapters_two_and_four_parameter_panels_use_aligned_columns():
     paths = (
-        "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py",
-        "capitulo4/experiment_ui.py",
+        "capitulo2/runtime/experimental_animation.py",
+        "capitulo4/runtime/experiment_ui.py",
     )
     for path in paths:
         module_source = source(path)
@@ -33,13 +33,13 @@ def test_chapters_two_and_four_parameter_panels_use_aligned_columns():
         assert "width: 346px !important" in module_source
 
     polynomial_source = source(
-        "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py"
+        "capitulo2/runtime/polynomial_animation.py"
     )
     assert 'flex_flow="row wrap"' in polynomial_source
 
 
 def test_chapter_three_control_sections_use_flex_wrap():
-    module_source = source("capitulo3/asymptotic_animation.py")
+    module_source = source("capitulo3/runtime/asymptotic_animation.py")
     controls_rule = module_source.split("#bo-wrap .controls-grid{", 1)[1].split("}", 1)[0]
     assert "display:flex" in controls_rule
     assert "flex-flow:row wrap" in controls_rule
@@ -103,12 +103,12 @@ def test_chapter_eight_preserves_compact_algorithm_checks_and_shell_theme():
 
 def test_every_simulation_family_loads_the_shared_visual_system():
     expected_contracts = {
-        "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py": '.constant-animation-root',
-        "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py": '.constant-animation-root',
-        "capitulo3/asymptotic_animation.py": '#bo-wrap',
-        "capitulo4/experiment_ui.py": '.constant-animation-root',
-        "capitulo5/recursion_tree_animation.py": '.recursion-tree-root',
-        "capitulo6/recursive_analysis_lab.py": '.recursive-analysis-lab',
+        "capitulo2/runtime/experimental_animation.py": '.constant-animation-root',
+        "capitulo2/runtime/polynomial_animation.py": '.constant-animation-root',
+        "capitulo3/runtime/asymptotic_animation.py": '#bo-wrap',
+        "capitulo4/runtime/experiment_ui.py": '.constant-animation-root',
+        "capitulo5/runtime/recursion_tree_animation.py": '.recursion-tree-root',
+        "capitulo6/runtime/recursive_analysis_lab.py": '.recursive-analysis-lab',
         "core/search/search_common.py": '.search-simulation-root',
         "core/search/0_comparacion_busquedas_app.py": '.comparison-simulation-root',
         "core/search/interpolation_visual.py": '#iv-wrap',

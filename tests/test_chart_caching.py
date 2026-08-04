@@ -143,8 +143,8 @@ class TestChartCaching(unittest.TestCase):
             self.assertGreater(module.count_sort_operations("burbuja", [3, 2, 1]), 0)
 
     def test_colab_bootstraps_include_common_chart_runtime(self):
-        cap7_bootstrap = (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
-        cap8_bootstrap = (PROJECT_ROOT / "capitulo8" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        cap7_bootstrap = (PROJECT_ROOT / "capitulo7" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        cap8_bootstrap = (PROJECT_ROOT / "capitulo8" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
 
         self.assertIn('"common/chart_runtime.py"', cap7_bootstrap)
         self.assertIn('"common/chart_runtime.py"', cap8_bootstrap)

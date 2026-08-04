@@ -4,13 +4,13 @@ from pathlib import Path
 SOURCE = (
     Path(__file__).resolve().parents[1]
     / "capitulo5"
-    / "recursion_tree_animation.py"
+    / "runtime" / "recursion_tree_animation.py"
 ).read_text(encoding="utf-8")
 
 
 def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
     bootstrap = (
-        Path(__file__).resolve().parents[1] / "capitulo5" / "colab_bootstrap.py"
+        Path(__file__).resolve().parents[1] / "capitulo5" / "runtime" / "colab_bootstrap.py"
     ).read_text(encoding="utf-8")
 
     assert "sys.path.insert(0, project_root)" in bootstrap
@@ -18,7 +18,7 @@ def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
 
 
 def test_general_expression_always_keeps_symbolic_external_cost():
-    from capitulo5.recursion_tree_animation import _equation_markup
+    from capitulo5.runtime.recursion_tree_animation import _equation_markup
 
     quadratic = _equation_markup(
         "division", 2, 2, "quadratic", 4, (2,), (0.5,)
@@ -36,7 +36,7 @@ def test_general_expression_always_keeps_symbolic_external_cost():
 
 
 def test_result_expression_formats_exact_division_factors_as_fractions():
-    from capitulo5.recursion_tree_animation import _expanded_equation_markup
+    from capitulo5.runtime.recursion_tree_animation import _expanded_equation_markup
 
     markup = _expanded_equation_markup(
         "division", (2, 1), (0.5, 0.75), "linear", 4
@@ -51,7 +51,7 @@ def test_result_expression_formats_exact_division_factors_as_fractions():
 
 
 def test_result_expression_adds_reduction_base_case():
-    from capitulo5.recursion_tree_animation import _expanded_equation_markup
+    from capitulo5.runtime.recursion_tree_animation import _expanded_equation_markup
 
     markup = _expanded_equation_markup(
         "reduction", (1, 1), (1, 2), "constant", 4
@@ -63,7 +63,7 @@ def test_result_expression_adds_reduction_base_case():
 
 
 def test_result_expression_uses_selected_base_case():
-    from capitulo5.recursion_tree_animation import _expanded_equation_markup
+    from capitulo5.runtime.recursion_tree_animation import _expanded_equation_markup
 
     markup = _expanded_equation_markup(
         "division", (2,), (0.5,), "linear", 4, base_value=7
@@ -196,7 +196,7 @@ def test_polylogarithmic_function_exposes_k_p_and_ell_after_b_i():
 
 
 def test_polylogarithmic_expression_uses_selected_parameters():
-    from capitulo5.recursion_tree_animation import _expanded_equation_markup
+    from capitulo5.runtime.recursion_tree_animation import _expanded_equation_markup
 
     markup = _expanded_equation_markup(
         "division", (2,), (0.5,), "polylogarithmic", (3, 2, 5)

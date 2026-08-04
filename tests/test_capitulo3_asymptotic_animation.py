@@ -10,11 +10,11 @@ import pytest
 
 
 PROJECT_ROOT = Path(__file__).parents[1]
-ANIMATION_PATH = PROJECT_ROOT / "capitulo3" / "asymptotic_animation.py"
-BOOTSTRAP_PATH = PROJECT_ROOT / "capitulo3" / "asymptotic_bootstrap.py"
-COMPARISON_NOTEBOOK = PROJECT_ROOT / "capitulo3" / "0_comparacion_notaciones_asintoticas.ipynb"
+ANIMATION_PATH = PROJECT_ROOT / "capitulo3" / "runtime" / "asymptotic_animation.py"
+BOOTSTRAP_PATH = PROJECT_ROOT / "capitulo3" / "runtime" / "asymptotic_bootstrap.py"
+COMPARISON_NOTEBOOK = PROJECT_ROOT / "capitulo3" / "notebooks" / "0_comparacion_notaciones_asintoticas.ipynb"
 ASYMPTOTIC_NOTEBOOKS = [
-    PROJECT_ROOT / "capitulo3" / f"{number}_{name}.ipynb"
+    PROJECT_ROOT / "capitulo3" / "notebooks" / f"{number}_{name}.ipynb"
     for number, name in [
         (1, "notacion_big_o"),
         (2, "notacion_little_o"),
@@ -606,7 +606,7 @@ def test_notebook_comparativo_usa_el_mismo_motor_compartido():
     assert 'ASYMPTOTIC_APP = "comparison"' in source
     assert "asymptotic_bootstrap.py" in source
     assert "0_comparacion_notaciones_asintoticas.ipynb" in (
-        PROJECT_ROOT / "capitulo3" / "README.md"
+        PROJECT_ROOT / "capitulo3" / "notebooks" / "README.md"
     ).read_text(encoding="utf-8")
 
 

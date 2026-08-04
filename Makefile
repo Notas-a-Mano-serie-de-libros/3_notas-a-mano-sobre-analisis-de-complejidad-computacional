@@ -13,6 +13,7 @@ lint:
 	$(PYTHON) -m ruff check .
 
 validate:
+	$(PYTHON) scripts/validate_repository_paths.py
 	$(PYTHON) scripts/validate_colab_bootstrap.py
 	$(PYTHON) scripts/validate_colab_links.py
 	$(PYTHON) scripts/validate_notebook_launchers.py

@@ -4,13 +4,13 @@ from pathlib import Path
 SOURCE = (
     Path(__file__).resolve().parents[1]
     / "capitulo6"
-    / "recursive_analysis_lab.py"
+    / "runtime" / "recursive_analysis_lab.py"
 ).read_text(encoding="utf-8")
 
 
 def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
     bootstrap = (
-        Path(__file__).resolve().parents[1] / "capitulo6" / "colab_bootstrap.py"
+        Path(__file__).resolve().parents[1] / "capitulo6" / "runtime" / "colab_bootstrap.py"
     ).read_text(encoding="utf-8")
 
     assert "sys.path.insert(0, project_root)" in bootstrap
@@ -18,7 +18,7 @@ def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
 
 
 def test_recursive_lab_supports_requested_analysis_examples():
-    from capitulo6.recursive_analysis_lab import ALGORITHMS
+    from capitulo6.runtime.recursive_analysis_lab import ALGORITHMS
 
     assert set(ALGORITHMS) == {
         "factorial", "fibonacci", "power_simple", "power_fast"
@@ -26,7 +26,7 @@ def test_recursive_lab_supports_requested_analysis_examples():
 
 
 def test_book_examples_are_selectable_in_the_last_panel():
-    from capitulo6.recursive_examples_analysis import EXAMPLES
+    from capitulo6.runtime.recursive_examples_analysis import EXAMPLES
 
     assert set(EXAMPLES) == {
         "factorial", "fibonacci", "power_fast", "merge_sort", "binary_tree"
@@ -40,7 +40,7 @@ def test_book_examples_are_selectable_in_the_last_panel():
 
     import json
     notebook = json.loads(
-        (Path(__file__).resolve().parents[1] / "capitulo6" / "0_laboratorio_analisis_recursivo.ipynb").read_text(encoding="utf-8")
+        (Path(__file__).resolve().parents[1] / "capitulo6" / "notebooks" / "0_laboratorio_analisis_recursivo.ipynb").read_text(encoding="utf-8")
     )
     assert notebook["cells"][-2]["cell_type"] == "markdown"
     assert notebook["cells"][-2]["source"][0] == "## Análisis de ejemplos\n"
@@ -49,7 +49,7 @@ def test_book_examples_are_selectable_in_the_last_panel():
 
 
 def test_fibonacci_trace_distinguishes_total_calls_from_stack_depth():
-    from capitulo6.recursive_analysis_lab import build_trace
+    from capitulo6.runtime.recursive_analysis_lab import build_trace
 
     nodes, events = build_trace("fibonacci", 5)
     maximum_depth = max(len(event["stack"]) for event in events)
@@ -60,7 +60,7 @@ def test_fibonacci_trace_distinguishes_total_calls_from_stack_depth():
 
 
 def test_fast_power_halves_the_argument_until_base_case():
-    from capitulo6.recursive_analysis_lab import build_trace
+    from capitulo6.runtime.recursive_analysis_lab import build_trace
 
     nodes, _ = build_trace("power_fast", 16)
 
@@ -68,7 +68,7 @@ def test_fast_power_halves_the_argument_until_base_case():
 
 
 def test_call_stack_places_original_problem_at_the_base_and_returns_in_reverse():
-    from capitulo6.recursive_analysis_lab import _call_stack_panel, build_trace
+    from capitulo6.runtime.recursive_analysis_lab import _call_stack_panel, build_trace
 
     nodes, events = build_trace("factorial", 3)
     base_return_step = next(
@@ -93,7 +93,7 @@ def test_lab_explains_temporal_and_spatial_recurrences():
 
 
 def test_cost_expression_uses_base_and_recursive_cases():
-    from capitulo6.recursive_analysis_lab import _cost_expression
+    from capitulo6.runtime.recursive_analysis_lab import _cost_expression
 
     factorial = _cost_expression("factorial", "temporal")
     fibonacci_space = _cost_expression("fibonacci", "espacial")
@@ -141,7 +141,7 @@ def test_lab_uses_editable_input_right_aligned_actions_and_collapsible_panels():
 
 
 def test_lab_provides_four_syntax_highlighted_languages():
-    from capitulo6.recursive_analysis_lab import CODE_SNIPPETS, _highlight_code_line
+    from capitulo6.runtime.recursive_analysis_lab import CODE_SNIPPETS, _highlight_code_line
 
     assert set(CODE_SNIPPETS) == {"pseudocode", "python", "java", "c"}
     assert '<span class="k">' in _highlight_code_line("def factorial(n):", "python")
@@ -149,7 +149,7 @@ def test_lab_provides_four_syntax_highlighted_languages():
 
 
 def test_code_snippets_use_standard_multiline_indentation():
-    from capitulo6.recursive_analysis_lab import CODE_SNIPPETS
+    from capitulo6.runtime.recursive_analysis_lab import CODE_SNIPPETS
 
     for language in CODE_SNIPPETS.values():
         for lines in language.values():
@@ -165,7 +165,7 @@ def test_code_panel_uses_content_driven_height_without_vertical_scroll():
 
 
 def test_recursion_tree_uses_arrows_and_only_marks_base_cases():
-    from capitulo6.recursive_analysis_lab import _tree_svg, build_trace
+    from capitulo6.runtime.recursive_analysis_lab import _tree_svg, build_trace
 
     nodes, events = build_trace("factorial", 3)
     base_enter = next(
@@ -184,7 +184,7 @@ def test_recursion_tree_uses_arrows_and_only_marks_base_cases():
 
 
 def test_recursion_tree_uses_the_full_available_vertical_height():
-    from capitulo6.recursive_analysis_lab import _tree_svg, build_trace
+    from capitulo6.runtime.recursive_analysis_lab import _tree_svg, build_trace
 
     nodes, events = build_trace("factorial", 4)
     final_markup = _tree_svg(nodes, events, len(events) - 1)
@@ -220,7 +220,7 @@ def test_execution_panels_use_book_section_names():
 
 
 def test_code_panel_identifies_the_selected_language_with_a_logo():
-    from capitulo6.recursive_analysis_lab import LANGUAGE_LOGOS, _language_logo
+    from capitulo6.runtime.recursive_analysis_lab import LANGUAGE_LOGOS, _language_logo
 
     assert set(LANGUAGE_LOGOS) == {"python", "java", "c"}
     assert "python-original.svg" in _language_logo("python")
@@ -235,7 +235,7 @@ def test_code_panel_identifies_the_selected_language_with_a_logo():
 
 
 def test_code_panel_uses_white_background_and_numbered_gutter():
-    from capitulo6.recursive_analysis_lab import _code_panel
+    from capitulo6.runtime.recursive_analysis_lab import _code_panel
 
     markup = _code_panel("factorial", "python", False)
 
@@ -250,7 +250,7 @@ def test_code_panel_uses_white_background_and_numbered_gutter():
 
 
 def test_trace_highlights_each_executed_line_like_a_debugger():
-    from capitulo6.recursive_analysis_lab import _code_panel, build_trace
+    from capitulo6.runtime.recursive_analysis_lab import _code_panel, build_trace
 
     nodes, events = build_trace("factorial", 2)
 
@@ -263,7 +263,7 @@ def test_trace_highlights_each_executed_line_like_a_debugger():
 
 
 def test_fast_power_debug_trace_visits_assignment_branch_and_return_lines():
-    from capitulo6.recursive_analysis_lab import _language_line, build_trace
+    from capitulo6.runtime.recursive_analysis_lab import _language_line, build_trace
 
     nodes, events = build_trace("power_fast", 2)
     root_lines = [event["line"] for event in events if event["node"] == nodes[0].id]
@@ -274,7 +274,7 @@ def test_fast_power_debug_trace_visits_assignment_branch_and_return_lines():
 
 
 def test_recursive_transition_receives_child_result_before_parent_returns():
-    from capitulo6.recursive_analysis_lab import _call_stack_panel, build_trace
+    from capitulo6.runtime.recursive_analysis_lab import _call_stack_panel, build_trace
 
     nodes, events = build_trace("factorial", 2)
     resume_step = next(
@@ -291,7 +291,7 @@ def test_recursive_transition_receives_child_result_before_parent_returns():
 
 
 def test_playback_uses_event_specific_transition_delays():
-    from capitulo6.recursive_analysis_lab import _event_delay, build_trace
+    from capitulo6.runtime.recursive_analysis_lab import _event_delay, build_trace
 
     nodes, events = build_trace("factorial", 2)
     delays = {event["kind"]: _event_delay(event, nodes) for event in events}
@@ -304,7 +304,7 @@ def test_playback_uses_event_specific_transition_delays():
 
 
 def test_final_unwind_shows_completion_check_next_to_result():
-    from capitulo6.recursive_analysis_lab import _call_stack_panel, build_trace
+    from capitulo6.runtime.recursive_analysis_lab import _call_stack_panel, build_trace
 
     nodes, events = build_trace("factorial", 3)
     final_markup = _call_stack_panel("factorial", nodes, events, len(events) - 1)
@@ -369,7 +369,5 @@ def test_all_configuration_field_titles_are_bold():
 def test_chapter_six_reference_notebooks_are_separated():
     root = Path(__file__).resolve().parents[1] / "capitulo6"
 
-    assert not (root / "ejemplo_recursion.ipynb").exists()
-    assert not (root / "comparacion_fibonacci.ipynb").exists()
-    assert (root / "referencias" / "ejemplo_recursion.ipynb").exists()
-    assert (root / "referencias" / "comparacion_fibonacci.ipynb").exists()
+    assert (root / "notebooks" / "ejemplo_recursion.ipynb").exists()
+    assert (root / "notebooks" / "comparacion_fibonacci.ipynb").exists()

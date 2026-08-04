@@ -8,7 +8,8 @@ from tests.helpers import PROJECT_ROOT, load_module_from_path
 
 
 DOMAIN_DIR = PROJECT_ROOT / "core" / "sort"
-NOTEBOOK_DIR = PROJECT_ROOT / "capitulo8" / "notebooks"
+CHAPTER_DIR = PROJECT_ROOT / "capitulo8"
+NOTEBOOK_DIR = CHAPTER_DIR / "notebooks"
 if str(DOMAIN_DIR) not in sys.path:
     sys.path.insert(0, str(DOMAIN_DIR))
 
@@ -41,7 +42,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         cls.config = load_module_from_path("capitulo8_sort_config", DOMAIN_DIR / "sort_config.py")
         cls.messages = load_module_from_path("capitulo8_sort_messages", DOMAIN_DIR / "sort_messages.py")
         cls.algorithms = load_module_from_path("capitulo8_sort_algorithms", DOMAIN_DIR / "sort_algorithms.py")
-        cls.launchers = load_module_from_path("capitulo8_launchers", NOTEBOOK_DIR / "launchers.py")
+        cls.launchers = load_module_from_path("capitulo8_launchers", CHAPTER_DIR / "runtime" / "launchers.py")
 
     def run_until_complete(self, module, step_name, state):
         step = getattr(module, step_name)
@@ -299,10 +300,11 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("def bubble_trace", algorithms_source)
         self.assertIn("def quick_trace", algorithms_source)
         self.assertIn("def quick_tree", tree_source)
-        self.assertIn('"common/animation_runtime.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
-        self.assertIn('"core/sort/sort_tree.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
-        self.assertIn('"core/sort/sort_messages.py"', (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
-        self.assertIn("project_root", (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8"))
+        bootstrap_source = (CHAPTER_DIR / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        self.assertIn('"common/animation_runtime.py"', bootstrap_source)
+        self.assertIn('"core/sort/sort_tree.py"', bootstrap_source)
+        self.assertIn('"core/sort/sort_messages.py"', bootstrap_source)
+        self.assertIn("project_root", bootstrap_source)
         self.assertNotIn("def bubble_trace", common_source)
         self.assertNotIn("def quick_trace", common_source)
         self.assertNotIn("def quick_tree", common_source)
@@ -957,8 +959,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         notebook = NOTEBOOK_DIR / "7_ordenamiento_radix.ipynb"
         nb = json.loads(notebook.read_text(encoding="utf-8"))
         code_cells = [cell for cell in nb["cells"] if cell["cell_type"] == "code"]
-        bootstrap = (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
-        launchers = (NOTEBOOK_DIR / "launchers.py").read_text(encoding="utf-8")
+        bootstrap = (CHAPTER_DIR / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         comparison = (NOTEBOOK_DIR / "0_comparacion_ordenamientos.ipynb").read_text(encoding="utf-8")
         chart_source = (DOMAIN_DIR / "ordenamientos_chart.py").read_text(encoding="utf-8")
 
@@ -1094,8 +1096,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         notebook = NOTEBOOK_DIR / "4_ordenamiento_shell.ipynb"
         nb = json.loads(notebook.read_text(encoding="utf-8"))
         code_cells = [cell for cell in nb["cells"] if cell["cell_type"] == "code"]
-        bootstrap = (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
-        launchers = (NOTEBOOK_DIR / "launchers.py").read_text(encoding="utf-8")
+        bootstrap = (CHAPTER_DIR / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         app_source = (DOMAIN_DIR / "4_ordenamiento_shell_app.py").read_text(encoding="utf-8")
 
         self.assertEqual(len(code_cells), 3)
@@ -1109,8 +1111,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         notebook = NOTEBOOK_DIR / "3_ordenamiento_insercion.ipynb"
         nb = json.loads(notebook.read_text(encoding="utf-8"))
         code_cells = [cell for cell in nb["cells"] if cell["cell_type"] == "code"]
-        bootstrap = (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
-        launchers = (NOTEBOOK_DIR / "launchers.py").read_text(encoding="utf-8")
+        bootstrap = (CHAPTER_DIR / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         app_source = (DOMAIN_DIR / "3_ordenamiento_insercion_app.py").read_text(encoding="utf-8")
 
         self.assertEqual(len(code_cells), 4)
@@ -1127,8 +1129,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         notebook = NOTEBOOK_DIR / "6_ordenamiento_rapido.ipynb"
         nb = json.loads(notebook.read_text(encoding="utf-8"))
         code_cells = [cell for cell in nb["cells"] if cell["cell_type"] == "code"]
-        bootstrap = (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
-        launchers = (NOTEBOOK_DIR / "launchers.py").read_text(encoding="utf-8")
+        bootstrap = (CHAPTER_DIR / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         app_source = (DOMAIN_DIR / "6_ordenamiento_rapido_app.py").read_text(encoding="utf-8")
 
         self.assertEqual(len(code_cells), 4)
@@ -1161,7 +1163,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                 self.assertTrue(nb["cells"][1]["metadata"]["jupyter"]["source_hidden"])
 
     def test_comparison_bootstrap_and_render_bars(self):
-        bootstrap = (NOTEBOOK_DIR / "colab_bootstrap.py").read_text(encoding="utf-8")
+        bootstrap = (CHAPTER_DIR / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
         module = self.launchers._load_module(
             "0_comparacion_ordenamientos_app.py",
             "capitulo8_comparacion_test_app",

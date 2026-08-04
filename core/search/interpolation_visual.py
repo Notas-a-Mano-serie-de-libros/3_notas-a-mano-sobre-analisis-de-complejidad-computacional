@@ -7,12 +7,13 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from IPython.display import HTML, Math, display
 import ipywidgets as widgets
+from common.graphics import graphics_path
 from common.simulation_views import standard_view_styles
 
 
 ARRAY_SIZE = 10
-GRAPH_PATH = Path("graficas") / "formula_interpolacion.png"
-GENERAL_GRAPH_PATH = Path("graficas") / "formula_interpolacion_general.png"
+GRAPH_PATH = graphics_path("capitulo7", "interpolacion", "formula_interpolacion.png")
+GENERAL_GRAPH_PATH = graphics_path("capitulo7", "interpolacion", "formula_interpolacion_general.png")
 
 
 plt.style.use("default")

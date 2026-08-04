@@ -5,7 +5,8 @@ import json
 import numpy as np
 
 
-EXPERIMENT_DIR = Path(__file__).parents[1] / "capitulo2" / "analisis_complejidad_temporal_experimental"
+CHAPTER_DIR = Path(__file__).parents[1] / "capitulo2"
+EXPERIMENT_DIR = CHAPTER_DIR / "runtime"
 sys.path.insert(0, str(EXPERIMENT_DIR))
 
 from constant_animation import (  # noqa: E402
@@ -752,14 +753,14 @@ def test_notebooks_generales_invocan_perfiles_interactivos():
     }
 
     for notebook_name, simulation_name in expected.items():
-        notebook = json.loads(Path(EXPERIMENT_DIR / notebook_name).read_text(encoding="utf-8"))
+        notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / notebook_name).read_text(encoding="utf-8"))
         source = "\n".join("".join(cell.get("source", [])) for cell in notebook["cells"])
         assert f'SIMULATION_NAME = "{simulation_name}"' in source
         assert 'SIMULATION_MODE = "selectable"' in source
         assert 'SIMULATION_MODE = "memory"' not in source
         assert "for base in (Path.cwd(), *Path.cwd().parents)" in source
         assert 'base / "colab_bootstrap.py"' in source
-        assert 'base / "capitulo2" / "analisis_complejidad_temporal_experimental"' in source
+        assert 'base / "capitulo2" / "runtime"' in source
         assert "_bootstrap_path is not None" in source
         assert "colab_bootstrap.py" in source
         assert "Solo teórico" in source
@@ -779,7 +780,7 @@ def test_notebooks_incluyen_grafica_teorica_correcta():
     }
 
     for notebook_name, simulation_name in expected.items():
-        notebook = json.loads(Path(EXPERIMENT_DIR / notebook_name).read_text(encoding="utf-8"))
+        notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / notebook_name).read_text(encoding="utf-8"))
         graph_cells = [
             "".join(cell.get("source", []))
             for cell in notebook["cells"]
@@ -794,7 +795,7 @@ def test_notebooks_incluyen_grafica_teorica_correcta():
 
 
 def test_notebook_logaritmico_explica_cambio_de_base():
-    notebook = json.loads(Path(EXPERIMENT_DIR / "2_complejidad_logaritmica.ipynb").read_text(encoding="utf-8"))
+    notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / "2_complejidad_logaritmica.ipynb").read_text(encoding="utf-8"))
     source = "".join(notebook["cells"][1].get("source", []))
 
     assert r"\log_\ell(n)" in source
@@ -806,7 +807,7 @@ def test_notebook_logaritmico_explica_cambio_de_base():
 
 
 def test_notebook_logaritmico_incluye_figura_hasta_10_a_la_100():
-    notebook = json.loads(Path(EXPERIMENT_DIR / "2_complejidad_logaritmica.ipynb").read_text(encoding="utf-8"))
+    notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / "2_complejidad_logaritmica.ipynb").read_text(encoding="utf-8"))
     source = "\n".join("".join(cell.get("source", [])) for cell in notebook["cells"])
 
     assert 'THEORETICAL_GRAPH = "plot_logarithmic_slow_growth"' in source
@@ -814,7 +815,7 @@ def test_notebook_logaritmico_incluye_figura_hasta_10_a_la_100():
 
 
 def test_notebook_polinomial_general_tiene_estructura_teorica_interactiva():
-    notebook = json.loads(Path(EXPERIMENT_DIR / "7_complejidad_polinomial_general.ipynb").read_text(encoding="utf-8"))
+    notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / "7_complejidad_polinomial_general.ipynb").read_text(encoding="utf-8"))
     cells = notebook["cells"]
     source = "\n".join("".join(cell.get("source", [])) for cell in cells)
     headings = ["".join(cell.get("source", [])).strip().splitlines()[0] for cell in cells]
@@ -855,7 +856,7 @@ def test_notebooks_buscan_bootstrap_local_antes_del_remoto():
     )
 
     for notebook_name in notebooks:
-        notebook = json.loads(Path(EXPERIMENT_DIR / notebook_name).read_text(encoding="utf-8"))
+        notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / notebook_name).read_text(encoding="utf-8"))
         simulation_cells = [
             "".join(cell.get("source", []))
             for cell in notebook["cells"]
@@ -873,7 +874,7 @@ def test_notebooks_buscan_bootstrap_local_antes_del_remoto():
 
 
 def test_notebook_polinomial_busca_bootstrap_local_antes_del_remoto():
-    notebook = json.loads(Path(EXPERIMENT_DIR / "7_complejidad_polinomial_general.ipynb").read_text(encoding="utf-8"))
+    notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / "7_complejidad_polinomial_general.ipynb").read_text(encoding="utf-8"))
     simulation_cells = [
         "".join(cell.get("source", [])) for cell in notebook["cells"] if cell["cell_type"] == "code" and "SIMULATION_NAME" in "".join(cell.get("source", []))
     ]
@@ -887,8 +888,14 @@ def test_notebook_polinomial_busca_bootstrap_local_antes_del_remoto():
 
 def test_referencias_colab_del_capitulo_2_siguen_orden_actual():
     abrir_source = Path(Path(__file__).parents[1] / "abrir.py").read_text(encoding="utf-8")
-    readme_source = Path(EXPERIMENT_DIR / "README.md").read_text(encoding="utf-8")
-    chapter_readme_source = Path(Path(__file__).parents[1] / "capitulo2" / "README.md").read_text(encoding="utf-8")
+    readme_source = Path(
+        CHAPTER_DIR
+        / "runtime"
+        / "recursos"
+        / "analisis_complejidad_temporal_experimental"
+        / "README.md"
+    ).read_text(encoding="utf-8")
+    chapter_readme_source = Path(CHAPTER_DIR / "notebooks" / "README.md").read_text(encoding="utf-8")
 
     expected_paths = (
         "1_complejidad_constante.ipynb",
@@ -925,7 +932,7 @@ def test_notebooks_generales_no_conservan_celdas_de_imports_antiguas():
     )
 
     for notebook_name in notebooks:
-        notebook = json.loads(Path(EXPERIMENT_DIR / notebook_name).read_text(encoding="utf-8"))
+        notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / notebook_name).read_text(encoding="utf-8"))
         code_cells = ["".join(cell.get("source", [])) for cell in notebook["cells"] if cell["cell_type"] == "code"]
         expected_code_cells = 4 if notebook_name == "2_complejidad_logaritmica.ipynb" else 3
         assert len(code_cells) == expected_code_cells
@@ -949,7 +956,7 @@ def test_notebooks_generales_siguen_estructura_de_constante():
     )
 
     for notebook_name in notebooks:
-        notebook = json.loads(Path(EXPERIMENT_DIR / notebook_name).read_text(encoding="utf-8"))
+        notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / notebook_name).read_text(encoding="utf-8"))
         cells = notebook["cells"]
         headings = ["".join(cell.get("source", [])).strip().splitlines()[0] for cell in cells]
         types = [cell["cell_type"] for cell in cells]

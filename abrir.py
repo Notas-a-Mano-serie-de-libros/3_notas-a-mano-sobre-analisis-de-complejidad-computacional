@@ -53,43 +53,43 @@ NOTEBOOKS: dict[str, str] = {
     # ------------------------------------------------------------------
     # Capítulo 2 – Fundamentos del análisis de algoritmos
     # ------------------------------------------------------------------
-    "2/constante":      "capitulo2/analisis_complejidad_temporal_experimental/1_complejidad_constante.ipynb",
-    "2/logaritmica":    "capitulo2/analisis_complejidad_temporal_experimental/2_complejidad_logaritmica.ipynb",
-    "2/lineal":         "capitulo2/analisis_complejidad_temporal_experimental/3_complejidad_lineal.ipynb",
-    "2/log-lineal":     "capitulo2/analisis_complejidad_temporal_experimental/4_complejidad_log_lineal.ipynb",
-    "2/cuadratica":     "capitulo2/analisis_complejidad_temporal_experimental/5_complejidad_cuadratica.ipynb",
-    "2/cubica":         "capitulo2/analisis_complejidad_temporal_experimental/6_complejidad_cubica.ipynb",
-    "2/polinomial-general": "capitulo2/analisis_complejidad_temporal_experimental/7_complejidad_polinomial_general.ipynb",
-    "2/exponencial":    "capitulo2/analisis_complejidad_temporal_experimental/8_complejidad_exponencial.ipynb",
-    "2/factorial":      "capitulo2/analisis_complejidad_temporal_experimental/9_complejidad_factorial.ipynb",
-    "2/alta-temporal":  "capitulo2/analisis_eficiencia/complejidad_temporal/analisis_alta_complejidad.ipynb",
-    "2/alta-espacial":  "capitulo2/analisis_eficiencia/complejidad_espacial/analisis_alta_complejidad.ipynb",
-    "2/comparacion":    "capitulo2/general/comparacion_complejidades_teoricas.ipynb",
-    "2/polinomica":     "capitulo2/general/complejidad_polinomica.ipynb",
+    "2/constante":      "capitulo2/notebooks/1_complejidad_constante.ipynb",
+    "2/logaritmica":    "capitulo2/notebooks/2_complejidad_logaritmica.ipynb",
+    "2/lineal":         "capitulo2/notebooks/3_complejidad_lineal.ipynb",
+    "2/log-lineal":     "capitulo2/notebooks/4_complejidad_log_lineal.ipynb",
+    "2/cuadratica":     "capitulo2/notebooks/5_complejidad_cuadratica.ipynb",
+    "2/cubica":         "capitulo2/notebooks/6_complejidad_cubica.ipynb",
+    "2/polinomial-general": "capitulo2/notebooks/7_complejidad_polinomial_general.ipynb",
+    "2/exponencial":    "capitulo2/notebooks/8_complejidad_exponencial.ipynb",
+    "2/factorial":      "capitulo2/notebooks/9_complejidad_factorial.ipynb",
+    "2/alta-temporal":  "capitulo2/notebooks/analisis_alta_complejidad_temporal.ipynb",
+    "2/alta-espacial":  "capitulo2/notebooks/analisis_alta_complejidad_espacial.ipynb",
+    "2/comparacion":    "capitulo2/notebooks/comparacion_complejidades_teoricas.ipynb",
+    "2/polinomica":     "capitulo2/notebooks/complejidad_polinomica.ipynb",
     # ------------------------------------------------------------------
     # Capítulo 3 – Notación asintótica
     # ------------------------------------------------------------------
-    "3/big-o":          "capitulo3/1_notacion_big_o.ipynb",
-    "3/little-o":       "capitulo3/2_notacion_little_o.ipynb",
-    "3/big-omega":      "capitulo3/3_notacion_big_omega.ipynb",
-    "3/little-omega":   "capitulo3/4_notacion_little_omega.ipynb",
-    "3/theta":          "capitulo3/5_notacion_theta.ipynb",
-    "3/representacion": "capitulo3/notacion_asintotica_representacion_generica.ipynb",
+    "3/big-o":          "capitulo3/notebooks/1_notacion_big_o.ipynb",
+    "3/little-o":       "capitulo3/notebooks/2_notacion_little_o.ipynb",
+    "3/big-omega":      "capitulo3/notebooks/3_notacion_big_omega.ipynb",
+    "3/little-omega":   "capitulo3/notebooks/4_notacion_little_omega.ipynb",
+    "3/theta":          "capitulo3/notebooks/5_notacion_theta.ipynb",
+    "3/representacion": "capitulo3/notebooks/notacion_asintotica_representacion_generica.ipynb",
     # ------------------------------------------------------------------
     # Capítulo 4 – Análisis de algoritmos estructurados
     # ------------------------------------------------------------------
-    "4/ejemplo1":       "capitulo4/ejemplo1_(sumar_numeros).ipynb",
-    "4/ejemplo2":       "capitulo4/ejemplo2_(imprimir_elementos_arreglo).ipynb",
-    "4/ejemplo3":       "capitulo4/ejemplo3_(imprimir_elementos_matriz).ipynb",
-    "4/ejemplo4":       "capitulo4/ejemplo4_(inicializar_matriz_variable).ipynb",
-    "4/ejemplo5":       "capitulo4/ejemplo5_(ciclos_incremento_no_lineal).ipynb",
-    "4/ejemplo7":       "capitulo4/ejemplo7_(ciclo_sin_dependencia).ipynb",
-    "4/ejemplo8":       "capitulo4/ejemplo9_(complejidad_oculta).ipynb",
+    "4/ejemplo1":       "capitulo4/notebooks/ejemplo1_(sumar_numeros).ipynb",
+    "4/ejemplo2":       "capitulo4/notebooks/ejemplo2_(imprimir_elementos_arreglo).ipynb",
+    "4/ejemplo3":       "capitulo4/notebooks/ejemplo3_(imprimir_elementos_matriz).ipynb",
+    "4/ejemplo4":       "capitulo4/notebooks/ejemplo4_(inicializar_matriz_variable).ipynb",
+    "4/ejemplo5":       "capitulo4/notebooks/ejemplo5_(ciclos_incremento_no_lineal).ipynb",
+    "4/ejemplo7":       "capitulo4/notebooks/ejemplo7_(ciclo_sin_dependencia).ipynb",
+    "4/ejemplo8":       "capitulo4/notebooks/ejemplo9_(complejidad_oculta).ipynb",
     # ------------------------------------------------------------------
     # Capítulo 6 – Análisis de algoritmos recursivos
     # ------------------------------------------------------------------
-    "6/fibonacci":      "capitulo6/comparacion_fibonacci.ipynb",
-    "6/recursion":      "capitulo6/ejemplo_recursion.ipynb",
+    "6/fibonacci":      "capitulo6/notebooks/comparacion_fibonacci.ipynb",
+    "6/recursion":      "capitulo6/notebooks/ejemplo_recursion.ipynb",
     # ------------------------------------------------------------------
     # Capítulo 7 – Algoritmos de búsqueda  (Voilà)
     # ------------------------------------------------------------------

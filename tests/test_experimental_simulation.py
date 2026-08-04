@@ -144,9 +144,9 @@ def test_todos_los_layouts_usan_propiedades_admitidas_por_ipywidgets():
 def test_capitulos_aplican_el_estilo_canonico_al_label_efectivo():
     project_root = Path(__file__).resolve().parents[1]
     compact_label_sources = (
-        "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py",
-        "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py",
-        "capitulo4/experiment_ui.py",
+        "capitulo2/runtime/experimental_animation.py",
+        "capitulo2/runtime/polynomial_animation.py",
+        "capitulo4/runtime/experiment_ui.py",
         "core/search/search_common.py",
         "core/search/0_comparacion_busquedas_app.py",
         "core/sort/sort_common.py",
@@ -155,8 +155,8 @@ def test_capitulos_aplican_el_estilo_canonico_al_label_efectivo():
         source = (project_root / relative_path).read_text(encoding="utf-8")
         assert ".compact-control-label" in source, relative_path
 
-    recursion_source = (project_root / "capitulo5/recursion_tree_animation.py").read_text(encoding="utf-8")
-    lab_source = (project_root / "capitulo6/recursive_analysis_lab.py").read_text(encoding="utf-8")
+    recursion_source = (project_root / "capitulo5/runtime/recursion_tree_animation.py").read_text(encoding="utf-8")
+    lab_source = (project_root / "capitulo6/runtime/recursive_analysis_lab.py").read_text(encoding="utf-8")
     for source in (recursion_source, lab_source):
         assert "font-family:sans-serif!important" in source
         assert "font-size:13px!important" in source
@@ -166,8 +166,8 @@ def test_capitulos_aplican_el_estilo_canonico_al_label_efectivo():
 
 def test_configuraciones_recursivas_no_generan_scroll_horizontal():
     project_root = Path(__file__).resolve().parents[1]
-    recursion_source = (project_root / "capitulo5/recursion_tree_animation.py").read_text(encoding="utf-8")
-    lab_source = (project_root / "capitulo6/recursive_analysis_lab.py").read_text(encoding="utf-8")
+    recursion_source = (project_root / "capitulo5/runtime/recursion_tree_animation.py").read_text(encoding="utf-8")
+    lab_source = (project_root / "capitulo6/runtime/recursive_analysis_lab.py").read_text(encoding="utf-8")
 
     assert ".recursion-tree-controls" in recursion_source
     assert "overflow-x:hidden!important" in recursion_source

@@ -30,10 +30,10 @@ def notebook_code_sources(path: Path) -> list[str]:
 
 
 def bootstrap_launchers(chapter: str) -> dict[str, str]:
-    bootstrap_source = (PROJECT_ROOT / chapter / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+    bootstrap_source = (PROJECT_ROOT / chapter / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
     value = assignment_value(bootstrap_source, "SIMULATION_LAUNCHERS")
     if not isinstance(value, dict):
-        raise AssertionError(f"{chapter}/notebooks/colab_bootstrap.py no define SIMULATION_LAUNCHERS")
+        raise AssertionError(f"{chapter}/runtime/colab_bootstrap.py no define SIMULATION_LAUNCHERS")
     return value
 
 
@@ -66,7 +66,7 @@ def main() -> None:
     errors = []
     for chapter in CHAPTERS:
         launchers = bootstrap_launchers(chapter)
-        for notebook_path in sorted((PROJECT_ROOT / chapter / "notebooks").glob("*.ipynb")):
+        for notebook_path in sorted((PROJECT_ROOT / chapter / "notebooks").glob("[0-9]_*.ipynb")):
             errors.extend(validate_notebook(notebook_path, launchers))
 
     if errors:

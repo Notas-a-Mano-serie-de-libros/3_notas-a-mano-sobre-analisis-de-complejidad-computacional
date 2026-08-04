@@ -1,4 +1,4 @@
-from capitulo5.recurrence_solution_methods import (
+from capitulo5.runtime.recurrence_solution_methods import (
     SOLUTION_STYLES,
     applicable_master_variants,
     solve_selected_method,

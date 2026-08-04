@@ -3,11 +3,11 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-UI_SOURCE = (ROOT / "capitulo4" / "experiment_ui.py").read_text(encoding="utf-8")
+UI_SOURCE = (ROOT / "capitulo4" / "runtime" / "experiment_ui.py").read_text(encoding="utf-8")
 C2_UI_SOURCE = (
     ROOT
     / "capitulo2"
-    / "analisis_complejidad_temporal_experimental"
+    / "runtime"
     / "experimental_animation.py"
 ).read_text(encoding="utf-8")
 
@@ -41,7 +41,7 @@ def test_interfaz_comparte_paneles_y_medidas_del_capitulo_dos():
 
 
 def test_no_restringir_elimina_el_limite_en_lugar_de_cambiarlo_por_otro():
-    from capitulo4.experiment_ui import effective_max_safe_elements
+    from capitulo4.runtime.experiment_ui import effective_max_safe_elements
 
     class Profile:
         max_safe_elements = 30
@@ -102,7 +102,7 @@ def test_renderizador_matematico_es_identico_al_del_capitulo_dos():
 
 
 def test_plantilla_de_grafica_conserva_titulos_y_contraste():
-    analysis_source = (ROOT / "capitulo4" / "experimental_analysis.py").read_text(
+    analysis_source = (ROOT / "capitulo4" / "runtime" / "experimental_analysis.py").read_text(
         encoding="utf-8"
     )
     assert "def _render_template(maximum_n, mode):" in analysis_source
@@ -114,7 +114,7 @@ def test_plantilla_de_grafica_conserva_titulos_y_contraste():
 
 
 def test_ejemplos_usan_una_sola_simulacion_con_selector_temporal_espacial():
-    notebooks = sorted((ROOT / "capitulo4").glob("ejemplo*.ipynb"))
+    notebooks = sorted((ROOT / "capitulo4" / "notebooks").glob("ejemplo*.ipynb"))
     notebooks = [path for path in notebooks if "_graficas" not in path.name]
     assert notebooks
 
@@ -127,7 +127,7 @@ def test_ejemplos_usan_una_sola_simulacion_con_selector_temporal_espacial():
         assert "EXPERIMENT_MODE" not in source
         assert "Complejidad espacial experimental" not in source
 
-    analysis_source = (ROOT / "capitulo4" / "experimental_analysis.py").read_text(
+    analysis_source = (ROOT / "capitulo4" / "runtime" / "experimental_analysis.py").read_text(
         encoding="utf-8"
     )
     assert "UI.run_selectable_app" in analysis_source

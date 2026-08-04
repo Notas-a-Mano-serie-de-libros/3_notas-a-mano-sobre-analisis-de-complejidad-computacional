@@ -37,7 +37,7 @@ def notebook_simulation_name(path: Path) -> str | None:
 
 def validate_chapter(chapter: str) -> list[str]:
     errors = []
-    bootstrap = PROJECT_ROOT / chapter / "notebooks" / "colab_bootstrap.py"
+    bootstrap = PROJECT_ROOT / chapter / "runtime" / "colab_bootstrap.py"
     required_files = load_constant(bootstrap, "REQUIRED_FILES")
     launchers = load_constant(bootstrap, "SIMULATION_LAUNCHERS")
     bootstrap_source = bootstrap.read_text(encoding="utf-8")
@@ -47,14 +47,14 @@ def validate_chapter(chapter: str) -> list[str]:
             errors.append(f"{bootstrap.relative_to(PROJECT_ROOT)} referencia un archivo inexistente: {relative_path}")
 
     for simulation_name, launcher_name in launchers.items():
-        if f"def {launcher_name}(" not in (PROJECT_ROOT / chapter / "notebooks" / "launchers.py").read_text(encoding="utf-8"):
+        if f"def {launcher_name}(" not in (PROJECT_ROOT / chapter / "runtime" / "launchers.py").read_text(encoding="utf-8"):
             errors.append(f"{chapter}: {simulation_name} apunta a un launcher inexistente: {launcher_name}")
 
     for marker in ("RAW_BASE_URL", "REQUIRED_FILES", "SIMULATION_LAUNCHERS", "ensure_colab_files", "resolve_launcher_path"):
         if marker not in bootstrap_source:
             errors.append(f"{bootstrap.relative_to(PROJECT_ROOT)} no contiene {marker}")
 
-    for notebook_path in sorted((PROJECT_ROOT / chapter / "notebooks").glob("*.ipynb")):
+    for notebook_path in sorted((PROJECT_ROOT / chapter / "notebooks").glob("[0-9]_*.ipynb")):
         simulation_name = notebook_simulation_name(notebook_path)
         if simulation_name is None:
             errors.append(f"{notebook_path.relative_to(PROJECT_ROOT)} no define SIMULATION_NAME")

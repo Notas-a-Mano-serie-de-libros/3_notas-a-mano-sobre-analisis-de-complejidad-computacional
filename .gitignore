@@ -9,5 +9,5 @@ dist/
 build/
 
 # Generated figures produced by notebooks and simulations
-**/graficas/*
-!**/graficas/.gitkeep
+capitulo*/images/generadas/*
+!capitulo*/images/generadas/.gitkeep

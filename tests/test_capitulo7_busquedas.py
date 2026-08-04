@@ -6,8 +6,8 @@ import unittest
 from tests.helpers import PROJECT_ROOT, load_module_from_path
 
 
-LAUNCHERS_PATH = PROJECT_ROOT / "capitulo7" / "notebooks" / "launchers.py"
-LOCAL_APP_PATH = PROJECT_ROOT / "capitulo7" / "abrir_busqueda.py"
+LAUNCHERS_PATH = PROJECT_ROOT / "capitulo7" / "runtime" / "launchers.py"
+LOCAL_APP_PATH = PROJECT_ROOT / "capitulo7" / "runtime" / "abrir_busqueda.py"
 
 SEARCH_CASES = [
     ([3, 8, 12, 20, 31, 44, 55, 68], 20, True),
@@ -124,18 +124,18 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         self.assertIn('sys.modules.pop("search_common", None)', source)
 
     def test_bootstrap_clears_previous_widget_output(self):
-        source = (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "capitulo7" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
 
         self.assertIn("clear_output(wait=False)", source)
         self.assertIn("clear_output(wait=True)", source)
 
     def test_bootstrap_resolves_only_chapter7_launcher(self):
-        source = (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        source = (PROJECT_ROOT / "capitulo7" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
 
-        self.assertIn('"capitulo7" / "notebooks" / "launchers.py"', source)
-        self.assertIn("No se pudo localizar capitulo7/notebooks/launchers.py", source)
+        self.assertIn('"capitulo7" / "runtime" / "launchers.py"', source)
+        self.assertIn("No se pudo localizar capitulo7/runtime/launchers.py", source)
         self.assertIn("project_root", source)
-        self.assertIn("launcher_path.parent.parent.parent.resolve()", source)
+        self.assertIn("launcher_path.parents[2].resolve()", source)
         self.assertNotIn('base / "notebooks"', source)
 
     def test_original_visual_convention_after_select_step(self):
@@ -180,7 +180,7 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         self.assertIn('row_controls.append(groups["target_readout"])', common_source)
         self.assertIn("def create_search_controls(", common_source)
         self.assertIn("controls = create_search_controls(default_size, max_size, default_target)", common_source)
-        self.assertIn('"common/widget_controls.py"', (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8"))
+        self.assertIn('"common/widget_controls.py"', (PROJECT_ROOT / "capitulo7" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8"))
         self.assertIn("def update_target_readout", common_source)
         self.assertIn('target_readout.value = target', common_source)
         self.assertIn("def current_values", common_source)
@@ -473,7 +473,7 @@ class TestCapitulo7BusquedaExponencial(unittest.TestCase):
     def test_exponential_ui_features_are_present(self):
         source = (PROJECT_ROOT / "core" / "search" / "5_busqueda_exponencial_app.py").read_text()
         common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text()
-        bootstrap = (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text()
+        bootstrap = (PROJECT_ROOT / "capitulo7" / "runtime" / "colab_bootstrap.py").read_text()
         notebook = (PROJECT_ROOT / "capitulo7" / "notebooks" / "5_busqueda_exponencial.ipynb").read_text()
 
         view_source = (PROJECT_ROOT / "common" / "simulation_views.py").read_text()
@@ -617,7 +617,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         }
 
     def test_launchers_and_bootstrap_include_all_remaining_searches(self):
-        bootstrap = (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        bootstrap = (PROJECT_ROOT / "capitulo7" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
 
         self.assertTrue(hasattr(self.launchers, "run_comparacion"))
         self.assertIn("0_comparacion_busquedas_app.py", bootstrap)
@@ -770,7 +770,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn('"Ejecución automática"', view_source)
         self.assertIn('"Generar nuevo arreglo"', view_source)
         self.assertIn('"Generar arreglo del libro"', view_source)
-        self.assertIn('"core/search/search_common.py"', (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8"))
+        self.assertIn('"core/search/search_common.py"', (PROJECT_ROOT / "capitulo7" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8"))
 
         for path in sorted((PROJECT_ROOT / "core" / "search").glob("*_busqueda_*_app.py")):
             with self.subTest(path=path.name):
@@ -1393,7 +1393,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
             (PROJECT_ROOT / "capitulo7" / "notebooks" / "6_busqueda_ternaria.ipynb").read_text(encoding="utf-8")
         )
         exercises = json.loads(
-            (PROJECT_ROOT / "capitulo7" / "ejercicios_propuestos.ipynb").read_text(encoding="utf-8")
+            (PROJECT_ROOT / "capitulo7" / "notebooks" / "ejercicios_propuestos.ipynb").read_text(encoding="utf-8")
         )
 
         comparison_source = "\n".join("".join(cell.get("source", [])) for cell in comparison["cells"])

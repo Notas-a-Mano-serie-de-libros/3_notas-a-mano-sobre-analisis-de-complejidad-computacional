@@ -262,8 +262,8 @@ class TestPerformanceContracts(unittest.TestCase):
         sort_common = (PROJECT_ROOT / "core" / "sort" / "sort_common.py").read_text(encoding="utf-8")
         visual_roles = (PROJECT_ROOT / "common" / "visual_roles.py").read_text(encoding="utf-8")
         sort_config = (PROJECT_ROOT / "core" / "sort" / "sort_config.py").read_text(encoding="utf-8")
-        cap7_bootstrap = (PROJECT_ROOT / "capitulo7" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
-        cap8_bootstrap = (PROJECT_ROOT / "capitulo8" / "notebooks" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        cap7_bootstrap = (PROJECT_ROOT / "capitulo7" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
+        cap8_bootstrap = (PROJECT_ROOT / "capitulo8" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
         search_comparison = (PROJECT_ROOT / "core" / "search" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
         sort_comparison = (PROJECT_ROOT / "core" / "sort" / "0_comparacion_ordenamientos_app.py").read_text(encoding="utf-8")
 

@@ -24,6 +24,7 @@ jobs:
       - name: Validate project
         run: |
           python scripts/clean_notebooks.py --check --diagnose
+          python scripts/validate_repository_paths.py
           python scripts/validate_colab_bootstrap.py
           python scripts/validate_colab_links.py
           python scripts/validate_notebook_launchers.py
@@ -35,6 +36,7 @@ jobs:
           python scripts/benchmark_animations.py --repeats 3 --max-ms 1500 --output artifacts/animation-benchmark.json --json
           python scripts/validate_benchmark_report.py --report artifacts/animation-benchmark.json
           python scripts/clean_notebooks.py --check --diagnose > artifacts/notebook-diagnostics.txt
+          python scripts/validate_repository_paths.py > artifacts/repository-paths.txt
           python scripts/validate_colab_bootstrap.py > artifacts/colab-bootstrap.txt
           python scripts/validate_colab_links.py > artifacts/colab-links.txt
       - name: Package project
