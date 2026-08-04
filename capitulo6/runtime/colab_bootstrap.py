@@ -4,6 +4,7 @@ import importlib
 import importlib.util
 import sys
 import tempfile
+import time
 import urllib.request
 from pathlib import Path
 
@@ -14,6 +15,14 @@ def _enable_colab_widgets():
     except (ImportError, ModuleNotFoundError):
         return
     colab_output.enable_custom_widget_manager()
+
+
+def _download(url, destination):
+    request = urllib.request.Request(
+        f"{url}?runtime={time.time_ns()}",
+        headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+    )
+    Path(destination).write_bytes(urllib.request.urlopen(request, timeout=30).read())
 
 
 def _local_module():
@@ -30,9 +39,9 @@ def _local_module():
 def _download_common_runtime(module_dir, repository_root):
     common_dir = module_dir / "common"
     common_dir.mkdir(parents=True, exist_ok=True)
-    urllib.request.urlretrieve(repository_root + "common/__init__.py", common_dir / "__init__.py")
-    urllib.request.urlretrieve(repository_root + "common/widget_controls.py", common_dir / "widget_controls.py")
-    urllib.request.urlretrieve(repository_root + "common/simulation_views.py", common_dir / "simulation_views.py")
+    _download(repository_root + "common/__init__.py", common_dir / "__init__.py")
+    _download(repository_root + "common/widget_controls.py", common_dir / "widget_controls.py")
+    _download(repository_root + "common/simulation_views.py", common_dir / "simulation_views.py")
 
 
 def _activate_runtime(root):
@@ -72,7 +81,7 @@ if module_path is None:
         "3_notas-a-mano-sobre-analisis-de-complejidad-computacional/"
         "main/capitulo6/runtime/"
     )
-    urllib.request.urlretrieve(base_url + "recursive_analysis_lab.py", module_path)
+    _download(base_url + "recursive_analysis_lab.py", module_path)
     _download_common_runtime(
         module_dir,
         "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/"

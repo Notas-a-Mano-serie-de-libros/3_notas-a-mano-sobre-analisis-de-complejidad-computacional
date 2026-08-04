@@ -16,6 +16,8 @@ def test_colab_bootstrap_reloads_the_active_common_runtime():
     source = (ROOT / "capitulo4" / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
     assert "def _activate_runtime(root):" in source
     assert 'module_name.startswith("common.")' in source
+    assert "?runtime={time.time_ns()}" in source
+    assert '"Pragma": "no-cache"' in source
 
 
 def test_interfaz_comparte_paneles_y_medidas_del_capitulo_dos():

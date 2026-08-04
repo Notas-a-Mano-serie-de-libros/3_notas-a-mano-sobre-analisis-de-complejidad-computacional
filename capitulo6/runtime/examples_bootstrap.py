@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib
 import sys
 import tempfile
+import time
 import urllib.request
 from pathlib import Path
 
@@ -26,6 +27,14 @@ def _project_root():
     return None
 
 
+def _download(url, destination):
+    request = urllib.request.Request(
+        f"{url}?runtime={time.time_ns()}",
+        headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+    )
+    Path(destination).write_bytes(urllib.request.urlopen(request, timeout=30).read())
+
+
 def _download_runtime():
     root = Path(tempfile.gettempdir()) / "capitulo6_examples_runtime"
     files = {
@@ -45,7 +54,7 @@ def _download_runtime():
         destination = root / relative_path
         destination.parent.mkdir(parents=True, exist_ok=True)
         (destination.parent / "__init__.py").touch(exist_ok=True)
-        urllib.request.urlretrieve(base_url + remote_path, destination)
+        _download(base_url + remote_path, destination)
     return root
 
 

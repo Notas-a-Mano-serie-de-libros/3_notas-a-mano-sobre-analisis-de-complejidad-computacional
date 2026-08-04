@@ -18,6 +18,8 @@ def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
     assert "capitulo5/runtime/recurrence_solution_methods.py" in bootstrap
     assert "def _activate_runtime(root):" in bootstrap
     assert 'module_name.startswith("common.")' in bootstrap
+    assert "?runtime={time.time_ns()}" in bootstrap
+    assert '"Pragma": "no-cache"' in bootstrap
 
 
 def test_playback_buttons_use_kernel_callbacks_instead_of_injected_javascript():

@@ -326,6 +326,8 @@ def test_bootstrap_remoto_descarga_motor_comun_y_perfiles():
     assert "simulation_module = importlib.import_module(module_name)" in source
     assert "simulation_module.run_app(simulation_name" in source
     assert "simulation_module.run_app()" in source
+    assert "?runtime={time.time_ns()}" in source
+    assert '"Pragma": "no-cache"' in source
 
 
 def test_bootstrap_tolera_que_google_no_este_instalado():

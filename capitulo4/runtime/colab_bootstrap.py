@@ -4,6 +4,7 @@ import importlib
 import importlib.util
 import sys
 import tempfile
+import time
 import urllib.request
 from pathlib import Path
 
@@ -22,6 +23,14 @@ def _load(path):
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def _download(url, destination):
+    request = urllib.request.Request(
+        f"{url}?runtime={time.time_ns()}",
+        headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
+    )
+    Path(destination).write_bytes(urllib.request.urlopen(request, timeout=30).read())
 
 
 def _activate_runtime(root):
@@ -53,11 +62,11 @@ if module_path is None:
         "3_notas-a-mano-sobre-analisis-de-complejidad-computacional/"
         "main/capitulo4/runtime/"
     )
-    urllib.request.urlretrieve(
+    _download(
         base_url + "experimental_analysis.py",
         module_path,
     )
-    urllib.request.urlretrieve(base_url + "experiment_ui.py", ui_path)
+    _download(base_url + "experiment_ui.py", ui_path)
     common_dir = module_dir / "common"
     common_dir.mkdir(parents=True, exist_ok=True)
     repository_root = (
@@ -68,7 +77,7 @@ if module_path is None:
         "__init__.py", "experimental_simulation.py",
         "widget_controls.py", "simulation_views.py",
     ):
-        urllib.request.urlretrieve(
+        _download(
             repository_root + "common/" + filename,
             common_dir / filename,
         )

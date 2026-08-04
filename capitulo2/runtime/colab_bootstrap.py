@@ -6,6 +6,7 @@ import importlib
 import importlib.util
 from pathlib import Path
 import sys
+import time
 import urllib.request
 
 from IPython.display import clear_output
@@ -64,8 +65,8 @@ def download_required_files(root):
         target = root / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
         request = urllib.request.Request(
-            f"{RAW_BASE_URL}/{relative_path}",
-            headers={"Cache-Control": "no-cache"},
+            f"{RAW_BASE_URL}/{relative_path}?runtime={time.time_ns()}",
+            headers={"Cache-Control": "no-cache", "Pragma": "no-cache"},
         )
         target.write_bytes(urllib.request.urlopen(request).read())
 
