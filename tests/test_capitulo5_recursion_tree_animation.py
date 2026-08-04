@@ -20,6 +20,13 @@ def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
     assert 'module_name.startswith("common.")' in bootstrap
 
 
+def test_playback_buttons_use_kernel_callbacks_instead_of_injected_javascript():
+    assert "play.on_click(start_playback)" in SOURCE
+    assert "pause.on_click(stop_playback)" in SOURCE
+    assert "loop.create_task(play_levels())" in SOURCE
+    assert "playbackTimer" not in SOURCE
+
+
 def test_general_expression_always_keeps_symbolic_external_cost():
     from capitulo5.runtime.recursion_tree_animation import _equation_markup
 

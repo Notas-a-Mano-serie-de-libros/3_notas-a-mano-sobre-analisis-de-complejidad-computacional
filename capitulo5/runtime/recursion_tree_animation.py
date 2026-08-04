@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import html
 import builtins
 import math
@@ -1725,7 +1726,18 @@ def run_app(builder_only=False):
             message = ""
         note.value = f'<div class="recursion-tree-note">{message}</div>'
 
+    playback_state = {"task": None}
+
+    def stop_playback(*_):
+        task = playback_state.get("task")
+        if task is not None and not task.done():
+            task.cancel()
+        playback_state["task"] = None
+        play.disabled = False
+        pause.disabled = True
+
     def reset_progress(*_):
+        stop_playback()
         animation_state["level"] = 0
         update()
 
@@ -1735,9 +1747,38 @@ def run_app(builder_only=False):
         )
         update()
 
-    previous_level.on_click(lambda _: change_level(-1))
-    next_level.on_click(lambda _: change_level(1))
+    async def play_levels():
+        try:
+            while animation_state["level"] < parameter_state["h"]:
+                await asyncio.sleep(0.35)
+                change_level(1)
+        except asyncio.CancelledError:
+            return
+        finally:
+            playback_state["task"] = None
+            play.disabled = False
+            pause.disabled = True
+
+    def start_playback(_):
+        stop_playback()
+        if animation_state["level"] >= parameter_state["h"]:
+            animation_state["level"] = 0
+            update()
+        play.disabled = True
+        pause.disabled = False
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            asyncio.run(play_levels())
+        else:
+            playback_state["task"] = loop.create_task(play_levels())
+
+    previous_level.on_click(lambda _: (stop_playback(), change_level(-1)))
+    next_level.on_click(lambda _: (stop_playback(), change_level(1)))
+    play.on_click(start_playback)
+    pause.on_click(stop_playback)
     reset.on_click(reset_progress)
+    pause.disabled = True
     def change_relation(change):
         if change.get("name") != "value":
             return
@@ -1888,45 +1929,6 @@ def run_app(builder_only=False):
           const roots = document.querySelectorAll('.recursion-tree-root');
           const activeRoot = roots.length ? roots[roots.length - 1] : null;
           if (!activeRoot) return;
-          let playbackTimer = 0;
-          let playbackCount = -1;
-          const stopPlayback = () => {
-            if (playbackTimer) clearTimeout(playbackTimer);
-            playbackTimer = 0;
-            playbackCount = -1;
-          };
-          const widgetButton = selector => {
-            const element = activeRoot.querySelector(selector);
-            if (!element) return null;
-            return element.matches('button') ? element : element.querySelector('button');
-          };
-          const schedulePlayback = delay => {
-            clearTimeout(playbackTimer);
-            playbackTimer = setTimeout(playbackStep, delay);
-          };
-          const playbackStep = () => {
-            if (!activeRoot.isConnected) {
-              stopPlayback();
-              return;
-            }
-            const pending = activeRoot.querySelector('.recursion-level-table tr.level-pending');
-            const completed = activeRoot.querySelectorAll(
-              '.recursion-level-table tr[data-level]'
-            ).length;
-            if (!pending) {
-              if (playbackCount === -2) schedulePlayback(100);
-              else stopPlayback();
-              return;
-            }
-            if (playbackCount === -2) playbackCount = -1;
-            if (typesetRunning || typesetQueued || completed === playbackCount) {
-              schedulePlayback(100);
-              return;
-            }
-            playbackCount = completed;
-            widgetButton('.recursion-next-button')?.click();
-            schedulePlayback(100);
-          };
           const rootFor = el => el.closest('.recursion-tree-root');
           const pathIsDescendant = (path, parent) =>
             parent === '' ? path !== '' : path.startsWith(parent + '.');
@@ -1969,34 +1971,6 @@ def run_app(builder_only=False):
             summary.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
             const marker = summary.querySelector('.recursion-panel-marker');
             if (marker) marker.textContent = collapsed ? '▸' : '▾';
-          }, {signal});
-          document.addEventListener('click', event => {
-            if (!activeRoot.contains(event.target)) return;
-            if (event.target.closest('.recursion-play-button')) {
-              stopPlayback();
-              if (!activeRoot.querySelector('.recursion-level-table tr.level-pending')) {
-                playbackCount = -2;
-                widgetButton('.recursion-reset-button')?.click();
-              } else {
-                playbackCount = -1;
-              }
-              schedulePlayback(100);
-              return;
-            }
-            if (
-              event.target.closest('.recursion-pause-button') ||
-              event.target.closest('.recursion-reset-button') ||
-              event.target.closest('.recursion-previous-button') ||
-              (event.isTrusted && event.target.closest('.recursion-next-button')) ||
-              event.target.closest('.recursion-tree-controls')
-            ) {
-              stopPlayback();
-            }
-          }, {signal});
-          document.addEventListener('change', event => {
-            if (activeRoot.contains(event.target) && event.target.closest('.recursion-tree-controls')) {
-              stopPlayback();
-            }
           }, {signal});
           document.addEventListener('click', event => {
             const button = event.target.closest('[data-tree-zoom]');
@@ -2126,7 +2100,6 @@ def run_app(builder_only=False):
             abort() {
               controller.abort();
               observer.disconnect();
-              stopPlayback();
               clearTimeout(repaintTimer);
               clearTimeout(typesetTimer);
             }
