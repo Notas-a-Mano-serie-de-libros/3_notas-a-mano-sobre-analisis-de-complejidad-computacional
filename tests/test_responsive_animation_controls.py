@@ -99,3 +99,41 @@ def test_chapter_eight_preserves_compact_algorithm_checks_and_shell_theme():
     assert 'title="Comparación de secuencias de Shell"' in shell
     assert "action_row = sort_action_button_row(" in shell
     assert "action_style = widgets.HTML" not in shell
+
+
+def test_every_simulation_family_loads_the_shared_visual_system():
+    expected_contracts = {
+        "capitulo2/analisis_complejidad_temporal_experimental/experimental_animation.py": '.constant-animation-root',
+        "capitulo2/analisis_complejidad_temporal_experimental/polynomial_animation.py": '.constant-animation-root',
+        "capitulo3/asymptotic_animation.py": '#bo-wrap',
+        "capitulo4/experiment_ui.py": '.constant-animation-root',
+        "capitulo5/recursion_tree_animation.py": '.recursion-tree-root',
+        "capitulo6/recursive_analysis_lab.py": '.recursive-analysis-lab',
+        "capitulo7/domain/search_common.py": '.search-simulation-root',
+        "capitulo7/domain/0_comparacion_busquedas_app.py": '.comparison-simulation-root',
+        "capitulo7/domain/interpolation_visual.py": '#iv-wrap',
+        "capitulo8/domain/sort_common.py": '.sort-simulation-root',
+    }
+    for path, root_selector in expected_contracts.items():
+        module_source = source(path)
+        assert "shared_ui_styles" in module_source, path
+        assert root_selector in module_source, path
+
+
+def test_shared_visual_system_defines_all_control_contracts_once():
+    controls = source("common/widget_controls.py")
+    assert "def shared_ui_styles(root_selector):" in controls
+    for token in (
+        "--simulation-field-width",
+        "--simulation-field-height",
+        "--simulation-row-gap",
+        "--simulation-column-gap",
+        ".standard-control-label",
+        'input:not([type="checkbox"]):not([type="radio"])',
+        ".widget-checkbox input[type=\"checkbox\"]",
+        ".widget-button",
+        ".simulation-action-row",
+        '[class*="subpanel-title"]',
+        '[class*="subpanel-content"]',
+    ):
+        assert token in controls

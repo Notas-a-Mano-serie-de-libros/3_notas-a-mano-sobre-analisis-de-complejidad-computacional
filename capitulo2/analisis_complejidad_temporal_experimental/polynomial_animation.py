@@ -30,7 +30,9 @@ from capitulo2.analisis_complejidad_temporal_experimental.theoretical_graphs imp
 from common.widget_controls import (  # noqa: E402
     STANDARD_CONTROL_ROW_GAP,
     STANDARD_LABEL_CONTROL_GAP,
+    collapsible_panel,
     compact_labeled_control,
+    shared_ui_styles,
 )
 
 try:
@@ -268,30 +270,12 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
     refresh()
 
     def subpanel(title, children):
-        header = widgets.Button(
-            description=title,
-            icon="caret-down",
-            layout=widgets.Layout(width="100%", height="44px"),
-        )
-        header.add_class("experimental-subpanel-summary")
         content = widgets.VBox(
             children,
             layout=widgets.Layout(width="100%", grid_gap="0px"),
         )
         content.add_class("experimental-subpanel-content")
-
-        def toggle_content(_):
-            collapsed = content.layout.display != "none"
-            content.layout.display = "none" if collapsed else "flex"
-            header.icon = "caret-right" if collapsed else "caret-down"
-
-        header.on_click(toggle_content)
-        panel = widgets.VBox(
-            [header, content],
-            layout=widgets.Layout(width="100%", grid_gap="0px"),
-        )
-        panel.add_class("experimental-subpanel")
-        return panel
+        return collapsible_panel(title, content, prefix="experimental")
 
     configuration_panel = subpanel("Configuración", [controls])
     result_spacer = widgets.HTML(
@@ -544,7 +528,7 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
             box-shadow: none !important;
           }
         </style>
-        """,
+        """ + shared_ui_styles(".constant-animation-root"),
         layout=widgets.Layout(height="0px", min_height="0px", overflow="hidden"),
     )
     app = widgets.VBox(

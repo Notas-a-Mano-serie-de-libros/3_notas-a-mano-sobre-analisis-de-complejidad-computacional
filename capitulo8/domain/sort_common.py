@@ -19,6 +19,7 @@ from common.widget_controls import (
     collapsible_panel,
     compact_labeled_control,
     dropdown_control,
+    shared_ui_styles,
 )
 
 try:
@@ -1714,7 +1715,7 @@ def sort_styles():
         white-space: nowrap;
       }}
     </style>
-    """
+    """ + shared_ui_styles(".sort-simulation-root")
     return _SORT_STYLES
 
 

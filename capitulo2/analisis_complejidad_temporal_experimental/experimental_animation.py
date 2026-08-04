@@ -32,8 +32,10 @@ from common.widget_controls import (
     STANDARD_LABEL_CONTROL_GAP,
     action_button_row,
     button_control,
+    collapsible_panel,
     compact_labeled_control,
     magnitude_stepper,
+    shared_ui_styles,
 )
 
 try:
@@ -643,27 +645,12 @@ def run_app(profile, display_app=True, mode_selector=None):
     )
     controls.add_class("experimental-controls")
     def subpanel(title, children):
-        header = widgets.Button(
-            description=title,
-            icon="caret-down",
-            layout=widgets.Layout(width="100%", height="44px"),
-        )
-        header.add_class("experimental-subpanel-summary")
         content = widgets.VBox(
             children,
             layout=widgets.Layout(width="100%", grid_gap="0px"),
         )
         content.add_class("experimental-subpanel-content")
-
-        def toggle_content(_):
-            collapsed = content.layout.display != "none"
-            content.layout.display = "none" if collapsed else "flex"
-            header.icon = "caret-right" if collapsed else "caret-down"
-
-        header.on_click(toggle_content)
-        panel = widgets.VBox([header, content], layout=widgets.Layout(width="100%", grid_gap="0px"))
-        panel.add_class("experimental-subpanel")
-        return panel
+        return collapsible_panel(title, content, prefix="experimental")
 
     configuration_panel = subpanel(
         "Configuración",
@@ -1039,7 +1026,7 @@ def run_app(profile, display_app=True, mode_selector=None):
             box-shadow: none !important;
           }
         </style>
-        """,
+        """ + shared_ui_styles(".constant-animation-root"),
         layout=widgets.Layout(height="0px", min_height="0px", overflow="hidden"),
     )
     app = widgets.VBox(

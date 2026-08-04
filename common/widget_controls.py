@@ -24,6 +24,150 @@ STANDARD_ACTION_GAP = 0
 STANDARD_ACTION_MARGIN_TOP = 16
 
 
+def shared_ui_styles(root_selector):
+    """Contrato visual único para controles y paneles de todas las simulaciones."""
+
+    root = root_selector.strip()
+    if not root:
+        raise ValueError("root_selector no puede estar vacío")
+    return f"""
+<style>
+{root} {{
+  --simulation-text: #333333;
+  --simulation-surface: #ffffff;
+  --simulation-muted-surface: #f7f7f7;
+  --simulation-hover-surface: #eeeeee;
+  --simulation-border: #cccccc;
+  --simulation-panel-border: #dedede;
+  --simulation-focus: #1976d2;
+  --simulation-field-width: {STANDARD_FIELD_WIDTH}px;
+  --simulation-field-height: {STANDARD_CONTROL_HEIGHT}px;
+  --simulation-row-gap: {STANDARD_CONTROL_ROW_GAP}px;
+  --simulation-column-gap: {STANDARD_CONTROL_COLUMN_GAP}px;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  color: var(--simulation-text) !important;
+  font-family: sans-serif !important;
+}}
+{root}, {root} * {{ box-sizing: border-box; }}
+{root} .standard-control-label,
+{root} .compact-control-label,
+{root} .widget-label,
+{root} label {{
+  color: var(--simulation-text) !important;
+  font-family: sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+}}
+{root} .widget-text,
+{root} .widget-inttext,
+{root} .widget-boundedint,
+{root} .widget-dropdown {{
+  height: var(--simulation-field-height) !important;
+  min-height: var(--simulation-field-height) !important;
+  margin: 0 !important;
+}}
+{root} input:not([type="checkbox"]):not([type="radio"]),
+{root} select {{
+  height: var(--simulation-field-height) !important;
+  min-height: var(--simulation-field-height) !important;
+  border: 1px solid var(--simulation-border) !important;
+  border-radius: 3px !important;
+  background: var(--simulation-surface) !important;
+  color: var(--simulation-text) !important;
+  box-shadow: none !important;
+  font-family: sans-serif !important;
+  font-size: 13px !important;
+}}
+{root} input:not([type="checkbox"]):not([type="radio"]):focus,
+{root} select:focus {{
+  outline: none !important;
+  border-color: var(--simulation-focus) !important;
+  box-shadow: 0 0 0 1px var(--simulation-focus) !important;
+}}
+{root} .widget-checkbox input[type="checkbox"] {{
+  width: 16px !important;
+  min-width: 16px !important;
+  max-width: 16px !important;
+  height: 16px !important;
+  min-height: 16px !important;
+  max-height: 16px !important;
+}}
+{root} .widget-button,
+{root} button:not([class*="subpanel-title"]):not([class*="panel-summary"]) {{
+  border: 1px solid var(--simulation-border) !important;
+  border-radius: 0 !important;
+  background: var(--simulation-muted-surface) !important;
+  color: var(--simulation-text) !important;
+  box-shadow: none !important;
+  font-family: sans-serif !important;
+}}
+{root} .widget-button:hover,
+{root} button:not([class*="subpanel-title"]):not([class*="panel-summary"]):hover {{
+  background: var(--simulation-hover-surface) !important;
+  color: var(--simulation-text) !important;
+}}
+{root} .widget-button:disabled,
+{root} button:disabled {{
+  background: var(--simulation-muted-surface) !important;
+  color: var(--simulation-text) !important;
+  cursor: not-allowed !important;
+  opacity: .45 !important;
+}}
+{root} .experimental-stepper,
+{root} .recursion-stepper,
+{root} .lab-stepper,
+{root} .stepper {{ gap: 0 !important; }}
+{root} .experimental-stepper > *,
+{root} .recursion-stepper > *,
+{root} .lab-stepper > *,
+{root} .stepper > * {{ margin: 0 !important; }}
+{root} .simulation-action-row {{
+  width: 100% !important;
+  gap: 0 !important;
+  margin: {STANDARD_ACTION_MARGIN_TOP}px 0 0 !important;
+  justify-content: flex-end !important;
+}}
+{root} [class*="subpanel-title"],
+{root} [class*="configuration-summary"],
+{root} [class*="panel-summary"] {{
+  width: 100% !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-bottom: 1px solid #e5e5e5 !important;
+  border-radius: 0 !important;
+  background: var(--simulation-muted-surface) !important;
+  color: var(--simulation-text) !important;
+  box-shadow: none !important;
+  font-family: sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 24px !important;
+  text-align: left !important;
+}}
+{root} [class*="subpanel-content"],
+{root} [class*="panel-content"] {{
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  background: var(--simulation-surface) !important;
+  overflow-x: hidden !important;
+}}
+{root} [class*="subpanel"],
+{root} [class*="widget-panel"] {{
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  border-color: var(--simulation-panel-border) !important;
+}}
+</style>
+"""
+
+
 @dataclass(frozen=True)
 class MagnitudeStepper:
     container: widgets.HBox

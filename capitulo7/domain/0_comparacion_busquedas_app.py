@@ -35,6 +35,7 @@ from common.widget_controls import (
     collapsible_panel,
     compact_labeled_control,
     dropdown_control,
+    shared_ui_styles,
 )
 
 
@@ -970,7 +971,7 @@ def run_app():
     )
     panel_content.add_class("comparison-panel-content")
     css_widget = widgets.HTML(
-        COMPARISON_PANEL_CSS,
+        COMPARISON_PANEL_CSS + shared_ui_styles(".comparison-simulation-root"),
         layout=widgets.Layout(width="0", height="0", margin="0", padding="0"),
     )
     controls = widgets.VBox(

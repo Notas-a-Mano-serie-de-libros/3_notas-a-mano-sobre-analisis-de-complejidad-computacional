@@ -7,6 +7,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from IPython.display import HTML, Math, display
 import ipywidgets as widgets
+from common.widget_controls import shared_ui_styles
 
 
 ARRAY_SIZE = 10
@@ -189,7 +190,7 @@ def draw_interpolation_visual(values, target, uniform=True):
 
 
 def run_interpolation_visual():
-    _HTML = """
+    _HTML = shared_ui_styles("#iv-wrap") + """
 <style>
 #iv-wrap{width:100%;max-width:100%;overflow-x:hidden;background:#ffffff;color:#333;
   padding:14px 4px;font-family:sans-serif;box-sizing:border-box}
@@ -259,10 +260,9 @@ def run_interpolation_visual():
 </style>
 <div id="iv-wrap">
  <div class="iv-main-panel">
-  <div class="iv-panel-title">Simulación de estimación por interpolación</div>
   <div class="iv-panel-body">
   <details class="iv-subpanel" open>
-   <summary class="iv-subpanel-title">Parámetros</summary>
+   <summary class="iv-subpanel-title">Configuración</summary>
    <div class="iv-panel-content">
     <div class="ctrl">
     <label><span class="label-text">\(\boldsymbol{f(x)}\)</span>

@@ -267,7 +267,7 @@ class TestPerformanceContracts(unittest.TestCase):
         search_comparison = (PROJECT_ROOT / "capitulo7" / "domain" / "0_comparacion_busquedas_app.py").read_text(encoding="utf-8")
         sort_comparison = (PROJECT_ROOT / "capitulo8" / "domain" / "0_comparacion_ordenamientos_app.py").read_text(encoding="utf-8")
 
-        self.assertIn("_SEARCH_CSS = _build_search_css()", search_common)
+        self.assertIn('_SEARCH_CSS = _build_search_css() + shared_ui_styles(".search-simulation-root")', search_common)
         self.assertIn("css_widget = widgets.HTML(_SEARCH_CSS)", search_common)
         self.assertIn("css_widget = widgets.HTML(sort_styles())", sort_common)
         self.assertIn("render_state_html(state, include_styles=False)", sort_common)

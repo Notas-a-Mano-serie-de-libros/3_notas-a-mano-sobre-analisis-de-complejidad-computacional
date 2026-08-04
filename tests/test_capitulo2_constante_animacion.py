@@ -206,9 +206,8 @@ def test_simulacion_unifica_configuracion_resultado_y_tipo_de_analisis():
     assert '("Espacial", "memory")' in source
     assert '"Análisis",' in source
     assert 'run_app(\n            profile_factory(mode), display_app=False, mode_selector=selector' in source
-    assert 'add_class("experimental-subpanel-summary")' in source
-    assert "def toggle_content(_):" in source
-    assert 'content.layout.display = "none" if collapsed else "flex"' in source
+    assert 'collapsible_panel(title, content, prefix="experimental")' in source
+    assert "def toggle_content(_):" not in source
 
 
 def test_controles_comparten_medidas_espaciado_y_flecha_del_resto_de_la_obra():
@@ -704,9 +703,9 @@ def test_simulacion_polinomial_comparte_medidas_con_los_demas_paneles():
     assert "overflow-y: visible !important" in source
     assert 'configuration_panel = subpanel("Configuración", [controls])' in source
     assert 'result_panel = subpanel("Resultado", [result_content])' in source
-    assert "experimental-subpanel-summary" in source
-    assert 'icon="caret-down"' in source
-    assert "header.on_click(toggle_content)" in source
+    assert 'collapsible_panel(title, content, prefix="experimental")' in source
+    assert 'shared_ui_styles(".constant-animation-root")' in source
+    assert "header.on_click(toggle_content)" not in source
     assert "Parámetros:" not in source
     assert "Resultados por grado:" not in source
     assert "Resultado:" not in source

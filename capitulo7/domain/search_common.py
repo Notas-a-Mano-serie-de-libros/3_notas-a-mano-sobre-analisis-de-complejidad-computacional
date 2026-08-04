@@ -21,6 +21,7 @@ from common.widget_controls import (
     collapsible_panel,
     compact_labeled_control,
     dropdown_control,
+    shared_ui_styles,
 )
 
 try:
@@ -722,7 +723,7 @@ def _build_search_css() -> str:
 
 
 # CSS inyectado una sola vez; las dimensiones dinámicas van como inline styles en el HTML
-_SEARCH_CSS = _build_search_css()
+_SEARCH_CSS = _build_search_css() + shared_ui_styles(".search-simulation-root")
 
 
 def render_result_symbol(state):
