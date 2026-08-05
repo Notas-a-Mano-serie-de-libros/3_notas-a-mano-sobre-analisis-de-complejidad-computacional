@@ -84,8 +84,7 @@ NOTEBOOKS: dict[str, str] = {
     "4/ejemplo4":       "capitulo4/notebooks/ejemplo4_(inicializar_matriz_variable).ipynb",
     "4/ejemplo5":       "capitulo4/notebooks/ejemplo5_(ciclos_incremento_no_lineal).ipynb",
     "4/ejemplo7":       "capitulo4/notebooks/ejemplo7_(ciclo_sin_dependencia).ipynb",
-    "4/ejemplo9":       "capitulo4/notebooks/ejemplo9_(fibonacci_iterativo).ipynb",
-    "4/ejemplo10":      "capitulo4/notebooks/ejemplo10_(complejidad_oculta).ipynb",
+    "4/ejemplo9":       "capitulo4/notebooks/ejemplo9_(complejidad_oculta).ipynb",
     # ------------------------------------------------------------------
     # Capítulo 6 – Análisis de algoritmos recursivos
     # ------------------------------------------------------------------
