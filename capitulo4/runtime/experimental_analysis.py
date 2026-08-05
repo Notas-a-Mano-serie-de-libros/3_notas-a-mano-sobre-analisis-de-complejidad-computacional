@@ -134,6 +134,18 @@ def _fib_operation(n):
     return b
 
 
+def _fib_iterative_operation(n):
+    if n <= 1:
+        return np.int32(n)
+    a, b = np.int32(0), np.int32(1)
+    with np.errstate(over="ignore"):
+        for _ in range(2, n + 1):
+            c = a + b
+            a = b
+            b = c
+    return b
+
+
 EXAMPLES = {
     "sum": Example("Suma de dos números", r"O(1)", r"O(1)", 10_000, 1_000_000, 10_000_000, 300, _sum_prepare, _sum_operation),
     "array": Example("Recorrido de un arreglo", r"O(n)", r"O(1)", 10_000, 100_000, 1_000_000, 100, _array_prepare, _array_operation),
@@ -142,6 +154,7 @@ EXAMPLES = {
     "matrix_jump": Example("Ciclos con incremento no lineal", r"O(n^2)", r"O(n^2)", 140, 350, 700, 20, _jump_matrix_prepare, _jump_matrix_operation),
     "fixed_loop": Example("Ciclo sin dependencia de la entrada", r"O(1)", r"O(1)", 10_000, 1_000_000, 10_000_000, 80, _fixed_prepare, _fixed_operation),
     "hidden": Example("Complejidad oculta de Fibonacci iterativo", r"O(n^2)", r"O(n)", 10_000, 30_000, 100_000, 10, _fib_prepare, _fib_operation),
+    "fib_iterative": Example("Fibonacci iterativo", r"O(n)", r"O(1)", 10_000, 100_000, 1_000_000, 100, _fib_prepare, _fib_iterative_operation),
 }
 
 
@@ -278,6 +291,8 @@ def _shape(example_name, mode, values):
         return values**2
     if example_name == "hidden":
         return values**2 if mode == "time" else values
+    if example_name == "fib_iterative":
+        return values if mode == "time" else np.ones_like(values)
     return values
 
 

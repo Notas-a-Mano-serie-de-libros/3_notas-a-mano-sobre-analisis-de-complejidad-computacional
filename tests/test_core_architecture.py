@@ -28,10 +28,17 @@ def test_chapters_separate_public_notebooks_from_runtime_logic():
             for path in chapter_dir.rglob("*.ipynb")
             if path.parent != notebooks_dir
         ]
-        assert nested_notebooks == [], (
-            f"{chapter_dir.name} contiene notebooks fuera de notebooks/: "
-            f"{nested_notebooks}"
-        )
+        if chapter_number == 4:
+            assert nested_notebooks
+            assert all(
+                path.startswith("notebooks/graficas/")
+                for path in nested_notebooks
+            )
+        else:
+            assert nested_notebooks == [], (
+                f"{chapter_dir.name} contiene notebooks fuera de notebooks/: "
+                f"{nested_notebooks}"
+            )
 
         internal_public_files = [
             path.relative_to(chapter_dir / "runtime").as_posix()
@@ -78,7 +85,7 @@ def test_graphics_live_inside_their_chapter():
     graphics_directories = sorted(
         path for path in ROOT.rglob("graficas") if ".git" not in path.parts
     )
-    assert graphics_directories == []
+    assert graphics_directories == [ROOT / "capitulo4" / "notebooks" / "graficas"]
     for chapter_number in range(2, 9):
         images_dir = ROOT / f"capitulo{chapter_number}" / "images"
         assert {path.name for path in images_dir.iterdir()} == {"generadas", "recursos"}

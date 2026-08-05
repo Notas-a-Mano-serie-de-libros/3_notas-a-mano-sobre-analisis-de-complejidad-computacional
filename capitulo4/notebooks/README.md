@@ -69,7 +69,8 @@ Los enlaces locales abren los archivos del repositorio. Los enlaces de Colab abr
 | 4 | Crear y recorrer una matriz variable | $O(n^2)$ | $O(n^2)$ | [Abrir](./ejemplo4_(inicializar_matriz_variable).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo4_(inicializar_matriz_variable).ipynb) |
 | 5 | Recorrer una matriz con incremento no unitario | $O(n^2)$ | $O(n^2)$ | [Abrir](./ejemplo5_(ciclos_incremento_no_lineal).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo5_(ciclos_incremento_no_lineal).ipynb) |
 | 7 | Ejecutar un ciclo con límite fijo | $O(1)$ | $O(1)$ | [Abrir](./ejemplo7_(ciclo_sin_dependencia).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo7_(ciclo_sin_dependencia).ipynb) |
-| 9 | Calcular Fibonacci iterativo con enteros de precisión arbitraria | $O(n^2)$ | $O(n)$ | [Abrir](./ejemplo9_(complejidad_oculta).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo9_(complejidad_oculta).ipynb) |
+| 9 | Calcular Fibonacci iterativo | $O(n)$ | $O(1)$ | [Abrir](./ejemplo9_(fibonacci_iterativo).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo9_(fibonacci_iterativo).ipynb) |
+| 10 | Calcular Fibonacci iterativo con enteros de precisión arbitraria | $O(n^2)$ | $O(n)$ | [Abrir](./ejemplo10_(complejidad_oculta).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo10_(complejidad_oculta).ipynb) |
 
 La numeración conserva la correspondencia con los ejemplos del libro; por eso la secuencia no es consecutiva.
 
@@ -306,9 +307,9 @@ El costo de una operación puede depender del tamaño de los datos que procesa, 
 
 ## Gráficas de referencia
 
-Los notebooks utilizados para generar las imágenes estáticas del capítulo se encuentran en [`referencias/`](../runtime/recursos/referencias/). Estas versiones sirven como base reproducible para las figuras del libro y están separadas de los laboratorios experimentales.
+Los notebooks utilizados para generar las imágenes estáticas del capítulo se encuentran en [`graficas/`](./graficas/). Estas versiones sirven como base reproducible para las figuras del libro y están separadas de los laboratorios experimentales.
 
-Consulta la [guía de las gráficas de referencia](../runtime/recursos/referencias/README.md) para conocer sus archivos y la forma de ejecutarlos.
+Consulta la [guía de los notebooks de gráficas](./graficas/README.md) para conocer sus archivos y la forma de ejecutarlos.
 
 ---
 
@@ -338,7 +339,8 @@ Los ejercicios propuestos permiten practicar:
 \newcommand{\colabInicializarMatrizVariable}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo4_(inicializar_matriz_variable).ipynb}
 \newcommand{\colabCiclosIncrementoNoLineal}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo5_(ciclos_incremento_no_lineal).ipynb}
 \newcommand{\colabCicloSinDependencia}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo7_(ciclo_sin_dependencia).ipynb}
-\newcommand{\colabComplejidadOculta}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo9_(complejidad_oculta).ipynb}
+\newcommand{\colabFibonacciIterativo}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo9_(fibonacci_iterativo).ipynb}
+\newcommand{\colabComplejidadOculta}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo10_(complejidad_oculta).ipynb}
 \newcommand{\visorEjerciciosCapituloCuatro}{https://docs.google.com/gview?embedded=true\&url=https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/capitulo4/ejercicios_propuestos.pdf}
 ```
 
@@ -358,9 +360,10 @@ capitulo4/
 ├── ejemplo4_(inicializar_matriz_variable).ipynb
 ├── ejemplo5_(ciclos_incremento_no_lineal).ipynb
 ├── ejemplo7_(ciclo_sin_dependencia).ipynb
-├── ejemplo9_(complejidad_oculta).ipynb
+├── ejemplo9_(fibonacci_iterativo).ipynb
+├── ejemplo10_(complejidad_oculta).ipynb
 ├── ejercicios_propuestos.pdf
-└── referencias/
+└── graficas/
 ```
 
 ---
