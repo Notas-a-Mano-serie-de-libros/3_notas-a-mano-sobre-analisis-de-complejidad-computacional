@@ -1,6 +1,6 @@
 from __future__ import annotations
 import math, random
-from common.exercises_laboratory import ExerciseAlgorithm, run_laboratory
+from capitulo7.runtime.exercise_laboratory import ExerciseAlgorithm, run_laboratory
 
 def sequential(a,x):
     for i,v in enumerate(a):
@@ -132,10 +132,9 @@ def ternary_inputs(n,case):
     return a,target
 ONE=lambda n:1.; LOG=lambda n:max(1.,math.log2(max(n,2))); LOGLOG=lambda n:max(1.,math.log2(math.log2(max(n,4)))); SQRT=lambda n:max(1.,math.sqrt(n)); LINEAR=lambda n:float(n)
 SPACE={c:("Θ(1)",ONE) for c in ("mejor","promedio","peor")}
-TERNARY_SPACE={"mejor":("Θ(1)",ONE),"promedio":("Θ(log₃ n)",LOG),"peor":("Θ(log₃ n)",LOG)}
+TERNARY_SPACE={c:("Θ(1)",ONE) for c in ("mejor","promedio","peor")}
 def constant_space(_a,_x):return 8
-def ternary_space(a,x):
- return 8 if x==a[(len(a)-1)//3] else 8*max(1,math.ceil(math.log(max(len(a),1),3)))
+def ternary_space(_a,_x):return 8
 def spec(name,fn,orders,builder=inputs,counter=None,space_counter=constant_space):
  return ExerciseAlgorithm(name,fn,builder,orders,SPACE,10**6,counter,space_counter)
 ALGORITHMS={

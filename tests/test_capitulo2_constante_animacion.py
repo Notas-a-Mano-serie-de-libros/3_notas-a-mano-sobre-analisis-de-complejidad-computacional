@@ -443,6 +443,16 @@ def test_graficas_teoricas_ubican_leyenda_segun_crecimiento():
     assert {name for name, config in THEORETICAL_CONFIGS.items() if config["legend_location"] == "upper left"} == upper_left
 
 
+def test_etiquetas_logaritmicas_usan_mathtext_y_no_subindices_unicode():
+    for configs in (THEORETICAL_CONFIGS, PROFILE_CONFIGS):
+        for name in ("logarithmic", "log_linear"):
+            labels = [configs[name]["label"]]
+            if "space_label" in configs[name]:
+                labels.append(configs[name]["space_label"])
+            assert all("₂" not in label for label in labels)
+            assert all("\\log_2" in label for label in labels)
+
+
 def test_graficas_teoricas_alinean_ejes_en_el_origen():
     import matplotlib.pyplot as plt
 

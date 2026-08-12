@@ -92,6 +92,20 @@ def test_steppers_usan_el_contrato_visual_global():
         assert label in html
 
 
+def test_arrastrar_n0_no_reemplaza_los_extremos_mathjax_sin_cambios():
+    html = load_animation_module()._BIG_O_HTML
+
+    function_start = html.index("  function setEditableField(id,value){")
+    function_end = html.index("  function beginEditableField(id){", function_start)
+    source = html[function_start:function_end]
+
+    assert "var serialized=String(value);" in source
+    assert "if(target.dataset.lastValue===serialized)return;" in source
+    assert source.index("if(target.dataset.lastValue===serialized)return;") < source.index(
+        "target.innerHTML=tex(valueLatex(value));"
+    )
+
+
 def run_math_engine(mode: str, expression: str):
     if shutil.which("node") is None:
         pytest.skip("Node.js no está disponible para validar el motor JavaScript")

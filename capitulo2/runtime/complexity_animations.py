@@ -53,8 +53,8 @@ PROFILE_CONFIGS = {
     "logarithmic": {
         "function_latex": r"\log_2(n)",
         "title": "logarítmica",
-        "label": "Función de complejidad teórica T(n) = log₂(n)",
-        "space_label": "Función de complejidad espacial teórica S(n) = log₂(n)",
+        "label": r"Función de complejidad teórica $T(n)=\log_2(n)$",
+        "space_label": r"Función de complejidad espacial teórica $S(n)=\log_2(n)$",
         "filename": "complejidad_logaritmica.png",
         "space_filename": "complejidad_logaritmica_espacial.png",
         "max_safe_elements": 1_000_000,
@@ -83,8 +83,8 @@ PROFILE_CONFIGS = {
     "log_linear": {
         "function_latex": r"n\log_2(n)",
         "title": "log-lineal",
-        "label": "Función de complejidad teórica T(n) = n log₂(n)",
-        "space_label": "Función de complejidad espacial teórica S(n) = n log₂(n)",
+        "label": r"Función de complejidad teórica $T(n)=n\log_2(n)$",
+        "space_label": r"Función de complejidad espacial teórica $S(n)=n\log_2(n)$",
         "filename": "complejidad_log_lineal.png",
         "space_filename": "complejidad_log_lineal_espacial.png",
         "max_safe_elements": 20_000,

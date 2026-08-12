@@ -30,7 +30,7 @@ THEORETICAL_CONFIGS = {
     },
     "logarithmic": {
         "title": "logarítmica",
-        "label": "Función de complejidad teórica T(n) = log₂(n)",
+        "label": r"Función de complejidad teórica $T(n)=\log_2(n)$",
         "max_safe_elements": 1_000_000,
         "function": lambda n: np.log2(np.maximum(n, 1)),
         "legend_location": "lower right",
@@ -44,7 +44,7 @@ THEORETICAL_CONFIGS = {
     },
     "log_linear": {
         "title": "log-lineal",
-        "label": "Función de complejidad teórica T(n) = n log₂(n)",
+        "label": r"Función de complejidad teórica $T(n)=n\log_2(n)$",
         "max_safe_elements": 20_000,
         "function": lambda n: n * np.log2(np.maximum(n, 1)),
         "legend_location": "lower right",

@@ -2,7 +2,9 @@ from dataclasses import replace
 
 from capitulo7.runtime.exercises_lab import ALGORITHMS as SEARCHES
 from capitulo8.runtime.exercises_lab import ALGORITHMS as SORTS
-from common.exercises_laboratory import experiment
+from capitulo7.runtime.exercise_laboratory import experiment as search_experiment
+from capitulo7.runtime.exercise_laboratory import linear_sizes as search_linear_sizes
+from capitulo8.runtime.exercise_laboratory import linear_sizes as sort_linear_sizes
 
 
 def metric(spec, case, n, analysis="temporal"):
@@ -30,7 +32,7 @@ def test_sequential_search_cases_have_constant_and_linear_growth():
 
 
 def test_sequential_average_points_are_collinear_on_linear_axes():
-    rows, _limit = experiment(SEARCHES["secuencial"], "temporal", 100_000, 100, "promedio")
+    rows, _limit = search_experiment(SEARCHES["secuencial"], "temporal", 100_000, 100, "promedio")
     measured = [row for row in rows if row["origin"] == "Medición experimental" and row["n"] in (10, 100, 1_000, 10_000, 100_000)]
     ratios = [right["estimate"] / left["estimate"] for left, right in zip(measured, measured[1:])]
     assert all(abs(ratio - 10) < 1e-12 for ratio in ratios)
@@ -38,7 +40,7 @@ def test_sequential_average_points_are_collinear_on_linear_axes():
 
 def test_progress_reports_loading_completion_and_projection_per_checkpoint():
     events = []
-    experiment(
+    search_experiment(
         SEARCHES["secuencial"], "temporal", 10_000_000, 100, "promedio",
         lambda n, state, value: events.append((n, state, value)),
     )
@@ -63,11 +65,29 @@ def test_every_linspace_size_is_executed_experimentally():
         return original.input_builder(n, case)
 
     tracked = replace(original, input_builder=tracked_builder)
-    rows, _limit = experiment(tracked, "temporal", 1_000, 100, "promedio")
+    rows, _limit = search_experiment(tracked, "temporal", 1_000, 100, "promedio")
     assert len(rows) == 100
     assert built_sizes == [row["n"] for row in rows]
     assert built_sizes[0] == 1 and built_sizes[-1] == 1_000
     assert {10, 100, 1_000} <= set(built_sizes)
+
+
+def test_each_chapter_owns_an_independent_linspace_implementation():
+    assert search_linear_sizes is not sort_linear_sizes
+    for builder in (search_linear_sizes, sort_linear_sizes):
+        sizes = builder(100_000, 1_000)
+        assert len(sizes) == 1_000
+        assert sizes[0] == 1
+        assert sizes[-1] == 100_000
+        assert list(sizes) == sorted(set(sizes))
+
+
+def test_iterative_ternary_search_uses_constant_auxiliary_space():
+    spec = SEARCHES["ternaria"]
+    assert spec.spatial["mejor"][0] == "Θ(1)"
+    assert spec.spatial["promedio"][0] == "Θ(1)"
+    assert spec.spatial["peor"][0] == "Θ(1)"
+    assert metric(spec, "peor", 10_000, analysis="espacial") == 8
 
 
 def test_search_inputs_represent_the_declared_cases():

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import math, random
-from common.exercises_laboratory import ExerciseAlgorithm, run_laboratory
+from capitulo8.runtime.exercise_laboratory import ExerciseAlgorithm, run_laboratory
 
 def bubble(a,_):
  a=a.copy();n=len(a)
@@ -136,7 +136,7 @@ ALGORITHMS={
  "burbuja":ExerciseAlgorithm("Ordenamiento burbuja",bubble,inputs,orders(("Θ(n)",LINEAR),("Θ(n²)",QUAD),("Θ(n²)",QUAD)),SP1,500,bubble_ops,constant_space),
  "seleccion":ExerciseAlgorithm("Ordenamiento por selección",selection,inputs,orders(("Θ(n²)",QUAD),("Θ(n²)",QUAD),("Θ(n²)",QUAD)),SP1,500,selection_ops,constant_space),
  "insercion":ExerciseAlgorithm("Ordenamiento por inserción",insertion,inputs,orders(("Θ(n)",LINEAR),("Θ(n²)",QUAD),("Θ(n²)",QUAD)),SP1,1000,insertion_ops,constant_space),
- "shell":ExerciseAlgorithm("Shell Sort",shell,inputs,orders(("Θ(n log n)",NLOG),("Θ(n^(3/2))",lambda n:n**1.5),("Θ(n²)",QUAD)),SP1,10000,shell_ops,constant_space),
+ "shell":ExerciseAlgorithm("Shell Sort",shell,inputs,orders(("O(n log n)",NLOG),("O(n^(3/2))",lambda n:n**1.5),("O(n²)",QUAD)),SP1,10000,shell_ops,constant_space),
  "mezcla":ExerciseAlgorithm("Merge Sort",merge,inputs,orders(("Θ(n log n)",NLOG),("Θ(n log n)",NLOG),("Θ(n log n)",NLOG)),SPL,10000,merge_ops,linear_space),
  "rapido":ExerciseAlgorithm("Quick Sort",quick,quick_inputs,orders(("Θ(n log n)",NLOG),("Θ(n log n)",NLOG),("Θ(n²)",QUAD)),orders(("Θ(log n)",lambda n:math.log2(max(n,2))),("Θ(log n)",lambda n:math.log2(max(n,2))),("Θ(n)",LINEAR)),2000,quick_ops,quick_space),
  "radix":ExerciseAlgorithm("Radix Sort",radix,inputs,orders(("Θ(nk)",RADIX),("Θ(nk)",RADIX),("Θ(nk)",RADIX)),SPL,100000,radix_ops,radix_space),

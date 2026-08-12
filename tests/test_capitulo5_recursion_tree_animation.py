@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 
 SOURCE = (
@@ -6,6 +7,12 @@ SOURCE = (
     / "capitulo5"
     / "runtime" / "recursion_tree_animation.py"
 ).read_text(encoding="utf-8")
+METHODS_NOTEBOOK = (
+    Path(__file__).resolve().parents[1]
+    / "capitulo5"
+    / "notebooks"
+    / "1_metodos_solucion_relaciones_recurrencia.ipynb"
+)
 
 
 def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
@@ -20,6 +27,22 @@ def test_bootstrap_loads_the_shared_widget_engine_in_local_and_colab_runs():
     assert 'module_name.startswith("common.")' in bootstrap
     assert "?runtime={time.time_ns()}" in bootstrap
     assert '"Pragma": "no-cache"' in bootstrap
+    assert 'module.run_app(**globals().get("RECURSION_TREE_RUN_KWARGS", {}))' in bootstrap
+
+
+def test_methods_notebook_uses_runtime_bootstrap_in_builder_only_mode():
+    notebook = json.loads(METHODS_NOTEBOOK.read_text(encoding="utf-8"))
+    source = "".join(
+        line
+        for cell in notebook["cells"]
+        if cell["cell_type"] == "code"
+        for line in cell["source"]
+    )
+
+    assert 'base / "capitulo5" / "runtime" / "colab_bootstrap.py"' in source
+    assert 'RECURSION_TREE_RUN_KWARGS = {"builder_only": True}' in source
+    assert "main/capitulo5/runtime/colab_bootstrap.py" in source
+    assert 'capitulo5.recursion_tree_animation' not in source
 
 
 def test_playback_buttons_use_kernel_callbacks_instead_of_injected_javascript():

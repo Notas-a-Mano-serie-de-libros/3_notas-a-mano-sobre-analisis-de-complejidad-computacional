@@ -101,4 +101,4 @@ else:
 
 _activate_runtime(runtime_root)
 module = _load(module_path)
-module.run_app()
+module.run_app(**globals().get("RECURSION_TREE_RUN_KWARGS", {}))

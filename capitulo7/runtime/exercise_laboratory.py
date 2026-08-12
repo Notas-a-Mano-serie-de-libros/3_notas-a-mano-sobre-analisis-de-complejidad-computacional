@@ -1,4 +1,4 @@
-"""Motor interactivo común para los ejercicios propuestos de búsquedas y ordenamientos."""
+"""Laboratorio autónomo de los ejercicios propuestos del capítulo 7."""
 from __future__ import annotations
 
 import math
@@ -49,7 +49,8 @@ class ExerciseAlgorithm:
     spatial_measure: object = None
 
 
-def logarithmic_sizes(maximum_n: int, points: int) -> np.ndarray:
+def linear_sizes(maximum_n: int, points: int) -> np.ndarray:
+    """Construye el arreglo solicitado con linspace e incluye sus extremos."""
     maximum_n = max(1, min(10**10, int(maximum_n)))
     points = max(10, min(10_000, int(points)))
     point_count = min(points, maximum_n)
@@ -104,7 +105,7 @@ def _measure(spec: ExerciseAlgorithm, n: int, case: str, analysis: str) -> float
 
 
 def experiment(spec: ExerciseAlgorithm, analysis: str, maximum_n: int, points: int, case: str, progress_callback=None):
-    sizes = logarithmic_sizes(maximum_n, points)
+    sizes = linear_sizes(maximum_n, points)
     model = spec.temporal[case][1] if analysis == "temporal" else spec.spatial[case][1]
     safe = min(PROJECTION_LIMIT, spec.safe_n)
     measured = {}
@@ -121,7 +122,8 @@ def experiment(spec: ExerciseAlgorithm, analysis: str, maximum_n: int, points: i
         except (MemoryError, RecursionError):
             break
     ratios = [measured[i] / max(float(model(int(sizes[i]))), 1e-300) for i in measured]
-    scale = statistics.median(ratios[-3:]) if ratios else 1.0
+    calibration_count = max(3, min(len(ratios), len(ratios) // 10))
+    scale = statistics.median(ratios[-calibration_count:]) if ratios else 1.0
     rows = []
     for index, n in enumerate(sizes):
         theory = float(model(int(n)))
@@ -265,7 +267,7 @@ def run_laboratory(algorithms: dict[str, ExerciseAlgorithm], chapter_title: str)
     points_value = sampling.value
     maximum_state = {"exponent": 5}
     maximum_value = formula_widget(r"10^{5}")
-    maximum_value.layout = widgets.Layout(width="120px", min_width="120px", max_width="120px", height="32px", flex="0 0 120px", border="1px solid #bdbdbd", display="flex", align_items="center", justify_content="center")
+    maximum_value.layout = widgets.Layout(width="120px", min_width="120px", max_width="120px", height="32px", flex="0 0 120px", display="flex", align_items="center", justify_content="center")
     maximum_value.add_class("constant-centered-math")
     arrow_layout = widgets.Layout(width="34px", min_width="34px", height="32px", margin="0")
     maximum_down = widgets.Button(description="◀", tooltip="Potencia anterior", layout=arrow_layout)

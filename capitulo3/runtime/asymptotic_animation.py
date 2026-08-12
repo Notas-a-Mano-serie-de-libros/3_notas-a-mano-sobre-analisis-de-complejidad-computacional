@@ -940,9 +940,15 @@ _BIG_O_HTML = r"""
   }
   function setEditableField(id,value){
     var target=el(id);
+    var serialized=String(value);
     target.dataset.raw=fieldText(value);
-    target.dataset.lastValue=String(value);
-    if(document.activeElement===target)return;
+    if(document.activeElement===target){target.dataset.lastValue=serialized;return;}
+    // draw() también se ejecuta mientras se arrastra n₀. No reemplazar una
+    // fórmula ya compuesta por MathJax cuando el extremo no ha cambiado:
+    // hacerlo dejaría visible el texto literal \(...\) hasta el siguiente
+    // typeset completo.
+    if(target.dataset.lastValue===serialized)return;
+    target.dataset.lastValue=serialized;
     target.innerHTML=tex(valueLatex(value));
   }
   function beginEditableField(id){
