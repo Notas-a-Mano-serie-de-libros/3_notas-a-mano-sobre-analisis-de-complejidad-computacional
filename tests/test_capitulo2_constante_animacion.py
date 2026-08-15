@@ -849,10 +849,10 @@ def test_notebook_polinomial_general_tiene_estructura_teorica_interactiva():
 
     assert [cell["cell_type"] for cell in cells] == ["markdown", "markdown", "code", "markdown", "code"]
     assert headings[0].startswith("# Complejidad polinomial general")
-    assert headings[1] == "## Forma teórica"
-    assert headings[2].startswith("#@title Gráfica del comportamiento teórico")
-    assert headings[3] == "## Simulación teórica interactiva"
-    assert headings[4].startswith("#@title Simulación teórica interactiva")
+    assert headings[1] == "## Simulación teórica interactiva"
+    assert headings[2].startswith("#@title Simulación teórica interactiva")
+    assert headings[3] == "## Detalle teórico"
+    assert headings[4].startswith("#@title Gráfica del comportamiento teórico")
     assert r"C(n)=n^k" in source
     assert r"k\in[0,4]" in source
     assert 'THEORETICAL_GRAPH = "plot_polynomial_family"' in source
@@ -963,9 +963,9 @@ def test_notebooks_generales_no_conservan_celdas_de_imports_antiguas():
         code_cells = ["".join(cell.get("source", [])) for cell in notebook["cells"] if cell["cell_type"] == "code"]
         expected_code_cells = 4 if notebook_name == "2_complejidad_logaritmica.ipynb" else 3
         assert len(code_cells) == expected_code_cells
-        assert code_cells[0].startswith("#@title Gráfica del comportamiento teórico")
-        example_cell_index = 2 if notebook_name == "2_complejidad_logaritmica.ipynb" else 1
-        assert code_cells[example_cell_index].startswith("def ")
+        assert code_cells[0].startswith("def ")
+        assert code_cells[1].startswith("#@title Simulación interactiva")
+        assert code_cells[2].startswith("#@title Gráfica del comportamiento teórico")
         assert all("matplotlib.pyplot" not in cell for cell in code_cells)
         assert all("from scipy" not in cell for cell in code_cells)
         assert all("plt.rcParams" not in cell for cell in code_cells)
@@ -993,19 +993,19 @@ def test_notebooks_generales_siguen_estructura_de_constante():
                 "markdown",
                 "markdown",
                 "code",
+                "markdown",
+                "markdown",
                 "code",
                 "markdown",
                 "code",
-                "markdown",
-                "markdown",
                 "code",
             ]
-            assert headings[1] == "## Forma teórica"
-            assert headings[2].startswith("#@title Gráfica del comportamiento teórico")
-            assert headings[3].startswith("#@title Crecimiento logarítmico hasta")
-            assert headings[4].startswith("## Ejemplo:")
-            assert headings[7] == "## Simulaciones experimentales"
-            assert headings[8].startswith("#@title Simulación interactiva de complejidad temporal y espacial")
+            assert headings[1].startswith("## Algoritmo simulado:")
+            assert headings[4] == "## Simulación"
+            assert headings[5].startswith("#@title Simulación interactiva de complejidad temporal y espacial")
+            assert headings[6] == "## Detalle teórico"
+            assert headings[7].startswith("#@title Gráfica del comportamiento teórico")
+            assert headings[8].startswith("#@title Crecimiento logarítmico hasta")
             continue
 
         assert types == [
@@ -1013,16 +1013,16 @@ def test_notebooks_generales_siguen_estructura_de_constante():
             "markdown",
             "code",
             "markdown",
-            "code",
             "markdown",
+            "code",
             "markdown",
             "code",
         ]
-        assert headings[1] == "## Forma teórica"
-        assert headings[2].startswith("#@title Gráfica del comportamiento teórico")
-        assert headings[3].startswith("## Ejemplo:")
-        assert headings[6] == "## Simulaciones experimentales"
-        assert headings[7].startswith("#@title Simulación interactiva de complejidad temporal y espacial")
+        assert headings[1].startswith("## Algoritmo simulado:")
+        assert headings[4] == "## Simulación"
+        assert headings[5].startswith("#@title Simulación interactiva de complejidad temporal y espacial")
+        assert headings[6] == "## Detalle teórico"
+        assert headings[7].startswith("#@title Gráfica del comportamiento teórico")
 
 
 def test_rango_experimental_conserva_puntos_intermedios_y_potencias():
