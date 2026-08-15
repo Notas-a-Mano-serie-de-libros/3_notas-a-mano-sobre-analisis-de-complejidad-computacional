@@ -68,8 +68,8 @@ PROFILE_CONFIGS = {
     "linear": {
         "function_latex": "n",
         "title": "lineal",
-        "label": "Función de complejidad teórica T(n) = n",
-        "space_label": "Función de complejidad espacial teórica S(n) = n",
+        "label": r"Función de complejidad teórica $T(n)=n$",
+        "space_label": r"Función de complejidad espacial teórica $S(n)=n$",
         "filename": "complejidad_lineal.png",
         "space_filename": "complejidad_lineal_espacial.png",
         "max_safe_elements": 1_000_000,
@@ -81,10 +81,10 @@ PROFILE_CONFIGS = {
         "measure": "linear_search",
     },
     "log_linear": {
-        "function_latex": r"n\log_2(n)",
+        "function_latex": r"n\cdot\log_2(n)",
         "title": "log-lineal",
-        "label": r"Función de complejidad teórica $T(n)=n\log_2(n)$",
-        "space_label": r"Función de complejidad espacial teórica $S(n)=n\log_2(n)$",
+        "label": r"Función de complejidad teórica $T(n)=n\cdot\log_2(n)$",
+        "space_label": r"Función de complejidad espacial teórica $S(n)=n\cdot\log_2(n)$",
         "filename": "complejidad_log_lineal.png",
         "space_filename": "complejidad_log_lineal_espacial.png",
         "max_safe_elements": 20_000,
@@ -98,8 +98,8 @@ PROFILE_CONFIGS = {
     "quadratic": {
         "function_latex": "n^2",
         "title": "cuadrática",
-        "label": "Función de complejidad teórica T(n) = n²",
-        "space_label": "Función de complejidad espacial teórica S(n) = n²",
+        "label": r"Función de complejidad teórica $T(n)=n^2$",
+        "space_label": r"Función de complejidad espacial teórica $S(n)=n^2$",
         "filename": "complejidad_cuadratica.png",
         "space_filename": "complejidad_cuadratica_espacial.png",
         "max_safe_elements": 2_000,
@@ -113,8 +113,8 @@ PROFILE_CONFIGS = {
     "cubic": {
         "function_latex": "n^3",
         "title": "cúbica",
-        "label": "Función de complejidad teórica T(n) = n³",
-        "space_label": "Función de complejidad espacial teórica S(n) = n³",
+        "label": r"Función de complejidad teórica $T(n)=n^3$",
+        "space_label": r"Función de complejidad espacial teórica $S(n)=n^3$",
         "filename": "complejidad_cubica.png",
         "space_filename": "complejidad_cubica_espacial.png",
         "max_safe_elements": 200,
@@ -128,8 +128,8 @@ PROFILE_CONFIGS = {
     "exponential": {
         "function_latex": "2^n",
         "title": "exponencial",
-        "label": "Función de complejidad teórica T(n) = 2ⁿ",
-        "space_label": "Función de complejidad espacial teórica S(n) = 2ⁿ",
+        "label": r"Función de complejidad teórica $T(n)=2^n$",
+        "space_label": r"Función de complejidad espacial teórica $S(n)=2^n$",
         "filename": "complejidad_exponencial.png",
         "space_filename": "complejidad_exponencial_espacial.png",
         "max_safe_elements": 30,
@@ -143,8 +143,8 @@ PROFILE_CONFIGS = {
     "factorial": {
         "function_latex": "n!",
         "title": "factorial",
-        "label": "Función de complejidad teórica T(n) = n!",
-        "space_label": "Función de complejidad espacial teórica S(n) = n!",
+        "label": r"Función de complejidad teórica $T(n)=n!$",
+        "space_label": r"Función de complejidad espacial teórica $S(n)=n!$",
         "filename": "complejidad_factorial.png",
         "space_filename": "complejidad_factorial_espacial.png",
         "max_safe_elements": 10,
@@ -440,7 +440,7 @@ def render_profile_result(config, profile, shape_function, label, filename, size
     style_experiment_axis(
         ax1,
         profile.mode,
-        f"{symbol}(n) teórico vs {symbol}(n) calculado",
+        rf"${symbol}(n)$ teórico vs ${symbol}(n)$ calculado",
     )
     fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)
 
@@ -467,7 +467,7 @@ def render_profile_template(config, profile, label, maximum_n):
     style_experiment_axis(
         ax1,
         profile.mode,
-        f"{symbol}(n) teórico vs {symbol}(n) calculado",
+        rf"${symbol}(n)$ teórico vs ${symbol}(n)$ calculado",
         legend_handles=legend_handles,
     )
     fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)

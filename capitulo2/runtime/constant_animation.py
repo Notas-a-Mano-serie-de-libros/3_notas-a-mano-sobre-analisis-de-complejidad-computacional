@@ -210,7 +210,7 @@ def render_result(sizes, experimental, checkpoint_sizes, checkpoint_times, mode,
         center = average
         padding = max(1.0, abs(center) * 0.15)
         ax1.set_ylim(center - padding, center + padding)
-    style_experiment_axis(ax1, mode, f"{symbol}(n) teórico vs {symbol}(n) calculado")
+    style_experiment_axis(ax1, mode, rf"${symbol}(n)$ teórico vs ${symbol}(n)$ calculado")
     fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)
 
     GRAPHICS_DIR.mkdir(parents=True, exist_ok=True)
@@ -242,7 +242,7 @@ def render_template(maximum_n, mode):
     style_experiment_axis(
         ax1,
         mode,
-        f"{symbol}(n) teórico vs {symbol}(n) calculado",
+        rf"${symbol}(n)$ teórico vs ${symbol}(n)$ calculado",
         legend_handles=legend_handles,
     )
     fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)

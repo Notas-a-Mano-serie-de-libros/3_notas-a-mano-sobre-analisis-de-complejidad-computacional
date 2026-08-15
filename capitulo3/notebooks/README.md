@@ -1,5 +1,22 @@
 # Capítulo 3: Notación asintótica
 
+## Correspondencia con el libro
+
+Este README acompaña el Capítulo 3, páginas 87–130, y conserva la secuencia desde el contexto histórico hasta los ejercicios propuestos.
+
+| Libro | Recurso | Simulación |
+| :---: | :---: | :---: |
+| 3.2 | Representación asintótica general | [Abrir](./notacion_asintotica_representacion_generica.ipynb) |
+| 3.5.1 | Notación $O$ | [Abrir](./1_notacion_big_o.ipynb) |
+| 3.5.2 | Notación $\Omega$ | [Abrir](./3_notacion_big_omega.ipynb) |
+| 3.5.3 | Notación $\Theta$ | [Abrir](./5_notacion_theta.ipynb) |
+| Adicional | Comparación general | [Abrir](./0_comparacion_notaciones_asintoticas.ipynb) |
+| Adicional | Notación little-$o$ | [Abrir](./2_notacion_little_o.ipynb) |
+| Adicional | Notación little-$\omega$ | [Abrir](./4_notacion_little_omega.ipynb) |
+| 3.6 | Ejemplos concretos | [Abrir](./ejemplos_concretos_notaciones.ipynb) |
+
+> **Material adicional del repositorio:** las notaciones estrictas y el comparador de las cinco relaciones amplían el alcance de la exposición impresa. Se incluyen para contrastar cotas no estrictas, estrictas y ajustadas en una misma herramienta.
+
 La notación asintótica es un método matemático que permite analizar el comportamiento de una función cuando sus variables se aproximan a valores límite, típicamente el infinito. En análisis de algoritmos, este lenguaje permite caracterizar el crecimiento de una función de complejidad e identificar el término dominante que gobierna su tendencia.
 
 En el Capítulo 2 estudiamos funciones como $1$, $\log_2(n)$, $n$, $n\log_2(n)$, $n^2$, $n^3$, $n^k$, $2^n$ y $n!$. En este capítulo damos el siguiente paso: aprendemos a comparar esas funciones mediante cotas, límites y familias de crecimiento.
@@ -47,11 +64,11 @@ Al finalizar este capítulo deberías poder:
 ## Mapa del capítulo
 
 | Sección | Tema | Pregunta guía |
-|---|---|---|
+| :---: | :---: | :---: |
 | 3.1 | Contexto histórico | ¿De dónde viene la notación asintótica? |
 | 3.2 | Comportamiento asintótico general | ¿Por qué el término dominante controla el crecimiento? |
 | 3.3 | Familias de funciones | ¿Qué significa agrupar funciones por su comportamiento límite? |
-| 3.4 | Notación asintótica simplificada | ¿Por qué suele escribirse $f(n)=O(g(n))$ aunque formalmente sea pertenencia? |
+| 3.4 | Notación asintótica simplificada | ¿Por qué suele escribirse $f(n)=$O(g(n))$$ aunque formalmente sea pertenencia? |
 | 3.5 | Tipos de notación asintótica | ¿Qué diferencia hay entre $O$, $o$, $\Omega$, $\omega$ y $\Theta$? |
 | 3.6 | Ejercicios | ¿Cómo se aplican las definiciones en casos concretos? |
 
@@ -59,16 +76,16 @@ Al finalizar este capítulo deberías poder:
 
 ## Notebooks interactivos
 
-Usa estos notebooks en paralelo con el libro. En local, los enlaces abren los archivos del repositorio; en remoto, los enlaces de Colab abren la versión ejecutable correspondiente.
+Usa estos notebooks en paralelo con el libro. Cada enlace relativo abre el archivo concreto según el contexto; el propio notebook ofrece su acceso directo a Google Colab.
 
-| Notación | Notebook local | Colab | Qué deberías observar |
-|---|---|---|---|
-| Comparación general | [Abrir local](./0_comparacion_notaciones_asintoticas.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/0_comparacion_notaciones_asintoticas.ipynb) | Cómo cambian la desigualdad, los límites, las constantes y el intervalo solución entre las cinco notaciones. |
-| Big-$O$ | [Abrir local](./1_notacion_big_o.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/1_notacion_big_o.ipynb) | Cuándo $C(n)$ queda por debajo de $c\cdot g(n)$. |
-| little-$o$ | [Abrir local](./2_notacion_little_o.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/2_notacion_little_o.ipynb) | Cuándo $C(n)$ crece estrictamente más lento que $g(n)$. |
-| Big-$\Omega$ | [Abrir local](./3_notacion_big_omega.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/3_notacion_big_omega.ipynb) | Cuándo $C(n)$ queda por encima de $c\cdot g(n)$. |
-| little-$\omega$ | [Abrir local](./4_notacion_little_omega.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/4_notacion_little_omega.ipynb) | Cuándo $C(n)$ crece estrictamente más rápido que $g(n)$. |
-| $\Theta$ | [Abrir local](./5_notacion_theta.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/5_notacion_theta.ipynb) | Cuándo $C(n)$ queda entre $c_1\cdot g(n)$ y $c_2\cdot g(n)$. |
+| Notación | Simulación | Qué deberías observar |
+| :---: | :---: | :---: |
+| Comparación general | [Abrir local](./0_comparacion_notaciones_asintoticas.ipynb) | Cómo cambian la desigualdad, los límites, las constantes y el intervalo solución entre las cinco notaciones. |
+| Big-$O$ | [Abrir local](./1_notacion_big_o.ipynb) | Cuándo $C(n)$ queda por debajo de $c\cdot g(n)$. |
+| little-$o$ | [Abrir local](./2_notacion_little_o.ipynb) | Cuándo $C(n)$ crece estrictamente más lento que $g(n)$. |
+| Big-$\Omega$ | [Abrir local](./3_notacion_big_omega.ipynb) | Cuándo $C(n)$ queda por encima de $c\cdot g(n)$. |
+| little-$\omega$ | [Abrir local](./4_notacion_little_omega.ipynb) | Cuándo $C(n)$ crece estrictamente más rápido que $g(n)$. |
+| $\Theta$ | [Abrir local](./5_notacion_theta.ipynb) | Cuándo $C(n)$ queda entre $c_1\cdot g(n)$ y $c_2\cdot g(n)$. |
 
 ---
 
@@ -284,7 +301,7 @@ Por ejemplo, las funciones $3n+5$, $7n-2$ y $n+\log(n)$ pertenecen a la misma fa
 ### 3.3.3 Propiedades asintóticas de $\mathcal{F}$
 
 | Propiedad | Idea formal | Significado |
-|---|---|---|
+| :---: | :---: | :---: |
 | Invarianza frente a constantes | $c\in\mathbb{R}^{+}\Rightarrow \mathcal{F}(c\cdot g(n))=\mathcal{F}(g(n))$ | Multiplicar por una constante positiva no cambia la familia asintótica. |
 | Aditividad | $\mathcal{F}(f(n))+\mathcal{F}(g(n))\subseteq \mathcal{F}(f(n)+g(n))$ | La suma conserva la lectura por familias de crecimiento. |
 | Multiplicatividad | $\mathcal{F}(f(n))\cdot\mathcal{F}(g(n))\subseteq \mathcal{F}(f(n)\cdot g(n))$ | El producto combina los comportamientos de crecimiento. |
@@ -293,7 +310,7 @@ Por ejemplo, las funciones $3n+5$, $7n-2$ y $n+\log(n)$ pertenecen a la misma fa
 ### 3.3.4 Ejemplos de clasificación en familias
 
 | Función $f(n)$ | Familia asintótica |
-|---|---|
+| :---: | :---: |
 | $f(n)=k$ | $\mathcal{F}(1)$ |
 | $f(n)=3n+5$ | $\mathcal{F}(n)$ |
 | $f(n)=n\log(n)+5n$ | $\mathcal{F}(n\log(n))$ |
@@ -342,7 +359,7 @@ $$
 Las cinco notaciones principales describen relaciones distintas entre $C(n)$ y $g(n)$.
 
 | Notación | Tipo de relación | Lectura |
-|---|---|---|
+| :---: | :---: | :---: |
 | $O(g(n))$ | Cota superior | $C(n)$ crece al mismo ritmo o más lento que $g(n)$. |
 | $o(g(n))$ | Cota superior estricta | $C(n)$ crece estrictamente más lento que $g(n)$. |
 | $\Omega(g(n))$ | Cota inferior | $C(n)$ crece al mismo ritmo o más rápido que $g(n)$. |
@@ -397,7 +414,7 @@ $$
 \forall n\ge A,\qquad C(n)\le c\cdot g(n)
 $$
 
-Notebook: [abrir simulación Big-O](./1_notacion_big_o.ipynb) · [abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/1_notacion_big_o.ipynb)
+Notebook: [abrir simulación Big-O](./1_notacion_big_o.ipynb) · [abrir simulación](./1_notacion_big_o.ipynb)
 
 ---
 
@@ -441,7 +458,7 @@ $$
 \forall n\ge A,\qquad C(n)\le c\cdot g(n)
 $$
 
-Notebook: [abrir simulación little-o](./2_notacion_little_o.ipynb) · [abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/2_notacion_little_o.ipynb)
+Notebook: [abrir simulación little-o](./2_notacion_little_o.ipynb) · [abrir simulación](./2_notacion_little_o.ipynb)
 
 ---
 
@@ -491,7 +508,7 @@ $$
 \forall n\ge A,\qquad C(n)\ge c\cdot g(n)
 $$
 
-Notebook: [abrir simulación Big-Omega](./3_notacion_big_omega.ipynb) · [abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/3_notacion_big_omega.ipynb)
+Notebook: [abrir simulación Big-Omega](./3_notacion_big_omega.ipynb) · [abrir simulación](./3_notacion_big_omega.ipynb)
 
 ---
 
@@ -535,7 +552,7 @@ $$
 \forall n\ge A,\qquad C(n)\ge c\cdot g(n)
 $$
 
-Notebook: [abrir simulación little-omega](./4_notacion_little_omega.ipynb) · [abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/4_notacion_little_omega.ipynb)
+Notebook: [abrir simulación little-omega](./4_notacion_little_omega.ipynb) · [abrir simulación](./4_notacion_little_omega.ipynb)
 
 ---
 
@@ -595,14 +612,14 @@ $$
 \forall n\ge A,\qquad c_1\cdot g(n)\le C(n)\le c_2\cdot g(n)
 $$
 
-Notebook: [abrir simulación Theta](./5_notacion_theta.ipynb) · [abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/5_notacion_theta.ipynb)
+Notebook: [abrir simulación Theta](./5_notacion_theta.ipynb) · [abrir simulación](./5_notacion_theta.ipynb)
 
 ---
 
 ## 3.5.6 Resumen de propiedades
 
 | Notación | Límite del cociente | Desigualdad eventual | Lectura |
-|---|---|---|---|
+| :---: | :---: | :---: | :---: |
 | $O(g(n))$ | $\limsup\frac{C(n)}{g(n)}\text{ es finito}$ | $C(n)\le c\cdot g(n)$ | Cota superior. |
 | $o(g(n))$ | $\lim\frac{C(n)}{g(n)}=0$ | $C(n)\le c\cdot g(n)$ para todo $c\in\mathbb{R}^{+}$ | Cota superior estricta. |
 | $\Omega(g(n))$ | $\liminf\frac{C(n)}{g(n)}\text{ es positivo}$ | $C(n)\ge c\cdot g(n)$ | Cota inferior. |
@@ -616,7 +633,7 @@ Notebook: [abrir simulación Theta](./5_notacion_theta.ipynb) · [abrir en Colab
 Las simulaciones del capítulo comparten una misma estructura para que puedas comparar las notaciones sin aprender una interfaz distinta en cada notebook.
 
 | Control | Significado |
-|---|---|
+| :---: | :---: |
 | $C(n)$ | Función de complejidad de interés. |
 | $g(n)$ | Función de referencia contra la que se compara $C(n)$. |
 | $a$ y $b$ | Intervalo visible de la gráfica. |
@@ -694,8 +711,8 @@ La razón es que el cociente no tiende a $0$ ni a $\infty$; tiende a una constan
 
 Los ejemplos concretos del libro se conservaron como material de referencia para reutilización futura:
 
-| Recurso | Local |
-|---|---|
+| Recurso | Simulación |
+| :---: | :---: |
 | Ejemplos concretos de notaciones | [Abrir](./ejemplos_concretos_notaciones.ipynb) |
 | Representación genérica de la notación asintótica | [Abrir](./notacion_asintotica_representacion_generica.ipynb) |
 
@@ -717,8 +734,8 @@ Los ejemplos concretos del libro se conservaron como material de referencia para
 ## Errores comunes
 
 | Error | Por qué ocurre | Cómo evitarlo |
-|---|---|---|
-| Leer $O(g(n))$ como igualdad exacta | $O(g(n))$ representa una familia de funciones, no una función individual. | Usa la lectura $C(n)\in O(g(n))$. |
+| :---: | :---: | :---: |
+| Leer $O(g(n))$ como igualdad exacta | $O(g(n))$ representa una familia de funciones, no una función individual. | Usa la lectura $C(n)\in $O(g(n))$$. |
 | Olvidar el papel de $n_0$ | La desigualdad no tiene que cumplirse para valores pequeños de $n$. | Busca desde qué punto se vuelve estable. |
 | Confundir Big-$O$ con $\Theta$ | Una cota superior puede ser correcta pero poco ajustada. | Verifica también si existe cota inferior. |
 | Usar little-$o$ como si fuera Big-$O$ | little-$o$ exige crecimiento estrictamente más lento. | Revisa si el cociente tiende a $0$. |

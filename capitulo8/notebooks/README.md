@@ -2,6 +2,24 @@
   <strong>Capítulo 8: Análisis de algoritmos de ordenamiento clásicos</strong>
 </h1>
 
+## Correspondencia con el libro
+
+Este README sigue el Capítulo 8, páginas 313–366. Los seis algoritmos impresos tienen un notebook propio. Shell Sort, el comparador y el laboratorio de ejercicios se presentan como ampliaciones.
+
+| Libro | Recurso | Simulación |
+| :---: | :---: | :---: |
+| 8.2 | Ordenamiento burbuja | [Abrir](./1_ordenamiento_burbuja.ipynb) |
+| 8.3 | Ordenamiento por selección | [Abrir](./2_ordenamiento_seleccion.ipynb) |
+| 8.4 | Ordenamiento por inserción | [Abrir](./3_ordenamiento_insercion.ipynb) |
+| 8.5 | Ordenamiento por mezcla | [Abrir](./5_ordenamiento_mezcla.ipynb) |
+| 8.6 | Ordenamiento rápido | [Abrir](./6_ordenamiento_rapido.ipynb) |
+| 8.7 | Ordenamiento Radix | [Abrir](./7_ordenamiento_radix.ipynb) |
+| Adicional | Shell Sort | [Abrir](./4_ordenamiento_shell.ipynb) |
+| Adicional | Comparación de ordenamientos | [Abrir](./0_comparacion_ordenamientos.ipynb) |
+| 8.9 | Ejercicios propuestos | [Abrir](./ejercicios_propuestos.ipynb) |
+
+> **Material adicional del repositorio:** Shell Sort, las comparaciones experimentales, las proyecciones y las soluciones amplían el contenido publicado sin alterar la secuencia del capítulo.
+
 ---
 
 <h2>🧭 Contenido del capítulo</h2>
@@ -10,35 +28,46 @@
   <li><a href="#8-1">8.1 Consideraciones previas</a></li>
   <li><a href="#8-2">8.2 Ordenamiento burbuja</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/1_ordenamiento_burbuja.ipynb">Animación interactiva – Ordenamiento burbuja</a></li>
+      <li>🎬 <a href="./1_ordenamiento_burbuja.ipynb">Animación interactiva – Ordenamiento burbuja</a></li>
     </ul>
   </li>
   <li><a href="#8-3">8.3 Ordenamiento por selección</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/2_ordenamiento_seleccion.ipynb">Animación interactiva – Ordenamiento por selección</a></li>
+      <li>🎬 <a href="./2_ordenamiento_seleccion.ipynb">Animación interactiva – Ordenamiento por selección</a></li>
     </ul>
   </li>
   <li><a href="#8-4">8.4 Ordenamiento por inserción</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/3_ordenamiento_insercion.ipynb">Animación interactiva – Ordenamiento por inserción</a></li>
+      <li>🎬 <a href="./3_ordenamiento_insercion.ipynb">Animación interactiva – Ordenamiento por inserción</a></li>
     </ul>
   </li>
   <li><a href="#8-5">8.5 Ordenamiento por mezcla</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb">Animación interactiva – Ordenamiento por mezcla</a></li>
+      <li>🎬 <a href="./5_ordenamiento_mezcla.ipynb">Animación interactiva – Ordenamiento por mezcla</a></li>
     </ul>
   </li>
   <li><a href="#8-6">8.6 Ordenamiento rápido</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/6_ordenamiento_rapido.ipynb">Animación interactiva – Ordenamiento rápido</a></li>
+      <li>🎬 <a href="./6_ordenamiento_rapido.ipynb">Animación interactiva – Ordenamiento rápido</a></li>
+    </ul>
+  </li>
+  <li><a href="#8-7">8.7 Ordenamiento radix</a>
+    <ul>
+      <li>🎬 <a href="./7_ordenamiento_radix.ipynb">Animación interactiva – Ordenamiento radix</a></li>
+    </ul>
+  </li>
+  <li><a href="#8-shell">Material adicional: Shell Sort</a>
+    <ul>
+      <li>🎬 <a href="./4_ordenamiento_shell.ipynb">Animación interactiva – Shell Sort</a></li>
     </ul>
   </li>
   <li><a href="#8-comp">📊 Comparación de todos los algoritmos</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/0_comparacion_ordenamientos.ipynb">Comparación interactiva – Todos los algoritmos</a></li>
+      <li>🎬 <a href="./0_comparacion_ordenamientos.ipynb">Comparación interactiva – Todos los algoritmos</a></li>
     </ul>
   </li>
-  <li><a href="#8-7">8.7 Consideraciones finales</a></li>
+  <li><a href="#8-8">8.8 Consideraciones finales</a></li>
+  <li><a href="#8-9">8.9 Ejercicios propuestos</a></li>
 </ul>
 
 ---
@@ -50,7 +79,7 @@ Este capítulo aplica las herramientas desarrolladas en los capítulos anteriore
 </p>
 
 <p align="justify">
-El capítulo estudia cinco algoritmos: tres <b>cuadráticos</b> (burbuja, selección, inserción) apropiados para conjuntos pequeños por su simplicidad de implementación, y dos <b>logarítmicos</b> (mezcla y rápido) que escalan eficientemente a grandes volúmenes de datos.
+El libro estudia seis algoritmos: tres de comportamiento cuadrático en sus casos promedio o peor (burbuja, selección e inserción), dos de comportamiento log-lineal en sus casos habituales (mezcla y rápido) y Radix, cuyo costo depende de la cantidad de elementos y dígitos procesados. El repositorio añade Shell Sort como ampliación.
 </p>
 
 <p align="justify">
@@ -62,7 +91,7 @@ Las animaciones utilizan dos modos de visualización intercambiables: representa
 <h2 id="8-2">🫧 8.2 Ordenamiento burbuja</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/1_ordenamiento_burbuja.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./1_ordenamiento_burbuja.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -77,70 +106,29 @@ Se implementan dos ciclos anidados: el externo controla el número de pasadas (d
 <h3>Análisis de complejidad</h3>
 
 <p align="justify">
-El número de comparaciones en la pasada <i>i</i>-ésima es <code>n−1−i</code>. Sumando para todas las pasadas: <code>Σᵢ₌₀ⁿ⁻² (n−1−i) = n(n−1)/2</code>.
+El número de comparaciones en la pasada <i>i</i>-ésima es <code>n−1−i</code>. Sumando para todas las pasadas: $Σᵢ₌₀^n⁻^2 (n-1-i) = n(n-1)/2$.
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mejor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Arreglo ya ordenado (con optimización de bandera)</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Caso promedio</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n²)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">n²/2 comparaciones en promedio</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Peor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(n²)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Arreglo ordenado en orden inverso: n(n−1)/2 comparaciones</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Mejor caso** | $\Omega(n)$ | $\Omega(1)$ | Arreglo ya ordenado (con optimización de bandera) |
+| **Caso promedio** | $\Theta(n^2)$ | $\Theta(1)$ | $\frac{n^2}{2}$ comparaciones en promedio |
+| **Peor caso** | $O(n^2)$ | $O(1)$ | Arreglo ordenado en orden inverso: $\frac{n(n-1)}{2}$ comparaciones |
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Implementación simple y comprensible</td>
-      <td style="padding:8px; border:1px solid #ccc;">Ineficiente para arreglos grandes</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Ordenamiento <i>in-place</i> (O(1) espacio adicional)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Alto número de intercambios comparado con otros métodos cuadráticos</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Estable: preserva el orden relativo de elementos iguales</td>
-      <td style="padding:8px; border:1px solid #ccc;">Desempeño consistentemente pobre en datos desordenados</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Implementación simple y comprensible | Ineficiente para arreglos grandes |
+| Ordenamiento <i>in-place</i> ($O(1)$ espacio adicional) | Alto número de intercambios comparado con otros métodos cuadráticos |
+| Estable: preserva el orden relativo de elementos iguales | Desempeño consistentemente pobre en datos desordenados |
 
 ---
 
 <h2 id="8-3">🎯 8.3 Ordenamiento por selección</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/2_ordenamiento_seleccion.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./2_ordenamiento_seleccion.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -153,51 +141,23 @@ El <b>ordenamiento por selección</b> divide el arreglo en dos partes: la porci�
 El número de comparaciones es siempre <code>n(n−1)/2</code> independientemente del estado inicial del arreglo, porque siempre debe recorrer toda la porción no ordenada para encontrar el mínimo. El número de intercambios es a lo sumo <i>n−1</i>.
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Todos los casos</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n²)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">n(n−1)/2 comparaciones en cualquier escenario; la disposición inicial no afecta el costo</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Todos los casos** | $\Theta(n^2)$ | $\Theta(1)$ | $\frac{n(n-1)}{2}$ comparaciones en cualquier escenario; la disposición inicial no afecta el costo |
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Número mínimo de intercambios: a lo sumo n−1</td>
-      <td style="padding:8px; border:1px solid #ccc;">Costo siempre cuadrático, no mejora con datos casi ordenados</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Útil cuando el costo de los intercambios supera al de las comparaciones</td>
-      <td style="padding:8px; border:1px solid #ccc;">No es estable en la implementación estándar</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Número mínimo de intercambios: a lo sumo n−1 | Costo siempre cuadrático, no mejora con datos casi ordenados |
+| Útil cuando el costo de los intercambios supera al de las comparaciones | No es estable en la implementación estándar |
 
 ---
 
 <h2 id="8-4">🃏 8.4 Ordenamiento por inserción</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/3_ordenamiento_insercion.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./3_ordenamiento_insercion.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -207,70 +167,29 @@ El <b>ordenamiento por inserción</b> construye el arreglo ordenado de izquierda
 <h3>Análisis de complejidad</h3>
 
 <p align="justify">
-En el mejor caso (arreglo ya ordenado), cada elemento solo requiere una comparación: <code>T(n) ∈ Ω(n)</code>. En el caso promedio, el elemento se inserta en la posición media de la porción ordenada, dando <code>n²/4</code> comparaciones. En el peor caso (orden inverso), cada elemento se mueve hasta el inicio: <code>n(n−1)/2</code> comparaciones.
+En el mejor caso (arreglo ya ordenado), cada elemento solo requiere una comparación: $T(n)\in\Omega(n)$. En el caso promedio, el elemento se inserta en la posición media de la porción ordenada, dando $n^2/4$ comparaciones. En el peor caso (orden inverso), cada elemento se mueve hasta el inicio: $n(n-1)/2$ comparaciones.
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mejor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Arreglo ya ordenado: solo n−1 comparaciones</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Caso promedio</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n²)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">n²/4 comparaciones en promedio</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Peor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(n²)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Arreglo en orden inverso: n(n−1)/2 comparaciones</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Mejor caso** | $\Omega(n)$ | $\Omega(1)$ | Arreglo ya ordenado: solo $n-1$ comparaciones |
+| **Caso promedio** | $\Theta(n^2)$ | $\Theta(1)$ | $\frac{n^2}{4}$ comparaciones en promedio |
+| **Peor caso** | $O(n^2)$ | $O(1)$ | Arreglo en orden inverso: $\frac{n(n-1)}{2}$ comparaciones |
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Eficiente para arreglos pequeños y casi ordenados</td>
-      <td style="padding:8px; border:1px solid #ccc;">Cuadrático en el caso general</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Estable y <i>in-place</i></td>
-      <td style="padding:8px; border:1px solid #ccc;">Muchos desplazamientos en el peor caso</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Útil como paso final en algoritmos híbridos (ej. Timsort)</td>
-      <td style="padding:8px; border:1px solid #ccc;">No escala bien para n grande</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Eficiente para arreglos pequeños y casi ordenados | Cuadrático en el caso general |
+| Estable y <i>in-place</i> | Muchos desplazamientos en el peor caso |
+| Útil como paso final en algoritmos híbridos (ej. Timsort) | No escala bien para n grande |
 
 ---
 
 <h2 id="8-5">🔀 8.5 Ordenamiento por mezcla</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./5_ordenamiento_mezcla.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -278,64 +197,38 @@ El <b>ordenamiento por mezcla</b> (merge sort) es un algoritmo <b>divide y vence
 </p>
 
 <h3>Relación de recurrencia</h3>
-<pre><code>T(n) = { 1             si n ≤ 1
-        { 2T(n/2) + n   si n &gt; 1</code></pre>
+$$
+T(n)=
+\begin{cases}
+1, & \text{si } n\le 1,\\
+2T(n/2)+n, & \text{si } n>1.
+\end{cases}
+$$
 
 <p align="justify">
-Aplicando el <b>teorema maestro básico</b> con <code>a=2, b=2, f(n)∈O(n¹)</code> → <code>a = bᵏ</code> (Caso 2) → <code>T(n) ∈ Θ(n·log₂(n))</code>.
+Aplicando el <b>teorema maestro básico</b> con $a=2$, $b=2$ y $f(n)\in O(n)$, se cumple $a=b^k$ (Caso 2); por tanto, $T(n)\in\Theta(n\log_2 n)$.
 </p>
 
 <h3>Análisis de complejidad</h3>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Todos los casos</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n·log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">La división y mezcla ocurren siempre en el mismo número de pasos, independientemente de los datos</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Todos los casos** | $\Theta(n\,\log_2 (n))$ | $\Theta(n)$ | La división y mezcla ocurren siempre en el mismo número de pasos, independientemente de los datos |
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Complejidad Θ(n log n) garantizada en todos los casos</td>
-      <td style="padding:8px; border:1px solid #ccc;">Requiere O(n) de memoria adicional para la fase de mezcla</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Estable: preserva el orden relativo de elementos iguales</td>
-      <td style="padding:8px; border:1px solid #ccc;">No es <i>in-place</i> en la implementación estándar</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Paralelizable: las dos mitades se pueden ordenar de forma independiente</td>
-      <td style="padding:8px; border:1px solid #ccc;">Mayor constante multiplicativa que quicksort en la práctica</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Complejidad $\Theta(n\log n)$ garantizada en todos los casos | Requiere $O(n)$ de memoria adicional para la fase de mezcla |
+| Estable: preserva el orden relativo de elementos iguales | No es <i>in-place</i> en la implementación estándar |
+| Paralelizable: las dos mitades se pueden ordenar de forma independiente | Mayor constante multiplicativa que quicksort en la práctica |
 
 ---
 
 <h2 id="8-6">⚡ 8.6 Ordenamiento rápido</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/6_ordenamiento_rapido.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./6_ordenamiento_rapido.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -353,141 +246,84 @@ El <b>ordenamiento rápido</b> (quicksort) es otro algoritmo divide y vencerás.
 
 <h3>Análisis de complejidad</h3>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mejor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(n·log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El pivote siempre divide el arreglo en dos mitades iguales: T(n)=2T(n/2)+n</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Caso promedio</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n·log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El pivote produce particiones razonablemente balanceadas en promedio</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Peor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(n²)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El pivote es siempre el mínimo o el máximo: T(n)=T(n−1)+n (arreglo ordenado con pivote en extremo)</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Mejor caso** | $\Omega(n\,\log_2 n)$ | $\Omega(\log_2 n)$ | El pivote siempre divide el arreglo en dos mitades iguales: $T(n)=2T(n/2)+n$ |
+| **Caso promedio** | $\Theta(n\,\log_2 (n))$ | $\Theta(\log_2 (n))$ | El pivote produce particiones razonablemente balanceadas en promedio |
+| **Peor caso** | $O(n^2)$ | $O(n)$ | El pivote es siempre el mínimo o el máximo: $T(n)=T(n-1)+n$ (arreglo ordenado con pivote en extremo) |
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Muy eficiente en la práctica: constante multiplicativa pequeña</td>
-      <td style="padding:8px; border:1px solid #ccc;">Peor caso O(n²) si el pivote es siempre el extremo</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Ordenamiento <i>in-place</i> (O(log n) espacio de pila)</td>
-      <td style="padding:8px; border:1px solid #ccc;">No es estable en la implementación estándar</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Altamente optimizable: pivote aleatorio elimina el peor caso en la práctica</td>
-      <td style="padding:8px; border:1px solid #ccc;">Su análisis es más complejo que el del ordenamiento por mezcla</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Muy eficiente en la práctica: constante multiplicativa pequeña | Peor caso $O(n^2)$ si el pivote es siempre el extremo |
+| Ordenamiento <i>in-place</i> ($O(\log n)$ espacio de pila) | No es estable en la implementación estándar |
+| Altamente optimizable: pivote aleatorio elimina el peor caso en la práctica | Su análisis es más complejo que el del ordenamiento por mezcla |
 
 ---
 
-<h2 id="8-comp">📊 Comparación de todos los algoritmos</h2>
+<h2 id="8-7">🔢 8.7 Ordenamiento radix</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/0_comparacion_ordenamientos.ipynb"><b>Abrir comparación interactiva en Google Colab</b></a>
+  🎬 <a href="./7_ordenamiento_radix.ipynb"><b>Abrir simulación</b></a>
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Algoritmo</th>
-      <th style="padding:8px; border:1px solid #ccc;">Mejor caso T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Caso promedio T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Peor caso T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Estable</th>
-      <th style="padding:8px; border:1px solid #ccc;">In-place</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Burbuja</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ω(n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(n²)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(n²)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Selección</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(n²)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(n²)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(n²)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">No</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Inserción</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ω(n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(n²)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(n²)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mezcla</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(n·log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(n·log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(n·log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-      <td style="padding:8px; border:1px solid #ccc;">No</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Rápido</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ω(n·log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(n·log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(n²)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">No</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-    </tr>
-  </tbody>
-</table>
+<p align="justify">
+El <b>ordenamiento radix</b> procesa las claves por posiciones, normalmente desde el dígito menos significativo hasta el más significativo. En cada pasada agrupa los elementos de acuerdo con el dígito actual y conserva su orden relativo. Si se procesan <i>k</i> dígitos de <i>n</i> elementos, su costo se expresa como $\Theta(nk)$ bajo una base fija.
+</p>
+
+<p align="justify">
+No es un algoritmo de comparación: su eficiencia depende de la representación y del rango de las claves. La implementación del notebook trabaja con enteros no negativos y permite observar cada distribución y recolección de cubetas.
+</p>
 
 ---
 
-<h2 id="8-7">💡 8.7 Consideraciones finales</h2>
+<h2 id="8-shell">➕ Material adicional: Shell Sort</h2>
+
+<p align="justify"><b>Esta sección amplía el libro.</b> Shell Sort generaliza el ordenamiento por inserción comparando primero elementos separados por una distancia o <i>gap</i>. Su rendimiento depende de la secuencia de saltos elegida; por ello no debe asignársele una única complejidad ajustada sin indicar esa secuencia.</p>
+
+<p align="center">
+  🎬 <a href="./4_ordenamiento_shell.ipynb"><b>Abrir simulación</b></a>
+</p>
+
+---
+
+<h2 id="8-comp">📊 Material adicional: comparación de todos los algoritmos</h2>
+
+<p align="center">
+  🎬 <a href="./0_comparacion_ordenamientos.ipynb"><b>Abrir simulación</b></a>
+</p>
+
+| Algoritmo | Mejor caso $T(n)$ | Caso promedio $T(n)$ | Peor caso $T(n)$ | $S(n)$ | Estable | In-place |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Burbuja** | $\Omega(n)$ | $\Theta(n^2)$ | $O(n^2)$ | $O(1)$ | Sí | Sí |
+| **Selección** | $\Theta(n^2)$ | $\Theta(n^2)$ | $O(n^2)$ | $O(1)$ | No | Sí |
+| **Inserción** | $\Omega(n)$ | $\Theta(n^2)$ | $O(n^2)$ | $O(1)$ | Sí | Sí |
+| **Mezcla** | $\Theta(n\,\log_2 n)$ | $\Theta(n\,\log_2 n)$ | $O(n\,\log_2 n)$ | $O(n)$ | Sí | No |
+| **Rápido** | $\Omega(n\,\log_2 n)$ | $\Theta(n\,\log_2 n)$ | $O(n^2)$ | $O(\log_2 n)$ | No | Sí |
+| **Radix** | $\Theta(nk)$ | $\Theta(nk)$ | $\Theta(nk)$ | $\Theta(n + r)$ | Sí | No |
+
+<p><small>En Radix, <i>k</i> es la cantidad de dígitos procesados y <i>r</i> es la base o cantidad de cubetas.</small></p>
+
+---
+
+<h2 id="8-8">💡 8.8 Consideraciones finales</h2>
 
 <p align="justify">
 La elección del algoritmo de ordenamiento depende del contexto de uso. Los algoritmos cuadráticos (burbuja, selección, inserción) son apropiados para conjuntos pequeños y situaciones donde la simplicidad de implementación prima sobre la eficiencia. El ordenamiento por inserción, en particular, es el más eficiente de los tres para arreglos casi ordenados y es utilizado en la fase final de algoritmos híbridos como Timsort.
 </p>
 
 <p align="justify">
-Para conjuntos grandes, los algoritmos logarítmicos son imprescindibles. El ordenamiento por mezcla garantiza <code>Θ(n log n)</code> en todos los casos y es estable, al costo de memoria adicional lineal. El ordenamiento rápido es en la práctica el más veloz por su pequeña constante multiplicativa y su naturaleza <i>in-place</i>, aunque requiere una estrategia de selección de pivote adecuada para evitar el peor caso cuadrático.
+Para conjuntos grandes, los algoritmos log-lineales suelen ser preferibles. El ordenamiento por mezcla garantiza $\Theta(n\log n)$ en todos los casos y es estable, al costo de memoria adicional lineal. El ordenamiento rápido tiene un comportamiento promedio $\Theta(n\log n)$ y buena localidad de memoria, aunque requiere una estrategia de selección de pivote adecuada para evitar el peor caso cuadrático. Radix puede resultar competitivo cuando las claves admiten procesamiento por dígitos y su representación satisface las condiciones del algoritmo.
 </p>
+
+---
+
+<h2 id="8-9">📚 8.9 Ejercicios propuestos</h2>
+
+<p>El libro propone implementar los algoritmos del capítulo, medir mejor caso, caso promedio y peor caso, y comparar los resultados experimentales con sus funciones analíticas. También presenta ejercicios opcionales sobre aplicaciones, algoritmos avanzados, distribución inicial de los datos y matrices.</p>
+
+<p>El notebook <a href="./ejercicios_propuestos.ipynb"><code>ejercicios_propuestos.ipynb</code></a> desarrolla las actividades mediante mediciones y proyecciones claramente diferenciadas. Las explicaciones de aplicaciones, Heap Sort, Counting Sort, Radix Sort y distribución de entrada se identifican como <b>soluciones y material adicional</b>.</p>
 
 ---
 

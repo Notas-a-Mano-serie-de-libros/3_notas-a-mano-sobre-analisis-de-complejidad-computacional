@@ -1,5 +1,17 @@
 # Capítulo 5: Relaciones de recurrencia y análisis de complejidad
 
+## Correspondencia con el libro
+
+Este README sigue el Capítulo 5, páginas 177–218. Los laboratorios reproducen los métodos de la sección 5.4 y añaden controles para construir nuevas recurrencias.
+
+| Libro | Recurso | Simulación |
+| :---: | :---: | :---: |
+| 5.1–5.4.3 | Árboles de recurrencia | [Abrir](./0_arboles_recursion.ipynb) |
+| 5.4.2–5.4.5 | Métodos de solución | [Abrir](./1_metodos_solucion_relaciones_recurrencia.ipynb) |
+| 5.5.1 | Ejercicios propuestos | [Abrir PDF](./ejercicios_propuestos.pdf) |
+
+> **Material adicional del repositorio:** los constructores permiten modificar coeficientes, factores, costos externos y casos base más allá de los ejemplos desarrollados en la obra.
+
 Este capítulo estudia cómo describir y resolver el costo de los algoritmos recursivos. Una relación de recurrencia expresa $C(n)$ mediante el costo de uno o varios subproblemas más pequeños y el trabajo adicional $f(n)$ realizado fuera de las llamadas recursivas.
 
 La pregunta central es:
@@ -48,24 +60,24 @@ Al finalizar este capítulo deberías poder:
 ## Mapa del capítulo
 
 | Sección | Tema | Pregunta guía |
-|---|---|---|
+| :---: | :---: | :---: |
 | 5.1 | Relaciones de recurrencia | ¿Cómo se define una sucesión o un costo mediante valores anteriores? |
 | 5.2 | Clasificación | ¿Qué propiedades determinan el método de solución? |
 | 5.3 | Recurrencias en algoritmos | ¿Cómo se representan las llamadas y el trabajo externo? |
 | 5.4 | Métodos de solución | ¿Qué método es compatible con cada estructura? |
-| 5.5 | Comparación de métodos | ¿Qué resultado produce cada método y cuáles son sus límites? |
-| 5.6 | Ejercicios propuestos | ¿Cómo se aplican los métodos a nuevas relaciones? |
+| 5.5 | Consideraciones finales | ¿Qué método conviene según la estructura de la recurrencia? |
+| 5.5.1 | Ejercicios propuestos | ¿Cómo se aplican los métodos a nuevas relaciones? |
 
 ---
 
 ## Notebooks interactivos
 
-Los enlaces locales abren los archivos del repositorio. Los enlaces de Colab abren sus versiones ejecutables en línea.
+Cada enlace abre el notebook concreto según el contexto del README. Dentro del notebook se ofrece el acceso directo a Google Colab.
 
-| Notebook | Propósito | Local | Colab |
-|---|---|:---:|:---:|
-| Árboles de recurrencia | Construir una relación, recorrer sus niveles y observar el costo de los nodos. | [Abrir](./0_arboles_recursion.ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo5/notebooks/0_arboles_recursion.ipynb) |
-| Métodos de solución | Aplicar sustitución iterativa, árbol de recurrencia, teorema maestro o ecuación característica. | [Abrir](./1_metodos_solucion_relaciones_recurrencia.ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo5/notebooks/1_metodos_solucion_relaciones_recurrencia.ipynb) |
+| Notebook | Propósito | Simulación |
+| :---: | :---: | :---: |
+| Árboles de recurrencia | Construir una relación, recorrer sus niveles y observar el costo de los nodos. | [Abrir](./0_arboles_recursion.ipynb) |
+| Métodos de solución | Aplicar sustitución iterativa, árbol de recurrencia, teorema maestro o ecuación característica. | [Abrir](./1_metodos_solucion_relaciones_recurrencia.ipynb) |
 
 ### Controles principales
 
@@ -145,7 +157,7 @@ Cuando los coeficientes $a_i$ no dependen de $n$, la relación tiene coeficiente
 La estructura de una recurrencia depende de la transformación aplicada al tamaño de entrada.
 
 | Tipo | Forma | Interpretación | Ejemplo típico |
-|---|---|---|---|
+| :---: | :---: | :---: | :---: |
 | Reducción | $C(n)=\sum_{i=1}^{m}a_iC(n-b_i)+f(n)$ | Cada llamada resta una cantidad fija al tamaño. | Fibonacci y recurrencias lineales |
 | División | $C(n)=aC(n/b)+f(n)$ | Cada llamada divide el tamaño por un factor constante. | Búsqueda binaria y merge sort |
 | División con factores distintos | $C(n)=\sum_{i=1}^{m}a_iC(b_i n)+f(n)$, con $0<b_i<1$ | Los términos generan subproblemas de tamaños diferentes. | Divide y vencerás no uniforme |
@@ -212,7 +224,7 @@ C(n)=aC(n/b)+\Theta(n^k)
 $$
 
 | Comparación | Interpretación | Resultado |
-|---|---|---|
+| :---: | :---: | :---: |
 | $a>b^k$ | Domina la recursión. | $\Theta(n^{\log_b(a)})$ |
 | $a=b^k$ | Ambos costos tienen el mismo orden. | $\Theta(n^k\log_b(n))$ |
 | $a<b^k$ | Domina el costo externo. | $\Theta(n^k)$, bajo la condición de regularidad correspondiente |
@@ -279,7 +291,7 @@ La simulación admite varios retardos enteros $b_i$ y verifica la solución obte
 ## 5.5 Cómo elegir el método
 
 | Método | Relación compatible | Cantidad de términos | Resultado principal |
-|---|---|:---:|---|
+| :---: | :---: | :---: | :---: |
 | Sustitución iterativa | Reducción o división con patrón analítico | $m=1$ | Expansión y, cuando existe, expresión cerrada |
 | Árbol de recurrencia | Reducción o división uniforme | $m=1$ | Costo por nivel, suma total y orden asintótico |
 | Maestro básico | División con costo polinómico | $m=1$ | Orden asintótico |
@@ -319,7 +331,7 @@ Las bases constantes mayores que uno difieren por un factor constante. Por ello 
 
 ---
 
-## 5.6 Ejercicios propuestos
+## 5.5.1 Ejercicios propuestos
 
 Los ejercicios permiten practicar:
 
@@ -330,7 +342,7 @@ Los ejercicios permiten practicar:
 - resolución mediante ecuaciones características;
 - verificación de expresiones exactas y asintóticas.
 
-[Abrir los ejercicios propuestos en el visor en línea](https://docs.google.com/gview?embedded=true&url=https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/capitulo5/ejercicios_propuestos.pdf)
+[Abrir los ejercicios propuestos en el visor en línea](https://docs.google.com/gview?embedded=true&url=https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/capitulo5/notebooks/ejercicios_propuestos.pdf)
 
 [Descargar el PDF desde el repositorio](./ejercicios_propuestos.pdf)
 
@@ -341,7 +353,7 @@ Los ejercicios permiten practicar:
 ```latex
 \newcommand{\colabArbolesRecursion}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo5/notebooks/0_arboles_recursion.ipynb}
 \newcommand{\colabMetodosSolucionRecurrencias}{https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo5/notebooks/1_metodos_solucion_relaciones_recurrencia.ipynb}
-\newcommand{\visorEjerciciosCapituloCinco}{https://docs.google.com/gview?embedded=true\&url=https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/capitulo5/ejercicios_propuestos.pdf}
+\newcommand{\visorEjerciciosCapituloCinco}{https://docs.google.com/gview?embedded=true\&url=https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main/capitulo5/notebooks/ejercicios_propuestos.pdf}
 ```
 
 ---

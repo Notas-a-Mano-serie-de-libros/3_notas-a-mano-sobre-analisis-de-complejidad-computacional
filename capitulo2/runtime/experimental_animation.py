@@ -589,7 +589,6 @@ def run_app(profile, display_app=True, mode_selector=None):
         figure_output.value = figure_frame_html(
             figure_html, profile.figure_width, profile.figure_aspect_ratio,
         )
-
     def release_experiment():
         execution_state["reset_requested"] = False
         execution_state["task"] = None

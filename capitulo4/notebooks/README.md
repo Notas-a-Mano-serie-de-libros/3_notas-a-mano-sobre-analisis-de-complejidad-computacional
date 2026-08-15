@@ -1,5 +1,21 @@
 # Capítulo 4: Análisis de algoritmos estructurados
 
+## Correspondencia con el libro
+
+Este README acompaña el Capítulo 4, páginas 131–176. La numeración de los notebooks conserva el número de los ejemplos del libro, incluso cuando la secuencia disponible no es consecutiva.
+
+| Libro | Recurso | Simulación |
+| :---: | :---: | :---: |
+| 4.4.4, ejemplo 1 | Sumar dos números | [Abrir](./ejemplo1_(sumar_numeros).ipynb) |
+| 4.4.4, ejemplo 2 | Recorrer un arreglo | [Abrir](./ejemplo2_(imprimir_elementos_arreglo).ipynb) |
+| 4.4.4, ejemplo 3 | Recorrer una matriz | [Abrir](./ejemplo3_(imprimir_elementos_matriz).ipynb) |
+| 4.4.4, ejemplo 4 | Inicializar una matriz variable | [Abrir](./ejemplo4_(inicializar_matriz_variable).ipynb) |
+| 4.4.4, ejemplo 5 | Ciclos con incremento no lineal | [Abrir](./ejemplo5_(ciclos_incremento_no_lineal).ipynb) |
+| 4.4.4, ejemplo 7 | Ciclo sin dependencia de $n$ | [Abrir](./ejemplo7_(ciclo_sin_dependencia).ipynb) |
+| 4.4.4, ejemplo 9 | Complejidad oculta | [Abrir](./ejemplo9_(complejidad_oculta).ipynb) |
+
+> **Material adicional del repositorio:** cada ejemplo incorpora mediciones temporales y espaciales para contrastar el análisis formal con el comportamiento observado en la máquina de ejecución.
+
 Este capítulo aplica las funciones de complejidad y la notación asintótica al análisis de algoritmos construidos mediante secuencias, condicionales y ciclos. El objetivo es reconocer cómo la estructura del código determina el crecimiento del tiempo de ejecución y del consumo adicional de memoria.
 
 La pregunta central es:
@@ -47,7 +63,7 @@ Al finalizar este capítulo deberías poder:
 ## Mapa del capítulo
 
 | Sección | Tema | Pregunta guía |
-|---|---|---|
+| :---: | :---: | :---: |
 | 4.1 | Aspectos preliminares | ¿Qué representa el costo de un algoritmo? |
 | 4.2 | Complejidad temporal | ¿Cuántas operaciones se ejecutan cuando aumenta $n$? |
 | 4.3 | Complejidad espacial | ¿Cuánta memoria adicional requiere el algoritmo? |
@@ -59,17 +75,17 @@ Al finalizar este capítulo deberías poder:
 
 ## Notebooks experimentales
 
-Los enlaces locales abren los archivos del repositorio. Los enlaces de Colab abren las versiones ejecutables en línea.
+Cada enlace relativo abre el notebook concreto según el contexto del README. El propio notebook ofrece el acceso directo a Google Colab.
 
-| Ejemplo | Algoritmo | Tiempo | Espacio adicional | Local | Colab |
-|---:|---|:---:|:---:|:---:|:---:|
-| 1 | Sumar dos números | $O(1)$ | $O(1)$ | [Abrir](./ejemplo1_(sumar_numeros).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo1_(sumar_numeros).ipynb) |
-| 2 | Recorrer los elementos de un arreglo | $O(n)$ | $O(1)$ | [Abrir](./ejemplo2_(imprimir_elementos_arreglo).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo2_(imprimir_elementos_arreglo).ipynb) |
-| 3 | Recorrer los elementos de una matriz | $O(n^2)$ | $O(1)$ | [Abrir](./ejemplo3_(imprimir_elementos_matriz).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo3_(imprimir_elementos_matriz).ipynb) |
-| 4 | Crear y recorrer una matriz variable | $O(n^2)$ | $O(n^2)$ | [Abrir](./ejemplo4_(inicializar_matriz_variable).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo4_(inicializar_matriz_variable).ipynb) |
-| 5 | Recorrer una matriz con incremento no unitario | $O(n^2)$ | $O(n^2)$ | [Abrir](./ejemplo5_(ciclos_incremento_no_lineal).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo5_(ciclos_incremento_no_lineal).ipynb) |
-| 7 | Ejecutar un ciclo con límite fijo | $O(1)$ | $O(1)$ | [Abrir](./ejemplo7_(ciclo_sin_dependencia).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo7_(ciclo_sin_dependencia).ipynb) |
-| 9 | Calcular Fibonacci iterativo con enteros de precisión arbitraria | $O(n^2)$ | $O(n)$ | [Abrir](./ejemplo9_(complejidad_oculta).ipynb) | [Ejecutar](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/notebooks/ejemplo9_(complejidad_oculta).ipynb) |
+| Ejemplo | Algoritmo | Tiempo | Espacio adicional | Simulación |
+| :---: | :---: | :---: | :---: | :---: |
+| 1 | Sumar dos números | $O(1)$ | $O(1)$ | [Abrir](./ejemplo1_(sumar_numeros).ipynb) |
+| 2 | Recorrer los elementos de un arreglo | $O(n)$ | $O(1)$ | [Abrir](./ejemplo2_(imprimir_elementos_arreglo).ipynb) |
+| 3 | Recorrer los elementos de una matriz | $O(n^2)$ | $O(1)$ | [Abrir](./ejemplo3_(imprimir_elementos_matriz).ipynb) |
+| 4 | Crear y recorrer una matriz variable | $O(n^2)$ | $O(n^2)$ | [Abrir](./ejemplo4_(inicializar_matriz_variable).ipynb) |
+| 5 | Recorrer una matriz con incremento no unitario | $O(n^2)$ | $O(n^2)$ | [Abrir](./ejemplo5_(ciclos_incremento_no_lineal).ipynb) |
+| 7 | Ejecutar un ciclo con límite fijo | $O(1)$ | $O(1)$ | [Abrir](./ejemplo7_(ciclo_sin_dependencia).ipynb) |
+| 9 | Calcular Fibonacci iterativo con enteros de precisión arbitraria | $O(n^2)$ | $O(n)$ | [Abrir](./ejemplo9_(complejidad_oculta).ipynb) |
 
 La numeración conserva la correspondencia con los ejemplos del libro; por eso la secuencia no es consecutiva.
 
@@ -210,7 +226,7 @@ $$
 ### Ciclos
 
 | Estructura | Cantidad aproximada de iteraciones | Complejidad |
-|---|---:|:---:|
+| :---: | :---: | :---: |
 | Límite fijo | $k$, con $k$ constante | $O(1)$ |
 | Incremento unitario hasta $n$ | $n$ | $O(n)$ |
 | Incremento de tamaño $k$ | $n/k$ | $O(n)$ |
@@ -254,7 +270,7 @@ El notebook de Fibonacci añade una consideración importante: una operación es
 ## Ruta recomendada de experimentación
 
 | Orden | Notebook | Qué deberías observar |
-|---:|---|---|
+| :---: | :---: | :---: |
 | 1 | Sumar dos números | Las curvas permanecen aproximadamente constantes aunque cambie $n$. |
 | 2 | Recorrer un arreglo | El tiempo crece de forma lineal y el espacio adicional permanece estable. |
 | 3 | Recorrer una matriz | El tiempo refleja el efecto de dos ciclos anidados. |

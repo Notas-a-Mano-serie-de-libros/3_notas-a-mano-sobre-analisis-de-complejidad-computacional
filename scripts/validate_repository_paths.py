@@ -84,6 +84,9 @@ def raw_urls(text: str) -> list[str]:
     urls = re.findall(r"https?://[^\s\"'<>]+", text)
     cleaned: list[str] = []
     for url in urls:
+        # En el JSON de un notebook el salto de línea posterior a un enlace se
+        # representa literalmente como ``\\n``.
+        url = url.removesuffix("\\n")
         while url.endswith(")") and url.count(")") > url.count("("):
             url = url[:-1]
         cleaned.append(url.rstrip("\\}.,;"))

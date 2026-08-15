@@ -2,28 +2,25 @@
   <strong>Capítulo 6: Análisis de algoritmos recursivos</strong>
 </h1>
 
+## Correspondencia con el libro
+
+Este README acompaña el Capítulo 6, páginas 219–254. Los cinco ejemplos conservan la secuencia y el propósito del libro; el laboratorio general permite aplicar la metodología a nuevas funciones.
+
+| Libro | Recurso | Simulación |
+| :---: | :---: | :---: |
+| 6.1–6.3 | Laboratorio de análisis recursivo | [Abrir](./0_laboratorio_analisis_recursivo.ipynb) |
+| Adicional | Comparación de Fibonacci | [Abrir](./comparacion_fibonacci.ipynb) |
+| Adicional | Ejemplo general de recursión | [Abrir](./ejemplo_recursion.ipynb) |
+
+> **Material adicional del repositorio:** el laboratorio permite construir algoritmos recursivos distintos de los cinco ejemplos impresos y observar por separado el apilamiento, el desapilamiento, el tiempo y el espacio.
+
 ---
 
 <h2>🧪 Laboratorios interactivos</h2>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Laboratorio</th>
-      <th style="padding:8px; border:1px solid #ccc;">Propósito</th>
-      <th style="padding:8px; border:1px solid #ccc;">Local</th>
-      <th style="padding:8px; border:1px solid #ccc;">Colab</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Análisis recursivo</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Construye las relaciones temporal y espacial y muestra cómo se apilan las llamadas y se desapilan en orden inverso desde el caso base.</td>
-      <td style="padding:8px; border:1px solid #ccc;"><a href="./0_laboratorio_analisis_recursivo.ipynb">Abrir</a></td>
-      <td style="padding:8px; border:1px solid #ccc;"><a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb">Ejecutar</a></td>
-    </tr>
-  </tbody>
-</table>
+| Laboratorio | Propósito | Simulación |
+| :---: | :---: | :---: |
+| **Análisis recursivo** | Construye las relaciones temporal y espacial y muestra cómo se apilan las llamadas y se desapilan en orden inverso desde el caso base. | [Abrir](./0_laboratorio_analisis_recursivo.ipynb) |
 
 Los notebooks empleados como apoyo para gráficas estáticas se encuentran en <a href="../runtime/recursos/referencias/"><code>referencias/</code></a>.
 
@@ -49,7 +46,7 @@ Los notebooks empleados como apoyo para gráficas estáticas se encuentran en <a
     </ul>
   </li>
   <li><a href="#6-4">6.4 Consideraciones finales</a></li>
-  <li><a href="#6-5">6.4.1 Ejercicios propuestos</a></li>
+  <li><a href="#6-4-1">6.4.1 Ejercicios propuestos</a></li>
 </ul>
 
 ---
@@ -69,15 +66,25 @@ Un algoritmo es <b>recursivo</b> cuando se llama a sí mismo para resolver insta
 Si el caso base no está bien definido o la reducción no converge hacia él, la función entra en recursión infinita. En términos formales, la función recursiva que calcula el factorial se define como:
 </p>
 
-<pre><code>f(n) = { 1           si n ∈ [0, 1]
-        { n · f(n−1)  si n &gt; 1</code></pre>
+$$
+f(n)=
+\begin{cases}
+1, & \text{si } n\in[0,1],\\
+n\,f(n-1), & \text{si } n>1.
+\end{cases}
+$$
 
 <p align="justify">
 Y la sucesión de Fibonacci:
 </p>
 
-<pre><code>f(n) = { 1              si n ∈ [0, 1]
-        { f(n−1)+f(n−2)  si n &gt; 1</code></pre>
+$$
+f(n)=
+\begin{cases}
+1, & \text{si } n\in[0,1],\\
+f(n-1)+f(n-2), & \text{si } n>1.
+\end{cases}
+$$
 
 ---
 
@@ -91,9 +98,9 @@ El capítulo introduce una <b>metodología de 4 pasos</b> para construir la rela
 
 <ol>
   <li><b>Caracterizar el caso base:</b> determinar <code>T_base(n)</code>, el costo de ejecutar el algoritmo sin realizar llamadas recursivas.</li>
-  <li><b>Sumar las llamadas recursivas:</b> <code>T_recursivo(n) = Σ aᵢ·Tᵢ(n)</code>, donde cada término representa una llamada con su coeficiente.</li>
-  <li><b>Calcular el costo de las operaciones propias:</b> <code>f(n) = Σ Tⱼ(n)</code>, el costo de las instrucciones que no son llamadas recursivas.</li>
-  <li><b>Construir la relación completa:</b> <code>T(n) = T_base(n) + T_recursivo(n) + f(n)</code>.</li>
+  <li><b>Sumar las llamadas recursivas:</b> $T_recursivo(n) = Σ aᵢ\cdot Tᵢ(n)$, donde cada término representa una llamada con su coeficiente.</li>
+  <li><b>Calcular el costo de las operaciones propias:</b> $f(n) = Σ Tⱼ(n)$, el costo de las instrucciones que no son llamadas recursivas.</li>
+  <li><b>Construir la relación completa:</b> $T(n) = T_base(n) + T_recursivo(n) + f(n)$.</li>
 </ol>
 
 <h3 id="6-2-2">💾 6.2.2 Complejidad espacial</h3>
@@ -105,7 +112,7 @@ Para la complejidad espacial, el procedimiento es análogo pero modelando el con
 <ol>
   <li>Identificar el espacio requerido por el caso base: <code>S_base(n) = s(n)</code>.</li>
   <li>Determinar la profundidad máxima de la recursión: <code>S_recursivo(n) = d(n)</code>.</li>
-  <li>Sumar el costo de estructuras auxiliares declaradas en cada llamada: <code>f(n) = Σ Sⱼ(n)</code>.</li>
+  <li>Sumar el costo de estructuras auxiliares declaradas en cada llamada: $f(n) = Σ Sⱼ(n)$.</li>
 </ol>
 
 <p align="justify">
@@ -122,39 +129,31 @@ A diferencia de los algoritmos iterativos, los recursivos consumen espacio propo
 El factorial ilustra el caso más simple de recursión lineal. Su relación de recurrencia es:
 </p>
 
-<pre><code>T(n) = { 1         si n ≤ 1
-        { T(n−1)+1  si n &gt; 1</code></pre>
+$$
+T(n)=
+\begin{cases}
+1, & \text{si } n\le 1,\\
+T(n-1)+1, & \text{si } n>1.
+\end{cases}
+$$
 
 <p align="justify">
 Los tres métodos del Capítulo 5 producen el mismo resultado:
 </p>
 
 <ul>
-  <li><b>Sustitución iterativa:</b> <code>T(n) = 1 + 1 + ... + 1</code> (n veces) → <code>T(n) ∈ Θ(n)</code></li>
-  <li><b>Árbol de recurrencia:</b> árbol lineal de profundidad <i>n</i>, costo 1 por nodo → <code>T(n) ∈ Θ(n)</code></li>
-  <li><b>Ecuación característica:</b> raíz única <code>r = 1</code> → <code>T(n) ∈ Θ(n)</code></li>
+  <li><b>Sustitución iterativa:</b> $T(n) = 1 + 1 + ... + 1$ (n veces) → $T(n) \in \Theta(n)$</li>
+  <li><b>Árbol de recurrencia:</b> árbol lineal de profundidad <i>n</i>, costo 1 por nodo → $T(n) \in \Theta(n)$</li>
+  <li><b>Ecuación característica:</b> raíz única $r = 1$ → $T(n) \in \Theta(n)$</li>
 </ul>
 
 <p align="justify">
-La complejidad espacial también es lineal porque la pila de llamadas acumula <i>n</i> marcos activos simultáneamente: <code>S(n) ∈ Θ(n)</code>.
+La complejidad espacial también es lineal porque la pila de llamadas acumula <i>n</i> marcos activos simultáneamente: $S(n) \in \Theta(n)$.
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Todos los casos</td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ |
+| :---: | :---: | :---: |
+| Todos los casos | $\Theta(n)$ | $\Theta(n)$ |
 
 <h3 id="6-3-2">🌀 6.3.2 Sucesión de Fibonacci</h3>
 
@@ -162,71 +161,46 @@ La complejidad espacial también es lineal porque la pila de llamadas acumula <i
 La sucesión de Fibonacci es el ejemplo paradigmático de la <b>explosión exponencial</b> en algoritmos recursivos ingenuos. Su relación de recurrencia es:
 </p>
 
-<pre><code>T(n) = { 1              si n ∈ [0, 1]
-        { T(n−1)+T(n−2)+1  si n &gt; 1</code></pre>
+$$
+T(n)=
+\begin{cases}
+1, & \text{si } n\in[0,1],\\
+T(n-1)+T(n-2)+1, & \text{si } n>1.
+\end{cases}
+$$
 
 <p align="justify">
 Dado que la ecuación característica exacta produce raíces irracionales, el análisis se realiza en dos niveles:
 </p>
 
 <ul>
-  <li><b>Cota superior aproximada:</b> aproximando el árbol de recursión por un árbol binario completo de profundidad <i>n</i>, se obtiene <code>T(n) ∈ O(2ⁿ)</code>.</li>
-  <li><b>Resultado exacto:</b> la ecuación característica <code>r² − r − 1 = 0</code> produce la raíz <code>φ = (1+√5)/2 ≈ 1.618</code> (la proporción áurea), dando <code>T(n) ∈ Θ(φⁿ)</code>.</li>
+  <li><b>Cota superior aproximada:</b> aproximando el árbol de recursión por un árbol binario completo de profundidad <i>n</i>, se obtiene $T(n) \in O(2^n)$.</li>
+  <li><b>Resultado exacto:</b> la ecuación característica $r^2-r-1=0$ produce la raíz $\varphi = (1+\sqrt{5})/2 \approx 1.618$ (la proporción áurea), dando $T(n) \in \Theta(\varphi^n)$.</li>
 </ul>
 
 <p align="justify">
-La implementación recursiva directa es <b>exponencialmente ineficiente</b>: recalcula los mismos subproblemas millones de veces. Esta ineficiencia se elimina con técnicas de programación dinámica o memoización, que reducen el costo a <code>Θ(n)</code>.
+La implementación recursiva directa es <b>exponencialmente ineficiente</b>: recalcula los mismos subproblemas millones de veces. Esta ineficiencia se elimina con técnicas de programación dinámica o memoización, que reducen el costo a $\Theta(n)$.
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Todos los casos</td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(φⁿ)</b> ≈ <b>O(2ⁿ)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ |
+| :---: | :---: | :---: |
+| Todos los casos | $\Theta(\varphi^n)$ ≈ $O(2^n)$ | $\Theta(n)$ |
 
 <h3 id="6-3-3">⚡ 6.3.3 Potencia de un número entero positivo</h3>
 
 <p align="justify">
-El cálculo de <code>bⁿ</code> de forma recursiva puede implementarse de dos maneras con complejidades radicalmente distintas:
+El cálculo de $b^n$ de forma recursiva puede implementarse de dos maneras con complejidades radicalmente distintas:
 </p>
 
 <ul>
-  <li><b>Recursión simple:</b> <code>potencia(b, n) = b · potencia(b, n−1)</code>, con caso base <code>potencia(b, 0) = 1</code>. Genera una cadena lineal de <i>n</i> llamadas → <code>T(n) ∈ Θ(n)</code>, <code>S(n) ∈ Θ(n)</code>.</li>
-  <li><b>Exponenciación rápida:</b> divide el exponente a la mitad en cada paso usando la identidad <code>bⁿ = (b^(n/2))²</code>. La recurrencia resultante es <code>T(n) = T(n/2) + 1</code>, cuya solución por teorema maestro (Caso 2: a=1, b=2, k=0, a=b⁰=1) da <code>T(n) ∈ Θ(log₂(n))</code>.</li>
+  <li><b>Recursión simple:</b> <code>potencia(b, n) = b · potencia(b, n−1)</code>, con caso base <code>potencia(b, 0) = 1</code>. Genera una cadena lineal de <i>n</i> llamadas → $T(n) \in \Theta(n)$, $S(n) \in \Theta(n)$.</li>
+  <li><b>Exponenciación rápida:</b> divide el exponente a la mitad en cada paso usando la identidad $b^n=(b^{n/2})^2$. La recurrencia resultante es $T(n)=T(n/2)+1$, cuya solución por el teorema maestro (Caso 2: $a=1$, $b=2$, $k=0$ y $a=b^0=1$) da $T(n)\in\Theta(\log_2 n)$.</li>
 </ul>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Implementación</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Recursión simple</td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Exponenciación rápida</td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-    </tr>
-  </tbody>
-</table>
+| Implementación | $T(n)$ | $S(n)$ |
+| :---: | :---: | :---: |
+| Recursión simple | $\Theta(n)$ | $\Theta(n)$ |
+| Exponenciación rápida | $\Theta(\log_2 (n))$ | $\Theta(\log_2 (n))$ |
 
 <h3 id="6-3-4">🔀 6.3.4 Ordenamiento por mezcla</h3>
 
@@ -234,38 +208,30 @@ El cálculo de <code>bⁿ</code> de forma recursiva puede implementarse de dos m
 El <i>merge sort</i> es el ejemplo arquetípico de la estrategia <b>divide y vencerás</b> en ordenamiento. El algoritmo divide el arreglo en dos mitades, ordena cada una recursivamente y luego las fusiona en tiempo lineal:
 </p>
 
-<pre><code>T(n) = { 1             si n ≤ 1
-        { 2T(n/2) + n   si n &gt; 1</code></pre>
+$$
+T(n)=
+\begin{cases}
+1, & \text{si } n\le 1,\\
+2T(n/2)+n, & \text{si } n>1.
+\end{cases}
+$$
 
 <p align="justify">
-Aplicando el <b>teorema maestro básico</b> con <code>a=2, b=2, f(n)∈O(n¹)</code>:
+Aplicando el <b>teorema maestro básico</b> con $a=2$, $b=2$ y $f(n)\in O(n)$:
 </p>
 
 <ul>
-  <li>Se compara <i>a</i> con <i>bᵏ</i>: <code>2 = 2¹</code> → Caso 2 (igualdad)</li>
-  <li>Resultado: <code>T(n) ∈ Θ(n·log₂(n))</code></li>
+  <li>Se compara $a$ con $b^k$: $2=2^1$ → Caso 2 (igualdad)</li>
+  <li>Resultado: $T(n) \in \Theta(n\cdot \log_2 (n))$</li>
 </ul>
 
 <p align="justify">
-La complejidad espacial es lineal porque se requiere un arreglo auxiliar del mismo tamaño para la fase de mezcla: <code>S(n) ∈ Θ(n)</code>.
+La complejidad espacial es lineal porque se requiere un arreglo auxiliar del mismo tamaño para la fase de mezcla: $S(n) \in \Theta(n)$.
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Todos los casos</td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n·log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ |
+| :---: | :---: | :---: |
+| Todos los casos | $\Theta(n\,\log_2 (n))$ | $\Theta(n)$ |
 
 <h3 id="6-3-5">🌲 6.3.5 Búsqueda en árbol binario</h3>
 
@@ -273,99 +239,36 @@ La complejidad espacial es lineal porque se requiere un arreglo auxiliar del mis
 La búsqueda recursiva en un árbol binario de búsqueda (BST) descarta la mitad de los nodos en cada llamada cuando el árbol está <b>balanceado</b>. La relación de recurrencia en ese caso es:
 </p>
 
-<pre><code>T(n) = { 1         si n = 0 (árbol vacío)
-        { T(n/2)+1  si n &gt; 0 (árbol balanceado)</code></pre>
+$$
+T(n)=
+\begin{cases}
+1, & \text{si } n=0,\\
+T(n/2)+1, & \text{si } n>0 \text{ y el árbol está balanceado}.
+\end{cases}
+$$
 
 <p align="justify">
-Esta es la misma recurrencia que la búsqueda binaria sobre arreglos. El teorema maestro (Caso 2 con <code>a=1, b=2, k=0</code>) da <code>T(n) ∈ Θ(log₂(n))</code>. Sin embargo, en el <b>peor caso</b> (árbol completamente degenerado, equivalente a una lista enlazada), la búsqueda visita todos los nodos: <code>T(n) ∈ O(n)</code>.
+Esta es la misma recurrencia que la búsqueda binaria sobre arreglos. El teorema maestro (Caso 2 con $a=1, b=2, k=0$) da $T(n) \in \Theta(\log_2 (n))$. Sin embargo, en el <b>peor caso</b> (árbol completamente degenerado, equivalente a una lista enlazada), la búsqueda visita todos los nodos: $T(n) \in O(n)$.
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Mejor caso</td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Caso promedio (balanceado)</td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Peor caso (degenerado)</td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(n)</b></td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ |
+| :---: | :---: | :---: |
+| Mejor caso | $\Omega(1)$ | $\Omega(1)$ |
+| Caso promedio (balanceado) | $\Theta(\log_2 (n))$ | $\Theta(\log_2 (n))$ |
+| Peor caso (degenerado) | $O(n)$ | $O(n)$ |
 
 ---
 
 <h2>📊 Resumen de complejidades</h2>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Algoritmo</th>
-      <th style="padding:8px; border:1px solid #ccc;">Recurrencia</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Método de resolución</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Factorial</td>
-      <td style="padding:8px; border:1px solid #ccc;"><code>T(n)=T(n−1)+1</code></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Sustitución, árbol, ec. característica</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Fibonacci (naïve)</td>
-      <td style="padding:8px; border:1px solid #ccc;"><code>T(n)=T(n−1)+T(n−2)+1</code></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(φⁿ)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ecuación característica</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Potencia simple</td>
-      <td style="padding:8px; border:1px solid #ccc;"><code>T(n)=T(n−1)+1</code></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Sustitución iterativa</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Potencia rápida</td>
-      <td style="padding:8px; border:1px solid #ccc;"><code>T(n)=T(n/2)+1</code></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Teorema maestro (Caso 2)</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Merge sort</td>
-      <td style="padding:8px; border:1px solid #ccc;"><code>T(n)=2T(n/2)+n</code></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n·log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Teorema maestro (Caso 2)</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">BST (balanceado)</td>
-      <td style="padding:8px; border:1px solid #ccc;"><code>T(n)=T(n/2)+1</code></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Teorema maestro (Caso 2)</td>
-    </tr>
-  </tbody>
-</table>
+| Algoritmo | Recurrencia | $T(n)$ | $S(n)$ | Método de resolución |
+| :---: | :---: | :---: | :---: | :---: |
+| Factorial | `$T(n)$=T(n−1)+1` | $\Theta(n)$ | $\Theta(n)$ | Sustitución, árbol, ec. característica |
+| Fibonacci (naïve) | `$T(n)$=T(n−1)+T(n−2)+1` | $\Theta(\varphi^n)$ | $\Theta(n)$ | Ecuación característica |
+| Potencia simple | `$T(n)$=T(n−1)+1` | $\Theta(n)$ | $\Theta(n)$ | Sustitución iterativa |
+| Potencia rápida | `$T(n)$=T(n/2)+1` | $\Theta(\log_2 (n))$ | $\Theta(\log_2 (n))$ | Teorema maestro (Caso 2) |
+| Merge sort | `$T(n)$=2T(n/2)+n` | $\Theta(n\,\log_2 (n))$ | $\Theta(n)$ | Teorema maestro (Caso 2) |
+| BST (balanceado) | `$T(n)$=T(n/2)+1` | $\Theta(\log_2 (n))$ | $\Theta(\log_2 (n))$ | Teorema maestro (Caso 2) |
 
 ---
 
@@ -381,7 +284,7 @@ Asimismo, el capítulo subraya que identificar correctamente el tipo de relació
 
 ---
 
-<h2 id="6-5">📚 6.4.1 Ejercicios propuestos</h2>
+<h2 id="6-4-1">📚 6.4.1 Ejercicios propuestos</h2>
 
 <p align="justify">
 El capítulo incluye <b>8 ejercicios propuestos</b> para consolidar la metodología de análisis sobre algoritmos recursivos reales:

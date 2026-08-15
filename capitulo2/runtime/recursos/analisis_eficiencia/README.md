@@ -13,8 +13,8 @@ Esta carpeta reúne los notebooks que llevan las funciones de crecimiento a esca
 
 | Análisis | Local | Colab | Qué observar |
 |---|---|---|---|
-| Temporal | [Abrir local](../../../notebooks/analisis_alta_complejidad_temporal.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/notebooks/analisis_alta_complejidad_temporal.ipynb) | Cuándo \(2^n\) y \(n!\) superan escalas temporales útiles. |
-| Espacial | [Abrir local](../../../notebooks/analisis_alta_complejidad_espacial.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/notebooks/analisis_alta_complejidad_espacial.ipynb) | Cuándo \(2^n\) y \(n!\) exceden capacidades de almacenamiento. |
+| Temporal | [Abrir local](../../../notebooks/graficas/analisis_alta_complejidad_temporal.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/notebooks/graficas/analisis_alta_complejidad_temporal.ipynb) | Cuándo \(2^n\) y \(n!\) superan escalas temporales útiles. |
+| Espacial | [Abrir local](../../../notebooks/graficas/analisis_alta_complejidad_espacial.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/notebooks/graficas/analisis_alta_complejidad_espacial.ipynb) | Cuándo \(2^n\) y \(n!\) exceden capacidades de almacenamiento. |
 
 ## Figuras de referencia
 

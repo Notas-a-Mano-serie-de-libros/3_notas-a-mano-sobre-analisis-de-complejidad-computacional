@@ -2,6 +2,23 @@
   <strong>Capítulo 7: Análisis de algoritmos de búsqueda clásicos</strong>
 </h1>
 
+## Correspondencia con el libro
+
+Este README sigue el Capítulo 7, páginas 255–312. Cada algoritmo del libro tiene un notebook propio; la comparación global y el laboratorio de ejercicios son ampliaciones ejecutables.
+
+| Libro | Recurso | Simulación |
+| :---: | :---: | :---: |
+| 7.2 | Búsqueda secuencial | [Abrir](./1_busqueda_secuencial.ipynb) |
+| 7.3 | Búsqueda binaria | [Abrir](./2_busqueda_binaria.ipynb) |
+| 7.4 | Búsqueda por interpolación | [Abrir](./3_busqueda_interpolacion.ipynb) |
+| 7.5 | Búsqueda por saltos | [Abrir](./4_busqueda_saltos.ipynb) |
+| 7.6 | Búsqueda exponencial | [Abrir](./5_busqueda_exponencial.ipynb) |
+| 7.7 | Búsqueda ternaria | [Abrir](./6_busqueda_ternaria.ipynb) |
+| Adicional | Comparación de búsquedas | [Abrir](./0_comparacion_busquedas.ipynb) |
+| 7.9 | Ejercicios propuestos | [Abrir](./ejercicios_propuestos.ipynb) |
+
+> **Material adicional del repositorio:** el comparador, las mediciones para diferentes casos, las proyecciones teóricas y las soluciones de los ejercicios amplían el análisis impreso. Las proyecciones se identifican como tales y no representan ejecuciones reales.
+
 ---
 
 <h2>🧭 Contenido del capítulo</h2>
@@ -10,37 +27,37 @@
   <li><a href="#7-1">7.1 Consideraciones previas</a></li>
   <li><a href="#7-2">7.2 Búsqueda secuencial</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/1_busqueda_secuencial.ipynb">Animación interactiva – Búsqueda secuencial</a></li>
+      <li>🎬 <a href="./1_busqueda_secuencial.ipynb">Animación interactiva – Búsqueda secuencial</a></li>
     </ul>
   </li>
   <li><a href="#7-3">7.3 Búsqueda binaria</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/2_busqueda_binaria.ipynb">Animación interactiva – Búsqueda binaria</a></li>
+      <li>🎬 <a href="./2_busqueda_binaria.ipynb">Animación interactiva – Búsqueda binaria</a></li>
     </ul>
   </li>
   <li><a href="#7-4">7.4 Búsqueda por interpolación</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/3_busqueda_interpolacion.ipynb">Animación interactiva – Búsqueda por interpolación</a></li>
+      <li>🎬 <a href="./3_busqueda_interpolacion.ipynb">Animación interactiva – Búsqueda por interpolación</a></li>
     </ul>
   </li>
   <li><a href="#7-5">7.5 Búsqueda por saltos</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/4_busqueda_saltos.ipynb">Animación interactiva – Búsqueda por saltos</a></li>
+      <li>🎬 <a href="./4_busqueda_saltos.ipynb">Animación interactiva – Búsqueda por saltos</a></li>
     </ul>
   </li>
   <li><a href="#7-6">7.6 Búsqueda exponencial</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/5_busqueda_exponencial.ipynb">Animación interactiva – Búsqueda exponencial</a></li>
+      <li>🎬 <a href="./5_busqueda_exponencial.ipynb">Animación interactiva – Búsqueda exponencial</a></li>
     </ul>
   </li>
   <li><a href="#7-7">7.7 Búsqueda ternaria</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/6_busqueda_ternaria.ipynb">Animación interactiva – Búsqueda ternaria</a></li>
+      <li>🎬 <a href="./6_busqueda_ternaria.ipynb">Animación interactiva – Búsqueda ternaria</a></li>
     </ul>
   </li>
   <li><a href="#7-comp">📊 Comparación de todos los algoritmos</a>
     <ul>
-      <li>🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/0_comparacion_busquedas.ipynb">Comparación interactiva – Todos los algoritmos</a></li>
+      <li>🎬 <a href="./0_comparacion_busquedas.ipynb">Comparación interactiva – Todos los algoritmos</a></li>
     </ul>
   </li>
   <li><a href="#7-8">7.8 Consideraciones finales</a></li>
@@ -59,27 +76,19 @@ Este capítulo aplica las herramientas formales desarrolladas en los capítulos 
 Las animaciones utilizan la siguiente convención de colores para representar el estado de los elementos durante la búsqueda:
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Color</th>
-      <th style="padding:8px; border:1px solid #ccc;">Significado</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr><td style="padding:8px; border:1px solid #ccc;">⬜ Blanco</td><td style="padding:8px; border:1px solid #ccc;">Elemento en estado de reposo (no evaluado aún)</td></tr>
-    <tr><td style="padding:8px; border:1px solid #ccc;">🔵 Azul</td><td style="padding:8px; border:1px solid #ccc;">Elemento en evaluación activa (comparación actual)</td></tr>
-    <tr><td style="padding:8px; border:1px solid #ccc;">⬛ Gris</td><td style="padding:8px; border:1px solid #ccc;">Elemento descartado del espacio de búsqueda</td></tr>
-    <tr><td style="padding:8px; border:1px solid #ccc;">🟢 Verde</td><td style="padding:8px; border:1px solid #ccc;">Elemento encontrado (objetivo localizado)</td></tr>
-  </tbody>
-</table>
+| Color | Significado |
+| :---: | :---: |
+| ⬜ Blanco | Elemento en estado de reposo (no evaluado aún) |
+| 🔵 Azul | Elemento en evaluación activa (comparación actual) |
+| ⬛ Gris | Elemento descartado del espacio de búsqueda |
+| 🟢 Verde | Elemento encontrado (objetivo localizado) |
 
 ---
 
 <h2 id="7-2">🔍 7.2 Búsqueda secuencial</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/1_busqueda_secuencial.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./1_busqueda_secuencial.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -93,39 +102,14 @@ La implementación itera sobre el arreglo con un ciclo <code>for</code>, compara
 
 <h3>Análisis de complejidad</h3>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mejor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El objetivo está en la primera posición</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Caso promedio</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">E[X] = (n+1)/2 ≈ n/2 comparaciones (fórmula de Gauss)</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Peor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El objetivo está al final o no existe</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Mejor caso** | $\Omega(1)$ | $\Omega(1)$ | El objetivo está en la primera posición |
+| **Caso promedio** | $\Theta(n)$ | $\Theta(1)$ | $E[X] = \frac{n+1}{2} \approx \frac{n}{2}$ comparaciones (fórmula de Gauss) |
+| **Peor caso** | $O(n)$ | $O(1)$ | El objetivo está al final o no existe |
 
 <p align="justify">
-<b>Dato curioso:</b> Donald Knuth demostró formalmente que <code>O(n)</code> es la cota óptima para cualquier algoritmo de búsqueda sobre datos no ordenados. No es posible hacer búsqueda sobre un conjunto desordenado en menos de <i>n</i> comparaciones en el peor caso.
+<b>Dato curioso:</b> Donald Knuth demostró formalmente que $O(n)$ es la cota óptima para cualquier algoritmo de búsqueda sobre datos no ordenados. No es posible hacer búsqueda sobre un conjunto desordenado en menos de <i>n</i> comparaciones en el peor caso.
 </p>
 
 <h3>Escenarios de aplicación</h3>
@@ -136,35 +120,19 @@ La implementación itera sobre el arreglo con un ciclo <code>for</code>, compara
 </ul>
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">No requiere datos ordenados</td>
-      <td style="padding:8px; border:1px solid #ccc;">Ineficiente para conjuntos grandes</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Implementación trivial</td>
-      <td style="padding:8px; border:1px solid #ccc;">No aprovecha ninguna propiedad estructural</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Flexible: aplica a cualquier tipo de dato comparable</td>
-      <td style="padding:8px; border:1px solid #ccc;">Costoso si se repite con frecuencia sobre conjuntos grandes</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| No requiere datos ordenados | Ineficiente para conjuntos grandes |
+| Implementación trivial | No aprovecha ninguna propiedad estructural |
+| Flexible: aplica a cualquier tipo de dato comparable | Costoso si se repite con frecuencia sobre conjuntos grandes |
 
 ---
 
 <h2 id="7-3">⚡ 7.3 Búsqueda binaria</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/2_busqueda_binaria.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./2_busqueda_binaria.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -185,36 +153,11 @@ Buscar el valor <b>10</b> en el arreglo <code>[2, 3, 5, 9, 10, 11, 21, 43]</code
 
 <h3>Análisis de complejidad</h3>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mejor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El objetivo está en la posición central</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Caso promedio</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Derivado con la fórmula de Stirling: log₂(n!) ≈ n(log₂n − log₂e)</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Peor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El objetivo está en los extremos o no existe</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Mejor caso** | $\Omega(1)$ | $\Omega(1)$ | El objetivo está en la posición central |
+| **Caso promedio** | $\Theta(\log_2 n)$ | $\Theta(1)$ | Derivado con la fórmula de Stirling: $\log_2(n!) \approx n(\log_2 n - \log_2 e)$ |
+| **Peor caso** | $O(\log_2 (n))$ | $O(1)$ | El objetivo está en los extremos o no existe |
 
 <p align="justify">
 <b>Dato curioso:</b> La idea de buscar dividiendo el espacio a la mitad fue sugerida por <b>John Mauchly</b> en 1946, pero la primera implementación sin errores fue publicada por <b>Derrick Henry Lehmer</b> en 1960, 14 años después.
@@ -228,31 +171,18 @@ Buscar el valor <b>10</b> en el arreglo <code>[2, 3, 5, 9, 10, 11, 21, 43]</code
 </ul>
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Alta eficiencia logarítmica incluso para n muy grande</td>
-      <td style="padding:8px; border:1px solid #ccc;">Requiere que los datos estén ordenados</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Bajo consumo de memoria</td>
-      <td style="padding:8px; border:1px solid #ccc;">No es adecuado para estructuras dinámicas con inserciones frecuentes</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Alta eficiencia logarítmica incluso para n muy grande | Requiere que los datos estén ordenados |
+| Bajo consumo de memoria | No es adecuado para estructuras dinámicas con inserciones frecuentes |
 
 ---
 
 <h2 id="7-4">🎯 7.4 Búsqueda por interpolación</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/3_busqueda_interpolacion.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./3_busqueda_interpolacion.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -272,39 +202,14 @@ Buscar el valor <b>60</b> en el arreglo <code>[0, 10, 20, 30, 40, 60, 80, 90]</c
 
 <h3>Análisis de complejidad</h3>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mejor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">La estimación apunta directamente al objetivo</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Caso promedio</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(log₂(n)))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Distribución uniforme: cada iteración reduce el espacio por factor √n (Perl et al., 1978)</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Peor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Distribución exponencial: la estimación siempre apunta al extremo</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Mejor caso** | $\Omega(1)$ | $\Omega(1)$ | La estimación apunta directamente al objetivo |
+| **Caso promedio** | $\Theta(\log_2(\log_2 n))$ | $\Theta(1)$ | Distribución uniforme: cada iteración reduce el espacio por un factor $\sqrt{n}$ (Perl et al., 1978) |
+| **Peor caso** | $O(n)$ | $O(1)$ | Distribución exponencial: la estimación siempre apunta al extremo |
 
 <p align="justify">
-<b>Dato curioso:</b> Fue descrito por <b>W. W. Peterson</b> en 1957 para localizar registros en almacenamiento de acceso aleatorio. Su complejidad promedio <code>O(log log n)</code> fue demostrada formalmente 21 años después por <b>Yehoshua Perl, Alon Itai y Haim Avni</b> (1978).
+<b>Dato curioso:</b> Fue descrito por <b>W. W. Peterson</b> en 1957 para localizar registros en almacenamiento de acceso aleatorio. Su complejidad promedio $O(\log\log n)$ fue demostrada formalmente 21 años después por <b>Yehoshua Perl, Alon Itai y Haim Avni</b> (1978).
 </p>
 
 <h3>Escenarios de aplicación</h3>
@@ -314,31 +219,18 @@ Buscar el valor <b>60</b> en el arreglo <code>[0, 10, 20, 30, 40, 60, 80, 90]</c
 </ul>
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Extremadamente eficiente con datos uniformes: O(log log n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Se degrada a O(n) con datos sesgados o exponenciales</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Reduce drásticamente el número de comparaciones en distribuciones lineales</td>
-      <td style="padding:8px; border:1px solid #ccc;">Requiere datos ordenados y acceso por posición</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Extremadamente eficiente con datos uniformes: $O(\log\log n)$ | Se degrada a $O(n)$ con datos sesgados o exponenciales |
+| Reduce drásticamente el número de comparaciones en distribuciones lineales | Requiere datos ordenados y acceso por posición |
 
 ---
 
 <h2 id="7-5">🦘 7.5 Búsqueda por saltos</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/4_busqueda_saltos.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./4_busqueda_saltos.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -349,7 +241,7 @@ La <b>búsqueda por saltos</b> (también llamada búsqueda por bloques) recorre 
 <p align="justify">
 El costo total en función de δ es <code>C(δ) = n/δ + δ</code>. Minimizando esta función mediante la primera derivada:
 </p>
-<p align="center"><code>dC/dδ = 0 → δ = √n → δ = ⌊√n⌋</code></p>
+<p align="center">$\frac{dC}{d\delta}=0 \to \delta=\sqrt{n} \to \delta=\lfloor\sqrt{n}\rfloor$</p>
 
 <h3>Ejemplo</h3>
 <p align="justify">
@@ -363,36 +255,11 @@ Buscar el valor <b>6</b> en el arreglo <code>[1, 2, 3, 4, 5, 6, 7, 8]</code> (n=
 
 <h3>Análisis de complejidad</h3>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mejor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El objetivo está en la primera posición del primer bloque</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Caso promedio</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(√n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">E[X] = √n + 1 (fórmula de Gauss en ambas fases)</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Peor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(√n)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El objetivo está al final o no existe: √n + √n = 2√n iteraciones</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Mejor caso** | $\Omega(1)$ | $\Omega(1)$ | El objetivo está en la primera posición del primer bloque |
+| **Caso promedio** | $\Theta(\sqrt{n})$ | $\Theta(1)$ | $E[X] = \sqrt{n}+1$ (fórmula de Gauss en ambas fases) |
+| **Peor caso** | $O(\sqrt{n})$ | $O(1)$ | El objetivo está al final o no existe: $\sqrt{n}+\sqrt{n}=2\sqrt{n}$ iteraciones |
 
 <p align="justify">
 <b>Dato curioso:</b> <b>Ben Shneiderman</b> introdujo esta técnica en 1978 demostrando que el tamaño de los bloques puede ajustarse dinámicamente para optimizar cada salto, dando lugar a la <b>búsqueda por saltos multinivel</b>, cuya eficiencia puede competir con la búsqueda binaria en condiciones específicas.
@@ -405,31 +272,18 @@ Buscar el valor <b>6</b> en el arreglo <code>[1, 2, 3, 4, 5, 6, 7, 8]</code> (n=
 </ul>
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Más eficiente que búsqueda lineal; punto medio entre O(n) y O(log n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Requiere datos ordenados</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Reduce accesos a memoria en estructuras con acceso costoso</td>
-      <td style="padding:8px; border:1px solid #ccc;">No ofrece ventajas sobre búsqueda secuencial en arreglos pequeños</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Más eficiente que búsqueda lineal; punto medio entre $O(n)$ y $O(\log n)$ | Requiere datos ordenados |
+| Reduce accesos a memoria en estructuras con acceso costoso | No ofrece ventajas sobre búsqueda secuencial en arreglos pequeños |
 
 ---
 
 <h2 id="7-6">📈 7.6 Búsqueda exponencial</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/5_busqueda_exponencial.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./5_busqueda_exponencial.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -450,36 +304,11 @@ Buscar el valor <b>6</b> en el arreglo <code>[1, 2, 3, 4, 5, 6, 7, 8]</code> (n=
 
 <h3>Análisis de complejidad</h3>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mejor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El objetivo está en la primera posición</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Caso promedio</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Derivado con fórmula de Stirling: E[X] ≈ log₂(n) − log₂(e)</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Peor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(log₂(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">T(n) ∈ O(log₂n + log₂n) = O(2·log₂n) = O(log₂n)</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Mejor caso** | $\Omega(1)$ | $\Omega(1)$ | El objetivo está en la primera posición |
+| **Caso promedio** | $\Theta(\log_2 n)$ | $\Theta(1)$ | Derivado con la fórmula de Stirling: $E[X] \approx \log_2 n - \log_2 e$ |
+| **Peor caso** | $O(\log_2 n)$ | $O(1)$ | $T(n) \in O(\log_2 n+\log_2 n)=O(2\log_2 n)=O(\log_2 n)$ |
 
 <p align="justify">
 <b>Dato curioso:</b> Introducida por <b>Jon Bentley</b> y <b>Andrew Chi-Chih Yao</b> en 1976 como estrategia para operar sobre listas ordenadas potencialmente infinitas. Su ventaja sobre la búsqueda binaria es que no necesita conocer el tamaño de la estructura de antemano.
@@ -493,31 +322,18 @@ Buscar el valor <b>6</b> en el arreglo <code>[1, 2, 3, 4, 5, 6, 7, 8]</code> (n=
 </ul>
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Funciona sin conocer el tamaño de la estructura</td>
-      <td style="padding:8px; border:1px solid #ccc;">Dependencia de datos ordenados</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Muy eficiente cuando el objetivo está cerca del inicio: O(log i)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Si el rango resultante no es eficiente para búsqueda binaria, la ventaja se diluye</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Funciona sin conocer el tamaño de la estructura | Dependencia de datos ordenados |
+| Muy eficiente cuando el objetivo está cerca del inicio: $O(\log i)$ | Si el rango resultante no es eficiente para búsqueda binaria, la ventaja se diluye |
 
 ---
 
 <h2 id="7-7">🔱 7.7 Búsqueda ternaria</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/6_busqueda_ternaria.ipynb"><b>Abrir animación interactiva en Google Colab</b></a>
+  🎬 <a href="./6_busqueda_ternaria.ipynb"><b>Abrir simulación</b></a>
 </p>
 
 <p align="justify">
@@ -545,45 +361,20 @@ Buscar el valor <b>8</b> en el arreglo <code>[1, 2, 3, 4, 5, 6, 7, 8]</code> (n=
 <p align="justify">
 La relación de recurrencia modela exactamente el mismo costo para tiempo y espacio porque el algoritmo es recursivo y el rango siempre se reduce a 1/3 de su tamaño:
 </p>
-<p align="center"><code>C(n) = C(n/3) + 1</code></p>
+<p align="center">$C(n) = C(n/3) + 1$</p>
 <p align="justify">
-Aplicando el teorema maestro básico con <code>a=1, b=3, f(n)∈O(1)</code> (Caso 2: a = b⁰ = 1):
-<code>C(n) ∈ O(log₃(n))</code>
+Aplicando el teorema maestro básico con $a=1$, $b=3$ y $f(n)\in O(1)$ (Caso 2: $a=b^0=1$):
+$C(n) \in O(\log_3 (n))$
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Escenario</th>
-      <th style="padding:8px; border:1px solid #ccc;">T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Mejor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ω(1)</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">El objetivo coincide con m₁ o m₂ en la primera iteración</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Caso promedio</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₃(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Θ(log₃(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">La reducción a 1/3 ocurre independientemente de la distribución</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Peor caso</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(log₃(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;"><b>O(log₃(n))</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Máxima profundidad de recursión: log₃(n) niveles</td>
-    </tr>
-  </tbody>
-</table>
+| Escenario | $T(n)$ | $S(n)$ | Descripción |
+| :---: | :---: | :---: | :---: |
+| **Mejor caso** | $\Omega(1)$ | $\Omega(1)$ | El objetivo coincide con m₁ o m₂ en la primera iteración |
+| **Caso promedio** | $\Theta(\log_3 (n))$ | $\Theta(\log_3 (n))$ | La reducción a 1/3 ocurre independientemente de la distribución |
+| **Peor caso** | $O(\log_3 n)$ | $O(\log_3 n)$ | Máxima profundidad de recursión: $\log_3 n$ niveles |
 
 <p align="justify">
-<b>Consideración final del libro:</b> Aunque divide el espacio en tres partes en lugar de dos, la búsqueda ternaria no mejora asintóticamente a la búsqueda binaria. La razón es que <code>log₃(n) = log₂(n)/log₂(3)</code>, que solo introduce una constante multiplicativa que desaparece en el análisis asintótico. Dividir en más partes no reduce el orden de crecimiento del algoritmo.
+<b>Consideración final del libro:</b> Aunque divide el espacio en tres partes en lugar de dos, la búsqueda ternaria no mejora asintóticamente a la búsqueda binaria. La razón es que $\log_3 (n) = \log_2 (n)/\log_2 (3)$, que solo introduce una constante multiplicativa que desaparece en el análisis asintótico. Dividir en más partes no reduce el orden de crecimiento del algoritmo.
 </p>
 
 <p align="justify">
@@ -597,102 +388,35 @@ Aplicando el teorema maestro básico con <code>a=1, b=3, f(n)∈O(1)</code> (Cas
 </ul>
 
 <h3>Ventajas y desventajas</h3>
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Ventajas</th>
-      <th style="padding:8px; border:1px solid #ccc;">Desventajas</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Reduce el rango más agresivamente por iteración</td>
-      <td style="padding:8px; border:1px solid #ccc;">Realiza 2 comparaciones por iteración (vs 1 en búsqueda binaria)</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;">Versátil: aplica tanto a arreglos como a funciones continuas</td>
-      <td style="padding:8px; border:1px solid #ccc;">Menos eficiente en hardware moderno optimizado para operaciones binarias</td>
-    </tr>
-  </tbody>
-</table>
+
+| Ventajas | Desventajas |
+| :---: | :---: |
+| Reduce el rango más agresivamente por iteración | Realiza 2 comparaciones por iteración (vs 1 en búsqueda binaria) |
+| Versátil: aplica tanto a arreglos como a funciones continuas | Menos eficiente en hardware moderno optimizado para operaciones binarias |
 
 ---
 
 <h2 id="7-comp">📊 Comparación de todos los algoritmos</h2>
 
 <p align="center">
-  🎬 <a href="https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/0_comparacion_busquedas.ipynb"><b>Abrir comparación interactiva en Google Colab</b></a>
+  🎬 <a href="./0_comparacion_busquedas.ipynb"><b>Abrir simulación</b></a>
 </p>
 
-<table style="width:100%; border-collapse:collapse; margin-top:1em;">
-  <thead>
-    <tr style="background-color:#f2f2f2;">
-      <th style="padding:8px; border:1px solid #ccc;">Algoritmo</th>
-      <th style="padding:8px; border:1px solid #ccc;">Mejor caso T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Caso promedio T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Peor caso T(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">S(n)</th>
-      <th style="padding:8px; border:1px solid #ccc;">Requiere orden</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Secuencial</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ω(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">No</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Binaria</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ω(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Interpolación</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ω(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(log₂log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí + uniforme</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Saltos</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ω(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(√n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(√n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Exponencial</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ω(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(log₂n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-    </tr>
-    <tr>
-      <td style="padding:8px; border:1px solid #ccc;"><b>Ternaria</b></td>
-      <td style="padding:8px; border:1px solid #ccc;">Ω(1)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Θ(log₃n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(log₃n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">O(log₃n)</td>
-      <td style="padding:8px; border:1px solid #ccc;">Sí</td>
-    </tr>
-  </tbody>
-</table>
+| Algoritmo | Mejor caso $T(n)$ | Caso promedio $T(n)$ | Peor caso $T(n)$ | $S(n)$ | Requiere orden |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| **Secuencial** | $\Omega(1)$ | $\Theta(n)$ | $O(n)$ | $O(1)$ | No |
+| **Binaria** | $\Omega(1)$ | $\Theta(\log_2 n)$ | $O(\log_2 n)$ | $O(1)$ | Sí |
+| **Interpolación** | $\Omega(1)$ | $\Theta(\log_2 \log_2 n)$ | $O(n)$ | $O(1)$ | Sí + uniforme |
+| **Saltos** | $\Omega(1)$ | $\Theta(\sqrt{n})$ | $O(\sqrt{n})$ | $O(1)$ | Sí |
+| **Exponencial** | $\Omega(1)$ | $\Theta(\log_2 n)$ | $O(\log_2 n)$ | $O(1)$ | Sí |
+| **Ternaria** | $\Omega(1)$ | $\Theta(\log_3 n)$ | $O(\log_3 n)$ | $O(\log_3 n)$ | Sí |
 
 ---
 
 <h2 id="7-8">💡 7.8 Consideraciones finales</h2>
 
 <p align="justify">
-La elección del algoritmo de búsqueda depende de múltiples factores: el <b>orden y distribución de los datos</b>, la <b>frecuencia de las búsquedas</b> y el <b>tamaño del conjunto de datos</b>. Para conjuntos pequeños, la diferencia entre técnicas es despreciable. Para conjuntos grandes, la distancia entre <code>O(n)</code>, <code>O(√n)</code>, <code>O(log₂n)</code> y <code>O(log₂log₂n)</code> se hace enorme, y la elección correcta puede significar la diferencia entre una solución práctica y una impracticable.
+La elección del algoritmo de búsqueda depende de múltiples factores: el <b>orden y distribución de los datos</b>, la <b>frecuencia de las búsquedas</b> y el <b>tamaño del conjunto de datos</b>. Para conjuntos pequeños, la diferencia entre técnicas es despreciable. Para conjuntos grandes, la distancia entre $O(n)$, $O(\sqrt{n})$, $O(\log_2 n)$ y $O(\log_2\log_2 n)$ se hace enorme, y la elección correcta puede significar la diferencia entre una solución práctica y una impracticable.
 </p>
 
 <p align="justify">
@@ -721,7 +445,7 @@ El capítulo propone los siguientes ejercicios para consolidar el análisis de b
 </ol>
 
 <p align="justify">
-Se sugiere utilizar entradas en el intervalo <code>n ∈ [1, 10¹⁰]</code> para observar el comportamiento asintótico de cada función.
+Se sugiere utilizar entradas en el intervalo $n \in [1,10^{10}]$ para observar el comportamiento asintótico de cada función.
 </p>
 
 ---

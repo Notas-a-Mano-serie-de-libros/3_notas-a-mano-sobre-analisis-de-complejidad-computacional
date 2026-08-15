@@ -18,6 +18,43 @@ Este repositorio reúne los <b>notebooks interactivos</b>, <b>ejemplos práctico
 Su propósito es ofrecer un marco conceptual sólido para el estudio del <b>análisis algorítmico</b>, la <b>medición del costo computacional</b> y la <b>clasificación de problemas</b> en función de su eficiencia y recursos.
 </p>
 
+## Relación entre el libro y el repositorio
+
+Este repositorio es el complemento interactivo de la segunda edición del libro. Su documentación conserva el orden, la numeración y los temas de la obra impresa, y añade recursos ejecutables que permiten observar, experimentar y profundizar en sus contenidos.
+
+Los recursos se identifican mediante estas categorías:
+
+- **Espejo del libro:** reproduce una sección, ejemplo o algoritmo presentado en la obra.
+- **Espejo interactivo:** convierte el contenido del libro en una simulación manipulable sin alterar su explicación.
+- **Solución:** desarrolla los ejercicios propuestos u opcionales del libro.
+- **Material adicional:** amplía la obra con comparaciones, algoritmos, experimentos o explicaciones que no aparecen en la edición impresa.
+- **Fe de erratas:** documenta una corrección sin modificar silenciosamente lo publicado.
+
+| Capítulo | Contenido del libro | Documentación y notebooks |
+| :---: | :---: | :---: |
+| 2 | Fundamentos del análisis de algoritmos, pp. 57–86 | [Abrir capítulo 2](./capitulo2/notebooks/README.md) |
+| 3 | Notación asintótica, pp. 87–130 | [Abrir capítulo 3](./capitulo3/notebooks/README.md) |
+| 4 | Análisis de algoritmos estructurados, pp. 131–176 | [Abrir capítulo 4](./capitulo4/notebooks/README.md) |
+| 5 | Relaciones de recurrencia, pp. 177–218 | [Abrir capítulo 5](./capitulo5/notebooks/README.md) |
+| 6 | Análisis de algoritmos recursivos, pp. 219–254 | [Abrir capítulo 6](./capitulo6/notebooks/README.md) |
+| 7 | Algoritmos de búsqueda clásicos, pp. 255–312 | [Abrir capítulo 7](./capitulo7/notebooks/README.md) |
+| 8 | Algoritmos de ordenamiento clásicos, pp. 313–366 | [Abrir capítulo 8](./capitulo8/notebooks/README.md) |
+
+> Los README acompañan la lectura, pero no sustituyen el desarrollo formal del libro. Las ampliaciones se señalan expresamente para que el lector pueda distinguirlas del contenido publicado.
+
+### Apertura local o remota
+
+Las tablas de cada capítulo ofrecen una sola columna **Simulación**. El enlace es relativo al notebook concreto: desde un clon local abre la copia local y desde GitHub abre el archivo publicado. Cada notebook incluye a su vez el acceso directo a Google Colab.
+
+Al ejecutar la simulación, el lanzador resuelve automáticamente el entorno: utiliza el runtime del repositorio cuando está disponible y, si se ejecuta en Colab, descarga la versión correspondiente antes de iniciar.
+
+### Política de fidelidad y fe de erratas
+
+- El contenido marcado como espejo mantiene la estructura y las convenciones de la edición impresa.
+- Una explicación complementaria no se presenta como si formara parte del libro.
+- Si se detecta una diferencia matemática o editorial, se documenta como fe de erratas indicando la sección afectada, la formulación publicada, la corrección y su justificación.
+- Las simulaciones distinguen resultados medidos de estimaciones o proyecciones teóricas.
+
 <p style="text-align:center;">
 📖 <a href="https://www.amazon.com/dp/B0CW1JH98V"><strong>Ver el libro en Amazon</strong></a>
 </p>
@@ -32,6 +69,7 @@ Su propósito es ofrecer un marco conceptual sólido para el estudio del <b>aná
 
 <h2>👥 Información de los autores</h2>
 
+<div align="center">
 <table>
   <thead>
     <tr><th>Autor</th><th>Contacto</th><th>Enlace</th></tr>
@@ -49,6 +87,7 @@ Su propósito es ofrecer un marco conceptual sólido para el estudio del <b>aná
     <tr><td>ORCID</td><td><a href="https://orcid.org">ORCID</a></td></tr>
   </tbody>
 </table>
+</div>
 
 <blockquote style="text-align:justify;">
 💡 <b>Nota:</b> El material aquí presentado sirve como guía de referencia para comprender los fundamentos de la <b>complejidad algorítmica</b> desde una perspectiva teórica, experimental y aplicada.  
@@ -69,19 +108,6 @@ Cada volumen aborda un área clave de la ingeniería del software, integrando te
   <li><a href="https://a.co/d/aobD6ct"><b>Notas a mano sobre fundamentos en lógica y programación estructurada</b></a></li>
   <li><a href="https://a.co/d/9rEY0dC"><b>Notas a mano sobre análisis orientado a objetos y patrones de diseño</b></a></li>
 </ol>
-
-<hr/>
-
-<h2>🧭 Navegación del contenido</h2>
-
-<p style="text-align:justify;">
-La documentación detallada de los capítulos, junto con los notebooks y scripts de ejemplo, se encuentra disponible  
-en el índice general del proyecto. Desde allí es posible explorar cada tema o consultar los resultados experimentales asociados.
-</p>
-
-<p style="text-align:center;">
-👉 <a href="./README_index.md"><strong>Ir al índice general de capítulos</strong></a>
-</p>
 
 <hr/>
 
@@ -150,8 +176,6 @@ Los resultados pueden reproducirse sin dependencias externas.
 </p>
 
 <h3>Preparación del repositorio para desarrollo</h3>
-
-<p>La separación entre notebooks, módulos de dominio y componentes compartidos se documenta en <a href="./ARCHITECTURE.md">ARCHITECTURE.md</a>.</p>
 
 <p style="text-align:justify;">
 Las imágenes de cada capítulo se guardan en su carpeta <code>images/</code>. Los recursos editoriales permanecen en <code>images/recursos/</code> y los resultados producidos por simulaciones se escriben en <code>images/generadas/</code>; estos últimos no forman parte del repositorio. Para instalar los hooks que limpian notebooks y eliminan las imágenes generadas antes de cada push, ejecute una vez:

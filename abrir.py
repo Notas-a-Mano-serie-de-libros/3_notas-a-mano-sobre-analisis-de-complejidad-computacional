@@ -62,10 +62,10 @@ NOTEBOOKS: dict[str, str] = {
     "2/polinomial-general": "capitulo2/notebooks/7_complejidad_polinomial_general.ipynb",
     "2/exponencial":    "capitulo2/notebooks/8_complejidad_exponencial.ipynb",
     "2/factorial":      "capitulo2/notebooks/9_complejidad_factorial.ipynb",
-    "2/alta-temporal":  "capitulo2/notebooks/analisis_alta_complejidad_temporal.ipynb",
-    "2/alta-espacial":  "capitulo2/notebooks/analisis_alta_complejidad_espacial.ipynb",
-    "2/comparacion":    "capitulo2/notebooks/comparacion_complejidades_teoricas.ipynb",
-    "2/polinomica":     "capitulo2/notebooks/complejidad_polinomica.ipynb",
+    "2/alta-temporal":  "capitulo2/notebooks/graficas/analisis_alta_complejidad_temporal.ipynb",
+    "2/alta-espacial":  "capitulo2/notebooks/graficas/analisis_alta_complejidad_espacial.ipynb",
+    "2/comparacion":    "capitulo2/notebooks/graficas/comparacion_complejidades_teoricas.ipynb",
+    "2/polinomica":     "capitulo2/notebooks/graficas/complejidad_polinomica.ipynb",
     # ------------------------------------------------------------------
     # Capítulo 3 – Notación asintótica
     # ------------------------------------------------------------------

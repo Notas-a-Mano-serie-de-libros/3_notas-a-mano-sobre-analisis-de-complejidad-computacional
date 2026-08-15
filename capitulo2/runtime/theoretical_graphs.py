@@ -16,6 +16,10 @@ GRAPH_STYLE = {
     "font.family": "STIXGeneral",
     "mathtext.fontset": "stix",
     "axes.formatter.use_mathtext": True,
+    "axes.titlesize": 15,
+    "axes.labelsize": 13,
+    "xtick.labelsize": 10,
+    "ytick.labelsize": 10,
     "figure.dpi": 600,
     "savefig.dpi": 600,
 }
@@ -23,7 +27,7 @@ GRAPH_STYLE = {
 THEORETICAL_CONFIGS = {
     "constant": {
         "title": "constante",
-        "label": "Función de complejidad teórica T(n) = 1",
+        "label": r"Función de complejidad teórica $T(n)=1$",
         "max_safe_elements": 1_000_000,
         "function": lambda n: np.ones_like(n, dtype=np.float64),
         "legend_location": "lower right",
@@ -37,42 +41,42 @@ THEORETICAL_CONFIGS = {
     },
     "linear": {
         "title": "lineal",
-        "label": "Función de complejidad teórica T(n) = n",
+        "label": r"Función de complejidad teórica $T(n)=n$",
         "max_safe_elements": 1_000_000,
         "function": lambda n: n,
         "legend_location": "lower right",
     },
     "log_linear": {
         "title": "log-lineal",
-        "label": r"Función de complejidad teórica $T(n)=n\log_2(n)$",
+        "label": r"Función de complejidad teórica $T(n)=n\cdot\log_2(n)$",
         "max_safe_elements": 20_000,
         "function": lambda n: n * np.log2(np.maximum(n, 1)),
         "legend_location": "lower right",
     },
     "quadratic": {
         "title": "cuadrática",
-        "label": "Función de complejidad teórica T(n) = n²",
+        "label": r"Función de complejidad teórica $T(n)=n^2$",
         "max_safe_elements": 2_000,
         "function": lambda n: n**2,
         "legend_location": "upper left",
     },
     "cubic": {
         "title": "cúbica",
-        "label": "Función de complejidad teórica T(n) = n³",
+        "label": r"Función de complejidad teórica $T(n)=n^3$",
         "max_safe_elements": 200,
         "function": lambda n: n**3,
         "legend_location": "upper left",
     },
     "exponential": {
         "title": "exponencial",
-        "label": "Función de complejidad teórica T(n) = 2ⁿ",
+        "label": r"Función de complejidad teórica $T(n)=2^n$",
         "max_safe_elements": 30,
         "function": lambda n: np.power(2.0, n),
         "legend_location": "upper left",
     },
     "factorial": {
         "title": "factorial",
-        "label": "Función de complejidad teórica T(n) = n!",
+        "label": r"Función de complejidad teórica $T(n)=n!$",
         "max_safe_elements": 10,
         "function": lambda n: np.array([math.factorial(int(value)) for value in n], dtype=np.float64),
         "legend_location": "upper left",
@@ -118,7 +122,7 @@ def plot_theoretical_growth(name):
     plt.rcParams.update(GRAPH_STYLE)
     fig_main, ax1 = plt.subplots(1, 1, figsize=(8, 4))
     ax1.plot(n_values, y_values, label=config["label"], linestyle="dotted", color="red")
-    ax1.set_xlabel("Tamaño de la entrada ($n$)")
+    ax1.set_xlabel(r"Tamaño de la entrada $n$")
     ax1.set_ylabel("Costo teórico")
     ax1.set_xlim(left=0)
     ax1.set_ylim(bottom=0)
@@ -303,8 +307,8 @@ def plot_polynomial_family(max_degree=4, maximum_n=10):
             label=rf"$n^{{{degree}}}$",
         )
         lines[degree] = line
-    ax1.set_xlabel("Tamaño de la entrada ($n$)")
-    ax1.set_ylabel("Función de complejidad teórica")
+    ax1.set_xlabel(r"$\mathrm{Tamaño\ de\ la\ entrada}\ (n)$")
+    ax1.set_ylabel(r"$\mathrm{Función\ de\ complejidad\ teórica}$")
     if max_degree <= 4:
         ax1.set_xlim([1, maximum_n + 0.6])
         ax1.set_ylim([0, maximum_n])
@@ -315,10 +319,26 @@ def plot_polynomial_family(max_degree=4, maximum_n=10):
         ax1.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
     ax1.set_title(rf"$C(n)=n^k$ para $k \in [0, {max_degree}]$")
     label_polynomial_curves(ax1, max_degree, lines, n_values, maximum_n)
-    ax1.grid(True)
-    ax1.xaxis.set_major_formatter(plt.ScalarFormatter(useMathText=True))
-    ax1.yaxis.set_major_formatter(plt.ScalarFormatter(useMathText=True))
-    fig_main.tight_layout()
+    ax1.xaxis.set_label_coords(0.5, -0.12)
+    ax1.yaxis.set_label_coords(-0.075, 0.5)
+    ax1.title.set_position((0.5, 1.02))
+    x_formatter = plt.ScalarFormatter(useMathText=True)
+    x_formatter.set_scientific(False)
+    x_formatter.set_useOffset(False)
+    ax1.xaxis.set_major_formatter(x_formatter)
+    y_formatter = plt.ScalarFormatter(useMathText=True)
+    y_formatter.set_scientific(True)
+    y_formatter.set_powerlimits((0, 0))
+    ax1.yaxis.set_major_formatter(y_formatter)
+    ax1.yaxis.get_offset_text().set_fontfamily("STIXGeneral")
+    ax1.tick_params(axis="both", labelsize=10)
+    for tick_label in (*ax1.get_xticklabels(), *ax1.get_yticklabels()):
+        tick_label.set_fontfamily("STIXGeneral")
+    ax1.grid(True, color="#CFD8DC", linestyle="-", linewidth=0.6, alpha=0.55)
+    for spine in ax1.spines.values():
+        spine.set_color("#000000")
+        spine.set_linewidth(0.8)
+    fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)
     plt.show()
 
 

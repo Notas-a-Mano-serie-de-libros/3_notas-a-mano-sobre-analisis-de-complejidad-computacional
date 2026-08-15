@@ -309,7 +309,7 @@ def test_simulacion_declara_defaults_y_estados():
 def test_titulos_experimentales_no_reiteran_la_complejidad_del_notebook():
     source = Path(EXPERIMENT_DIR / "complexity_animations.py").read_text(encoding="utf-8")
 
-    assert source.count('f"{symbol}(n) teórico vs {symbol}(n) calculado"') == 2
+    assert source.count('rf"${symbol}(n)$ teórico vs ${symbol}(n)$ calculado"') == 2
     assert "calculado - Complejidad" not in source
 
 
@@ -453,6 +453,19 @@ def test_etiquetas_logaritmicas_usan_mathtext_y_no_subindices_unicode():
             assert all("\\log_2" in label for label in labels)
 
 
+def test_todas_las_funciones_de_las_graficas_usan_mathtext():
+    unicode_math = {"₂", "₃", "²", "³", "ⁿ"}
+
+    for configs in (THEORETICAL_CONFIGS, PROFILE_CONFIGS):
+        for config in configs.values():
+            labels = [config["label"]]
+            if "space_label" in config:
+                labels.append(config["space_label"])
+            for label in labels:
+                assert label.count("$") == 2
+                assert not unicode_math.intersection(label)
+
+
 def test_graficas_teoricas_alinean_ejes_en_el_origen():
     import matplotlib.pyplot as plt
 
@@ -520,7 +533,7 @@ def test_grafica_polinomial_estatica_usa_k_0_a_4():
     assert captured["line_count"] == 5
     assert captured["xlim"] == (1.0, 10.6)
     assert captured["ylim"] == (0.0, 10.0)
-    assert captured["ylabel"] == "Función de complejidad teórica"
+    assert captured["ylabel"] == r"$\mathrm{Función\ de\ complejidad\ teórica}$"
     assert captured["title"] == r"$C(n)=n^k$ para $k \in [0, 4]$"
     assert captured["legend"] is None
     assert captured["labels"] == [rf"$n^{{{degree}}}$" for degree in range(5)]
@@ -930,8 +943,8 @@ def test_referencias_colab_del_capitulo_2_siguen_orden_actual():
     assert '"2/polinomial-general"' in abrir_source
     assert "7_complejidad_polinomial_general.ipynb" in abrir_source
     assert r"\newcommand{\colabComplejidadPolinomialGeneral}" in readme_source
-    assert "7_complejidad_exponencial.ipynb" not in readme_source + chapter_readme_source + abrir_source
-    assert "8_complejidad_factorial.ipynb" not in readme_source + chapter_readme_source + abrir_source
+    assert "notebooks/7_complejidad_exponencial.ipynb" not in readme_source + chapter_readme_source + abrir_source
+    assert "notebooks/8_complejidad_factorial.ipynb" not in readme_source + chapter_readme_source + abrir_source
 
 
 def test_notebooks_generales_no_conservan_celdas_de_imports_antiguas():

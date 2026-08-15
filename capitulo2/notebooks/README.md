@@ -1,5 +1,28 @@
 # Capítulo 2: Fundamentos del análisis de algoritmos
 
+## Correspondencia con el libro
+
+Este README sigue el Capítulo 2 del libro, páginas 57–86. Las secciones 2.1 a 2.2 conservan su orden editorial; las simulaciones y comparadores amplían la exposición mediante experimentación.
+
+| Libro | Recurso | Simulación |
+| :---: | :---: | :---: |
+| 2.1.2 | Complejidad constante | [Abrir](./1_complejidad_constante.ipynb) |
+| 2.1.2 | Complejidad logarítmica | [Abrir](./2_complejidad_logaritmica.ipynb) |
+| 2.1.2 | Complejidad lineal | [Abrir](./3_complejidad_lineal.ipynb) |
+| 2.1.2 | Complejidad log-lineal | [Abrir](./4_complejidad_log_lineal.ipynb) |
+| 2.1.2 | Complejidad cuadrática | [Abrir](./5_complejidad_cuadratica.ipynb) |
+| 2.1.2 | Complejidad cúbica | [Abrir](./6_complejidad_cubica.ipynb) |
+| 2.1.2 | Complejidad polinomial general | [Abrir](./7_complejidad_polinomial_general.ipynb) |
+| 2.1.2 | Complejidad exponencial | [Abrir](./8_complejidad_exponencial.ipynb) |
+| 2.1.2 | Complejidad factorial | [Abrir](./9_complejidad_factorial.ipynb) |
+| 2.1.3 | Comparación teórica | [Abrir](graficas/comparacion_complejidades_teoricas.ipynb) |
+| 2.1.4 | Alta complejidad temporal | [Abrir](graficas/analisis_alta_complejidad_temporal.ipynb) |
+| 2.1.4 | Alta complejidad espacial | [Abrir](graficas/analisis_alta_complejidad_espacial.ipynb) |
+
+Las gráficas experimentales fijas, independientes de los controles del laboratorio, están disponibles en la sección [Notebooks para reproducir las gráficas experimentales](#notebooks-para-reproducir-las-gráficas-experimentales).
+
+> **Material adicional del repositorio:** las mediciones repetidas, comparaciones globales y análisis para entradas que exceden los límites prácticos complementan el libro; no deben confundirse con una ejecución experimental cuando se presentan como proyección.
+
 Este capítulo introduce una idea que aparece una y otra vez en el resto del libro: un algoritmo no solo se estudia por lo que calcula, sino también por la forma en que su costo cambia cuando aumenta el tamaño de la entrada.
 
 La pregunta central es sencilla de formular, pero profunda en sus consecuencias:
@@ -49,7 +72,7 @@ Al finalizar este capítulo deberías poder:
 ## Mapa del capítulo
 
 | Sección | Tema | Pregunta guía |
-|---|---|---|
+| :---: | :---: | :---: |
 | 2.1 | Función de complejidad | ¿Cómo representamos el costo de un algoritmo como función de $n$? |
 | 2.1.1 | Propiedades básicas | ¿Qué condiciones debe cumplir una función para modelar complejidad? |
 | 2.1.2 | Funciones teóricas comunes | ¿Qué formas de crecimiento aparecen con más frecuencia? |
@@ -97,7 +120,7 @@ Así, $C(n)$ representa una función de costo. El punto importante es que el an�
 Una función de complejidad debe ser razonable para modelar costos computacionales. En particular:
 
 | Propiedad | Idea formal | Significado práctico |
-|---|---|---|
+| :---: | :---: | :---: |
 | Dominio válido | $n\in\mathbb{N}$ | No tiene sentido hablar de $-5$ elementos o de $3.7$ nodos. |
 | Valores no negativos | $C(n)\ge 0$ | El tiempo y la memoria no pueden ser negativos. |
 | Lectura de crecimiento | observar qué ocurre cuando $n$ aumenta | El objetivo es entender cómo escala el costo. |
@@ -112,7 +135,7 @@ Esta distinción será importante en los experimentos. Una ejecución real puede
 Las siguientes funciones aparecen con frecuencia al estudiar algoritmos. Conviene leerlas en orden, porque cada una introduce una forma diferente de crecimiento.
 
 | Función $C(n)$ | Nombre | Lectura intuitiva |
-|---|---|---|
+| :---: | :---: | :---: |
 | $1$ | Constante | El costo no depende de $n$. |
 | $\log_2(n)$ | Logarítmica | El problema se reduce fuertemente en cada paso. |
 | $n$ | Lineal | El costo crece al mismo ritmo que la entrada. |
@@ -132,10 +155,23 @@ Una forma útil de estudiar esta tabla es preguntarse:
 
 ### Notebooks teóricos de apoyo
 
-| Notebook | Local | Colab |
-|---|---|---|
-| Comparación de complejidades teóricas | [Abrir local](./comparacion_complejidades_teoricas.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/notebooks/comparacion_complejidades_teoricas.ipynb) |
-| Complejidad polinómica | [Abrir local](./complejidad_polinomica.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/notebooks/complejidad_polinomica.ipynb) |
+| Notebook | Simulación |
+| :---: | :---: |
+| Comparación de complejidades teóricas | [Abrir local](graficas/comparacion_complejidades_teoricas.ipynb) |
+| Complejidad polinómica | [Abrir local](graficas/complejidad_polinomica.ipynb) |
+
+### Notebooks para reproducir las gráficas experimentales
+
+| Función | Notebook |
+| :---: | :---: |
+| $T(n)=c$ | [Abrir](./graficas/1_complejidad_constante.ipynb) |
+| $T(n)=\log_2(n)$ | [Abrir](./graficas/2_complejidad_logaritmica.ipynb) |
+| $T(n)=n$ | [Abrir](./graficas/3_complejidad_lineal.ipynb) |
+| $T(n)=n\cdot\log_2(n)$ | [Abrir](./graficas/4_complejidad_log_lineal.ipynb) |
+| $T(n)=n^2$ | [Abrir](./graficas/5_complejidad_cuadratica.ipynb) |
+| $T(n)=n^3$ | [Abrir](./graficas/6_complejidad_cubica.ipynb) |
+| $T(n)=2^n$ | [Abrir](./graficas/7_complejidad_exponencial.ipynb) |
+| $T(n)=n!$ | [Abrir](./graficas/8_complejidad_factorial.ipynb) |
 
 ---
 
@@ -182,10 +218,10 @@ Cuando compares funciones, no mires solo la primera fila. Observa cómo cambia c
 
 ### Notebooks de análisis de alta complejidad
 
-| Notebook | Local | Colab |
-|---|---|---|
-| Análisis de alta complejidad temporal | [Abrir local](./analisis_alta_complejidad_temporal.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/notebooks/analisis_alta_complejidad_temporal.ipynb) |
-| Análisis de alta complejidad espacial | [Abrir local](./analisis_alta_complejidad_espacial.ipynb) | [Abrir en Colab](https://githubtocolab.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/notebooks/analisis_alta_complejidad_espacial.ipynb) |
+| Notebook | Simulación |
+| :---: | :---: |
+| Análisis de alta complejidad temporal | [Abrir local](graficas/analisis_alta_complejidad_temporal.ipynb) |
+| Análisis de alta complejidad espacial | [Abrir local](graficas/analisis_alta_complejidad_espacial.ipynb) |
 
 ---
 
@@ -211,7 +247,7 @@ Los detalles de uso, controles y columnas de las tablas están en la [guía espe
 Sigue los notebooks en este orden. La dificultad conceptual y computacional aumenta de forma gradual.
 
 | Orden | Notebook | Ejemplo | Qué deberías observar |
-|---:|---|---|---|
+| :---: | :---: | :---: | :---: |
 | 1 | [1_complejidad_constante.ipynb](./1_complejidad_constante.ipynb) | Acceso a una posición de un arreglo | La figura debería mantenerse casi plana aunque $n$ aumente. |
 | 2 | [2_complejidad_logaritmica.ipynb](./2_complejidad_logaritmica.ipynb) | Búsqueda binaria | La curva crece muy lento, incluso para entradas enormes. |
 | 3 | [3_complejidad_lineal.ipynb](./3_complejidad_lineal.ipynb) | Búsqueda secuencial | Duplicar $n$ tiende a duplicar el costo. |
@@ -248,7 +284,7 @@ Una buena práctica es anotar una frase por notebook. Por ejemplo:
 ## Errores comunes al interpretar los experimentos
 
 | Error | Por qué ocurre | Cómo evitarlo |
-|---|---|---|
+| :---: | :---: | :---: |
 | Confundir ruido experimental con crecimiento real | Las mediciones pequeñas pueden fluctuar por el sistema operativo o el hardware. | Repite ejecuciones y mira la tendencia, no una sola fila. |
 | Comparar funciones con escalas incompatibles | Una curva dominante puede hacer que otras parezcan planas. | Observa los valores de la tabla además de la figura. |
 | Ejecutar tamaños demasiado grandes sin revisar advertencias | Algunas funciones crecen demasiado rápido. | Lee el aviso teórico antes de saltar límites. |
@@ -284,7 +320,7 @@ Consulta el documento con los ejercicios y sus indicaciones:
 ## Mini-glosario
 
 | Término | Significado |
-|---|---|
+| :---: | :---: |
 | $n$ | Tamaño de la entrada. |
 | $T(n)$ | Función que modela el costo temporal. |
 | $S(n)$ | Función que modela el consumo espacial o de recursos. |
@@ -299,11 +335,11 @@ Consulta el documento con los ejercicios y sus indicaciones:
 ## Guías complementarias del capítulo
 
 | Recurso | Descripción |
-|---|---|
-| [Laboratorio de complejidad experimental](../runtime/recursos/analisis_complejidad_temporal_experimental/README.md) | Guía de notebooks interactivos, controles y enlaces local/Colab. |
+| :---: | :---: |
+| [Laboratorio de complejidad experimental](../runtime/recursos/analisis_complejidad_temporal_experimental/README.md) | Guía de notebooks interactivos, controles y acceso contextual. |
 | [Análisis de eficiencia](../runtime/recursos/analisis_eficiencia/README.md) | Guía para los notebooks de límites temporales y espaciales. |
-| [Comparación de complejidades teóricas](./comparacion_complejidades_teoricas.ipynb) | Notebook de apoyo para comparar formas de crecimiento. |
-| [Complejidad polinómica](./complejidad_polinomica.ipynb) | Notebook de apoyo para estudiar la familia \(n^k\). |
+| [Comparación de complejidades teóricas](graficas/comparacion_complejidades_teoricas.ipynb) | Notebook de apoyo para comparar formas de crecimiento. |
+| [Complejidad polinómica](graficas/complejidad_polinomica.ipynb) | Notebook de apoyo para estudiar la familia \(n^k\). |
 
 ---
 
