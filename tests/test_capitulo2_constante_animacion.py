@@ -466,6 +466,17 @@ def test_todas_las_funciones_de_las_graficas_usan_mathtext():
                 assert not unicode_math.intersection(label)
 
 
+def test_comparacion_teorica_representa_la_complejidad_constante_como_c():
+    notebook_path = CHAPTER_DIR / "notebooks" / "graficas" / "comparacion_complejidades_teoricas.ipynb"
+    notebook = json.loads(notebook_path.read_text(encoding="utf-8"))
+    source = "\n".join("".join(cell.get("source", [])) for cell in notebook["cells"])
+
+    assert "c = 1.0" in source
+    assert "(r'$c$', np.full_like(n, c, dtype=float))" in source
+    assert "r'$c$': 1.45 * c" in source
+    assert "(r'$1$', np.ones_like(n, dtype=float))" not in source
+
+
 def test_graficas_teoricas_alinean_ejes_en_el_origen():
     import matplotlib.pyplot as plt
 
