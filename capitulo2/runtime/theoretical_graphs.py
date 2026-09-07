@@ -334,7 +334,7 @@ def plot_polynomial_family(max_degree=4, maximum_n=10):
     ax1.tick_params(axis="both", labelsize=10)
     for tick_label in (*ax1.get_xticklabels(), *ax1.get_yticklabels()):
         tick_label.set_fontfamily("STIXGeneral")
-    ax1.grid(True, color="#CFD8DC", linestyle="-", linewidth=0.6, alpha=0.55)
+    ax1.grid(True)
     for spine in ax1.spines.values():
         spine.set_color("#000000")
         spine.set_linewidth(0.8)

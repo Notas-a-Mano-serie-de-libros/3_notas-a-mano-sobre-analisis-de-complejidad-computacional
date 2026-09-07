@@ -150,7 +150,7 @@ def _abrir_local(alias: str, notebook: Path, port: int) -> int:
         )
 
     # Para los demás capítulos abre Jupyter Lab; si no está disponible,
-    # intenta con Jupyter Notebook clásico.
+    # intenta con Jupyter Notebook clásico. Pages usa Colab como ruta web.
     for mod, flag in [("jupyterlab", "lab"), ("notebook", "notebook")]:
         if importlib.util.find_spec(mod) is not None:
             return subprocess.call(

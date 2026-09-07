@@ -961,7 +961,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         code_cells = [cell for cell in nb["cells"] if cell["cell_type"] == "code"]
         bootstrap = (CHAPTER_DIR / "runtime" / "colab_bootstrap.py").read_text(encoding="utf-8")
         launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
-        comparison = (NOTEBOOK_DIR / "0_comparacion_ordenamientos.ipynb").read_text(encoding="utf-8")
+        comparison = (
+            PROJECT_ROOT / "docs" / "laboratorios" / "capitulo-8"
+            / "0-comparacion-ordenamientos.md"
+        ).read_text(encoding="utf-8")
         chart_source = (DOMAIN_DIR / "ordenamientos_chart.py").read_text(encoding="utf-8")
 
         self.assertEqual(len(code_cells), 2)
@@ -1193,9 +1196,13 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertNotIn("AUTO_RENDER_EVERY", source)
         self.assertNotIn("Complejidad temporal", notebook_source)
         self.assertNotIn("Complejidad espacial", notebook_source)
-        self.assertEqual(notebook_source.count("Mejor caso"), 1)
-        self.assertEqual(notebook_source.count("Caso promedio"), 1)
-        self.assertEqual(notebook_source.count("Peor caso"), 1)
+        comparison_page = (
+            PROJECT_ROOT / "docs" / "laboratorios" / "capitulo-8"
+            / "0-comparacion-ordenamientos.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(comparison_page.count("Mejor caso"), 1)
+        self.assertEqual(comparison_page.count("Caso promedio"), 1)
+        self.assertEqual(comparison_page.count("Peor caso"), 1)
         self.assertNotIn('description="Paso siguiente"', source)
         self.assertNotIn('description="Ejecución automática"', source)
         self.assertEqual(len(state["algorithms"]), 7)

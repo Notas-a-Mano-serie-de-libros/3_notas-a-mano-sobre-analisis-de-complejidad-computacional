@@ -5,9 +5,9 @@
 Este capítulo compara algoritmos de ordenamiento mediante animaciones, trazas y métricas. Cada notebook permite cambiar el orden, el caso de entrada y la representación visual.
 
 > [!IMPORTANT]
-> **Complemento de lectura:** [consultar la síntesis del capítulo 8 en GitHub Pages](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-8/).
+> **Complemento de lectura:** [síntesis del capítulo 8](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-8/) · [explicaciones de los laboratorios](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/laboratorios/capitulo-8/).
 
-<a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-8/"><img src="../../assets/qr/capitulo-8.png" width="132" alt="Código QR de la síntesis digital del capítulo 8"></a>
+<p align="center"><a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-8/"><img src="../../assets/qr/capitulo-8.png" width="132" alt="Código QR de la síntesis digital del capítulo 8"></a></p>
 
 ## Objetivos de aprendizaje
 

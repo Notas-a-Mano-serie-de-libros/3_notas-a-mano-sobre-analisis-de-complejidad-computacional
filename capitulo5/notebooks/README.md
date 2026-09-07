@@ -5,9 +5,9 @@
 Este capítulo estudia la formulación y solución de recurrencias. Los laboratorios hacen visibles las expansiones, los niveles del árbol y las condiciones de aplicación de cada método.
 
 > [!IMPORTANT]
-> **Complemento de lectura:** [consultar la síntesis del capítulo 5 en GitHub Pages](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-5/).
+> **Complemento de lectura:** [síntesis del capítulo 5](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-5/) · [explicaciones de los laboratorios](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/laboratorios/capitulo-5/).
 
-<a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-5/"><img src="../../assets/qr/capitulo-5.png" width="132" alt="Código QR de la síntesis digital del capítulo 5"></a>
+<p align="center"><a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-5/"><img src="../../assets/qr/capitulo-5.png" width="132" alt="Código QR de la síntesis digital del capítulo 5"></a></p>
 
 ## Objetivos de aprendizaje
 

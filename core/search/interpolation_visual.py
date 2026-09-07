@@ -107,7 +107,7 @@ def draw_general_formula_visual():
     ax.set_xlim(0, 9.2)
     ax.set_ylim(0, 5.8)
     ax.tick_params(axis="both", which="major", pad=5)
-    ax.grid(True, linestyle="--", linewidth=0.6, color="#b8b8b8", alpha=0.7)
+    ax.grid(True)
     plt.tight_layout()
     save_figure(fig, GENERAL_GRAPH_PATH)
     plt.show()
@@ -180,7 +180,7 @@ def draw_interpolation_visual(values, target, uniform=True):
     ax.set_ylabel("")
     ax.set_xticks(values)
     ax.set_yticks(positions)
-    ax.grid(True, linestyle="--", linewidth=0.6, color="#b8b8b8", alpha=0.7)
+    ax.grid(True)
     ax.legend(loc="upper left")
     padding = max(4, (max(values) - min(values)) * 0.05)
     ax.set_xlim(min(values) - padding, max(values) + padding)
@@ -349,8 +349,8 @@ def run_interpolation_visual():
       if(window.MathJax && MathJax.typesetPromise){resolve(window.MathJax);return;}
       window.MathJax={
         tex:{
-          inlineMath:[['\\\\(','\\\\)']],
-          displayMath:[['\\\\[','\\\\]']],
+          inlineMath:[['\\(','\\)']],
+          displayMath:[['\\[','\\]']],
           processEscapes:true
         },
         svg:{fontCache:'none'},
@@ -391,9 +391,9 @@ def run_interpolation_visual():
   var FN_KEYS=['lin','sq','sin','sqrt'];
   var FNS={
     lin: {fn:function(x){return 0.8*x+1;},       lbl:'f(x) = 0.8x + 1',latex:'0.8x+1'},
-    sq:  {fn:function(x){return x*x/10;},         lbl:'f(x) = x² / 10',latex:'\\\\dfrac{x^2}{10}'},
-    sin: {fn:function(x){return 5+4*Math.sin(x);},lbl:'f(x) = 5 + 4·sin(x)',latex:'5+4\\\\cdot\\\\sin(x)'},
-    sqrt:{fn:function(x){return 3*Math.sqrt(x);}, lbl:'f(x) = 3·√x',latex:'3\\\\sqrt{x}'}
+    sq:  {fn:function(x){return x*x/10;},         lbl:'f(x) = x² / 10',latex:'\\dfrac{x^2}{10}'},
+    sin: {fn:function(x){return 5+4*Math.sin(x);},lbl:'f(x) = 5 + 4·sin(x)',latex:'5+4\\cdot\\sin(x)'},
+    sqrt:{fn:function(x){return 3*Math.sqrt(x);}, lbl:'f(x) = 3·√x',latex:'3\\sqrt{x}'}
   };
   function stepFunction(direction){
     var select=document.getElementById('iv-fn');
@@ -469,7 +469,7 @@ def run_interpolation_visual():
   }
   function resetCards(){
     ['iv-dx','iv-di','iv-dt','iv-erra','iv-err'].forEach(function(k){
-      renderDynamicMath(k,'\\\\text{—}',false);
+      renderDynamicMath(k,'\\text{—}',false);
     });
     document.getElementById('iv-fml-vals').style.display='none';
   }
@@ -483,20 +483,20 @@ def run_interpolation_visual():
     if(!force && now-lastMathUpdate<mathUpdateDelay)return;
     lastMathUpdate=now;
     renderDynamicMath('iv-dx','x='+selX.toFixed(3),false);
-    renderDynamicMath('iv-di','y_{\\\\mathrm{est}}='+yi.toFixed(4),false);
-    renderDynamicMath('iv-dt','y_{\\\\mathrm{real}}='+yt.toFixed(4),false);
+    renderDynamicMath('iv-di','y_{\\mathrm{est}}='+yi.toFixed(4),false);
+    renderDynamicMath('iv-dt','y_{\\mathrm{real}}='+yt.toFixed(4),false);
     renderDynamicMath('iv-erra','E_a='+err.toFixed(4),false);
-    renderDynamicMath('iv-err','E_r='+errPct.toFixed(2)+'\\\\%',false);
+    renderDynamicMath('iv-err','E_r='+errPct.toFixed(2)+'\\%',false);
     document.getElementById('iv-fml-vals').style.display='flex';
     renderDynamicMath('iv-fml-vals',
-      '\\\\begin{aligned}'+
-      'y &=y_0+\\\\dfrac{(y_1-y_0)(x-x_0)}{x_1-x_0}\\\\\\\\[4pt]'+
-      '&='+y0.toFixed(3)+'+\\\\dfrac{('+(y1-y0).toFixed(3)+')('+
-      (selX-x0).toFixed(3)+')}{'+(x1-x0).toFixed(3)+'}\\\\\\\\[4pt]'+
-      '&='+y0.toFixed(3)+'+\\\\dfrac{'+((y1-y0)*(selX-x0)).toFixed(4)+
-      '}{'+(x1-x0).toFixed(3)+'}\\\\\\\\[4pt]'+
+      '\\begin{aligned}'+
+      'y &=y_0+\\dfrac{(y_1-y_0)(x-x_0)}{x_1-x_0}\\\\[4pt]'+
+      '&='+y0.toFixed(3)+'+\\dfrac{('+(y1-y0).toFixed(3)+')('+
+      (selX-x0).toFixed(3)+')}{'+(x1-x0).toFixed(3)+'}\\\\[4pt]'+
+      '&='+y0.toFixed(3)+'+\\dfrac{'+((y1-y0)*(selX-x0)).toFixed(4)+
+      '}{'+(x1-x0).toFixed(3)+'}\\\\[4pt]'+
       '&='+yi.toFixed(4)+
-      '\\\\end{aligned}',true);
+      '\\end{aligned}',true);
   }
   function draw(){
     ctx.clearRect(0,0,W,H);

@@ -2,32 +2,32 @@
 
 # Capítulo 3 · Notación asintótica
 
-**Páginas 89–132.** El capítulo construye un lenguaje para comparar funciones cuando la entrada crece indefinidamente y lo conecta con los casos de análisis computacional.
+<span class="chapter-kicker">Páginas 89–132</span>
 
-## Estructura conceptual
+## 3.1 Contexto y propósito
 
-| Sección | Desarrollo |
-| :---: | --- |
-| 3.1 | Contexto histórico: análisis límite, Bachmann–Landau y adopción computacional. |
-| 3.2 | Comportamiento general, casos polinómico y exponencial, y jerarquía funcional. |
-| 3.3 | Familias de funciones, propiedades y relaciones en el límite. |
-| 3.4 | Paso de la formulación general a una notación simplificada. |
-| 3.5 | Familias \(O\), \(o\), \(\Omega\), \(\omega\) y \(\Theta\), propiedades y estudio por casos. |
-| 3.6 | Ejercicios generales y verificación mediante límites. |
+La notación asintótica compara tasas de crecimiento cuando \(n\) tiende a infinito. Su utilidad consiste en abstraer constantes de implementación sin perder la relación formal entre una función de costo \(C(n)\) y una función de referencia \(g(n)\). Las cotas pueden ser superiores, inferiores, ajustadas o estrictas; por eso los cinco símbolos no son intercambiables.
 
-## Cinco relaciones
+<nav class="chapter-outline chapter-outline--pages" aria-label="Secciones del capítulo">
+<strong>Secciones del capítulo</strong>
+<ol class="chapter-section-list">
+<li><a href="familias-de-funciones/"><span>3.2 Familias de funciones</span><small>Leer sección →</small></a></li>
+<li class="chapter-section-group">
+<a href="notacion-asintotica-representacion-generica/"><span>3.3 Representación general</span><small>Leer sección principal →</small></a>
+<ol aria-label="Subsecciones de representación general">
+<li><a href="0-comparacion-notaciones-asintoticas/">3.3.1 Comparación general</a></li>
+<li><a href="1-notacion-big-o/">3.3.2 Notación \(O\)</a></li>
+<li><a href="2-notacion-little-o/">3.3.3 Notación \(o\)</a></li>
+<li><a href="3-notacion-big-omega/">3.3.4 Notación \(\Omega\)</a></li>
+<li><a href="4-notacion-little-omega/">3.3.5 Notación \(\omega\)</a></li>
+<li><a href="5-notacion-theta/">3.3.6 Notación \(\Theta\)</a></li>
+</ol>
+</li>
+<li><a href="ejemplos-concretos-notaciones/"><span>3.4 Ejemplos concretos</span><small>Leer sección →</small></a></li>
+<li><a href="ejercicios-propuestos/"><span>3.6 Ejercicios propuestos</span><small>Consultar PDF →</small></a></li>
+</ol>
+</nav>
 
-| Relación | Interpretación |
-| :---: | --- |
-| \(O(g(n))\) | Cota superior |
-| \(o(g(n))\) | Crecimiento estrictamente menor |
-| \(\Omega(g(n))\) | Cota inferior |
-| \(\omega(g(n))\) | Crecimiento estrictamente mayor |
-| \(\Theta(g(n))\) | Cota ajustada |
-
-La obra estudia reflexividad, antirreflexividad estricta, simetría, simetría transpuesta, transitividad, anidamiento y ausencia de tricotomía. Si dos entradas de tamaño \(n\) producen costos diferentes, el análisis debe distinguir casos.
-
-[Ver todos los recursos](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/tree/main/capitulo3/notebooks){ .md-button .md-button--primary }
-[Abrir comparador en Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/0_comparacion_notaciones_asintoticas.ipynb){ .md-button }
+---
 
 <nav class="chapter-nav chapter-nav--bottom" aria-label="Navegación inferior entre capítulos"><a href="../capitulo-2/">← Capítulo 2</a><a class="chapter-nav__index" href="../">Recorrido</a><a class="chapter-nav__next" href="../capitulo-4/">Capítulo 4 →</a></nav>

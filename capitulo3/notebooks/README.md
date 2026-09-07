@@ -5,9 +5,9 @@
 Este capítulo introduce las notaciones que permiten comparar funciones de complejidad mediante cotas superiores, inferiores, ajustadas y estrictas.
 
 > [!IMPORTANT]
-> **Complemento de lectura:** [consultar la síntesis del capítulo 3 en GitHub Pages](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-3/).
+> **Complemento de lectura:** [síntesis del capítulo 3](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-3/) · [explicaciones de los laboratorios](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/laboratorios/capitulo-3/).
 
-<a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-3/"><img src="../../assets/qr/capitulo-3.png" width="132" alt="Código QR de la síntesis digital del capítulo 3"></a>
+<p align="center"><a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-3/"><img src="../../assets/qr/capitulo-3.png" width="132" alt="Código QR de la síntesis digital del capítulo 3"></a></p>
 
 ## Objetivos de aprendizaje
 

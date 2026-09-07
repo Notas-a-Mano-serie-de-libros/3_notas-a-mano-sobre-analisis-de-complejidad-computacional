@@ -9,6 +9,8 @@ on:
       - "mkdocs.yml"
       - "requirements-docs.txt"
       - ".github/workflows/pages.yml"
+      - "scripts/integrate_laboratories_into_chapters.py"
+      - "scripts/validate_editorial_content.py"
   workflow_dispatch:
 
 permissions:
@@ -37,6 +39,10 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Build documentation
         run: python -m mkdocs build --strict
+      - name: Validate editorial structure and equations
+        run: python scripts/validate_editorial_content.py
+      - name: Validate breadcrumbs on every content page
+        run: python scripts/validate_pages_breadcrumbs.py --site-dir site
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:

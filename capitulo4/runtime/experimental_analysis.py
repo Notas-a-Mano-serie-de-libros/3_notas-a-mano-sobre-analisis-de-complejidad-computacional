@@ -218,7 +218,7 @@ def _plot(example, sizes, values, mode):
     ax.legend(loc="best", frameon=True, framealpha=0.9, edgecolor="#E0E0E0")
     _set_adaptive_y_limits(ax, values)
     _format_axis_text(ax)
-    ax.grid(True, color="#CFD8DC", linestyle="-", linewidth=0.6, alpha=0.55)
+    ax.grid(True)
     for spine in ax.spines.values():
         spine.set_color("#000000")
         spine.set_linewidth(0.8)
@@ -381,7 +381,7 @@ def _render_result(
     ax.set_xlim(left=0)
     _set_adaptive_y_limits(ax, measured_values, theoretical)
     _format_axis_text(ax)
-    ax.grid(True, color="#CFD8DC", linestyle="-", linewidth=0.6, alpha=0.55)
+    ax.grid(True)
     ax.legend(loc="upper right", frameon=True, framealpha=0.9, edgecolor="#E0E0E0")
     for spine in ax.spines.values():
         spine.set_color("#000000")
@@ -420,7 +420,7 @@ def _render_template(maximum_n, mode):
         else r"$\mathrm{Consumo\ de\ memoria}\ [bytes]$"
     )
     ax.set_title("Complejidad teórica vs. experimental")
-    ax.grid(True, color="#CFD8DC", linestyle="-", linewidth=0.6, alpha=0.55)
+    ax.grid(True)
     ax.legend(
         handles=[
             Line2D([], [], color="#1f77b4", linewidth=1.5,

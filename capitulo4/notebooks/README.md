@@ -5,9 +5,9 @@
 Este capítulo aplica las funciones de complejidad y la notación asintótica a algoritmos construidos con secuencias, condicionales y ciclos.
 
 > [!IMPORTANT]
-> **Complemento de lectura:** [consultar la síntesis del capítulo 4 en GitHub Pages](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-4/).
+> **Complemento de lectura:** [síntesis del capítulo 4](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-4/) · [explicaciones de los laboratorios](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/laboratorios/capitulo-4/).
 
-<a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-4/"><img src="../../assets/qr/capitulo-4.png" width="132" alt="Código QR de la síntesis digital del capítulo 4"></a>
+<p align="center"><a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-4/"><img src="../../assets/qr/capitulo-4.png" width="132" alt="Código QR de la síntesis digital del capítulo 4"></a></p>
 
 ## Objetivos de aprendizaje
 

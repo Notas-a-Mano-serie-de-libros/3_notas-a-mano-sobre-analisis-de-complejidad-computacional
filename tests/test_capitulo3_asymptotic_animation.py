@@ -387,8 +387,9 @@ def test_resultado_muestra_intervalo_y_n0_directo_sin_bloque_de_seleccion():
 
 def test_notebooks_presentan_n0_como_umbral_real_seleccionado():
     for notebook_path in ASYMPTOTIC_NOTEBOOKS:
-        notebook = json.loads(notebook_path.read_text(encoding="utf-8"))
-        source = "\n".join("".join(cell.get("source", [])) for cell in notebook["cells"])
+        number, slug = notebook_path.stem.split("_", 1)
+        page = PROJECT_ROOT / "docs" / "laboratorios" / "capitulo-3" / f"{number}-{slug.replace('_', '-')}.md"
+        source = page.read_text(encoding="utf-8")
         assert r"\lceil A\rceil" not in source
         assert r"n_0\in\mathbb{N}" not in source
         assert r"n_0\in\mathbb{R}^{+}" in source

@@ -5,9 +5,9 @@
 Este capítulo aplica el análisis temporal y espacial a seis algoritmos de búsqueda. Las animaciones muestran el intervalo activo, las comparaciones y los elementos descartados en cada paso.
 
 > [!IMPORTANT]
-> **Complemento de lectura:** [consultar la síntesis del capítulo 7 en GitHub Pages](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-7/).
+> **Complemento de lectura:** [síntesis del capítulo 7](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-7/) · [explicaciones de los laboratorios](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/laboratorios/capitulo-7/).
 
-<a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-7/"><img src="../../assets/qr/capitulo-7.png" width="132" alt="Código QR de la síntesis digital del capítulo 7"></a>
+<p align="center"><a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-7/"><img src="../../assets/qr/capitulo-7.png" width="132" alt="Código QR de la síntesis digital del capítulo 7"></a></p>
 
 ## Objetivos de aprendizaje
 

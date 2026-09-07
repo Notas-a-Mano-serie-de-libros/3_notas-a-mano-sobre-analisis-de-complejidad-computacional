@@ -16,7 +16,7 @@ COLAB_LINK_RE = re.compile(
 
 
 def iter_text_files():
-    ignored_parts = {".git", ".pytest_cache", "__pycache__"}
+    ignored_parts = {".git", ".mypy_cache", ".pytest_cache", ".ruff_cache", ".venv", "__pycache__"}
     for path in sorted(PROJECT_ROOT.rglob("*")):
         if not path.is_file():
             continue

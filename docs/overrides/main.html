@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% macro route_panel(position) %}
+  <nav class="editorial-breadcrumb route-panel route-panel--{{ position }}" aria-label="Ubicación y navegación de la lectura">
+    <ol class="route-panel__trail">
+      <li><a href="{{ nav.homepage.url | url }}">Inicio</a></li>
+      {% if page.parent and page.parent.parent %}
+        {% set grandparent_url = page.parent.parent.url or (page.parent.parent.children[0].url if page.parent.parent.children else none) %}
+        <li>{% if grandparent_url %}<a href="{{ grandparent_url | url }}">{{ page.parent.parent.title }}</a>{% else %}<span>{{ page.parent.parent.title }}</span>{% endif %}</li>
+      {% endif %}
+      {% if page.parent %}
+        {% set parent_url = page.parent.url or (page.parent.children[0].url if page.parent.children else none) %}
+        <li>{% if parent_url %}<a href="{{ parent_url | url }}">{{ page.parent.title }}</a>{% else %}<span>{{ page.parent.title }}</span>{% endif %}</li>
+      {% endif %}
+      <li aria-current="page"><span>{{ page.title }}</span></li>
+    </ol>
+    {% if page.previous_page or page.parent or page.next_page %}
+      <div class="route-panel__controls">
+        <span>{% if page.previous_page %}<a href="{{ page.previous_page.url | url }}">← {{ page.previous_page.title }}</a>{% endif %}</span>
+        <span>{% if page.parent %}{% set parent_url = page.parent.url or (page.parent.children[0].url if page.parent.children else none) %}{% if parent_url %}<a href="{{ parent_url | url }}">Índice de {{ page.parent.title }}</a>{% endif %}{% endif %}</span>
+        <span>{% if page.next_page %}<a href="{{ page.next_page.url | url }}">{{ page.next_page.title }} →</a>{% endif %}</span>
+      </div>
+    {% endif %}
+  </nav>
+{% endmacro %}
+
+{% macro reading_card() %}
+  <aside class="reading-card" aria-label="Orientación de la sección">
+    <div><strong>Propósito</strong><span>Comprender {{ page.title | lower }} y relacionarlo con el análisis de complejidad.</span></div>
+    <div><strong>Antes de empezar</strong><span>Identifica el tamaño de entrada, las hipótesis y la función que se estudia.</span></div>
+    <div><strong>Ruta</strong><span>Lee el desarrollo, interpreta las ecuaciones y abre el recurso asociado al final.</span></div>
+    <div><strong>Tiempo estimado</strong><span>Entre 8 y 15 minutos, sin contar la experimentación en Colab.</span></div>
+    <div><strong>Edición</strong><span>Segunda edición · revisión digital 2026</span></div>
+    <div class="reading-card__terms"><strong>También puedes buscar</strong><span>
+      {% if 'capitulo-2/' in page.file.src_uri %}funciones de costo, orden de crecimiento, tiempo y espacio
+      {% elif 'capitulo-3/' in page.file.src_uri %}notación asintótica, Big O, cotas y comportamiento límite
+      {% elif 'capitulo-4/' in page.file.src_uri %}conteo de operaciones, ciclos y algoritmos iterativos
+      {% elif 'capitulo-5/' in page.file.src_uri %}recurrencias, sustitución, árbol y teorema maestro
+      {% elif 'capitulo-6/' in page.file.src_uri %}recursión, pila de llamadas, tiempo y memoria
+      {% elif 'capitulo-7/' in page.file.src_uri %}búsqueda, localización, mejor caso y peor caso
+      {% elif 'capitulo-8/' in page.file.src_uri %}ordenación, sorting, estabilidad y memoria auxiliar
+      {% endif %}
+    </span></div>
+  </aside>
+{% endmacro %}
+
+{% macro learning_close() %}
+  <aside class="learning-close" aria-label="Cierre de la sección">
+    <strong>Para cerrar la lectura</strong>
+    <p>Resume con tus palabras qué crece, respecto de qué variable y bajo qué condiciones. Después contrasta esa conclusión con el laboratorio o los ejercicios de la sección.</p>
+    <p><strong>Error frecuente</strong> No confundas una tendencia asintótica con tiempo real ni una gráfica experimental con una demostración.</p>
+  </aside>
+{% endmacro %}
+
+{% block extrahead %}
+  {{ super() }}
+  <meta name="author" content="Carlos Eduardo Orozco Garcés, César Jesús Pardo Calvache y Mauro Callejas Cuervo">
+  <meta name="book-edition" content="Segunda edición, 2026">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ page.title }} · Notas a mano sobre análisis de complejidad computacional">
+  <meta property="og:description" content="Explicación, análisis y recursos de {{ page.title }} para la segunda edición de la obra.">
+{% endblock %}
+
+{% block content %}
+  {% set is_chapter_section = page.file and page.file.src_uri.startswith('capitulos/capitulo-') and page.file.src_uri.count('/') > 1 %}
+  {% if page != nav.homepage %}{{ route_panel("top") }}{% endif %}
+  {% if is_chapter_section %}{{ reading_card() }}{% endif %}
+  {{ super() }}
+  {% if is_chapter_section %}{{ learning_close() }}{% endif %}
+  {% if page != nav.homepage %}{{ route_panel("bottom") }}{% endif %}
+  <dialog class="figure-lightbox" aria-label="Ampliación de figura">
+    <button class="figure-lightbox__close" type="button" aria-label="Cerrar imagen ampliada">Cerrar</button>
+    <img alt="">
+    <p></p>
+  </dialog>
+{% endblock %}

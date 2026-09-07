@@ -4,38 +4,37 @@
 
 <span class="chapter-kicker">Páginas 223–258</span>
 
-Este capítulo traslada las herramientas de recurrencia al análisis de programas recursivos. El objetivo no es reconocer una fórmula de memoria, sino reconstruir el costo a partir del código y distinguir el tiempo de ejecución del espacio ocupado por la pila.
+## 6.1 Estructura de una solución recursiva
 
-## Método de análisis
+Toda función recursiva necesita un caso base y una transformación que acerque cada llamada a ese caso. El seguimiento distingue tres momentos: apilamiento de llamadas, resolución del caso base y retorno de resultados. El tiempo cuenta todo el trabajo ejecutado; el espacio cuenta la máxima cantidad de marcos activos simultáneamente, no el total histórico de llamadas.
 
-1. Identificar el caso base y el caso recursivo.
-2. Establecer cómo cambia el tamaño de la entrada en cada llamada.
-3. Formular la relación de recurrencia que representa el tiempo o el espacio.
-4. Resolverla y expresar el resultado con el orden asintótico correspondiente.
+### Procedimiento para calcular el tiempo
 
-En términos generales, el costo temporal reúne el trabajo local de cada llamada y el costo de las llamadas recursivas:
+1. Identifique el caso base y su costo.
+2. Cuente las llamadas de un caso no base y el tamaño recibido por cada una.
+3. Calcule el trabajo local realizado fuera de las llamadas.
+4. Escriba \(T(n)\), resuélvala con un método compatible y compruebe el resultado.
 
-\[
-T(n)=\sum T(n_i)+f(n)
-\]
+### Procedimiento para calcular el espacio
 
-El costo espacial exige observar, además, la profundidad máxima de la pila:
+1. Determine la memoria local de un marco de llamada.
+2. Calcule la profundidad máxima de llamadas activas, no la cantidad total de nodos del árbol.
+3. Añada estructuras auxiliares que sobrevivan mientras se resuelven los subproblemas.
+4. Exprese la altura en función de \(n\) y simplifique \(S(n)\).
 
-\[
-S(n)=S(\text{llamada activa})+\text{memoria local}
-\]
+Las secciones siguientes aplican el procedimiento a factorial, Fibonacci, potencia, Merge Sort y búsqueda en árbol binario, siempre en el orden código, análisis y simulación.
 
-## Casos estudiados
-
-El recorrido incluye factorial, Fibonacci, potencia, ordenamiento por mezcla y operaciones sobre árboles binarios de búsqueda. Estos ejemplos permiten contrastar recursión lineal, ramificada y por división del problema.
-
-!!! note "La diferencia que importa"
-    Dos algoritmos pueden resolver el mismo problema mediante recursión y, aun así, generar árboles de llamadas radicalmente distintos. Fibonacci ingenuo repite subproblemas; *merge sort* divide la entrada y combina resultados con una estructura regular.
-
-## Laboratorios
-
-[Abrir laboratorio del capítulo](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb){ .md-button .md-button--primary }
-[Ver archivos del capítulo](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/tree/main/capitulo6/notebooks){ .md-button }
+<nav class="chapter-outline chapter-outline--pages" aria-label="Secciones del capítulo">
+<strong>Secciones del capítulo</strong>
+<ol class="chapter-section-list">
+<li><a href="factorial/"><span>Ejemplo 1 · Factorial recursivo</span><small>Leer sección →</small></a></li>
+<li><a href="fibonacci/"><span>Ejemplo 2 · Fibonacci recursivo ingenuo</span><small>Leer sección →</small></a></li>
+<li><a href="potencia/"><span>Ejemplo 3 · Potencia de un número entero positivo</span><small>Leer sección →</small></a></li>
+<li><a href="merge-sort/"><span>Ejemplo 4 · Ordenamiento por mezcla</span><small>Leer sección →</small></a></li>
+<li><a href="arbol-binario/"><span>Ejemplo 5 · Búsqueda en árbol binario</span><small>Leer sección →</small></a></li>
+<li><a href="ejercicios-propuestos/"><span>6.4.1 Ejercicios propuestos</span><small>Leer sección →</small></a></li>
+</ol>
+</nav>
 
 ---
 

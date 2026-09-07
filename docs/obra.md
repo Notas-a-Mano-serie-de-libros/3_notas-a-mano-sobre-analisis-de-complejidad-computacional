@@ -7,16 +7,18 @@
 | Parte | Propósito |
 | --- | --- |
 | [Consideraciones teóricas previas](consideraciones-teoricas.md) | Reúne la simbología y la base matemática utilizada durante la obra. |
-| Capítulo 1 | Introduce algoritmo, análisis, complejidad computacional y su contexto histórico. |
+| [Capítulo 1](capitulos/capitulo-1.md) | Introduce algoritmo, análisis, complejidad computacional y su contexto histórico. |
 | Capítulos 2–3 | Construyen el lenguaje matemático de las funciones de complejidad y la notación asintótica. |
 | Capítulos 4–6 | Aplican ese lenguaje a algoritmos estructurados, recurrencias y algoritmos recursivos. |
 | Capítulos 7–8 | Analizan algoritmos clásicos de búsqueda y ordenamiento. |
-| Capítulo 9 | Cierra con reflexiones sobre el reto de mejorar una solución sin perder su propósito. |
+| [Capítulo 9](capitulos/capitulo-9.md) | Cierra con reflexiones sobre el reto de mejorar una solución sin perder su propósito. |
 | Material final | Bibliografía, fe de erratas, comentarios e índice alfabético. |
 
 ## Alcance del complemento digital
 
-El repositorio desarrolla recursos ejecutables para los capítulos 2–8. Los códigos QR de la obra conectan la lectura con animaciones, comparadores y soluciones. Este sitio incorpora una capa estable de navegación para que esos accesos no dependan de conocer la estructura interna del repositorio.
+El sitio ofrece una síntesis de los capítulos 1–9 y recursos ejecutables para los capítulos 2–8. Los códigos QR de la obra conectan la lectura con animaciones, comparadores y soluciones; la navegación editorial permite acceder también a los capítulos narrativos sin conocer la estructura interna del repositorio.
+
+[Consultar la correspondencia entre secciones, Pages y recursos](correspondencia.md){ .md-button }
 
 Los materiales digitales cumplen tres funciones:
 

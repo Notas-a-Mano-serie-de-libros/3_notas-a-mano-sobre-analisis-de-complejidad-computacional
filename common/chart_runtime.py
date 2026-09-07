@@ -187,7 +187,7 @@ def configure_log_axes(ax, *, title, x_limit, legend_columns=1):
     ax.set_ylabel("Operaciones promedio", fontsize=13)
     ax.set_title(title, fontsize=12)
     ax.legend(fontsize=9 if legend_columns > 1 else 11, loc="upper left", ncol=legend_columns)
-    ax.grid(True, which="both", linestyle="--", alpha=0.3)
+    ax.grid(True)
     ax.set_xlim(2, x_limit)
     ax.xaxis.set_major_formatter(mticker.FuncFormatter(format_large_tick))
 

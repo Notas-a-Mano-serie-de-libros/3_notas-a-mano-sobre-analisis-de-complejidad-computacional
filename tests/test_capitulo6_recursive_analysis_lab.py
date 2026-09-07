@@ -46,8 +46,12 @@ def test_book_examples_are_selectable_in_the_last_panel():
     notebook = json.loads(
         (Path(__file__).resolve().parents[1] / "capitulo6" / "notebooks" / "0_laboratorio_analisis_recursivo.ipynb").read_text(encoding="utf-8")
     )
-    assert notebook["cells"][-2]["cell_type"] == "markdown"
-    assert notebook["cells"][-2]["source"][0] == "## Análisis de ejemplos\n"
+    page = (
+        Path(__file__).resolve().parents[1] / "docs" / "laboratorios" / "capitulo-6"
+        / "0-laboratorio-analisis-recursivo.md"
+    ).read_text(encoding="utf-8")
+    assert len([cell for cell in notebook["cells"] if cell["cell_type"] == "markdown"]) == 1
+    assert "## Análisis de ejemplos" in page
     assert notebook["cells"][-1]["cell_type"] == "code"
     assert "examples_bootstrap.py" in "".join(notebook["cells"][-1]["source"])
 

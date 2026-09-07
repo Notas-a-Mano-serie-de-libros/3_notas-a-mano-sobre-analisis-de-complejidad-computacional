@@ -1,10 +1,25 @@
 # Cómo usar los laboratorios
 
-El sitio sirve como mapa de lectura; el código ejecutable permanece en los cuadernos del repositorio. Puedes trabajar de tres maneras.
+El sitio concentra las explicaciones de los laboratorios; el código ejecutable permanece en los cuadernos del repositorio. De esta manera, Pages funciona como espacio de lectura y Colab como espacio de experimentación.
+
+## Cómo se distribuye el contenido
+
+| Soporte | Contenido principal |
+| --- | --- |
+| Obra | Desarrollo completo, contexto y progresión editorial. |
+| GitHub Pages | Explicaciones de los laboratorios, ecuaciones, análisis e interpretación. |
+| Notebook | Código, controles, animaciones, tablas y resultados ejecutables. |
+| Google Colab | Entorno inmediato para ejecutar el notebook. |
+
+## Qué encontrarás en cada sección
+
+La lectura sigue una secuencia fija: **objetivo**, **procedimiento**, **ecuaciones**, **resultado teórico**, **interpretación experimental** y, cuando corresponde, **ejercicios**. El botón de Colab aparece después de la explicación para que puedas formular primero una predicción y contrastarla luego con la ejecución.
+
+Cada notebook incluye un enlace hacia su explicación específica en Pages. Al final de cada explicación encontrarás un botón para abrir el notebook en Colab.
 
 ## 1. Leer y orientar el estudio
 
-Usa el recorrido por capítulos para ubicar conceptos, ecuaciones, comparaciones y enlaces. La búsqueda del sitio permite encontrar un término en todo el complemento digital.
+Usa el recorrido por capítulos para ubicar conceptos generales y entra en cada sección para consultar el desarrollo asociado a una simulación concreta. La búsqueda del sitio permite encontrar términos dentro de todo el complemento digital.
 
 ## 2. Ejecutar en Google Colab
 
@@ -27,7 +42,7 @@ Después puedes abrir un recurso concreto, por ejemplo:
 python3 abrir.py 7/binaria
 ```
 
-Los capítulos 2–6 se apoyan principalmente en cuadernos Jupyter. Los capítulos 7–8 incorporan experiencias interactivas que también pueden ejecutarse con Voilà desde el entorno local.
+Los capítulos 2–8 se apoyan en cuadernos Jupyter. Colab es la ruta recomendada para ejecutar las animaciones desde Pages; la ejecución local queda disponible para quien quiera modificar el código.
 
 !!! tip "Un ciclo de estudio útil"
     Lee primero el razonamiento del capítulo, formula tu predicción sobre \(T(n)\) o \(S(n)\), ejecuta el cuaderno y contrasta el resultado. La medición complementa el análisis; no lo reemplaza.

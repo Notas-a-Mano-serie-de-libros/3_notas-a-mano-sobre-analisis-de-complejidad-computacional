@@ -422,7 +422,7 @@ def test_perfiles_generales_usan_estilo_visual_de_constante():
         assert style_line in polynomial_source
     assert "plt.rcParams.update(GRAPH_STYLE)" in polynomial_source
     assert "figsize=(8, 4)" in polynomial_source
-    assert 'ax1.grid(True, color="#CFD8DC"' in polynomial_source
+    assert "ax1.grid(True)" in polynomial_source
 
 
 def test_graficas_teoricas_definen_todas_las_complejidades_y_limites_seguros():
@@ -709,7 +709,7 @@ def test_grafica_polinomial_usa_tipografia_y_ejes_del_motor_experimental():
     assert 'fontsize=13' in polynomial_source
     assert 'fontsize=15' in polynomial_source
     assert 'labelsize=10' in polynomial_source
-    assert 'color="#CFD8DC"' in polynomial_source
+    assert "ax1.grid(True)" in polynomial_source
     assert 'spine.set_linewidth(0.8)' in polynomial_source
     assert 'fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)' in polynomial_source
 
@@ -801,7 +801,7 @@ def test_notebooks_generales_invocan_perfiles_interactivos():
         assert 'base / "capitulo2" / "runtime"' in source
         assert "_bootstrap_path is not None" in source
         assert "colab_bootstrap.py" in source
-        assert "Solo teórico" in source
+        assert "Leer la explicación completa en GitHub Pages" in source
         assert "Complejidad espacial experimental" not in source
 
 
@@ -833,8 +833,10 @@ def test_notebooks_incluyen_grafica_teorica_correcta():
 
 
 def test_notebook_logaritmico_explica_cambio_de_base():
-    notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / "2_complejidad_logaritmica.ipynb").read_text(encoding="utf-8"))
-    source = "".join(notebook["cells"][1].get("source", []))
+    source = (
+        CHAPTER_DIR.parent / "docs" / "laboratorios" / "capitulo-2"
+        / "2-complejidad-logaritmica.md"
+    ).read_text(encoding="utf-8")
 
     assert r"\log_\ell(n)" in source
     assert r"\log_\ell(n) = \frac{\log_b(n)}{\log_b(\ell)}" in source
@@ -856,27 +858,26 @@ def test_notebook_polinomial_general_tiene_estructura_teorica_interactiva():
     notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / "7_complejidad_polinomial_general.ipynb").read_text(encoding="utf-8"))
     cells = notebook["cells"]
     source = "\n".join("".join(cell.get("source", [])) for cell in cells)
-    headings = ["".join(cell.get("source", [])).strip().splitlines()[0] for cell in cells]
+    page_source = (
+        CHAPTER_DIR.parent / "docs" / "laboratorios" / "capitulo-2"
+        / "7-complejidad-polinomial-general.md"
+    ).read_text(encoding="utf-8")
 
-    assert [cell["cell_type"] for cell in cells] == ["markdown", "markdown", "code", "markdown", "code"]
-    assert headings[0].startswith("# Complejidad polinomial general")
-    assert headings[1] == "## Simulación teórica interactiva"
-    assert headings[2].startswith("#@title Simulación teórica interactiva")
-    assert headings[3] == "## Detalle teórico"
-    assert headings[4].startswith("#@title Gráfica del comportamiento teórico")
-    assert r"C(n)=n^k" in source
-    assert r"k\in[0,4]" in source
+    assert [cell["cell_type"] for cell in cells] == ["markdown", "code", "code"]
+    assert "Leer la explicación completa en GitHub Pages" in source
+    assert r"C(n)=n^k" in page_source
+    assert r"k\in[0,4]" in page_source
     assert 'THEORETICAL_GRAPH = "plot_polynomial_family"' in source
     assert 'THEORETICAL_KWARGS = {"max_degree": 4, "maximum_n": 10}' in source
     assert 'SIMULATION_NAME = "polynomial_general"' in source
     assert "colab_bootstrap.py" in source
     assert "urllib.request.urlopen" in source
-    assert "no se realizan ejecuciones experimentales" in source
-    assert "El valor máximo de $n$ se mantiene fijo y de solo lectura en $10$" in source
-    assert "botones laterales" in source
-    assert "La tabla siempre muestra el valor teórico calculado hasta $k=5$" in source
-    assert "Al cambiar el valor de $k$, la figura se actualiza automáticamente" in source
-    assert "cantidad adimensional de operaciones teóricas" in source
+    assert "no se realizan ejecuciones experimentales" in page_source
+    assert "El valor máximo de \\(n\\) se mantiene fijo" in page_source
+    assert "botones laterales" in page_source
+    assert "La tabla siempre muestra el valor teórico" in page_source
+    assert "Al cambiar el valor de \\(k\\)" in page_source
+    assert "cantidad adimensional de operaciones teóricas" in page_source
     assert all(cell.get("outputs", []) == [] for cell in cells if cell["cell_type"] == "code")
     assert all(cell.get("execution_count") is None for cell in cells if cell["cell_type"] == "code")
 
@@ -996,44 +997,10 @@ def test_notebooks_generales_siguen_estructura_de_constante():
     for notebook_name in notebooks:
         notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / notebook_name).read_text(encoding="utf-8"))
         cells = notebook["cells"]
-        headings = ["".join(cell.get("source", [])).strip().splitlines()[0] for cell in cells]
         types = [cell["cell_type"] for cell in cells]
-
-        if notebook_name == "2_complejidad_logaritmica.ipynb":
-            assert types == [
-                "markdown",
-                "markdown",
-                "code",
-                "markdown",
-                "markdown",
-                "code",
-                "markdown",
-                "code",
-                "code",
-            ]
-            assert headings[1].startswith("## Algoritmo simulado:")
-            assert headings[4] == "## Simulación"
-            assert headings[5].startswith("#@title Simulación interactiva de complejidad temporal y espacial")
-            assert headings[6] == "## Detalle teórico"
-            assert headings[7].startswith("#@title Gráfica del comportamiento teórico")
-            assert headings[8].startswith("#@title Crecimiento logarítmico hasta")
-            continue
-
-        assert types == [
-            "markdown",
-            "markdown",
-            "code",
-            "markdown",
-            "markdown",
-            "code",
-            "markdown",
-            "code",
-        ]
-        assert headings[1].startswith("## Algoritmo simulado:")
-        assert headings[4] == "## Simulación"
-        assert headings[5].startswith("#@title Simulación interactiva de complejidad temporal y espacial")
-        assert headings[6] == "## Detalle teórico"
-        assert headings[7].startswith("#@title Gráfica del comportamiento teórico")
+        expected_code_cells = 4 if notebook_name == "2_complejidad_logaritmica.ipynb" else 3
+        assert types == ["markdown", *("code" for _ in range(expected_code_cells))]
+        assert "Leer la explicación completa en GitHub Pages" in "".join(cells[0]["source"])
 
 
 def test_rango_experimental_conserva_puntos_intermedios_y_potencias():

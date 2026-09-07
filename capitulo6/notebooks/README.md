@@ -5,9 +5,9 @@
 Este capítulo conecta la ejecución de funciones recursivas con sus relaciones de recurrencia. El laboratorio permite observar el apilamiento, el caso base y el desapilamiento de cada llamada.
 
 > [!IMPORTANT]
-> **Complemento de lectura:** [consultar la síntesis del capítulo 6 en GitHub Pages](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-6/).
+> **Complemento de lectura:** [síntesis del capítulo 6](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-6/) · [explicaciones de los laboratorios](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/laboratorios/capitulo-6/).
 
-<a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-6/"><img src="../../assets/qr/capitulo-6.png" width="132" alt="Código QR de la síntesis digital del capítulo 6"></a>
+<p align="center"><a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-6/"><img src="../../assets/qr/capitulo-6.png" width="132" alt="Código QR de la síntesis digital del capítulo 6"></a></p>
 
 ## Objetivos de aprendizaje
 

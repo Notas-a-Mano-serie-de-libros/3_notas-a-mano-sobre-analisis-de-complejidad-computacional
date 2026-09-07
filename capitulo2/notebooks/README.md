@@ -5,9 +5,9 @@
 Este capítulo presenta las funciones de complejidad temporal y espacial. Los notebooks permiten reconocer sus formas de crecimiento y contrastar modelos teóricos con mediciones experimentales.
 
 > [!IMPORTANT]
-> **Complemento de lectura:** [consultar la síntesis del capítulo 2 en GitHub Pages](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-2/).
+> **Complemento de lectura:** [síntesis del capítulo 2](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-2/) · [explicaciones de los laboratorios](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/laboratorios/capitulo-2/).
 
-<a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-2/"><img src="../../assets/qr/capitulo-2.png" width="132" alt="Código QR de la síntesis digital del capítulo 2"></a>
+<p align="center"><a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-2/"><img src="../../assets/qr/capitulo-2.png" width="132" alt="Código QR de la síntesis digital del capítulo 2"></a></p>
 
 ## Objetivos de aprendizaje
 

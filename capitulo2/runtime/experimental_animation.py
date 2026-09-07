@@ -82,7 +82,7 @@ def style_experiment_axis(ax, mode, title, legend_handles=None):
     for label in (*ax.get_xticklabels(), *ax.get_yticklabels()):
         label.set_fontfamily("STIXGeneral")
 
-    ax.grid(True, color="#CFD8DC", linestyle="-", linewidth=0.6, alpha=0.55)
+    ax.grid(True)
     for spine in ax.spines.values():
         spine.set_color("#000000")
         spine.set_linewidth(0.8)

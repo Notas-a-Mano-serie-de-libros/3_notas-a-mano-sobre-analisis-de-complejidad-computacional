@@ -4,33 +4,23 @@
 
 <span class="chapter-kicker">Páginas 259–316</span>
 
-El capítulo compara estrategias para localizar elementos y muestra por qué la organización de los datos condiciona el algoritmo que conviene utilizar. El material digital conserva la estructura de la obra.
+## Cómo leer este capítulo
 
-## 1. Comparación general
+Los algoritmos de búsqueda se comparan a partir de sus precondiciones, la forma en que descartan candidatos, sus casos mejor, promedio y peor, y la memoria adicional que requieren. Cada sección desarrolla el procedimiento y su análisis antes de ofrecer la simulación correspondiente.
 
-La comparación reúne requisitos, idea central y complejidad de cada búsqueda. No existe un algoritmo universalmente superior: ordenar previamente, disponer de acceso aleatorio o conocer la distribución de las claves cambia la decisión.
-
-| Algoritmo | Requisito principal | Tiempo característico |
-| --- | --- | --- |
-| Secuencial | Ninguno | \(O(n)\) |
-| Binaria | Datos ordenados | \(O(\log n)\) |
-| Interpolación | Datos ordenados y bien distribuidos | promedio \(O(\log\log n)\) |
-| Por saltos | Datos ordenados | \(O(\sqrt n)\) |
-| Exponencial | Datos ordenados | \(O(\log n)\) |
-| Ternaria | Datos ordenados | \(O(\log n)\) |
-
-[Consultar la comparación completa](../algoritmos/busquedas.md){ .md-button .md-button--primary }
-
-## 2. Algoritmos específicos
-
-La obra desarrolla seis algoritmos: búsqueda secuencial, binaria, por interpolación, por saltos, exponencial y ternaria. Cada estudio incluye su funcionamiento, implementación, análisis temporal y espacial, escenarios de aplicación, ventajas y limitaciones.
-
-## 3. Solución de los ejercicios propuestos
-
-Los cuadernos permiten ejecutar los algoritmos, cambiar entradas y contrastar el comportamiento observado con el análisis teórico. La solución se presenta como material de estudio reproducible, no como sustituto del razonamiento previo.
-
-[Abrir comparación en Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo7/notebooks/0_comparacion_busquedas.ipynb){ .md-button }
-[Ver soluciones del capítulo](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/tree/main/capitulo7/notebooks){ .md-button }
+<nav class="chapter-outline chapter-outline--pages" aria-label="Secciones del capítulo">
+<strong>Secciones del capítulo</strong>
+<ol class="chapter-section-list">
+<li><a href="0-comparacion-busquedas/"><span>7.1 Comparación general</span><small>Leer sección →</small></a></li>
+<li><a href="1-busqueda-secuencial/"><span>7.2 Búsqueda secuencial</span><small>Leer sección →</small></a></li>
+<li><a href="2-busqueda-binaria/"><span>7.3 Búsqueda binaria</span><small>Leer sección →</small></a></li>
+<li><a href="3-busqueda-interpolacion/"><span>7.4 Búsqueda por interpolación</span><small>Leer sección →</small></a></li>
+<li><a href="4-busqueda-saltos/"><span>7.5 Búsqueda por saltos</span><small>Leer sección →</small></a></li>
+<li><a href="5-busqueda-exponencial/"><span>7.6 Búsqueda exponencial</span><small>Leer sección →</small></a></li>
+<li><a href="6-busqueda-ternaria/"><span>7.7 Búsqueda ternaria</span><small>Leer sección →</small></a></li>
+<li><a href="ejercicios-propuestos/"><span>7.9 Ejercicios propuestos</span><small>Leer sección →</small></a></li>
+</ol>
+</nav>
 
 ---
 

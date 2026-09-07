@@ -12,7 +12,7 @@ from urllib.parse import unquote, urlparse
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY_NAME = "3_notas-a-mano-sobre-analisis-de-complejidad-computacional"
 TEXT_SUFFIXES = {".md", ".ipynb", ".py"}
-IGNORED_PARTS = {".git", ".pytest_cache", "__pycache__"}
+IGNORED_PARTS = {".git", ".mypy_cache", ".pytest_cache", ".ruff_cache", ".venv", "__pycache__"}
 OBSOLETE_PATTERNS = {
     r"capitulo[2-8]/graficas/": "carpeta antigua de gráficas del capítulo",
     r"(?:^|[\"'/])graficas/(?:recursos|generadas)/": "carpeta central de gráficas eliminada",
@@ -89,7 +89,8 @@ def raw_urls(text: str) -> list[str]:
         url = url.removesuffix("\\n")
         while url.endswith(")") and url.count(")") > url.count("("):
             url = url[:-1]
-        cleaned.append(url.rstrip("\\}.,;"))
+        # Los atributos de MkDocs pueden dejar ``){`` tras la URL capturada.
+        cleaned.append(url.rstrip("\\}.,;){"))
     return cleaned
 
 
@@ -114,9 +115,33 @@ def local_target_error(source: Path, target: str) -> str | None:
     if not cleaned or cleaned.startswith(("#", "http://", "https://", "mailto:", "data:")):
         return None
     destination = (source.parent / unquote(cleaned)).resolve()
-    if not destination.exists():
-        return f"{source.relative_to(PROJECT_ROOT)} enlaza un destino inexistente: {target}"
-    return None
+    if destination.exists():
+        return None
+
+    # El HTML incrustado en Markdown se resuelve desde la URL publicada. Así,
+    # ``docs/autores.md`` vive en ``/autores/`` y ``../assets/`` apunta a
+    # ``docs/assets/``. Esta alternativa también reconoce las URL limpias de
+    # MkDocs: ``capitulo-2/`` corresponde a ``capitulo-2.md``.
+    docs_root = PROJECT_ROOT / "docs"
+    try:
+        relative_source = source.relative_to(docs_root)
+    except ValueError:
+        pass
+    else:
+        if source.suffix == ".md":
+            rendered_parent = docs_root / relative_source.parent
+            if source.name != "index.md":
+                rendered_parent /= source.stem
+            rendered_target = (rendered_parent / unquote(cleaned)).resolve()
+            candidates = (
+                rendered_target,
+                rendered_target.with_suffix(".md"),
+                rendered_target / "index.md",
+            )
+            if any(candidate.exists() for candidate in candidates):
+                return None
+
+    return f"{source.relative_to(PROJECT_ROOT)} enlaza un destino inexistente: {target}"
 
 
 def repository_url_path(url: str) -> str | None:

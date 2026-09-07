@@ -219,7 +219,7 @@ def _plot_template_html(maximum_n, analysis):
     ax.set_xlabel(r"Tamaño de la entrada $(n)$", fontsize=15)
     ax.set_ylabel("Tiempo de ejecución promedio [s]" if analysis == "temporal" else "Consumo de memoria auxiliar [bytes]", fontsize=15)
     ax.set_title(rf"{symbol}(n) teórico vs {symbol}(n) calculado", fontsize=17)
-    ax.grid(True, color="#CFD8DC", linewidth=.6, alpha=.55)
+    ax.grid(True)
     ax.legend(loc="upper right", frameon=True, facecolor="white", edgecolor="#e0e0e0", fontsize=13)
     for spine in ax.spines.values():spine.set_color("black");spine.set_linewidth(.8)
     fig.tight_layout()
@@ -245,7 +245,7 @@ def _plot_html(rows, title, analysis):
     ax.set_ylabel("Tiempo de ejecución promedio [s]" if analysis == "temporal" else "Consumo de memoria auxiliar [bytes]", fontsize=15)
     symbol = "T" if analysis == "temporal" else "S"
     ax.set_title(rf"{symbol}(n) teórico vs {symbol}(n) calculado", fontsize=17)
-    ax.grid(True, color="#CFD8DC", linewidth=.6, alpha=.55)
+    ax.grid(True)
     ax.legend(loc="upper right", frameon=True, facecolor="white", edgecolor="#e0e0e0", fontsize=13)
     for spine in ax.spines.values():
         spine.set_color("black"); spine.set_linewidth(.8)

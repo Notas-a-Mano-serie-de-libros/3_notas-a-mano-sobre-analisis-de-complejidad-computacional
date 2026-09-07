@@ -50,11 +50,11 @@ Este glosario reúne la terminología central y las entradas del índice alfabé
 
 **Complejidad constante.** Crecimiento que no depende del tamaño de entrada, representado por \(\Theta(1)\).
 
-**Complejidad logarítmica.** Crecimiento proporcional a \(\log n\).
+**Complejidad logarítmica.** Crecimiento proporcional a \(\log(n)\).
 
 **Complejidad lineal.** Crecimiento proporcional a \(n\).
 
-**Complejidad log-lineal.** Crecimiento proporcional a \(n\log n\).
+**Complejidad log-lineal.** Crecimiento proporcional a \(n\log(n)\).
 
 **Complejidad polinomial.** Crecimiento acotado por alguna potencia \(n^k\) con \(k\) constante.
 

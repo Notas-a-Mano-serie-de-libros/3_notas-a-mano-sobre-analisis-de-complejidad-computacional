@@ -34,6 +34,10 @@ plugins:
   - search:
       lang: es
 
+exclude_docs: |
+  laboratorios/
+  algoritmos/
+
 markdown_extensions:
   - admonition
   - attr_list
@@ -57,24 +61,94 @@ extra_css:
 
 extra_javascript:
   - assets/javascripts/mathjax.js
+  - assets/javascripts/site.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 nav:
   - Inicio: index.md
   - La obra: obra.md
+  - Correspondencia libro–sitio: correspondencia.md
   - Consideraciones teóricas: consideraciones-teoricas.md
   - Capítulos:
       - Recorrido: capitulos/index.md
-      - 2. Fundamentos: capitulos/capitulo-2.md
-      - 3. Notación asintótica: capitulos/capitulo-3.md
-      - 4. Algoritmos estructurados: capitulos/capitulo-4.md
-      - 5. Relaciones de recurrencia: capitulos/capitulo-5.md
-      - 6. Algoritmos recursivos: capitulos/capitulo-6.md
-      - 7. Búsquedas: capitulos/capitulo-7.md
-      - 8. Ordenamientos: capitulos/capitulo-8.md
-  - Algoritmos:
-      - Búsquedas: algoritmos/busquedas.md
-      - Ordenamientos: algoritmos/ordenamientos.md
+      - Capítulo 1 · Introducción: capitulos/capitulo-1.md
+      - Capítulo 2 · Fundamentos:
+          - Teoría: capitulos/capitulo-2.md
+          - Sublineal: capitulos/capitulo-2/0-complejidad-sublineal.md
+          - Constante: capitulos/capitulo-2/1-complejidad-constante.md
+          - Logarítmica: capitulos/capitulo-2/2-complejidad-logaritmica.md
+          - Lineal: capitulos/capitulo-2/3-complejidad-lineal.md
+          - Log-lineal: capitulos/capitulo-2/4-complejidad-log-lineal.md
+          - Cuadrática: capitulos/capitulo-2/5-complejidad-cuadratica.md
+          - Cúbica: capitulos/capitulo-2/6-complejidad-cubica.md
+          - Polinomial: capitulos/capitulo-2/7-complejidad-polinomial-general.md
+          - Exponencial: capitulos/capitulo-2/8-complejidad-exponencial.md
+          - Factorial: capitulos/capitulo-2/9-complejidad-factorial.md
+          - Ejercicios propuestos: capitulos/capitulo-2/ejercicios-propuestos.md
+      - Capítulo 3 · Notación asintótica:
+          - Teoría: capitulos/capitulo-3.md
+          - Familias de funciones: capitulos/capitulo-3/familias-de-funciones.md
+          - Representación general:
+              - Introducción: capitulos/capitulo-3/notacion-asintotica-representacion-generica.md
+              - Comparación de las notaciones: capitulos/capitulo-3/0-comparacion-notaciones-asintoticas.md
+              - Notación O: capitulos/capitulo-3/1-notacion-big-o.md
+              - Notación o: capitulos/capitulo-3/2-notacion-little-o.md
+              - Notación Ω: capitulos/capitulo-3/3-notacion-big-omega.md
+              - Notación ω: capitulos/capitulo-3/4-notacion-little-omega.md
+              - Notación Θ: capitulos/capitulo-3/5-notacion-theta.md
+          - Ejemplos integradores: capitulos/capitulo-3/ejemplos-concretos-notaciones.md
+          - Ejercicios propuestos: capitulos/capitulo-3/ejercicios-propuestos.md
+      - Capítulo 4 · Algoritmos estructurados:
+          - Procedimiento de análisis: capitulos/capitulo-4.md
+          - Ejemplo 1 · Suma: capitulos/capitulo-4/ejemplo1-sumar-numeros.md
+          - Ejemplo 2 · Arreglo: capitulos/capitulo-4/ejemplo2-imprimir-elementos-arreglo.md
+          - Ejemplo 3 · Matriz: capitulos/capitulo-4/ejemplo3-imprimir-elementos-matriz.md
+          - Ejemplo 4 · Matriz variable: capitulos/capitulo-4/ejemplo4-inicializar-matriz-variable.md
+          - Ejemplo 5 · Incremento no lineal: capitulos/capitulo-4/ejemplo5-ciclos-incremento-no-lineal.md
+          - Ejemplo 6 · Estructura compleja: capitulos/capitulo-4/ejemplo6.md
+          - Ejemplo 7 · Límite fijo: capitulos/capitulo-4/ejemplo7-ciclo-sin-dependencia.md
+          - Ejemplo 8 · Función lineal: capitulos/capitulo-4/ejemplo8.md
+          - Ejemplo 9 · Complejidad oculta: capitulos/capitulo-4/ejemplo9-complejidad-oculta.md
+          - Ejemplo 10 · Casos: capitulos/capitulo-4/ejemplo10.md
+          - Ejercicios propuestos: capitulos/capitulo-4/ejercicios-propuestos.md
+      - Capítulo 5 · Recurrencias:
+          - Teoría y clasificación: capitulos/capitulo-5.md
+          - Formas de recurrencia: capitulos/capitulo-5/formas-de-recurrencia.md
+          - Sustitución iterativa: capitulos/capitulo-5/sustitucion-iterativa.md
+          - Árbol de recurrencia: capitulos/capitulo-5/arbol-recurrencia.md
+          - Teorema maestro: capitulos/capitulo-5/teorema-maestro.md
+          - Ecuación característica: capitulos/capitulo-5/ecuacion-caracteristica.md
+          - Ejercicios propuestos: capitulos/capitulo-5/ejercicios-propuestos.md
+      - Capítulo 6 · Algoritmos recursivos:
+          - Procedimiento de análisis: capitulos/capitulo-6.md
+          - Factorial: capitulos/capitulo-6/factorial.md
+          - Fibonacci: capitulos/capitulo-6/fibonacci.md
+          - Potencia: capitulos/capitulo-6/potencia.md
+          - Merge Sort: capitulos/capitulo-6/merge-sort.md
+          - Árbol binario: capitulos/capitulo-6/arbol-binario.md
+          - Ejercicios propuestos: capitulos/capitulo-6/ejercicios-propuestos.md
+      - Capítulo 7 · Búsquedas:
+          - Introducción: capitulos/capitulo-7.md
+          - Comparación general: capitulos/capitulo-7/0-comparacion-busquedas.md
+          - Secuencial: capitulos/capitulo-7/1-busqueda-secuencial.md
+          - Binaria: capitulos/capitulo-7/2-busqueda-binaria.md
+          - Interpolación: capitulos/capitulo-7/3-busqueda-interpolacion.md
+          - Saltos: capitulos/capitulo-7/4-busqueda-saltos.md
+          - Exponencial: capitulos/capitulo-7/5-busqueda-exponencial.md
+          - Ternaria: capitulos/capitulo-7/6-busqueda-ternaria.md
+          - Ejercicios propuestos: capitulos/capitulo-7/ejercicios-propuestos.md
+      - Capítulo 8 · Ordenamientos:
+          - Introducción: capitulos/capitulo-8.md
+          - Comparación general: capitulos/capitulo-8/0-comparacion-ordenamientos.md
+          - Burbuja: capitulos/capitulo-8/1-ordenamiento-burbuja.md
+          - Selección: capitulos/capitulo-8/2-ordenamiento-seleccion.md
+          - Inserción: capitulos/capitulo-8/3-ordenamiento-insercion.md
+          - Shell: capitulos/capitulo-8/4-ordenamiento-shell.md
+          - Mezcla: capitulos/capitulo-8/5-ordenamiento-mezcla.md
+          - Rápido: capitulos/capitulo-8/6-ordenamiento-rapido.md
+          - Radix: capitulos/capitulo-8/7-ordenamiento-radix.md
+          - Ejercicios propuestos: capitulos/capitulo-8/ejercicios-propuestos.md
+      - Capítulo 9 · Reflexiones finales: capitulos/capitulo-9.md
   - Recursos:
       - Cómo usar los laboratorios: recursos.md
       - Glosario de la obra: glosario.md

@@ -162,5 +162,5 @@ Un MSE menor indica que el modelo se aproxima mejor a las observaciones, dentro 
 
 ---
 
-[Continuar con el capítulo 2](capitulos/capitulo-2.md){ .md-button .md-button--primary }
+[Continuar con el capítulo 1](capitulos/capitulo-1.md){ .md-button .md-button--primary }
 [Consultar el glosario](glosario.md){ .md-button }

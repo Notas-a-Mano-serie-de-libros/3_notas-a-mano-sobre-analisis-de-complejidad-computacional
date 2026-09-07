@@ -92,8 +92,12 @@ class TestInterpolacionVisualDinamica(unittest.TestCase):
         self.assertIn(r"\((x_1,y_1)\)", self.source)
 
     def test_desarrollo_alineado_en_un_solo_panel(self):
-        self.assertIn("'\\\\\\\\begin{aligned}'+", self.source)
+        self.assertIn("'\\\\begin{aligned}'+", self.source)
         self.assertIn("'y &=y_0+", self.source)
+        self.assertIn("'y_{\\\\mathrm{est}}='", self.source)
+        self.assertIn("'y_{\\\\mathrm{real}}='", self.source)
+        self.assertNotIn("'\\\\\\\\begin{aligned}'+", self.source)
+        self.assertNotIn("y_{\\\\\\\\mathrm", self.source)
         self.assertNotIn('id="iv-fml-simple"', self.source)
         self.assertNotIn('id="iv-fml-result"', self.source)
         self.assertNotIn('id="iv-label-px"', self.source)
@@ -1086,9 +1090,13 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn("AUTO_RENDER_EVERY", source)
         self.assertNotIn("Complejidad temporal", notebook_source)
         self.assertNotIn("Complejidad espacial", notebook_source)
-        self.assertEqual(notebook_source.count("Mejor caso"), 1)
-        self.assertEqual(notebook_source.count("Caso promedio"), 1)
-        self.assertEqual(notebook_source.count("Peor caso"), 1)
+        comparison_page = (
+            PROJECT_ROOT / "docs" / "laboratorios" / "capitulo-7"
+            / "0-comparacion-busquedas.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(comparison_page.count("Mejor caso"), 1)
+        self.assertEqual(comparison_page.count("Caso promedio"), 1)
+        self.assertEqual(comparison_page.count("Peor caso"), 1)
         self.assertNotIn('description="Paso siguiente"', source)
         self.assertNotIn('description="Ejecución automática"', source)
         self.assertEqual(len(state["algorithms"]), 6)
@@ -1385,27 +1393,23 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                         self.assertTrue(state["general_message"].startswith(module.NOT_FOUND_MESSAGE))
                         self.assertEqual(found_nodes, [])
 
-    def test_ternary_space_complexity_is_logarithmic_in_notebooks(self):
-        comparison = json.loads(
-            (PROJECT_ROOT / "capitulo7" / "notebooks" / "0_comparacion_busquedas.ipynb").read_text(encoding="utf-8")
-        )
-        ternary = json.loads(
-            (PROJECT_ROOT / "capitulo7" / "notebooks" / "6_busqueda_ternaria.ipynb").read_text(encoding="utf-8")
-        )
-        exercises = json.loads(
-            (PROJECT_ROOT / "capitulo7" / "notebooks" / "ejercicios_propuestos.ipynb").read_text(encoding="utf-8")
-        )
+    def test_ternary_space_complexity_is_logarithmic_in_pages(self):
+        pages = PROJECT_ROOT / "docs" / "laboratorios" / "capitulo-7"
+        comparison_source = (pages / "0-comparacion-busquedas.md").read_text(encoding="utf-8")
+        ternary_source = (pages / "6-busqueda-ternaria.md").read_text(encoding="utf-8")
+        exercises_source = (pages / "ejercicios-propuestos.md").read_text(encoding="utf-8")
 
-        comparison_source = "\n".join("".join(cell.get("source", [])) for cell in comparison["cells"])
-        ternary_source = "\n".join("".join(cell.get("source", [])) for cell in ternary["cells"])
-        exercises_source = "\n".join("".join(cell.get("source", [])) for cell in exercises["cells"])
-
-        self.assertIn("Búsqueda ternaria</td><td>Ω(1)</td><td>Θ(log n)</td><td>O(log n)</td>", comparison_source)
+        self.assertIn(
+            r"Búsqueda ternaria</td><td>\(\Omega(1)\)</td><td>\(\Theta(\log_2(n))\)</td><td>\(O(\log_2(n))\)</td>",
+            comparison_source,
+        )
         self.assertNotIn("Complejidad espacial", comparison_source)
-        self.assertIn('<tr><td>Caso promedio</td><td>$\\Theta(\\log_3 n)$</td><td>$\\Theta(\\log_3 n)$</td></tr>', ternary_source)
-        self.assertIn('<tr><td>Peor caso</td><td>$O(\\log_3 n)$</td><td>$O(\\log_3 n)$</td></tr>', ternary_source)
-        self.assertIn('<tr><td>Caso promedio</td><td>$\\Theta(\\log_3 n)$</td><td>$\\Theta(\\log_3 n)$</td></tr>', exercises_source)
-        self.assertIn('<tr><td>Peor caso</td><td>$O(\\log_3 n)$</td><td>$O(\\log_3 n)$</td></tr>', exercises_source)
+        average = r"<tr><td>Caso promedio</td><td>\(\Theta(\log_3(n))\)</td><td>\(\Theta(\log_3(n))\)</td></tr>"
+        worst = r"<tr><td>Peor caso</td><td>\(O(\log_3(n))\)</td><td>\(O(\log_3(n))\)</td></tr>"
+        self.assertIn(average, ternary_source)
+        self.assertIn(worst, ternary_source)
+        self.assertIn(average, exercises_source)
+        self.assertIn(worst, exercises_source)
 
 
 if __name__ == "__main__":

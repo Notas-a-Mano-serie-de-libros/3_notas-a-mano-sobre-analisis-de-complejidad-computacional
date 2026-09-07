@@ -100,7 +100,7 @@ def graficar_complejidad(x, y_experimental, y_teorico, nombre_archivo, ylabel, f
         facecolor='white',
         edgecolor='#E0E0E0',
     )
-    ax.grid(True, color='#CFD8DC', linestyle='-', linewidth=0.6, alpha=0.55)
+    ax.grid(True)
     for spine in ax.spines.values():
         spine.set_color('#000000')
         spine.set_linewidth(0.8)

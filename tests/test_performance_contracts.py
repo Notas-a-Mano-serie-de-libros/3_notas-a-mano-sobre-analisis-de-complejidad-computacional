@@ -130,12 +130,12 @@ class TestPerformanceContracts(unittest.TestCase):
         colab_job = workflow.split("  colab-sanity:\n", 1)[1].split("  tests:\n", 1)[0]
         self.assertIn("Install validation dependencies", colab_job)
         self.assertIn("python -m pip install -r requirements-ci.txt", colab_job)
-        for job in ("notebooks-clean:", "lint-python:", "colab-sanity:", "tests:", "benchmark:", "security:"):
+        for job in ("lint-python:", "colab-sanity:", "tests:", "benchmark:", "security:"):
             self.assertIn(job, workflow)
         for version in ('"3.10"', '"3.11"', '"3.12"'):
             self.assertIn(version, workflow)
-        self.assertIn("python scripts/clean_notebooks.py --check --diagnose", workflow)
-        self.assertIn("python scripts/clean_generated_graphics.py --check", workflow)
+        self.assertNotIn("notebooks-clean:", workflow)
+        self.assertNotIn("python scripts/clean_notebooks.py --check --diagnose", workflow)
         self.assertIn("ruff check .", workflow)
         self.assertIn("python scripts/validate_widget_contracts.py", workflow)
         self.assertIn("python scripts/validate_colab_bootstrap.py", workflow)

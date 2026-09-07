@@ -36,7 +36,7 @@ La ruta recomendada es: **leer el capítulo en la obra → consultar su síntesi
 
 La obra desarrolla un recorrido que parte de los conceptos iniciales y el contexto histórico de la complejidad computacional, establece sus fundamentos matemáticos, aplica el análisis a algoritmos estructurados y recursivos, y culmina con búsquedas, ordenamientos y una reflexión final sobre el diseño eficiente de soluciones.
 
-Este repositorio concentra el complemento ejecutable de los **capítulos 2–8**. Sus notebooks permiten comparar funciones de crecimiento, experimentar con notación asintótica, resolver recurrencias y observar paso a paso algoritmos de búsqueda y ordenamiento. La introducción, las consideraciones teóricas previas, las reflexiones finales, la bibliografía y la fe de erratas permanecen en la obra.
+El sitio desarrolla el recorrido completo de los **capítulos 1–9**. Los capítulos 1 y 9 aportan la apertura y el cierre editorial; los capítulos 2–8 enlazan notebooks para comparar funciones de crecimiento, experimentar con notación asintótica, resolver recurrencias y observar algoritmos de búsqueda y ordenamiento paso a paso. Las consideraciones teóricas, la bibliografía y la fe de erratas complementan esta ruta.
 
 El contenido conserva el orden y la numeración de la obra impresa. Cada ampliación se identifica como material adicional para diferenciarla de los ejemplos publicados.
 
@@ -60,6 +60,7 @@ python3 abrir.py --colab 3/theta
 
 | Capítulo | Tema | Leer en Pages | Recursos técnicos |
 | :---: | --- | :---: | :---: |
+| **1** | Introducción al análisis y la complejidad | [Síntesis](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-1/) | Lectura |
 | **2** | Fundamentos y funciones de complejidad | [Síntesis](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-2/) | [Notebooks](./capitulo2/notebooks/README.md) |
 | **3** | Notación asintótica | [Síntesis](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-3/) | [Notebooks](./capitulo3/notebooks/README.md) |
 | **4** | Análisis de algoritmos estructurados | [Síntesis](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-4/) | [Notebooks](./capitulo4/notebooks/README.md) |
@@ -67,6 +68,7 @@ python3 abrir.py --colab 3/theta
 | **6** | Análisis de algoritmos recursivos | [Síntesis](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-6/) | [Notebooks](./capitulo6/notebooks/README.md) |
 | **7** | Algoritmos de búsqueda clásicos | [Síntesis](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-7/) | [Notebooks](./capitulo7/notebooks/README.md) |
 | **8** | Algoritmos de ordenamiento clásicos | [Síntesis](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-8/) | [Notebooks](./capitulo8/notebooks/README.md) |
+| **9** | Reflexiones finales | [Síntesis](https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/capitulos/capitulo-9/) | Lectura |
 
 ## Qué encontrarás
 
