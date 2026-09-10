@@ -22,6 +22,7 @@ def test_colab_button_is_immediately_below_each_section_title():
         assert remainder.startswith('<div class="lab-action">'), path
         first_action = remainder.split("</div>", 1)[0]
         assert "colab-button" in first_action, path
+        assert ">Ejecutar simulación en Google Colab</a>" in first_action, path
 
     assert len(pages_with_colab) == 53
 
@@ -36,4 +37,3 @@ def test_every_published_explanation_figure_exists_in_pages_assets():
             assert asset.is_file(), (path, asset)
 
     assert len(figures) >= 98
-

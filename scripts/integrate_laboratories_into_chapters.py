@@ -698,7 +698,7 @@ def lab_button(url: str) -> str:
     return (
         '<div class="lab-action">\n'
         f'<a class="md-button md-button--primary colab-button" href="{url}" '
-        'target="_blank" rel="noopener noreferrer">Ejecutar notebook en Google Colab</a>\n'
+        'target="_blank" rel="noopener noreferrer">Ejecutar simulación en Google Colab</a>\n'
         '<small class="lab-action__note">Se abrirá en una pestaña nueva.</small>\n'
         "</div>"
     )
@@ -772,6 +772,16 @@ def relocate_colab_action(content: str) -> str:
     return content[: kicker.end()] + "\n\n" + block + content[kicker.end():]
 
 
+def normalize_colab_button_label(content: str) -> str:
+    """Unifica el llamado a la acción de todos los botones de simulación."""
+    return re.sub(
+        r'(<a\b[^>]*class="[^"]*\bcolab-button\b[^"]*"[^>]*>).*?(</a>)',
+        r"\1Ejecutar simulación en Google Colab\2",
+        content,
+        flags=re.DOTALL,
+    )
+
+
 def sync_published_sections() -> None:
     """Sincroniza posición de botones y figuras en todas las páginas hijas."""
     labels: dict[tuple[int, str], str] = {}
@@ -785,7 +795,9 @@ def sync_published_sections() -> None:
             continue
         chapter = int(match.group(1))
         slug = path.stem
-        content = relocate_colab_action(path.read_text(encoding="utf-8"))
+        content = path.read_text(encoding="utf-8")
+        content = normalize_colab_button_label(content)
+        content = relocate_colab_action(content)
 
         gallery_pattern = re.compile(
             rf"\n*{re.escape(FIGURES_START)}.*?{re.escape(FIGURES_END)}\n*",

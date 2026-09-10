@@ -4,7 +4,7 @@
 
 <span class="chapter-kicker">Capítulo 3</span>
 
-<div class="lab-action"><a class="md-button md-button--primary colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/notacion_asintotica_representacion_generica.ipynb" target="_blank" rel="noopener noreferrer">Ejecutar notebook en Google Colab</a><small class="lab-action__note">Se abrirá en una pestaña nueva.</small></div>
+<div class="lab-action"><a class="md-button md-button--primary colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo3/notebooks/notacion_asintotica_representacion_generica.ipynb" target="_blank" rel="noopener noreferrer">Ejecutar simulación en Google Colab</a><small class="lab-action__note">Se abrirá en una pestaña nueva.</small></div>
 
 Una familia agrupa funciones que comparten una misma estructura algebraica y se diferencian por los valores de sus parámetros. No es, en principio, una lista de órdenes de complejidad. Por ejemplo, todas las expresiones \(f(x)=mx+b\) forman una familia de rectas al variar \(m\) y \(b\); de modo análogo, \(f(x)=ax^2+bx+c\), con \(a\neq0\), describe una familia de parábolas.
 
