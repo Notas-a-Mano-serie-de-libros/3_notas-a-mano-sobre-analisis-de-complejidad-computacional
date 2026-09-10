@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
 FORMULA = re.compile(r"(?:[OΩΘωo]\s*\(|log(?:_\d+)?\s*\(|√|[nkd][²³])")
+COLAB_BUTTON_LABEL = "Ejecutar simulación en Google Colab"
 
 
 def main() -> int:
@@ -59,13 +60,20 @@ def main() -> int:
                 errors.append(f"capítulo {chapter}: {language}: se esperaban {count} selectores y hay {found}")
 
     for chapter in (7, 8):
-        source = (
+        path = (
             DOCS / "capitulos" / f"capitulo-{chapter}" /
             f"0-comparacion-{'busquedas' if chapter == 7 else 'ordenamientos'}.md"
-        ).read_text(encoding="utf-8")
-        start = source.index(f"# {chapter}.1 Comparación general")
-        button = source.index("Ejecutar notebook en Google Colab", start)
-        table = source.index("### Algoritmos incluidos", start)
+        )
+        source = path.read_text(encoding="utf-8")
+        start = source.find(f"# {chapter}.1 Comparación general")
+        button = source.find(COLAB_BUTTON_LABEL, start)
+        table = source.find("### Algoritmos incluidos", start)
+        if start < 0 or button < 0 or table < 0:
+            errors.append(
+                f"{path.relative_to(ROOT)}: faltan el título, el botón de simulación "
+                "o la tabla de algoritmos"
+            )
+            continue
         if button > table:
             errors.append(f"capítulo {chapter}: la simulación general aparece después de la tabla")
 
