@@ -10,7 +10,7 @@ MATH_EXPRESSION = re.compile(r"(\\\[.*?\\\]|\\\(.*?\\\))", re.DOTALL)
 
 
 def normalize_expression(expression: str) -> str:
-    """Añade ``\cdot`` solo en formas inequívocas de multiplicación."""
+    r"""Añade ``\cdot`` solo en formas inequívocas de multiplicación."""
     expression = re.sub(
         r"(?<![\\\w.^])(\d+(?:\.\d+)?)(?=(?:[A-Za-z]|\\(?:log|sqrt)))",
         r"\1 \\cdot ",

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Añade el producto explícito ``\cdot`` a las ecuaciones de Pages."""
+r"""Añade el producto explícito ``\cdot`` a las ecuaciones de Pages."""
 
 from __future__ import annotations
 

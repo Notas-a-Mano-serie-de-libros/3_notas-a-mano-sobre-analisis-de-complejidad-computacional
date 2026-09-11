@@ -842,7 +842,7 @@ def test_notebook_logaritmico_explica_cambio_de_base():
     assert r"\log_\ell(n) = \frac{\log_b(n)}{\log_b(\ell)}" in source
     assert "misma familia logarítmica" in source
     assert "crece extremadamente lento" in source
-    assert r"\log_2(10^{100}) = 100\log_2(10) \approx 332.19" in source
+    assert r"\log_2(10^{100}) = 100 \cdot \log_2(10) \approx 332.19" in source
     assert "la siguiente mejor opción práctica suelen ser las soluciones logarítmicas" in source
 
 
