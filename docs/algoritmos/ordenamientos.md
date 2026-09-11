@@ -22,19 +22,19 @@ Inserta cada elemento en la zona ya ordenada. Es lineal cuando la entrada ya est
 
 ## Mezcla
 
-Divide la colección, ordena recursivamente las partes y las combina. Mantiene \(O(n\log(n))\) en todos los casos y requiere \(O(n)\) memoria auxiliar en su implementación habitual.
+Divide la colección, ordena recursivamente las partes y las combina. Mantiene \(O(n \cdot \log(n))\) en todos los casos y requiere \(O(n)\) memoria auxiliar en su implementación habitual.
 
 [Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb){ target="_blank" rel="noopener noreferrer" }
 
 ## Rápido
 
-Particiona alrededor de un pivote. Su promedio es \(O(n\log(n))\), pero particiones muy desequilibradas producen \(O(n^2)\); la selección del pivote es decisiva.
+Particiona alrededor de un pivote. Su promedio es \(O(n \cdot \log(n))\), pero particiones muy desequilibradas producen \(O(n^2)\); la selección del pivote es decisiva.
 
 [Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/6_ordenamiento_rapido.ipynb){ target="_blank" rel="noopener noreferrer" }
 
 ## Radix
 
-Ordena por dígitos o posiciones sin comparar directamente todos los pares. Su costo se expresa como \(\Theta(d(n+b))\), donde \(d\) es el número de dígitos y \(b\) la base empleada.
+Ordena por dígitos o posiciones sin comparar directamente todos los pares. Su costo se expresa como \(\Theta(d \cdot (n+b))\), donde \(d\) es el número de dígitos y \(b\) la base empleada.
 
 [Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo8/notebooks/7_ordenamiento_radix.ipynb){ target="_blank" rel="noopener noreferrer" }
 

@@ -169,8 +169,8 @@ Complejidad temporal por escenario:
   </thead>
   <tbody>
     <tr><td>Mejor caso</td><td>\(1\)</td><td>\(\Omega(1)\)</td></tr>
-    <tr><td>Caso promedio</td><td>\(2\sqrt{n}\)</td><td>\(\Theta(\sqrt{n})\)</td></tr>
-    <tr><td>Peor caso</td><td>\(2\sqrt{n}\)</td><td>\(O(\sqrt{n})\)</td></tr>
+    <tr><td>Caso promedio</td><td>\(2 \cdot \sqrt{n}\)</td><td>\(\Theta(\sqrt{n})\)</td></tr>
+    <tr><td>Peor caso</td><td>\(2 \cdot \sqrt{n}\)</td><td>\(O(\sqrt{n})\)</td></tr>
   </tbody>
 </table>
 </div>
@@ -180,7 +180,7 @@ Complejidad temporal por escenario:
 La tabla usa el **caso promedio y peor caso** (misma función). El factor \(2\) refleja las dos fases del algoritmo: \(\approx\sqrt{n}\) saltos entre bloques más hasta \(\sqrt{n}\) comparaciones lineales dentro del bloque. Esto distingue la función concreta del simple \(\sqrt{n}\) de la notación asintótica.
 
 \[
-f(n) = 2\sqrt{n}
+f(n) = 2 \cdot \sqrt{n}
 \]
 
 El tiempo teórico se estima como:

@@ -22,7 +22,7 @@ Las relaciones de recurrencia describen el costo de un problema mediante el cost
 ### Relaciones de reducción
 
 \[
-C(n)=aC(n-b)+f(n),\qquad a,b,n\in\mathbb{N},\quad a\geq 1,\ b\geq 1.
+C(n)=a \cdot C(n-b)+f(n),\qquad a,b,n\in\mathbb{N},\quad a\geq 1,\ b\geq 1.
 \]
 
 Cada llamada disminuye el tamaño del problema en una cantidad fija \(b\).
@@ -33,7 +33,7 @@ Cada llamada disminuye el tamaño del problema en una cantidad fija \(b\).
 ### Relaciones de división
 
 \[
-C(n)=aC\!\left(\frac{n}{b}\right)+f(n),\qquad a,b,n\in\mathbb{N},\quad a\geq 1,\ b>1.
+C(n)=a \cdot C\!\left(\frac{n}{b}\right)+f(n),\qquad a,b,n\in\mathbb{N},\quad a\geq 1,\ b>1.
 \]
 
 Cada llamada reduce el tamaño del problema al dividirlo por un factor constante \(b\).
@@ -46,7 +46,7 @@ C(n)=\sum_{i=1}^{k}a_iC(b_i n)+f(n),\qquad k\geq 2,\quad 0<b_i<1.
 
 Las llamadas generan subproblemas de tamaños distintos, por lo que sus ramas pueden alcanzar el caso base en niveles diferentes.
 
-La simulación utiliza una forma particular de la relación mixta con \(a_i=1\) y factores de división consecutivos determinados por \(b\). Selecciona el tipo de relación, elige \(f(n)\) entre \(1\), \(\log_2(n)\), \(n\), \(n\log_2(n)\), \(n^2\), \(n^3\), \(n^k\), \(2^n\) y \(n!\), y modifica los parámetros para observar cómo cambia el árbol y el costo de cada nivel.
+La simulación utiliza una forma particular de la relación mixta con \(a_i=1\) y factores de división consecutivos determinados por \(b\). Selecciona el tipo de relación, elige \(f(n)\) entre \(1\), \(\log_2(n)\), \(n\), \(n \cdot \log_2(n)\), \(n^2\), \(n^3\), \(n^k\), \(2^n\) y \(n!\), y modifica los parámetros para observar cómo cambia el árbol y el costo de cada nivel.
 
 <nav class="section-return section-step" aria-label="Navegación entre secciones"><a class="section-step__index" href="../">Capítulo 5</a><a class="section-step__next" href="../sustitucion-iterativa/">5.5.1 Sustitución iterativa →</a></nav>
 

@@ -72,7 +72,7 @@ Este ejemplo combina un ciclo externo, dos ciclos internos y llamadas a funcione
 
 ## Análisis esperado
 
-El conteo debe conservar los costos de las funciones llamadas. Antes de simplificar, la forma general es \(T(n)\in O\!\left(n\,[n+\log_2(n)(1+T_{foo2}(n))+T_{foo1}(n)]\right)\). Solo después se sustituyen \(T_{foo1}\) y \(T_{foo2}\) y se aplica dominancia. La memoria suma las variables constantes y el costo lineal de `foo2`, por lo que \(S(n)\in O(n)\). La obra no propone simulación para este caso por su crecimiento deliberadamente poco habitual.
+El conteo debe conservar los costos de las funciones llamadas. Antes de simplificar, la forma general es \(T(n)\in O\!\left(n\,[n+\log_2(n) \cdot (1+T_{foo2}(n))+T_{foo1}(n)]\right)\). Solo después se sustituyen \(T_{foo1}\) y \(T_{foo2}\) y se aplica dominancia. La memoria suma las variables constantes y el costo lineal de `foo2`, por lo que \(S(n)\in O(n)\). La obra no propone simulación para este caso por su crecimiento deliberadamente poco habitual.
 
 <nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../ejemplo5-ciclos-incremento-no-lineal/">← 4.4.4.5 Ciclos con incremento no lineal</a><a class="section-step__index" href="../">Capítulo 4</a><a class="section-step__next" href="../ejemplo7-ciclo-sin-dependencia/">4.4.4.7 Ciclo sin dependencia de la entrada →</a></nav>
 

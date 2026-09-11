@@ -39,7 +39,7 @@ Se desarrollan los ejercicios opcionales 2, 3 y 4. El ejercicio opcional 1 no se
 
 #### Heap Sort
 
-Construye un montículo máximo y extrae repetidamente su raíz. Garantiza \(\Theta(n\log(n))\) en los tres casos, usa \(\Theta(1)\) espacio auxiliar en su versión in situ y no es estable.
+Construye un montículo máximo y extrae repetidamente su raíz. Garantiza \(\Theta(n \cdot \log(n))\) en los tres casos, usa \(\Theta(1)\) espacio auxiliar en su versión in situ y no es estable.
 
 #### Counting Sort
 
@@ -47,17 +47,17 @@ Cuenta cuántas veces aparece cada clave del intervalo \([0,k]\) y reconstruye l
 
 #### Radix Sort
 
-Ordena por dígitos usando un algoritmo estable en cada pasada. Con \(d\) dígitos y base \(k\), su tiempo es \(\Theta(d(n+k))\) y su espacio auxiliar usual es \(\Theta(n+k)\). No depende de comparaciones entre pares de elementos.
+Ordena por dígitos usando un algoritmo estable en cada pasada. Con \(d\) dígitos y base \(k\), su tiempo es \(\Theta(d \cdot (n+k))\) y su espacio auxiliar usual es \(\Theta(n+k)\). No depende de comparaciones entre pares de elementos.
 
 #### Tim Sort
 
-Detecta subsecuencias ya ordenadas y las combina, aprovechando la estructura existente en datos reales. Su peor caso es \(\Theta(n\log(n))\), su mejor caso puede ser \(\Theta(n)\) y es estable.
+Detecta subsecuencias ya ordenadas y las combina, aprovechando la estructura existente en datos reales. Su peor caso es \(\Theta(n \cdot \log(n))\), su mejor caso puede ser \(\Theta(n)\) y es estable.
 
 ### Opcional 4: impacto de la distribución inicial
 
-- **Arreglo ordenado:** burbuja optimizada e inserción se aproximan a \(\Theta(n)\); selección permanece en \(\Theta(n^2)\). Merge Sort y Heap Sort conservan \(\Theta(n\log(n))\). Quick Sort puede degradarse a \(\Theta(n^2)\) si escoge siempre un extremo como pivote.
+- **Arreglo ordenado:** burbuja optimizada e inserción se aproximan a \(\Theta(n)\); selección permanece en \(\Theta(n^2)\). Merge Sort y Heap Sort conservan \(\Theta(n \cdot \log(n))\). Quick Sort puede degradarse a \(\Theta(n^2)\) si escoge siempre un extremo como pivote.
 - **Orden inverso:** inserción y burbuja realizan el máximo número de desplazamientos o intercambios, ambos \(\Theta(n^2)\). Selección mantiene el mismo número de comparaciones. Merge Sort conserva su orden log-lineal.
-- **Distribución aleatoria:** inserción, burbuja y selección presentan comportamiento cuadrático promedio; Quick Sort con pivote razonable alcanza \(\Theta(n\log(n))\) esperado.
+- **Distribución aleatoria:** inserción, burbuja y selección presentan comportamiento cuadrático promedio; Quick Sort con pivote razonable alcanza \(\Theta(n \cdot \log(n))\) esperado.
 - **Muchos duplicados:** Quick Sort mejora con partición de tres vías; una partición binaria deficiente puede quedar desbalanceada. Counting Sort y Radix Sort aprovechan claves de dominio acotado.
 - **Datos casi ordenados:** inserción y Tim Sort suelen ser especialmente eficientes porque el número de inversiones o de subsecuencias naturales es pequeño.
 

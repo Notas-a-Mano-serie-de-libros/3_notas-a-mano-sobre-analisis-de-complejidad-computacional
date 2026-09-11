@@ -76,7 +76,7 @@ Complejidad temporal por escenario:
   <tbody>
     <tr><td>Mejor caso</td><td>\(n\)</td><td>\(\Omega(n)\)</td></tr>
     <tr><td>Caso promedio</td><td>\(n^2/2\)</td><td>\(\Theta(n^2)\)</td></tr>
-    <tr><td>Peor caso</td><td>\(n(n-1)/2\)</td><td>\(O(n^2)\)</td></tr>
+    <tr><td>Peor caso</td><td>\(n \cdot (n-1)/2\)</td><td>\(O(n^2)\)</td></tr>
   </tbody>
 </table>
 </div>

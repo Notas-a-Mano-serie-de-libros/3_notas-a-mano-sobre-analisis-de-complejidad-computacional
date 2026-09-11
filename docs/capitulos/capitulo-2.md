@@ -14,7 +14,7 @@ El dominio contiene tamaños de entrada válidos y el costo es no negativo. La m
 
 ### 2.1.2 Familias de crecimiento
 
-Las familias corresponden a estructuras de ejecución distintas. \(O(1)\) no depende de \(n\); \(O(\log_2(n))\) reduce el problema por factores; \(O(n)\) recorre la entrada; \(O(n\log_2(n))\) combina niveles logarítmicos con trabajo lineal; y \(O(n^k)\) suele aparecer en recorridos anidados. Los crecimientos \(O(2^n)\) y \(O(n!)\) enumeran combinaciones o permutaciones y dejan de ser prácticos rápidamente.
+Las familias corresponden a estructuras de ejecución distintas. \(O(1)\) no depende de \(n\); \(O(\log_2(n))\) reduce el problema por factores; \(O(n)\) recorre la entrada; \(O(n \cdot \log_2(n))\) combina niveles logarítmicos con trabajo lineal; y \(O(n^k)\) suele aparecer en recorridos anidados. Los crecimientos \(O(2^n)\) y \(O(n!)\) enumeran combinaciones o permutaciones y dejan de ser prácticos rápidamente.
 
 <div class="chapter-figures">
 <figure>

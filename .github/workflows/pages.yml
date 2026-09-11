@@ -10,6 +10,8 @@ on:
       - "requirements-docs.txt"
       - ".github/workflows/pages.yml"
       - "scripts/integrate_laboratories_into_chapters.py"
+      - "scripts/editorial_math.py"
+      - "scripts/normalize_editorial_math.py"
       - "scripts/validate_editorial_content.py"
   workflow_dispatch:
 

@@ -54,7 +54,7 @@ Este glosario reúne la terminología central y las entradas del índice alfabé
 
 **Complejidad lineal.** Crecimiento proporcional a \(n\).
 
-**Complejidad log-lineal.** Crecimiento proporcional a \(n\log(n)\).
+**Complejidad log-lineal.** Crecimiento proporcional a \(n \cdot \log(n)\).
 
 **Complejidad polinomial.** Crecimiento acotado por alguna potencia \(n^k\) con \(k\) constante.
 
@@ -204,7 +204,7 @@ Este glosario reúne la terminología central y las entradas del índice alfabé
 
 **Teorema maestro.** Familia de herramientas para resolver recurrencias producidas por estrategias de división.
 
-**Teorema maestro básico.** Clasifica recurrencias canónicas de la forma \(T(n)=aT(n/b)+f(n)\).
+**Teorema maestro básico.** Clasifica recurrencias canónicas de la forma \(T(n)=a \cdot T(n/b)+f(n)\).
 
 **Teorema maestro extendido.** Considera trabajos externos con factores polinómicos y logarítmicos dentro de su forma aplicable.
 

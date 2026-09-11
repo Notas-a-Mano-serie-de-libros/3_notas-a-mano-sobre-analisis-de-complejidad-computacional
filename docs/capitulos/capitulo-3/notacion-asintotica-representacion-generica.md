@@ -29,7 +29,7 @@ Por tanto, \(f(n)\sim f_m(n)\): para entradas suficientemente grandes, su compor
 Este razonamiento produce la jerarquía funcional asintótica:
 
 \[
-1\prec\log_\ell(n)\prec n\prec n\log_\ell(n)\prec n^2\prec n^3
+1\prec\log_\ell(n)\prec n\prec n \cdot \log_\ell(n)\prec n^2\prec n^3
 \prec\cdots\prec n^k\prec2^n\prec n!.
 \]
 

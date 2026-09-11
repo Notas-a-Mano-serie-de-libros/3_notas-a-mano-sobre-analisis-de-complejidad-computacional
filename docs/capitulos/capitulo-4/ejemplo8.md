@@ -42,7 +42,7 @@ El número de iteraciones es constante, pero la operación ejecutada dentro del 
 
 ## Análisis esperado
 
-Si \(T_{foo}(n)=n\), entonces \(T(n)=1000n\in O(n)\). La constante del ciclo se absorbe, pero la dependencia de `foo` no. Si \(S_{foo}(n)=n\), el espacio también queda en \(O(n)\).
+Si \(T_{foo}(n)=n\), entonces \(T(n)=1000 \cdot n\in O(n)\). La constante del ciclo se absorbe, pero la dependencia de `foo` no. Si \(S_{foo}(n)=n\), el espacio también queda en \(O(n)\).
 
 <nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../ejemplo7-ciclo-sin-dependencia/">← 4.4.4.7 Ciclo sin dependencia de la entrada</a><a class="section-step__index" href="../">Capítulo 4</a><a class="section-step__next" href="../ejemplo9-complejidad-oculta/">4.4.4.9 Complejidad oculta →</a></nav>
 

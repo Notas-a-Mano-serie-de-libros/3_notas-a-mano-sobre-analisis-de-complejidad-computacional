@@ -100,9 +100,9 @@ Complejidad temporal por escenario:
     <tr><th>Escenario</th><th>Función exacta</th><th>Notación asintótica</th></tr>
   </thead>
   <tbody>
-    <tr><td>Mejor caso</td><td>\(n(n-1)/2\)</td><td>\(\Omega(n^2)\)</td></tr>
-    <tr><td>Caso promedio</td><td>\(n(n-1)/2\)</td><td>\(\Theta(n^2)\)</td></tr>
-    <tr><td>Peor caso</td><td>\(n(n-1)/2\)</td><td>\(O(n^2)\)</td></tr>
+    <tr><td>Mejor caso</td><td>\(n \cdot (n-1)/2\)</td><td>\(\Omega(n^2)\)</td></tr>
+    <tr><td>Caso promedio</td><td>\(n \cdot (n-1)/2\)</td><td>\(\Theta(n^2)\)</td></tr>
+    <tr><td>Peor caso</td><td>\(n \cdot (n-1)/2\)</td><td>\(O(n^2)\)</td></tr>
   </tbody>
 </table>
 </div>
@@ -112,7 +112,7 @@ Complejidad temporal por escenario:
 La tabla usa la **función exacta para todos los escenarios**: selección siempre recorre el subarreglo completo para encontrar el mínimo sin importar el orden inicial, por lo que los tres casos comparten el mismo conteo de comparaciones.
 
 \[
-f(n) = \frac{n(n-1)}{2}
+f(n) = \frac{n \cdot (n-1)}{2}
 \]
 
 El tiempo teórico se estima como:

@@ -41,7 +41,7 @@ Por esa razón, aumentar mucho el tamaño de la entrada no produce un aumento pr
 Para una entrada de tamaño \(n\), una función de costo logarítmico puede expresarse como:
 
 \[
-T(n) = c \log_2(n)
+T(n) = c \cdot \log_2(n)
 \]
 
 donde \(T(n)\) representa el costo de ejecución, \(c\) representa el costo constante de cada comparación o decisión, y \(\log_2(n)\) representa la cantidad aproximada de veces que la entrada puede dividirse entre dos.
@@ -59,7 +59,7 @@ La expresión muestra que el costo crece por niveles de división. Si \(n\) pasa
 Una característica especialmente importante de esta familia es que crece extremadamente lento. Incluso cuando el tamaño de entrada alcanza valores enormes, el número de pasos logarítmicos permanece manejable. Por ejemplo, si \(n=10^{100}\), entonces:
 
 \[
-\log_2(10^{100}) = 100\log_2(10) \approx 332.19
+\log_2(10^{100}) = 100 \cdot \log_2(10) \approx 332.19
 \]
 
 Esto significa que una entrada con cien órdenes de magnitud puede reducirse, en un modelo logarítmico base dos, a poco más de trescientas decisiones teóricas. Encontrar soluciones de orden constante suele ser una tarea bastante complicada, porque exige que el costo no dependa del tamaño de la entrada. Cuando eso no es posible, la siguiente mejor opción práctica suelen ser las soluciones logarítmicas: todavía dependen de \(n\), pero lo hacen de una manera muy lenta.

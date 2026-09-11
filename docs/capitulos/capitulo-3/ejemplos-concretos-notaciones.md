@@ -12,7 +12,7 @@
 En todos los ejemplos se analiza la misma función:
 
 \[
-C(n)=n^3+2n^2+n+5.
+C(n)=n^3+2 \cdot n^2+n+5.
 \]
 
 El propósito es mostrar que la función de referencia cambia según la relación que se quiere demostrar. No basta con observar que ambas curvas parecen próximas: deben exhibirse constantes y un umbral, o calcular el límite correspondiente.
@@ -22,10 +22,10 @@ El propósito es mostrar que la función de referencia cambia según la relació
 Se toma \(g(n)=n^3\). Para \(n\geq 1\), se cumplen \(n^2\leq n^3\), \(n\leq n^3\) y \(1\leq n^3\). Por tanto:
 
 \[
-C(n)\leq n^3+2n^3+n^3+5n^3=9n^3.
+C(n)\leq n^3+2 \cdot n^3+n^3+5 \cdot n^3=9 \cdot n^3.
 \]
 
-Al elegir \(c=9\) y \(n_0=1\), queda demostrada la desigualdad \(C(n)\leq c\,g(n)\) para todo \(n\geq n_0\). En consecuencia, \(C(n)\in O(n^3)\). El valor de \(c\) no tiene que ser mínimo: cualquier constante válida prueba la cota.
+Al elegir \(c=9\) y \(n_0=1\), queda demostrada la desigualdad \(C(n)\leq c \cdot g(n)\) para todo \(n\geq n_0\). En consecuencia, \(C(n)\in O(n^3)\). El valor de \(c\) no tiene que ser mínimo: cualquier constante válida prueba la cota.
 
 ### Ejemplo 2 · Cota superior estricta \(o(n^4)\)
 
@@ -43,10 +43,10 @@ El límite cero significa que, para cualquier constante \(c>0\), existe un umbra
 Como todos los términos adicionales son no negativos para \(n\geq1\):
 
 \[
-C(n)=n^3+2n^2+n+5\geq n^3.
+C(n)=n^3+2 \cdot n^2+n+5\geq n^3.
 \]
 
-Con \(c=1\) y \(n_0=1\) se satisface \(C(n)\geq c\,g(n)\). Así, \(C(n)\in\Omega(n^3)\). Esta cota garantiza que el crecimiento de \(C\) no puede quedar asintóticamente por debajo del cúbico.
+Con \(c=1\) y \(n_0=1\) se satisface \(C(n)\geq c \cdot g(n)\). Así, \(C(n)\in\Omega(n^3)\). Esta cota garantiza que el crecimiento de \(C\) no puede quedar asintóticamente por debajo del cúbico.
 
 ### Ejemplo 4 · Cota inferior estricta \(\omega(n^2)\)
 

@@ -57,9 +57,9 @@ La versión implementada aquí usa radix LSD en base 10. Su comportamiento depen
     </tr>
   </thead>
   <tbody>
-    <tr><td>Mejor caso</td><td>\(\Omega(d(n+k))\)</td><td>\(\Omega(n+k)\)</td></tr>
-    <tr><td>Caso promedio</td><td>\(\Theta(d(n+k))\)</td><td>\(\Theta(n+k)\)</td></tr>
-    <tr><td>Peor caso</td><td>\(O(d(n+k))\)</td><td>\(O(n+k)\)</td></tr>
+    <tr><td>Mejor caso</td><td>\(\Omega(d \cdot (n+k))\)</td><td>\(\Omega(n+k)\)</td></tr>
+    <tr><td>Caso promedio</td><td>\(\Theta(d \cdot (n+k))\)</td><td>\(\Theta(n+k)\)</td></tr>
+    <tr><td>Peor caso</td><td>\(O(d \cdot (n+k))\)</td><td>\(O(n+k)\)</td></tr>
   </tbody>
 </table>
 </div>
@@ -75,7 +75,7 @@ La siguiente celda simula el ordenamiento radix sobre arreglos de tamaño crecie
 
 - **Línea sólida** — simulación empírica.
 - **Línea discontinua** — extrapolación analítica.
-- **Checkbox** — superpone la función teórica asociada a \(d(n+k)\).
+- **Checkbox** — superpone la función teórica asociada a \(d \cdot (n+k)\).
 
 La gráfica usa el mismo formato de los análisis experimentales del capítulo 2 para mantener consistencia visual con el resto de la obra.
 

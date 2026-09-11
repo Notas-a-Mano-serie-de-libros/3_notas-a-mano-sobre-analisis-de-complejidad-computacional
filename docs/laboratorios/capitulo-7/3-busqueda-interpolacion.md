@@ -7,7 +7,7 @@ La interpolación lineal es una técnica para estimar el valor \(y\) que corresp
 El principio es geométrico: se traza una línea recta entre ambos puntos de referencia y se evalúa esa recta en \(x\). La fórmula que expresa esta idea es:
 
 \[
-y = y_0 + \frac{(y_1 - y_0)(x - x_0)}{x_1 - x_0}
+y = y_0 + \frac{(y_1 - y_0) \cdot (x - x_0)}{x_1 - x_0}
 \]
 
 El cociente \(\dfrac{x - x_0}{x_1 - x_0}\) mide la posición relativa de \(x\) dentro del intervalo: vale \(0\) cuando \(x = x_0\) y vale \(1\) cuando \(x = x_1\). En cualquier punto intermedio, representa la fracción del recorrido horizontal ya completado.

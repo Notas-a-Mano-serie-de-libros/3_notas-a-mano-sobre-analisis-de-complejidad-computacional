@@ -9,7 +9,7 @@
 <small class="lab-action__note">Se abrirá en una pestaña nueva.</small>
 </div>
 
-El teorema maestro clasifica recurrencias de división de la forma \(T(n)=aT(n/b)+f(n)\). La comparación central es entre el trabajo externo \(f(n)\) y el costo crítico \(n^{\log_b(a)}\).
+El teorema maestro clasifica recurrencias de división de la forma \(T(n)=a \cdot T(n/b)+f(n)\). La comparación central es entre el trabajo externo \(f(n)\) y el costo crítico \(n^{\log_b(a)}\).
 
 ### Procedimiento
 

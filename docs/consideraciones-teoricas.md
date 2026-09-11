@@ -107,9 +107,9 @@ Propiedades y resultados utilizados con frecuencia:
 \]
 
 \[
-\sum_{i=1}^{n}i=\frac{n(n+1)}{2},
+\sum_{i=1}^{n}i=\frac{n \cdot (n+1)}{2},
 \qquad
-\sum_{i=1}^{n}i^2=\frac{n(n+1)(2n+1)}{6}
+\sum_{i=1}^{n}i^2=\frac{n \cdot (n+1) \cdot (2 \cdot n+1)}{6}
 \]
 
 Para una serie geométrica con \(r\ne1\):
@@ -121,15 +121,15 @@ Para una serie geométrica con \(r\ne1\):
 ### Logaritmos y potencias
 
 \[
-(a^m)^n=a^{mn},
+(a^m)^n=a^{m \cdot n},
 \qquad
 \log_a(n)=\frac{\log_b(n)}{\log_b(a)}
 \]
 
 \[
-\log_b(mn)=\log_b(m)+\log_b(n),
+\log_b(m \cdot n)=\log_b(m)+\log_b(n),
 \qquad
-\log_b(n^k)=k\log_b(n)
+\log_b(n^k)=k \cdot \log_b(n)
 \]
 
 \[
@@ -141,7 +141,7 @@ a^{\log_b(n)}=n^{\log_b(a)}
 ### Productorias
 
 \[
-\prod_{i=a}^{b}f(i)=f(a)\,f(a+1)\cdots f(b)
+\prod_{i=a}^{b}f(i)=f(a) \cdot f(a+1)\cdots f(b)
 \]
 
 ## Conceptos útiles para los capítulos 7 y 8

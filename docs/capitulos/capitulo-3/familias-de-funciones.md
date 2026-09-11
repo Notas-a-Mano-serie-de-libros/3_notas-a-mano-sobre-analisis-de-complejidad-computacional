@@ -37,7 +37,7 @@ F(C(n))=\{f_\lambda:\mathbb{N}\to\mathbb{R}^{+}\mid
 El símbolo \(\sim\) expresa equivalencia en el límite. Por ejemplo, las funciones
 
 \[
-3n+5,\qquad 7n-2,\qquad n+\log(n)
+3 \cdot n+5,\qquad 7 \cdot n-2,\qquad n+\log(n)
 \]
 
 son asintóticamente lineales; por ello pertenecen a \(F(n)\). Comparten el término dominante, aunque sus expresiones exactas y sus costos para entradas finitas sean diferentes.
@@ -46,7 +46,7 @@ son asintóticamente lineales; por ello pertenecen a \(F(n)\). Comparten el tér
 
 | Propiedad | Expresión | Lectura |
 | --- | --- | --- |
-| Invarianza frente a constantes | \(F(c\,g(n))=F(g(n)),\ c>0\) | Una constante positiva no cambia la familia asintótica. |
+| Invarianza frente a constantes | \(F(c \cdot g(n))=F(g(n)),\ c>0\) | Una constante positiva no cambia la familia asintótica. |
 | Aditividad | \(F(f(n))+F(g(n))\subseteq F(f(n)+g(n))\) | La suma conserva la combinación de comportamientos. |
 | Multiplicatividad | \(F(f(n))F(g(n))\subseteq F(f(n)g(n))\) | El producto combina los órdenes de ambas funciones. |
 | Dominancia | Si \(\lim_{n\to\infty}g(n)/f(n)=0\), entonces \(F(f(n)+g(n))=F(f(n))\) | El término de menor crecimiento desaparece en el límite. |
@@ -55,11 +55,11 @@ son asintóticamente lineales; por ello pertenecen a \(F(n)\). Comparten el tér
 
 \[
 \begin{aligned}
-3n+5 &\in F(n),\\
-n\log(n)+5n &\in F(n\log(n)),\\
-k\,n!+2^n &\in F(n!),\\
-3n^2+7n+1 &\in F(n^2),\\
-n^2 2^n+n^3 &\in F(n^2 2^n).
+3 \cdot n+5 &\in F(n),\\
+n \cdot \log(n)+5 \cdot n &\in F(n \cdot \log(n)),\\
+k \cdot n!+2^n &\in F(n!),\\
+3 \cdot n^2+7 \cdot n+1 &\in F(n^2),\\
+n^2 \cdot 2^n+n^3 &\in F(n^2 \cdot 2^n).
 \end{aligned}
 \]
 

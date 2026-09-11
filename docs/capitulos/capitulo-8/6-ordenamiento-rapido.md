@@ -59,8 +59,8 @@ En el caso promedio logra O(n log(n)) con una constante menor que el ordenamient
     </tr>
   </thead>
   <tbody>
-    <tr><td>Mejor caso</td><td>\(\Omega(n \log_2(n))\)</td><td>\(\Omega(\log_2(n))\)</td></tr>
-    <tr><td>Caso promedio</td><td>\(\Theta(n \log_2(n))\)</td><td>\(\Theta(\log_2(n))\)</td></tr>
+    <tr><td>Mejor caso</td><td>\(\Omega(n \cdot \log_2(n))\)</td><td>\(\Omega(\log_2(n))\)</td></tr>
+    <tr><td>Caso promedio</td><td>\(\Theta(n \cdot \log_2(n))\)</td><td>\(\Theta(\log_2(n))\)</td></tr>
     <tr><td>Peor caso</td><td>\(O(n^2)\)</td><td>\(O(n)\)</td></tr>
   </tbody>
 </table>

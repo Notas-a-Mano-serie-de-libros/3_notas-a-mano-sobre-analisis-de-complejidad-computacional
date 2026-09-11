@@ -62,10 +62,10 @@ La ventaja práctica aparece porque los elementos pueden desplazarse grandes dis
     </tr>
   </thead>
   <tbody>
-    <tr><td>Shell: n/2, n/4, ..., 1</td><td>\(\Omega(n \log_2(n))\)</td><td>Depende de los datos</td><td>\(O(n^2)\)</td><td>\(O(1)\)</td></tr>
-    <tr><td>Hibbard: \(2^k - 1\)</td><td>\(\Omega(n \log_2(n))\)</td><td>Depende de los datos</td><td>\(O(n^{3/2})\)</td><td>\(O(1)\)</td></tr>
-    <tr><td>Sedgewick</td><td>\(\Omega(n \log_2(n))\)</td><td>Depende de los datos</td><td>Aproximadamente \(O(n^{4/3})\)</td><td>\(O(1)\)</td></tr>
-    <tr><td>Pratt: \(2^i3^j\)</td><td>\(\Omega(n \log_2(n))\)</td><td>Depende de los datos</td><td>\(O(n\log_2^2(n))\)</td><td>\(O(1)\)</td></tr>
+    <tr><td>Shell: n/2, n/4, ..., 1</td><td>\(\Omega(n \cdot \log_2(n))\)</td><td>Depende de los datos</td><td>\(O(n^2)\)</td><td>\(O(1)\)</td></tr>
+    <tr><td>Hibbard: \(2^k - 1\)</td><td>\(\Omega(n \cdot \log_2(n))\)</td><td>Depende de los datos</td><td>\(O(n^{3/2})\)</td><td>\(O(1)\)</td></tr>
+    <tr><td>Sedgewick</td><td>\(\Omega(n \cdot \log_2(n))\)</td><td>Depende de los datos</td><td>Aproximadamente \(O(n^{4/3})\)</td><td>\(O(1)\)</td></tr>
+    <tr><td>Pratt: \(2^i3^j\)</td><td>\(\Omega(n \cdot \log_2(n))\)</td><td>Depende de los datos</td><td>\(O(n \cdot \log_2^2(n))\)</td><td>\(O(1)\)</td></tr>
   </tbody>
 </table>
 </div>

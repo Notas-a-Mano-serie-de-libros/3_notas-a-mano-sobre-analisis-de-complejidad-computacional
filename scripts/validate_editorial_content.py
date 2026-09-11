@@ -6,6 +6,11 @@ import re
 import sys
 from pathlib import Path
 
+try:
+    from scripts.editorial_math import implicit_product_issues
+except ModuleNotFoundError:  # Ejecución directa desde scripts/
+    from editorial_math import implicit_product_issues
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
@@ -29,6 +34,12 @@ def main() -> int:
 
     for path in DOCS.rglob("*.md"):
         source = path.read_text(encoding="utf-8")
+        for expression in implicit_product_issues(source):
+            compact = " ".join(expression.split())
+            errors.append(
+                f"{path.relative_to(ROOT)}: multiplicación implícita sin \\cdot: "
+                f"{compact[:160]}"
+            )
         for match in re.finditer(r"<td[^>]*>(.*?)</td>", source, re.I | re.S):
             cell = re.sub(r"<[^>]+>", "", match.group(1)).strip()
             if FORMULA.search(cell) and r"\(" not in cell and "$" not in cell:

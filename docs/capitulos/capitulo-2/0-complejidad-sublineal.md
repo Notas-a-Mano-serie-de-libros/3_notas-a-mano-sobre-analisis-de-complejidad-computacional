@@ -28,7 +28,7 @@ Esta condición permite distinguir el crecimiento sublineal de una función simp
 | Familia | Ejemplo | Relación con \(n\) |
 | --- | --- | --- |
 | Constante | \(T(n)=c\) | El trabajo no aumenta con la entrada. |
-| Logarítmica | \(T(n)=c\log_b(n)\) | El trabajo aumenta por niveles de reducción. |
+| Logarítmica | \(T(n)=c \cdot \log_b(n)\) | El trabajo aumenta por niveles de reducción. |
 | Raíz | \(T(n)=c\sqrt{n}\) | Se inspecciona una fracción decreciente de la entrada. |
 | Casi lineal sublineal | \(T(n)=n/\log_b(n)\) | Crece cerca de \(n\), pero su cociente con \(n\) tiende a cero. |
 

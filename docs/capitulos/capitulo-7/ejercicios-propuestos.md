@@ -60,7 +60,7 @@ En grafos, BFS y DFS recorren vértices y aristas en \(\Theta(V+E)\). BFS necesi
 
 Para una matriz de \(f\) filas y \(c\) columnas, una búsqueda secuencial revisa hasta \(fc\) elementos: tiempo \(\Theta(fc)\) y espacio auxiliar \(\Theta(1)\). Si se define \(n=f=c\), el costo es \(\Theta(n^2)\).
 
-Si cada fila está ordenada, puede aplicarse búsqueda binaria en cada una: \(\Theta(f\log c)\). Si toda la matriz está ordenada como una secuencia y se admite acceso por índice, puede interpretarse la posición lineal \(p\) como \((p//c,p\bmod c)\) y buscar en \(\Theta(\log(fc))\).
+Si cada fila está ordenada, puede aplicarse búsqueda binaria en cada una: \(\Theta(f \cdot \log c)\). Si toda la matriz está ordenada como una secuencia y se admite acceso por índice, puede interpretarse la posición lineal \(p\) como \((p//c,p\bmod c)\) y buscar en \(\Theta(\log(fc))\).
 
 Cuando filas y columnas están ordenadas de forma creciente, el recorrido desde la esquina superior derecha elimina una fila o una columna en cada comparación. Su tiempo es \(\Theta(f+c)\) y su espacio auxiliar \(\Theta(1)\). Interpolación, saltos, exponencial y ternaria requieren definir primero qué orden global garantiza la matriz; sin esa condición no pueden descartar regiones correctamente.
 

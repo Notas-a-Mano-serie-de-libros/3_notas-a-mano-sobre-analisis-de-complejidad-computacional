@@ -7,6 +7,11 @@ import shutil
 import unicodedata
 from pathlib import Path
 
+try:
+    from scripts.editorial_math import normalize_math_products
+except ModuleNotFoundError:  # Ejecución directa: python scripts/integrate_....py
+    from editorial_math import normalize_math_products
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
@@ -818,6 +823,7 @@ def sync_published_sections() -> None:
                 )
                 index = insertion.start() if insertion else len(content.rstrip())
                 content = content[:index].rstrip() + "\n\n" + gallery + "\n\n" + content[index:].lstrip()
+        content = normalize_math_products(content)
         path.write_text(content.rstrip() + "\n", encoding="utf-8")
 
 
@@ -1132,7 +1138,10 @@ def build_sectioned_chapter(chapter: int) -> None:
         cards.append(f'<li><a href="{slug}/"><span>{label}</span><small>Leer sección →</small></a></li>')
     cards.extend(("</ol>", "</nav>"))
     top, bottom = navigation(chapter)
-    current_path.write_text("\n\n".join((top, title, kicker, INTRO[chapter].strip(), "\n".join(cards), "---", bottom)) + "\n", encoding="utf-8")
+    chapter_content = "\n\n".join(
+        (top, title, kicker, INTRO[chapter].strip(), "\n".join(cards), "---", bottom)
+    ) + "\n"
+    current_path.write_text(normalize_math_products(chapter_content), encoding="utf-8")
 
     section_pairs = [(label, slug) for label, slug, _body, _url in specs]
     nested_top, nested_bottom = nested_chapter_navigation(chapter)
@@ -1150,7 +1159,10 @@ def build_sectioned_chapter(chapter: int) -> None:
                 body = body[:marker.start()].rstrip() + "\n\n" + button + "\n\n" + body[marker.start():]
                 button = ""
         content = (nested_top, f"# {label}", f'<span class="chapter-kicker">Capítulo {chapter}</span>', body, button, section_navigation(chapter, section_pairs, index), "---", nested_bottom)
-        (directory / f"{slug}.md").write_text("\n\n".join(part for part in content if part) + "\n", encoding="utf-8")
+        section_content = "\n\n".join(part for part in content if part) + "\n"
+        (directory / f"{slug}.md").write_text(
+            normalize_math_products(section_content), encoding="utf-8"
+        )
 def build_chapter(chapter: int) -> None:
     current = (DOCS / "capitulos" / f"capitulo-{chapter}.md").read_text(encoding="utf-8")
     title = re.search(r"^# .+$", current, flags=re.MULTILINE).group(0)
@@ -1193,7 +1205,10 @@ def build_chapter(chapter: int) -> None:
         elif chapter == 4 and slug == "ejemplo9-complejidad-oculta":
             parts.append(missing_chapter4_example("ejemplo10"))
     parts.extend(["---", bottom])
-    (DOCS / "capitulos" / f"capitulo-{chapter}.md").write_text("\n\n".join(parts) + "\n", encoding="utf-8")
+    chapter_content = "\n\n".join(parts) + "\n"
+    (DOCS / "capitulos" / f"capitulo-{chapter}.md").write_text(
+        normalize_math_products(chapter_content), encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":

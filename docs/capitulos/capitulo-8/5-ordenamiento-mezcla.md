@@ -57,9 +57,9 @@ Garantiza O(n log(n)) en todos los casos, lo que lo hace predecible y eficiente,
     </tr>
   </thead>
   <tbody>
-    <tr><td>Mejor caso</td><td>\(\Omega(n \log_2(n))\)</td><td>\(\Omega(n)\)</td></tr>
-    <tr><td>Caso promedio</td><td>\(\Theta(n \log_2(n))\)</td><td>\(\Theta(n)\)</td></tr>
-    <tr><td>Peor caso</td><td>\(O(n \log_2(n))\)</td><td>\(O(n)\)</td></tr>
+    <tr><td>Mejor caso</td><td>\(\Omega(n \cdot \log_2(n))\)</td><td>\(\Omega(n)\)</td></tr>
+    <tr><td>Caso promedio</td><td>\(\Theta(n \cdot \log_2(n))\)</td><td>\(\Theta(n)\)</td></tr>
+    <tr><td>Peor caso</td><td>\(O(n \cdot \log_2(n))\)</td><td>\(O(n)\)</td></tr>
   </tbody>
 </table>
 </div>
