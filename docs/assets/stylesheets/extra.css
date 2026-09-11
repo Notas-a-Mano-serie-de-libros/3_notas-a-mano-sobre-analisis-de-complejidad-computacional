@@ -512,17 +512,19 @@ input {
   margin-top: 1.7rem;
 }
 
-.book-hero__explore {
+.md-typeset .book-hero__explore {
   align-items: center;
   display: inline-flex;
-  gap: 0.55rem;
+  gap: 0.65rem;
+  text-decoration: none;
 }
 
-.book-hero__explore svg {
+.md-typeset .book-hero__explore-icon {
+  display: block;
   fill: currentColor;
-  flex: 0 0 auto;
-  height: 1.15em;
-  width: 1.15em;
+  flex: 0 0 1.35rem;
+  height: 1.35rem;
+  width: 1.35rem;
 }
 
 .chapter-index {

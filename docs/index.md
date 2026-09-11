@@ -20,7 +20,12 @@ hide:
       <li>Mauro Callejas Cuervo</li>
     </ul>
     <div class="book-hero__actions">
-      <a class="md-button md-button--primary book-hero__explore" href="capitulos/"><svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a2 2 0 0 1 2 2v14.25A3.75 3.75 0 0 0 9.25 16H4V5.5Zm16 0V16h-5.25A3.75 3.75 0 0 0 11 19.25V5a2 2 0 0 1 2-2h4.5A2.5 2.5 0 0 1 20 5.5Z"/></svg><span>Explorar capítulos</span></a>
+      <a class="md-button md-button--primary book-hero__explore" href="capitulos/">
+        <svg class="book-hero__explore-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a2 2 0 0 1 2 2v14.25A3.75 3.75 0 0 0 9.25 16H4V5.5Zm16 0V16h-5.25A3.75 3.75 0 0 0 11 19.25V5a2 2 0 0 1 2-2h4.5A2.5 2.5 0 0 1 20 5.5Z"/>
+        </svg>
+        <span>Explorar capítulos</span>
+      </a>
     </div>
   </div>
 </div>
