@@ -24,17 +24,17 @@ Toda función recursiva necesita un caso base y una transformación que acerque 
 
 Las secciones siguientes aplican el procedimiento a factorial, Fibonacci, potencia, Merge Sort y búsqueda en árbol binario, siempre en el orden código, análisis y simulación.
 
-<nav class="chapter-outline chapter-outline--pages" aria-label="Secciones del capítulo">
-<strong>Secciones del capítulo</strong>
-<ol class="chapter-section-list">
-<li><a href="factorial/"><span>Ejemplo 1 · Factorial recursivo</span><small>Leer sección →</small></a></li>
-<li><a href="fibonacci/"><span>Ejemplo 2 · Fibonacci recursivo ingenuo</span><small>Leer sección →</small></a></li>
-<li><a href="potencia/"><span>Ejemplo 3 · Potencia de un número entero positivo</span><small>Leer sección →</small></a></li>
-<li><a href="merge-sort/"><span>Ejemplo 4 · Ordenamiento por mezcla</span><small>Leer sección →</small></a></li>
-<li><a href="arbol-binario/"><span>Ejemplo 5 · Búsqueda en árbol binario</span><small>Leer sección →</small></a></li>
-<li><a href="ejercicios-propuestos/"><span>6.4.1 Ejercicios propuestos</span><small>Leer sección →</small></a></li>
-</ol>
-</nav>
+<section class="chapter-sections" aria-labelledby="chapter-sections-title">
+<h2 id="chapter-sections-title">Secciones del capítulo</h2>
+<div class="chapter-index chapter-index--sections">
+<a class="chapter-entry" href="factorial/"><span class="chapter-entry__number">01</span><strong>Factorial recursivo</strong><span>Relaciona una reducción unitaria con la profundidad de la pila de llamadas.</span></a>
+<a class="chapter-entry" href="fibonacci/"><span class="chapter-entry__number">02</span><strong>Fibonacci recursivo ingenuo</strong><span>Expone la repetición de subproblemas y el crecimiento del árbol recursivo.</span></a>
+<a class="chapter-entry" href="potencia/"><span class="chapter-entry__number">03</span><strong>Potencia de un entero positivo</strong><span>Compara reducción lineal y división del exponente mediante reutilización.</span></a>
+<a class="chapter-entry" href="merge-sort/"><span class="chapter-entry__number">04</span><strong>Ordenamiento por mezcla</strong><span>Combina dos subproblemas por nivel y deriva su costo log-lineal.</span></a>
+<a class="chapter-entry" href="arbol-binario/"><span class="chapter-entry__number">05</span><strong>Búsqueda en árbol binario</strong><span>Vincula el costo de búsqueda con la altura y el balance del árbol.</span></a>
+<a class="chapter-entry" href="ejercicios-propuestos/"><span class="chapter-entry__number">6.4.1</span><strong>Ejercicios propuestos</strong><span>Propone análisis de tiempo, espacio y profundidad para algoritmos recursivos.</span></a>
+</div>
+</section>
 
 ---
 

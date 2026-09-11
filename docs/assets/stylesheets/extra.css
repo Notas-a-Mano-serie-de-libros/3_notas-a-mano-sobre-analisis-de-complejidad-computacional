@@ -674,6 +674,10 @@ input {
   font-size: 0.78rem;
 }
 
+.chapter-index--sections .chapter-entry {
+  grid-template-columns: minmax(5.75rem, auto) minmax(12rem, 0.78fr) minmax(0, 1.4fr);
+}
+
 .editorial-note {
   border-bottom: 1px solid var(--notas-rule);
   border-top: 1px solid var(--notas-rule);
@@ -982,6 +986,10 @@ input {
 
   .chapter-entry span:last-child {
     grid-column: 2;
+  }
+
+  .chapter-index--sections .chapter-entry {
+    grid-template-columns: 5.3rem minmax(0, 1fr);
   }
 
   .chapter-nav {

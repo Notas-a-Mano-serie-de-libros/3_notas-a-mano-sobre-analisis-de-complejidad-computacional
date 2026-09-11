@@ -46,11 +46,15 @@ def main() -> int:
                 line = source.count("\n", 0, match.start()) + 1
                 errors.append(f"{path.relative_to(ROOT)}:{line}: fórmula sin delimitadores: {cell}")
 
-    for chapter in range(2, 9):
+    for chapter in range(1, 10):
         path = DOCS / "capitulos" / f"capitulo-{chapter}.md"
         source = path.read_text(encoding="utf-8")
-        if source.count('class="chapter-outline') != 1:
-            errors.append(f"{path.relative_to(ROOT)}: falta el índice interno único")
+        if source.count('class="chapter-index chapter-index--sections"') != 1:
+            errors.append(
+                f"{path.relative_to(ROOT)}: falta el índice editorial único de secciones"
+            )
+        if chapter in {1, 9}:
+            continue
         pages = sorted((DOCS / "capitulos" / f"capitulo-{chapter}").glob("*.md"))
         if not pages:
             errors.append(f"{path.relative_to(ROOT)}: el capítulo no tiene secciones propias")

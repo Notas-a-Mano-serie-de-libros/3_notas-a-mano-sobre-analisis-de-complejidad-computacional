@@ -8,25 +8,21 @@
 
 La notación asintótica compara tasas de crecimiento cuando \(n\) tiende a infinito. Su utilidad consiste en abstraer constantes de implementación sin perder la relación formal entre una función de costo \(C(n)\) y una función de referencia \(g(n)\). Las cotas pueden ser superiores, inferiores, ajustadas o estrictas; por eso los cinco símbolos no son intercambiables.
 
-<nav class="chapter-outline chapter-outline--pages" aria-label="Secciones del capítulo">
-<strong>Secciones del capítulo</strong>
-<ol class="chapter-section-list">
-<li><a href="familias-de-funciones/"><span>3.2 Familias de funciones</span><small>Leer sección →</small></a></li>
-<li class="chapter-section-group">
-<a href="notacion-asintotica-representacion-generica/"><span>3.3 Representación general</span><small>Leer sección principal →</small></a>
-<ol aria-label="Subsecciones de representación general">
-<li><a href="0-comparacion-notaciones-asintoticas/">3.3.1 Comparación general</a></li>
-<li><a href="1-notacion-big-o/">3.3.2 Notación \(O\)</a></li>
-<li><a href="2-notacion-little-o/">3.3.3 Notación \(o\)</a></li>
-<li><a href="3-notacion-big-omega/">3.3.4 Notación \(\Omega\)</a></li>
-<li><a href="4-notacion-little-omega/">3.3.5 Notación \(\omega\)</a></li>
-<li><a href="5-notacion-theta/">3.3.6 Notación \(\Theta\)</a></li>
-</ol>
-</li>
-<li><a href="ejemplos-concretos-notaciones/"><span>3.4 Ejemplos concretos</span><small>Leer sección →</small></a></li>
-<li><a href="ejercicios-propuestos/"><span>3.6 Ejercicios propuestos</span><small>Consultar PDF →</small></a></li>
-</ol>
-</nav>
+<section class="chapter-sections" aria-labelledby="chapter-sections-title">
+<h2 id="chapter-sections-title">Secciones del capítulo</h2>
+<div class="chapter-index chapter-index--sections">
+<a class="chapter-entry" href="familias-de-funciones/"><span class="chapter-entry__number">3.2</span><strong>Familias de funciones</strong><span>Organiza las funciones de referencia usadas para comparar órdenes de crecimiento.</span></a>
+<a class="chapter-entry" href="notacion-asintotica-representacion-generica/"><span class="chapter-entry__number">3.3</span><strong>Representación general</strong><span>Presenta gráficamente las relaciones entre una función y sus cotas asintóticas.</span></a>
+<a class="chapter-entry" href="0-comparacion-notaciones-asintoticas/"><span class="chapter-entry__number">3.3.1</span><strong>Comparación de las notaciones</strong><span>Contrasta en una sola vista las cinco relaciones asintóticas fundamentales.</span></a>
+<a class="chapter-entry" href="1-notacion-big-o/"><span class="chapter-entry__number">3.3.2</span><strong>Notación O</strong><span>Formaliza una cota superior asintótica mediante constantes y un umbral.</span></a>
+<a class="chapter-entry" href="2-notacion-little-o/"><span class="chapter-entry__number">3.3.3</span><strong>Notación o</strong><span>Expresa que una función crece estrictamente más lento que otra.</span></a>
+<a class="chapter-entry" href="3-notacion-big-omega/"><span class="chapter-entry__number">3.3.4</span><strong>Notación Ω</strong><span>Formaliza una cota inferior asintótica mediante constantes y un umbral.</span></a>
+<a class="chapter-entry" href="4-notacion-little-omega/"><span class="chapter-entry__number">3.3.5</span><strong>Notación ω</strong><span>Expresa que una función crece estrictamente más rápido que otra.</span></a>
+<a class="chapter-entry" href="5-notacion-theta/"><span class="chapter-entry__number">3.3.6</span><strong>Notación Θ</strong><span>Establece una cota ajustada combinando límites superior e inferior.</span></a>
+<a class="chapter-entry" href="ejemplos-concretos-notaciones/"><span class="chapter-entry__number">3.4</span><strong>Ejemplos concretos</strong><span>Aplica cada notación a una misma función para comparar las demostraciones.</span></a>
+<a class="chapter-entry" href="ejercicios-propuestos/"><span class="chapter-entry__number">3.6</span><strong>Ejercicios propuestos</strong><span>Propone problemas para practicar cotas, límites y relaciones asintóticas.</span></a>
+</div>
+</section>
 
 ---
 

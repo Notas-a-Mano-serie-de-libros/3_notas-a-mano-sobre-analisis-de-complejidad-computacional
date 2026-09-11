@@ -6,6 +6,15 @@
 
 Que un programa funcione es apenas el primer criterio de calidad. Cuando crecen los datos, la cantidad de usuarios o las restricciones operativas, también importa cuánto tarda una solución, cuánta memoria utiliza y cómo se comporta bajo demanda. El análisis de complejidad proporciona un lenguaje formal para estudiar esas preguntas antes de depender exclusivamente de mediciones.
 
+<section class="chapter-sections" aria-labelledby="chapter-sections-title">
+<h2 id="chapter-sections-title">Secciones del capítulo</h2>
+<div class="chapter-index chapter-index--sections">
+<a class="chapter-entry" href="#11-conceptos-iniciales"><span class="chapter-entry__number">1.1</span><strong>Conceptos iniciales</strong><span>Diferencia algoritmo, análisis de algoritmos y complejidad computacional.</span></a>
+<a class="chapter-entry" href="#12-contexto-historico"><span class="chapter-entry__number">1.2</span><strong>Contexto histórico</strong><span>Recorre los hitos que condujeron desde la automatización hasta la teoría de la complejidad.</span></a>
+<a class="chapter-entry" href="#13-de-vuelta-al-contexto-actual"><span class="chapter-entry__number">1.3</span><strong>De vuelta al contexto actual</strong><span>Relaciona el análisis crítico con el desarrollo de software y la inteligencia artificial.</span></a>
+</div>
+</section>
+
 ## 1.1 Conceptos iniciales
 
 | Concepto | Pregunta central | Alcance |
@@ -47,4 +56,3 @@ El propósito de la obra nace de esta exigencia: desarrollar una base crítica y
 ---
 
 <nav class="chapter-nav chapter-nav--bottom" aria-label="Navegación inferior entre capítulos"><a href="../../consideraciones-teoricas/">← Consideraciones teóricas</a><a class="chapter-nav__index" href="../">Recorrido</a><a class="chapter-nav__next" href="../capitulo-2/">Capítulo 2 →</a></nav>
-

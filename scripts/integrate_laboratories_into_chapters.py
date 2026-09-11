@@ -1064,6 +1064,87 @@ EXERCISE_TITLES = {
 }
 
 
+# Índices editoriales de las páginas de capítulo. Cada entrada conserva el
+# mismo patrón visual del recorrido de la portada: número, nombre y propósito.
+SECTION_INDEX: dict[int, tuple[tuple[str, str, str, str], ...]] = {
+    2: (
+        ("2.1.2.0", "Complejidad sublineal", "0-complejidad-sublineal", "Distingue los crecimientos que avanzan más lentamente que una función lineal."),
+        ("2.1.2.1", "Complejidad constante", "1-complejidad-constante", "Analiza operaciones cuyo costo no cambia cuando aumenta el tamaño de entrada."),
+        ("2.1.2.2", "Complejidad logarítmica", "2-complejidad-logaritmica", "Explica cómo la reducción sucesiva del problema produce crecimiento logarítmico."),
+        ("2.1.2.3", "Complejidad lineal", "3-complejidad-lineal", "Estudia recorridos cuyo trabajo crece en proporción directa al tamaño de entrada."),
+        ("2.1.2.4", "Complejidad log-lineal", "4-complejidad-log-lineal", "Relaciona el trabajo lineal por nivel con una cantidad logarítmica de niveles."),
+        ("2.1.2.5", "Complejidad cuadrática", "5-complejidad-cuadratica", "Muestra el costo de recorrer dos dimensiones o combinar pares de elementos."),
+        ("2.1.2.6", "Complejidad cúbica", "6-complejidad-cubica", "Examina algoritmos con tres dimensiones de trabajo dependientes de la entrada."),
+        ("2.1.2.7", "Complejidad polinomial general", "7-complejidad-polinomial-general", "Compara funciones de la forma n elevado a k y el efecto de cambiar su grado."),
+        ("2.1.2.8", "Complejidad exponencial", "8-complejidad-exponencial", "Observa cómo la ramificación recursiva multiplica rápidamente el trabajo."),
+        ("2.1.2.9", "Complejidad factorial", "9-complejidad-factorial", "Estudia la enumeración de permutaciones y su crecimiento extremadamente rápido."),
+        ("2.2", "Ejercicios propuestos", "ejercicios-propuestos", "Reúne problemas para aplicar y contrastar las familias de complejidad estudiadas."),
+    ),
+    3: (
+        ("3.2", "Familias de funciones", "familias-de-funciones", "Organiza las funciones de referencia usadas para comparar órdenes de crecimiento."),
+        ("3.3", "Representación general", "notacion-asintotica-representacion-generica", "Presenta gráficamente las relaciones entre una función y sus cotas asintóticas."),
+        ("3.3.1", "Comparación de las notaciones", "0-comparacion-notaciones-asintoticas", "Contrasta en una sola vista las cinco relaciones asintóticas fundamentales."),
+        ("3.3.2", "Notación O", "1-notacion-big-o", "Formaliza una cota superior asintótica mediante constantes y un umbral."),
+        ("3.3.3", "Notación o", "2-notacion-little-o", "Expresa que una función crece estrictamente más lento que otra."),
+        ("3.3.4", "Notación Ω", "3-notacion-big-omega", "Formaliza una cota inferior asintótica mediante constantes y un umbral."),
+        ("3.3.5", "Notación ω", "4-notacion-little-omega", "Expresa que una función crece estrictamente más rápido que otra."),
+        ("3.3.6", "Notación Θ", "5-notacion-theta", "Establece una cota ajustada combinando límites superior e inferior."),
+        ("3.4", "Ejemplos concretos", "ejemplos-concretos-notaciones", "Aplica cada notación a una misma función para comparar las demostraciones."),
+        ("3.6", "Ejercicios propuestos", "ejercicios-propuestos", "Propone problemas para practicar cotas, límites y relaciones asintóticas."),
+    ),
+    4: (
+        ("4.4.4.1", "Sumar dos números", "ejemplo1-sumar-numeros", "Separa el tamaño de entrada del costo fijo de una operación aritmética."),
+        ("4.4.4.2", "Imprimir los elementos de un arreglo", "ejemplo2-imprimir-elementos-arreglo", "Deriva el costo temporal y espacial de un recorrido lineal."),
+        ("4.4.4.3", "Imprimir los elementos de una matriz", "ejemplo3-imprimir-elementos-matriz", "Analiza un recorrido completo sobre una matriz cuadrada."),
+        ("4.4.4.4", "Inicializar una matriz variable", "ejemplo4-inicializar-matriz-variable", "Incluye en el análisis el costo de construir y recorrer una matriz."),
+        ("4.4.4.5", "Ciclos con incremento no lineal", "ejemplo5-ciclos-incremento-no-lineal", "Muestra cómo el incremento modifica constantes sin cambiar siempre el orden."),
+        ("4.4.4.6", "Algoritmo con estructura deliberadamente compleja", "ejemplo6", "Sustituye ciclos y llamadas por sus costos antes de simplificar el resultado."),
+        ("4.4.4.7", "Ciclo sin dependencia de la entrada", "ejemplo7-ciclo-sin-dependencia", "Diferencia un límite fijo de otro que crece con el tamaño de entrada."),
+        ("4.4.4.8", "Ciclo con límite fijo y costo lineal", "ejemplo8", "Explica por qué una operación dependiente de n domina dentro de un ciclo fijo."),
+        ("4.4.4.9", "Complejidad oculta", "ejemplo9-complejidad-oculta", "Revela costos que no son evidentes al contar solamente las iteraciones."),
+        ("4.4.4.10", "Algoritmo costoso por diseño", "ejemplo10", "Evalúa cómo el orden de condiciones altera el costo de los casos posibles."),
+        ("4.6", "Ejercicios propuestos", "ejercicios-propuestos", "Permite practicar el análisis de secuencias, condiciones, ciclos y memoria."),
+    ),
+    5: (
+        ("5.4", "Formas de las relaciones de recurrencia", "formas-de-recurrencia", "Clasifica recurrencias según reducción, división, linealidad y coeficientes."),
+        ("5.5.1", "Sustitución iterativa", "sustitucion-iterativa", "Expande una recurrencia hasta reconocer y justificar un patrón general."),
+        ("5.5.2", "Árbol de recurrencia", "arbol-recurrencia", "Suma el trabajo de nodos y niveles mediante una representación en árbol."),
+        ("5.5.3", "Teorema maestro", "teorema-maestro", "Compara el trabajo externo con el costo crítico de una recurrencia de división."),
+        ("5.5.4", "Ecuación característica", "ecuacion-caracteristica", "Resuelve recurrencias lineales de reducción con coeficientes constantes."),
+        ("5.6.1", "Ejercicios propuestos", "ejercicios-propuestos", "Reúne recurrencias para seleccionar, aplicar y verificar distintos métodos."),
+    ),
+    6: (
+        ("01", "Factorial recursivo", "factorial", "Relaciona una reducción unitaria con la profundidad de la pila de llamadas."),
+        ("02", "Fibonacci recursivo ingenuo", "fibonacci", "Expone la repetición de subproblemas y el crecimiento del árbol recursivo."),
+        ("03", "Potencia de un entero positivo", "potencia", "Compara reducción lineal y división del exponente mediante reutilización."),
+        ("04", "Ordenamiento por mezcla", "merge-sort", "Combina dos subproblemas por nivel y deriva su costo log-lineal."),
+        ("05", "Búsqueda en árbol binario", "arbol-binario", "Vincula el costo de búsqueda con la altura y el balance del árbol."),
+        ("6.4.1", "Ejercicios propuestos", "ejercicios-propuestos", "Propone análisis de tiempo, espacio y profundidad para algoritmos recursivos."),
+    ),
+    7: (
+        ("7.1", "Comparación general", "0-comparacion-busquedas", "Compara requisitos, pasos y costos de todos los algoritmos de búsqueda."),
+        ("7.2", "Búsqueda secuencial", "1-busqueda-secuencial", "Recorre los elementos en orden y no exige que los datos estén ordenados."),
+        ("7.3", "Búsqueda binaria", "2-busqueda-binaria", "Descarta la mitad del rango activo en cada comparación."),
+        ("7.4", "Búsqueda por interpolación", "3-busqueda-interpolacion", "Estima la posición del objetivo a partir de la distribución de los valores."),
+        ("7.5", "Búsqueda por saltos", "4-busqueda-saltos", "Avanza por bloques y completa la búsqueda dentro del intervalo encontrado."),
+        ("7.6", "Búsqueda exponencial", "5-busqueda-exponencial", "Duplica el índice para localizar un rango y luego aplica búsqueda binaria."),
+        ("7.7", "Búsqueda ternaria", "6-busqueda-ternaria", "Divide el rango ordenado en tres partes mediante dos puntos medios."),
+        ("7.9", "Ejercicios propuestos", "ejercicios-propuestos", "Plantea problemas para elegir y analizar búsquedas según los datos."),
+    ),
+    8: (
+        ("8.1", "Comparación general", "0-comparacion-ordenamientos", "Contrasta estabilidad, memoria y costos de los algoritmos de ordenamiento."),
+        ("8.2", "Ordenamiento burbuja", "1-ordenamiento-burbuja", "Ordena mediante comparaciones e intercambios de elementos adyacentes."),
+        ("8.3", "Ordenamiento por selección", "2-ordenamiento-seleccion", "Busca el mínimo restante y lo ubica al final de la zona ordenada."),
+        ("8.4", "Ordenamiento por inserción", "3-ordenamiento-insercion", "Inserta cada elemento en su posición dentro del prefijo ya ordenado."),
+        ("A", "Ordenamiento Shell", "4-ordenamiento-shell", "Amplía la inserción usando separaciones decrecientes entre los elementos."),
+        ("8.5", "Ordenamiento por mezcla", "5-ordenamiento-mezcla", "Divide el arreglo y combina recursivamente subarreglos ordenados."),
+        ("8.6", "Ordenamiento rápido", "6-ordenamiento-rapido", "Particiona alrededor de un pivote y ordena cada región resultante."),
+        ("8.7", "Ordenamiento radix", "7-ordenamiento-radix", "Procesa las claves por dígitos conservando el orden relativo en cada pasada."),
+        ("8.9", "Ejercicios propuestos", "ejercicios-propuestos", "Propone problemas para comparar mecanismos, casos y costos de ordenamiento."),
+    ),
+}
+
+
 def exercise_pdf(chapter: int) -> str:
     return (
         "Los enunciados de esta sección se conservan en el documento PDF del capítulo. "
@@ -1120,6 +1201,44 @@ def section_specs(chapter: int) -> list[tuple[str, str, str, str | None]]:
     return specs
 
 
+def chapter_section_cards(chapter: int) -> str:
+    cards = [
+        '<section class="chapter-sections" aria-labelledby="chapter-sections-title">',
+        '<h2 id="chapter-sections-title">Secciones del capítulo</h2>',
+        '<div class="chapter-index chapter-index--sections">',
+    ]
+    for number, name, slug, description in SECTION_INDEX[chapter]:
+        cards.append(
+            f'<a class="chapter-entry" href="{slug}/">'
+            f'<span class="chapter-entry__number">{number}</span>'
+            f'<strong>{name}</strong><span>{description}</span></a>'
+        )
+    cards.extend(("</div>", "</section>"))
+    return "\n".join(cards)
+
+
+def refresh_chapter_section_index(chapter: int) -> None:
+    """Actualiza solo el índice y preserva la edición manual del capítulo."""
+    path = DOCS / "capitulos" / f"capitulo-{chapter}.md"
+    source = path.read_text(encoding="utf-8")
+    patterns = (
+        r'<nav class="chapter-outline chapter-outline--pages".*?</nav>',
+        r'<section class="chapter-sections".*?</section>',
+    )
+    for pattern in patterns:
+        if re.search(pattern, source, flags=re.DOTALL):
+            source = re.sub(
+                pattern,
+                chapter_section_cards(chapter),
+                source,
+                count=1,
+                flags=re.DOTALL,
+            )
+            path.write_text(source, encoding="utf-8")
+            return
+    raise ValueError(f"El capítulo {chapter} no contiene un índice reemplazable")
+
+
 def build_sectioned_chapter(chapter: int) -> None:
     current_path = DOCS / "capitulos" / f"capitulo-{chapter}.md"
     current = current_path.read_text(encoding="utf-8")
@@ -1129,17 +1248,9 @@ def build_sectioned_chapter(chapter: int) -> None:
     directory = DOCS / "capitulos" / f"capitulo-{chapter}"
     directory.mkdir(exist_ok=True)
 
-    cards = [
-        '<nav class="chapter-outline chapter-outline--pages" aria-label="Secciones del capítulo">',
-        "<strong>Secciones del capítulo</strong>",
-        '<ol class="chapter-section-list">',
-    ]
-    for label, slug, _body, _url in specs:
-        cards.append(f'<li><a href="{slug}/"><span>{label}</span><small>Leer sección →</small></a></li>')
-    cards.extend(("</ol>", "</nav>"))
     top, bottom = navigation(chapter)
     chapter_content = "\n\n".join(
-        (top, title, kicker, INTRO[chapter].strip(), "\n".join(cards), "---", bottom)
+        (top, title, kicker, INTRO[chapter].strip(), chapter_section_cards(chapter), "---", bottom)
     ) + "\n"
     current_path.write_text(normalize_math_products(chapter_content), encoding="utf-8")
 
@@ -1216,6 +1327,7 @@ if __name__ == "__main__":
         # Los capítulos 2 y 3 contienen una edición manual ampliada con figuras y
         # secciones teóricas que no deben reconstruirse desde las fichas antiguas.
         if chapter_number in {2, 3}:
+            refresh_chapter_section_index(chapter_number)
             continue
         build_chapter(chapter_number)
         build_sectioned_chapter(chapter_number)

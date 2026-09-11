@@ -6,6 +6,15 @@
 
 El cierre de la obra reúne los aprendizajes y desafíos que surgieron durante su revisión. La reflexión no introduce otra técnica de análisis: invita a examinar cómo se construye, se enseña y se mejora un material académico sin perder la promesa que le dio origen.
 
+<section class="chapter-sections" aria-labelledby="chapter-sections-title">
+<h2 id="chapter-sections-title">Secciones del capítulo</h2>
+<div class="chapter-index chapter-index--sections">
+<a class="chapter-entry" href="#91-el-reto-mejorar-sin-perder-el-camino"><span class="chapter-entry__number">9.1</span><strong>El reto: mejorar sin perder el camino</strong><span>Expone las decisiones que equilibran accesibilidad, profundidad y rigor.</span></a>
+<a class="chapter-entry" href="#92-la-historia-detras-de-esta-nueva-edicion"><span class="chapter-entry__number">9.2</span><strong>La historia detrás de esta nueva edición</strong><span>Resume el proceso de revisión y el papel del criterio editorial humano.</span></a>
+<a class="chapter-entry" href="#93-continuar-despues-del-libro"><span class="chapter-entry__number">9.3</span><strong>Continuar después del libro</strong><span>Propone prácticas para contrastar, explicar y seguir mejorando lo aprendido.</span></a>
+</div>
+</section>
+
 ## 9.1 El reto: mejorar sin perder el camino
 
 La nueva edición parte de una tensión editorial: ampliar el rigor y la profundidad sin abandonar la puerta de entrada accesible que valoraron los lectores de la primera edición.
@@ -24,7 +33,7 @@ Lo que comenzó como una revisión general se convirtió en una reescritura prof
 
 La inteligencia artificial apoyó tareas mecánicas del proceso, pero el criterio editorial permaneció en las decisiones humanas: seleccionar qué debía explicarse mejor, revisar la coherencia, diseñar experiencias de aprendizaje y validar que los recursos digitales conservaran el propósito de la obra.
 
-## Continuar después del libro
+## 9.3 Continuar después del libro
 
 - Repite un análisis con entradas y supuestos diferentes.
 - Contrasta una predicción teórica con una medición controlada.

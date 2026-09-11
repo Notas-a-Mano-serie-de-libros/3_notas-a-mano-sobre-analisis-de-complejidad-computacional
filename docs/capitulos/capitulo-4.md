@@ -27,22 +27,22 @@ El análisis comienza definiendo qué representa \(n\), qué escenario se estudi
 
 Las páginas siguientes aplican este procedimiento a los diez ejemplos de la obra, en el orden código, análisis temporal, análisis espacial y simulación cuando existe un laboratorio asociado.
 
-<nav class="chapter-outline chapter-outline--pages" aria-label="Secciones del capítulo">
-<strong>Secciones del capítulo</strong>
-<ol class="chapter-section-list">
-<li><a href="ejemplo1-sumar-numeros/"><span>4.4.4.1 Sumar dos números</span><small>Leer sección →</small></a></li>
-<li><a href="ejemplo2-imprimir-elementos-arreglo/"><span>4.4.4.2 Imprimir los elementos de un arreglo</span><small>Leer sección →</small></a></li>
-<li><a href="ejemplo3-imprimir-elementos-matriz/"><span>4.4.4.3 Imprimir los elementos de una matriz</span><small>Leer sección →</small></a></li>
-<li><a href="ejemplo4-inicializar-matriz-variable/"><span>4.4.4.4 Inicializar una matriz variable</span><small>Leer sección →</small></a></li>
-<li><a href="ejemplo5-ciclos-incremento-no-lineal/"><span>4.4.4.5 Ciclos con incremento no lineal</span><small>Leer sección →</small></a></li>
-<li><a href="ejemplo6/"><span>4.4.4.6 Algoritmo con estructura deliberadamente compleja</span><small>Leer sección →</small></a></li>
-<li><a href="ejemplo7-ciclo-sin-dependencia/"><span>4.4.4.7 Ciclo sin dependencia de la entrada</span><small>Leer sección →</small></a></li>
-<li><a href="ejemplo8/"><span>4.4.4.8 Ciclo con límite fijo y función de costo lineal</span><small>Leer sección →</small></a></li>
-<li><a href="ejemplo9-complejidad-oculta/"><span>4.4.4.9 Complejidad oculta</span><small>Leer sección →</small></a></li>
-<li><a href="ejemplo10/"><span>4.4.4.10 Algoritmo costoso por diseño</span><small>Leer sección →</small></a></li>
-<li><a href="ejercicios-propuestos/"><span>4.6 Ejercicios propuestos</span><small>Leer sección →</small></a></li>
-</ol>
-</nav>
+<section class="chapter-sections" aria-labelledby="chapter-sections-title">
+<h2 id="chapter-sections-title">Secciones del capítulo</h2>
+<div class="chapter-index chapter-index--sections">
+<a class="chapter-entry" href="ejemplo1-sumar-numeros/"><span class="chapter-entry__number">4.4.4.1</span><strong>Sumar dos números</strong><span>Separa el tamaño de entrada del costo fijo de una operación aritmética.</span></a>
+<a class="chapter-entry" href="ejemplo2-imprimir-elementos-arreglo/"><span class="chapter-entry__number">4.4.4.2</span><strong>Imprimir los elementos de un arreglo</strong><span>Deriva el costo temporal y espacial de un recorrido lineal.</span></a>
+<a class="chapter-entry" href="ejemplo3-imprimir-elementos-matriz/"><span class="chapter-entry__number">4.4.4.3</span><strong>Imprimir los elementos de una matriz</strong><span>Analiza un recorrido completo sobre una matriz cuadrada.</span></a>
+<a class="chapter-entry" href="ejemplo4-inicializar-matriz-variable/"><span class="chapter-entry__number">4.4.4.4</span><strong>Inicializar una matriz variable</strong><span>Incluye en el análisis el costo de construir y recorrer una matriz.</span></a>
+<a class="chapter-entry" href="ejemplo5-ciclos-incremento-no-lineal/"><span class="chapter-entry__number">4.4.4.5</span><strong>Ciclos con incremento no lineal</strong><span>Muestra cómo el incremento modifica constantes sin cambiar siempre el orden.</span></a>
+<a class="chapter-entry" href="ejemplo6/"><span class="chapter-entry__number">4.4.4.6</span><strong>Algoritmo con estructura deliberadamente compleja</strong><span>Sustituye ciclos y llamadas por sus costos antes de simplificar el resultado.</span></a>
+<a class="chapter-entry" href="ejemplo7-ciclo-sin-dependencia/"><span class="chapter-entry__number">4.4.4.7</span><strong>Ciclo sin dependencia de la entrada</strong><span>Diferencia un límite fijo de otro que crece con el tamaño de entrada.</span></a>
+<a class="chapter-entry" href="ejemplo8/"><span class="chapter-entry__number">4.4.4.8</span><strong>Ciclo con límite fijo y costo lineal</strong><span>Explica por qué una operación dependiente de n domina dentro de un ciclo fijo.</span></a>
+<a class="chapter-entry" href="ejemplo9-complejidad-oculta/"><span class="chapter-entry__number">4.4.4.9</span><strong>Complejidad oculta</strong><span>Revela costos que no son evidentes al contar solamente las iteraciones.</span></a>
+<a class="chapter-entry" href="ejemplo10/"><span class="chapter-entry__number">4.4.4.10</span><strong>Algoritmo costoso por diseño</strong><span>Evalúa cómo el orden de condiciones altera el costo de los casos posibles.</span></a>
+<a class="chapter-entry" href="ejercicios-propuestos/"><span class="chapter-entry__number">4.6</span><strong>Ejercicios propuestos</strong><span>Permite practicar el análisis de secuencias, condiciones, ciclos y memoria.</span></a>
+</div>
+</section>
 
 ---
 

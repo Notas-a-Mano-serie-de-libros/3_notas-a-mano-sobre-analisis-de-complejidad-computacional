@@ -29,22 +29,22 @@ Las familias corresponden a estructuras de ejecución distintas. \(O(1)\) no dep
 
 Esta página establece el marco teórico. Cada sección hija realiza el análisis experimental de una familia: identifica un algoritmo representativo, presenta sus implementaciones, formula tiempo y espacio y enlaza la simulación con la que se contrasta la curva.
 
-<nav class="chapter-outline chapter-outline--pages" aria-label="Secciones del capítulo">
-<strong>Secciones del capítulo</strong>
-<ol class="chapter-section-list">
-<li><a href="0-complejidad-sublineal/"><span>2.1.2.0 Complejidad sublineal</span><small>Leer sección →</small></a></li>
-<li><a href="1-complejidad-constante/"><span>2.1.2.1 Complejidad constante</span><small>Leer sección →</small></a></li>
-<li><a href="2-complejidad-logaritmica/"><span>2.1.2.2 Complejidad logarítmica</span><small>Leer sección →</small></a></li>
-<li><a href="3-complejidad-lineal/"><span>2.1.2.3 Complejidad lineal</span><small>Leer sección →</small></a></li>
-<li><a href="4-complejidad-log-lineal/"><span>2.1.2.4 Complejidad log-lineal</span><small>Leer sección →</small></a></li>
-<li><a href="5-complejidad-cuadratica/"><span>2.1.2.5 Complejidad cuadrática</span><small>Leer sección →</small></a></li>
-<li><a href="6-complejidad-cubica/"><span>2.1.2.6 Complejidad cúbica</span><small>Leer sección →</small></a></li>
-<li><a href="7-complejidad-polinomial-general/"><span>2.1.2.7 Complejidad polinomial general</span><small>Leer sección →</small></a></li>
-<li><a href="8-complejidad-exponencial/"><span>2.1.2.8 Complejidad exponencial</span><small>Leer sección →</small></a></li>
-<li><a href="9-complejidad-factorial/"><span>2.1.2.9 Complejidad factorial</span><small>Leer sección →</small></a></li>
-<li><a href="ejercicios-propuestos/"><span>2.2 Ejercicios propuestos</span><small>Consultar PDF →</small></a></li>
-</ol>
-</nav>
+<section class="chapter-sections" aria-labelledby="chapter-sections-title">
+<h2 id="chapter-sections-title">Secciones del capítulo</h2>
+<div class="chapter-index chapter-index--sections">
+<a class="chapter-entry" href="0-complejidad-sublineal/"><span class="chapter-entry__number">2.1.2.0</span><strong>Complejidad sublineal</strong><span>Distingue los crecimientos que avanzan más lentamente que una función lineal.</span></a>
+<a class="chapter-entry" href="1-complejidad-constante/"><span class="chapter-entry__number">2.1.2.1</span><strong>Complejidad constante</strong><span>Analiza operaciones cuyo costo no cambia cuando aumenta el tamaño de entrada.</span></a>
+<a class="chapter-entry" href="2-complejidad-logaritmica/"><span class="chapter-entry__number">2.1.2.2</span><strong>Complejidad logarítmica</strong><span>Explica cómo la reducción sucesiva del problema produce crecimiento logarítmico.</span></a>
+<a class="chapter-entry" href="3-complejidad-lineal/"><span class="chapter-entry__number">2.1.2.3</span><strong>Complejidad lineal</strong><span>Estudia recorridos cuyo trabajo crece en proporción directa al tamaño de entrada.</span></a>
+<a class="chapter-entry" href="4-complejidad-log-lineal/"><span class="chapter-entry__number">2.1.2.4</span><strong>Complejidad log-lineal</strong><span>Relaciona el trabajo lineal por nivel con una cantidad logarítmica de niveles.</span></a>
+<a class="chapter-entry" href="5-complejidad-cuadratica/"><span class="chapter-entry__number">2.1.2.5</span><strong>Complejidad cuadrática</strong><span>Muestra el costo de recorrer dos dimensiones o combinar pares de elementos.</span></a>
+<a class="chapter-entry" href="6-complejidad-cubica/"><span class="chapter-entry__number">2.1.2.6</span><strong>Complejidad cúbica</strong><span>Examina algoritmos con tres dimensiones de trabajo dependientes de la entrada.</span></a>
+<a class="chapter-entry" href="7-complejidad-polinomial-general/"><span class="chapter-entry__number">2.1.2.7</span><strong>Complejidad polinomial general</strong><span>Compara funciones de la forma n elevado a k y el efecto de cambiar su grado.</span></a>
+<a class="chapter-entry" href="8-complejidad-exponencial/"><span class="chapter-entry__number">2.1.2.8</span><strong>Complejidad exponencial</strong><span>Observa cómo la ramificación recursiva multiplica rápidamente el trabajo.</span></a>
+<a class="chapter-entry" href="9-complejidad-factorial/"><span class="chapter-entry__number">2.1.2.9</span><strong>Complejidad factorial</strong><span>Estudia la enumeración de permutaciones y su crecimiento extremadamente rápido.</span></a>
+<a class="chapter-entry" href="ejercicios-propuestos/"><span class="chapter-entry__number">2.2</span><strong>Ejercicios propuestos</strong><span>Reúne problemas para aplicar y contrastar las familias de complejidad estudiadas.</span></a>
+</div>
+</section>
 
 ---
 
