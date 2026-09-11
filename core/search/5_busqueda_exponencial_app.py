@@ -1,4 +1,3 @@
-import math
 
 from search_common import (
     EXPONENTIAL_ROLE_STYLES,

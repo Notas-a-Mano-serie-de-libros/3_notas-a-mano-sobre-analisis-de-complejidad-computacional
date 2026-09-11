@@ -354,7 +354,7 @@ def _iterative(
         )
         recursive_factor = rf"{a:g}^{{\log_{{{divisor:g}}}(n)}}"
         body = (
-            rf"<p><b>Paso 1: Expandir la relación</b></p>"
+            r"<p><b>Paso 1: Expandir la relación</b></p>"
             + expansion
             + rf"<p><b>Paso 2: Obtener la expresión general</b></p>"
             rf"\[C(n)={a:g}^kC\left(\frac{{n}}{{{divisor:g}^k}}\right)"
@@ -401,7 +401,7 @@ def _iterative(
         evaluated_at_base = evaluated_sum.replace("j", k_latex)
         recursive_factor = rf"{a:g}^{{{k_latex}}}"
         body = (
-            rf"<p><b>Paso 1: Expandir la relación</b></p>"
+            r"<p><b>Paso 1: Expandir la relación</b></p>"
             + expansion
             + rf"<p><b>Paso 2: Obtener la expresión general</b></p>"
             rf"\[C(n)={a:g}^kC(n-k\cdot{reduction:g})+{general_sum}\]"
@@ -586,10 +586,10 @@ def _tree(relation_type, coefficients, reductions, function_type, degree, base_c
         if evaluated_sum else None
     )
     body = (
-        rf"<p><b>Paso 1: Construir el árbol de recurrencia</b></p>"
+        r"<p><b>Paso 1: Construir el árbol de recurrencia</b></p>"
         + tree_svg
-        + rf"<p><b>Paso 2: Calcular el costo del nivel "
-        rf"\(\boldsymbol{{k}}\)</b></p>"
+        + r"<p><b>Paso 2: Calcular el costo del nivel "
+        r"\(\boldsymbol{k}\)</b></p>"
         + level_table
         + rf"<p>El tamaño de cada subproblema en el nivel \(k\) es "
         rf"\({argument_k}\). Como \(f(n)={f_latex}\), el costo de cada nodo es:</p>"
@@ -615,7 +615,7 @@ def _tree(relation_type, coefficients, reductions, function_type, degree, base_c
             rf"&={final_result.replace('C(n)=', '')}"
             rf"\end{{aligned}}\]"
             + (
-                rf"<p><b>Resultado asintótico</b></p>"
+                r"<p><b>Resultado asintótico</b></p>"
                 + _asymptotic_development(final_result, asymptotic_result)
                 if asymptotic_result
                 else ""
@@ -713,8 +713,8 @@ def _master(
             rf"{a:g}\cdot({b:g})^p" for a, b in zip(coefficients, reductions)
         )
         general_solution = (
-            rf"\[C(n)\in\Theta\left(n^p\left(1+"
-            rf"\int_1^n\frac{{f(u)}}{{u^{{p+1}}}}\,du\right)\right)\]"
+            r"\[C(n)\in\Theta\left(n^p\left(1+"
+            r"\int_1^n\frac{f(u)}{u^{p+1}}\,du\right)\right)\]"
         )
         procedure = (
             rf"<p><b>1. Identificar los parámetros.</b></p>"

@@ -25,13 +25,9 @@ from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
-    action_button_row,
     bounded_int_control,
-    button_control,
-    collapsible_panel,
     compact_labeled_control,
     dropdown_control,
-    shared_ui_styles,
 )
 
 try:
@@ -342,7 +338,7 @@ def search_labeled_control(label, control):
         label,
         control,
         field_width=188,
-        group_width=294,
+        group_width=COMPACT_GROUP_WIDTH,
         label_width=92,
     )
     return group

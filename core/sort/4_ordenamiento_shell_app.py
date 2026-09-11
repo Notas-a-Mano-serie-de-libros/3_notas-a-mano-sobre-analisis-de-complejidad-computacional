@@ -8,7 +8,7 @@ import ipywidgets as widgets
 
 from common.widget_controls import bounded_int_control, button_control, compact_labeled_control, dropdown_control
 from sort_common import build_sort_panel, colab_pause, copy_sort_state, create_state as create_sort_state, generate_values, normalized_bar_height, render_multi_sort_legend, render_state_html, run_sort_app, sort_action_button_row, sort_controls_grid, step_sort
-from sort_config import DEFAULT_BAR_SIZE, GAP_SEQUENCE_OPTIONS, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES, SORT_THEME_CSS
+from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES, SORT_THEME_CSS
 
 try:
     from google.colab import output as colab_output

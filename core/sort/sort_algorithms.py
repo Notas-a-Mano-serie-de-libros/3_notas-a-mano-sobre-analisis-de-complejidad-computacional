@@ -552,7 +552,7 @@ def shell_trace(values, descending=False, gap_sequence="shell"):
                     make_event(
                         arr,
                         f"Intercambia las posiciones {j - gap} y {j}.",
-                        shell_formula(gap_line, gap_terms, rf"j = {j}", rf"a_{{j-h}} \leftrightarrow a_j"),
+                        shell_formula(gap_line, gap_terms, rf"j = {j}", r"a_{j-h} \leftrightarrow a_j"),
                         roles,
                         labels,
                         gap_sequence=gap_sequence,
@@ -725,7 +725,7 @@ def merge_trace(values, descending=False):
         current["visible"] = True
         current["sorted"] = False
         set_flat_focus(current["start"], current["end"])
-        append_event(f"Mezcla {left_values} y {right_values}.", rf"i = 0,\quad j = 0,\quad k = 0", focus=current)
+        append_event(f"Mezcla {left_values} y {right_values}.", r"i = 0,\quad j = 0,\quad k = 0", focus=current)
 
         while True:
             clear_roles()

@@ -701,7 +701,6 @@ def run_app():
             return
         step = min(state["step"], len(events) - 1)
         event = events[step]
-        data = ALGORITHMS[algorithm.value]
         entered = sum(item["kind"] == "enter" for item in events[: step + 1])
         returned = sum(item["kind"] == "return" for item in events[: step + 1])
         maximum_depth = max(len(item["stack"]) for item in events[: step + 1])

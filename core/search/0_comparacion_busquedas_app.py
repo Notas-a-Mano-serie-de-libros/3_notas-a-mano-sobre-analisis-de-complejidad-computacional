@@ -138,7 +138,7 @@ def comparison_labeled_control(label, control):
         label,
         control,
         field_width=188,
-        group_width=294,
+        group_width=COMPACT_GROUP_WIDTH,
         label_width=92,
     )
     group.layout.height = "32px"

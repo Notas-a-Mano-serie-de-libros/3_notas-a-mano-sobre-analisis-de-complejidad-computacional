@@ -22,13 +22,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-ci.txt
       - name: Validate project
-        run: |
-          python scripts/validate_repository_paths.py
-          python scripts/validate_colab_bootstrap.py
-          python scripts/validate_colab_links.py
-          python scripts/validate_notebook_launchers.py
-          python scripts/validate_size_budgets.py
-          python scripts/validate_html_snapshots.py
+        run: make validate PYTHON=python
       - name: Build reports
         run: |
           mkdir -p artifacts

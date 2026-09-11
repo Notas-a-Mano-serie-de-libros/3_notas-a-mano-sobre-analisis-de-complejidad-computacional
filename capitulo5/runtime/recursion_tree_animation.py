@@ -172,7 +172,6 @@ def _node_argument(
     initial = _initial_size(
         relation_type, branching_factor, reduction_parameter, depth, term_b
     )
-    level = node["level"]
     expanded_values = _expanded_term_values(term_a, term_b)
     if relation_type == "reduction":
         reduction = sum(
@@ -371,7 +370,7 @@ def _render_svg(
             )
             + f'{equation_markup}'
             + tooltip_markup
-            + f'</g>'
+            + '</g>'
         )
 
     level_labels = []

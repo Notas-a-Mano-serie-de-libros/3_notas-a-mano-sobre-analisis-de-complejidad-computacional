@@ -7,7 +7,6 @@ en local y en Colab sin depender del directorio actual.
 from __future__ import annotations
 
 import math
-import random
 import sys
 import time as _time
 import urllib.request

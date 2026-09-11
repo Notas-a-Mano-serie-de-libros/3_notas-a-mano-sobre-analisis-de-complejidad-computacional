@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import re
-from pathlib import Path
 from urllib.parse import urlparse
 
 from tests.helpers import PROJECT_ROOT

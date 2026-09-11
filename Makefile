@@ -20,6 +20,7 @@ validate:
 	$(PYTHON) scripts/validate_size_budgets.py
 	$(PYTHON) scripts/validate_html_snapshots.py
 	$(PYTHON) scripts/validate_widget_contracts.py
+	$(PYTHON) scripts/validate_editorial_content.py
 
 clean-notebooks:
 	$(PYTHON) scripts/clean_notebooks.py

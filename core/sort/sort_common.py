@@ -23,13 +23,9 @@ from common.widget_controls import (
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
     STANDARD_LABEL_CONTROL_GAP,
-    action_button_row,
     bounded_int_control,
-    button_control,
-    collapsible_panel,
     compact_labeled_control,
     dropdown_control,
-    shared_ui_styles,
 )
 
 try:
@@ -799,8 +795,6 @@ def render_tree_html(state):
         row_blocks = ""
         for node in sorted(rows.get(depth, []), key=lambda item: item["start"]):
             node_range = range_key(node)
-            left_px = node["start"] * slot_width
-            width_px = max(slot_width, len(node["values"]) * slot_width)
             if node_range not in active_ranges:
                 roles = [ROLE_EXCLUDED] * len(node["values"])
             elif algorithm == "rapido" and node.get("pivot"):

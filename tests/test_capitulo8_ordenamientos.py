@@ -248,7 +248,6 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('description="Orden"', source)
         self.assertIn("actions", source)
         self.assertIn("bounded_int_control", source)
-        self.assertIn("button_control", source)
         self.assertIn("dropdown_control", source)
         self.assertIn("dropdown_control(", source)
         self.assertIn("bounded_int_control(", source)

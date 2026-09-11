@@ -85,12 +85,8 @@ class TestPerformanceContracts(unittest.TestCase):
             text=True,
             cwd=PROJECT_ROOT,
         )
-        pre_push = (PROJECT_ROOT / "scripts" / "git_hooks" / "pre-push").read_text(
-            encoding="utf-8"
-        )
-        installer = (PROJECT_ROOT / "scripts" / "install_git_hooks.py").read_text(
-            encoding="utf-8"
-        )
+        pre_push = (PROJECT_ROOT / "scripts" / "git_hooks" / "pre-push").read_text(encoding="utf-8")
+        installer = (PROJECT_ROOT / "scripts" / "install_git_hooks.py").read_text(encoding="utf-8")
 
         self.assertEqual(result.stdout.strip(), "")
         self.assertIn("clean_generated_graphics.py", pre_push)
@@ -121,6 +117,7 @@ class TestPerformanceContracts(unittest.TestCase):
         release = (PROJECT_ROOT / ".github" / "workflows" / "release-artifacts.yml").read_text(encoding="utf-8")
         precommit = (PROJECT_ROOT / ".pre-commit-config.yaml").read_text(encoding="utf-8")
         readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
+        makefile = (PROJECT_ROOT / "Makefile").read_text(encoding="utf-8")
 
         self.assertIn("permissions:", workflow)
         self.assertIn("contents: read", workflow)
@@ -137,12 +134,18 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertNotIn("notebooks-clean:", workflow)
         self.assertNotIn("python scripts/clean_notebooks.py --check --diagnose", workflow)
         self.assertIn("ruff check .", workflow)
-        self.assertIn("python scripts/validate_widget_contracts.py", workflow)
-        self.assertIn("python scripts/validate_colab_bootstrap.py", workflow)
-        self.assertIn("python scripts/validate_colab_links.py", workflow)
-        self.assertIn("python scripts/validate_notebook_launchers.py", workflow)
-        self.assertIn("python scripts/validate_size_budgets.py", workflow)
-        self.assertIn("python scripts/validate_html_snapshots.py", workflow)
+        self.assertIn("make validate PYTHON=python", workflow)
+        self.assertIn("make validate PYTHON=python", release)
+        for validator in (
+            "validate_widget_contracts.py",
+            "validate_colab_bootstrap.py",
+            "validate_colab_links.py",
+            "validate_notebook_launchers.py",
+            "validate_size_budgets.py",
+            "validate_html_snapshots.py",
+            "validate_editorial_content.py",
+        ):
+            self.assertIn(validator, makefile)
         self.assertIn("python scripts/benchmark_animations.py --repeats 3 --max-ms 1500", workflow)
         self.assertIn("python scripts/validate_benchmark_report.py --report artifacts/animation-benchmark.json", workflow)
         self.assertIn("python -m pip_audit -r requirements-ci.txt --progress-spinner off --format json", workflow)
@@ -169,6 +172,7 @@ class TestPerformanceContracts(unittest.TestCase):
 
         class Widget:
             value = ""
+
             class layout:
                 min_height = ""
 
@@ -184,7 +188,7 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("tex-svg.js", widget.value)
         self.assertIn("visibility:hidden", widget.value)
         self.assertNotIn("formula-fallback", widget.value)
-        self.assertIn('id=&quot;formula&quot; style=&quot;visibility:hidden&quot;', widget.value)
+        self.assertIn("id=&quot;formula&quot; style=&quot;visibility:hidden&quot;", widget.value)
         self.assertIn("style.visibility = &#x27;visible&#x27;", widget.value)
         self.assertIn("previousElementSibling", widget.value)
         self.assertIn("math-ready", widget.value)
@@ -230,10 +234,10 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("widget.layout.min_height", source)
         self.assertIn("self.max_formula_height", source)
         self.assertNotIn("frameElement.style.height", source)
-        self.assertIn("widget.value = self.render_formula_html(formula, self.max_formula_height) if formula else \"\"", source)
+        self.assertIn('widget.value = self.render_formula_html(formula, self.max_formula_height) if formula else ""', source)
         self.assertNotIn("class _FormulaParser:", source)
         self.assertNotIn("KaTeX_Main", source)
-        self.assertNotIn('from IPython.display import Math, display', source)
+        self.assertNotIn("from IPython.display import Math, display", source)
         self.assertNotIn("display(Math(formula))", source)
         self.assertNotIn('widget.value = f"$${formula}$$" if formula else ""', source)
         self.assertNotIn("async def async_pause", source)
@@ -284,10 +288,10 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("import asyncio", sort_common)
         self.assertIn("async def run_auto_async(run_id):", search_common)
         self.assertIn("async def run_auto_async(run_id):", sort_common)
-        self.assertIn("execution_state = {\"run_id\": 0}", search_common)
-        self.assertIn("execution_state = {\"run_id\": 0}", sort_common)
-        self.assertIn("execution_state = {\"running\": False, \"finish_requested\": False, \"run_id\": 0}", search_comparison)
-        self.assertIn("execution_state = {\"running\": False, \"finish_requested\": False, \"run_id\": 0}", sort_comparison)
+        self.assertIn('execution_state = {"run_id": 0}', search_common)
+        self.assertIn('execution_state = {"run_id": 0}', sort_common)
+        self.assertIn('execution_state = {"running": False, "finish_requested": False, "run_id": 0}', search_comparison)
+        self.assertIn('execution_state = {"running": False, "finish_requested": False, "run_id": 0}', sort_comparison)
         self.assertIn("loop.create_task(coro)", search_comparison)
         self.assertIn("loop.create_task(coro)", sort_comparison)
 

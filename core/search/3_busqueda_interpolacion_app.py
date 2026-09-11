@@ -1,4 +1,3 @@
-import math
 import random
 
 from search_common import (
@@ -53,7 +52,7 @@ def build_formula(state, low_value, high_value):
     diff_indices = high - low
     diff_values  = target - low_value
 
-    symbolic = rf"a + \frac{{(b - a)(x - arr[a])}}{{arr[b] - arr[a]}}"
+    symbolic = r"a + \frac{(b - a)(x - arr[a])}{arr[b] - arr[a]}"
 
     # Paso 1: sustitución numérica
     step1 = rf"{low} + \frac{{({high} - {low})({target} - {low_value})}}{{{high_value} - {low_value}}}"
@@ -82,7 +81,6 @@ p =
 """
     else:
         step3 = rf"{low} + \frac{{{num}}}{{{den}}}"
-        raw   = low + num / den
         step4 = rf"{low} + {num / den:.4f}".rstrip('0').rstrip('.')
         return rf"""
 \displaystyle

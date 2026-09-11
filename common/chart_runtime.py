@@ -15,10 +15,9 @@ def calibrate_t0(n_iters: int = 1_000_000) -> float:
     global _T0_CACHE
     if _T0_CACHE is not None:
         return _T0_CACHE
-    _marker = False
     start = _time.perf_counter()
-    for index in range(n_iters):
-        _marker = index < n_iters
+    for _ in range(n_iters):
+        pass
     _T0_CACHE = (_time.perf_counter() - start) / n_iters
     return _T0_CACHE
 

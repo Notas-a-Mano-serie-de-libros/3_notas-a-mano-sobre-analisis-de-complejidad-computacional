@@ -24,7 +24,7 @@ theme:
       toggle:
         icon: material/weather-night
         name: Usar modo oscuro
-    - scheme: notas-dark
+    - scheme: slate
       toggle:
         icon: material/weather-sunny
         name: Usar modo claro

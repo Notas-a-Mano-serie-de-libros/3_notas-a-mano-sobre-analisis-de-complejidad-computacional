@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import math
 import random
-from pathlib import Path
 
 import matplotlib.pyplot as plt
 from IPython.display import HTML, Math, display
-import ipywidgets as widgets
 from common.graphics import graphics_path
 from common.simulation_views import standard_view_styles
 

@@ -3,7 +3,7 @@ import math
 from search_common import (
     TERNARY_ROLE_STYLES,
     create_search_base_state,
-    message_html,
+    message_html as message_html,
     render_state_html as render_search_state_html,
     run_search_app,
 )
