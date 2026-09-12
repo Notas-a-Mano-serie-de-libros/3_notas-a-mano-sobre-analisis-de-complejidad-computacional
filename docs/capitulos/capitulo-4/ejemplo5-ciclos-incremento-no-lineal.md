@@ -15,18 +15,109 @@ El ciclo interior avanza de dos en dos, pero continúa recorriendo una cantidad 
 
 <!-- book-code:start -->
 
-Listado original del libro, página 158 (Java).
+#### Ciclo interior con paso dos
 
-```java
-public static void recorrerMatrizVacia(int m, int n) {
-    int[][] matriz = new int[m][n];
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j+=2) {
-            // Sin operaciones internas en este ciclo
+Implementación corregida basada en el libro, página 158 (Java).
+
+=== "Java"
+
+    ```java
+    public static void recorrerMatrizVacia(int m, int n) {
+        int[][] matriz = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j+=2) {
+                // Sin operaciones internas en este ciclo
+            }
         }
     }
-}
-```
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función recorrerMatrizVacia(m, n)
+        matriz ← [[0] * n for _ in rango(m)]
+        para i en rango(m)
+            para j en rango(0, n, 2)
+                sin operaciones  # Sin operaciones internas.
+    ```
+
+=== "Python"
+
+    ```python
+    def recorrerMatrizVacia(m, n):
+        matriz = [[0] * n for _ in range(m)]
+        for i in range(m):
+            for j in range(0, n, 2):
+                pass  # Sin operaciones internas.
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    void recorrerMatrizVacia(int m, int n) {
+        // malloc/calloc usa un bloque contiguo en esta adaptación.
+        int *matriz = calloc((size_t) m * n, sizeof(int));
+        if (m > 0 && n > 0 && matriz == NULL) {
+            abort();
+        }
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j += 2) {
+                // Sin operaciones internas.
+            }
+        }
+        free(matriz);
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `m, n` | Filas y columnas de la matriz nueva. |
+| `i, j` | Fila actual y columna que avanza de dos en dos. |
+
+**Precondiciones:** m y n no negativos; memoria suficiente.
+
+**Resultado:** Crea una matriz; el cuerpo del ciclo interior no ejecuta operaciones.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `m = 2, n = 3`.
+
+    | Estado | Acción o resultado |
+    | --- | --- |
+    | `new int[2][3]` | Reserva la matriz. |
+    | `i = 0; j = 0, 2` | Ejecuta el control del ciclo, con cuerpo vacío. |
+    | `i = 1; j = 0, 2` | Repite en la segunda fila. |
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-822a694e4b44">Código Python · Ciclo interior con paso dos</label><textarea id="runner-822a694e4b44" spellcheck="false" wrap="off" rows="14">def recorrerMatrizVacia(m, n):
+    matriz = [[0] * n for _ in range(m)]
+    for i in range(m):
+        for j in range(0, n, 2):
+            pass  # Sin operaciones internas.
+
+# Entradas editables del ejemplo.
+m = 2
+n = 3
+
+recorrerMatrizVacia(m, n)
+print(&quot;Ejemplo finalizado&quot;)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+Los experimentos ejecutan adaptaciones Python. El tiempo excluye la preparación y se promedia por ejecución. La memoria representa el incremento de pico observado por tracemalloc durante la operación, sin incluir la entrada preparada; no es el tamaño de la memoria de una máquina Java.
+
+El experimento fija \(m = n\), crea la matriz dentro de la operación y lee las posiciones pares. El Java tiene el cuerpo interior vacío.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/runtime/experimental_analysis.py).
 
 <!-- book-code:end -->
 
@@ -34,20 +125,20 @@ public static void recorrerMatrizVacia(int m, int n) {
 
 #### Complejidad temporal
 
-\(T(n)\in O(n^2)\): el incremento de dos modifica una constante, no el orden cuadrático.
+El control del ciclo interior realiza \(m\cdot\lceil n/2\rceil\) iteraciones con cuerpo vacío. La reserva e inicialización de la matriz domina con \(\Theta(m\cdot n)\) para dimensiones positivas. Si \(m=n\), \(T(n)\in\Theta(n^2)\); avanzar de dos en dos modifica una constante.
 
 #### Complejidad espacial
 
-\(S(n)\in O(n^2)\) porque el algoritmo construye una matriz cuadrada.
+La matriz creada ocupa \(\Theta(1+m+m\cdot n)\). Para dimensiones positivas es \(\Theta(m\cdot n)\); si \(m=n\), \(S(n)\in\Theta(n^2)\).
 
 ### Simulaciones experimentales
 
-Cada experimento ejecuta el mismo algoritmo para distintos valores de \(n\).
+Cada experimento ejecuta la adaptación Python descrita en «Laboratorio y medición» para distintos valores de \(n\).
 
 - **Máximo \(n\):** determina el mayor tamaño de entrada. El sistema incluye valores intermedios y potencias de diez.
 - **Ejecuciones:** controla cuántas veces se repite la operación para cada valor de \(n\). La gráfica y la tabla muestran el promedio.
 
-La preparación de la entrada se realiza fuera de la medición temporal. En memoria se reporta el espacio adicional utilizado durante la operación.
+La entrada preparada se excluye de la medición. Las reservas realizadas dentro de la operación sí se incluyen; la memoria observada corresponde al incremento de pico de Python.
 
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">

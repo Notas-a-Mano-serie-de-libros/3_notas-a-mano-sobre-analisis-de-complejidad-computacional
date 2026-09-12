@@ -19,37 +19,271 @@ En el caso promedio logra O(n log(n)) con una constante menor que el ordenamient
 
 <!-- book-code:start -->
 
-Listado original del libro, página 349 (Java).
+#### Ordenamiento rápido con pivote inicial
 
-```java
-public void ordenar(int[] arr, int a, int b) {
-    if (a >= b)
-        return;
-    int p = particionar(arr, a, b);
-    ordenar(arr, a, p - 1);
-    ordenar(arr, p + 1, b);
-}
-public int particionar(int[] arr, int a, int b) {
-    int pivote = arr[a], i = a + 1, j = b;
-    while (i <= j) {
-        while (i <= j && arr[i] < pivote)
-            i++;
-        while (i <= j && arr[j] > pivote)
-            j--;
-        if (i <= j) {
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
-            i++;
-            j--;
-        }
+Implementación corregida basada en el libro, página 349 (Java).
+
+=== "Java"
+
+    ```java
+    public void ordenar(int[] arr, int a, int b) {
+        if (a >= b)
+            return;
+        int p = particionar(arr, a, b);
+        ordenar(arr, a, p - 1);
+        ordenar(arr, p + 1, b);
     }
-    int temp = arr[a];
-    arr[a] = arr[j];
-    arr[j] = temp;
-    return j;
-}
-```
+    public int particionar(int[] arr, int a, int b) {
+        int pivote = arr[a], i = a + 1, j = b;
+        while (i <= j) {
+            while (i <= j && arr[i] < pivote)
+                i++;
+            while (i <= j && arr[j] > pivote)
+                j--;
+            if (i <= j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+                i++;
+                j--;
+            }
+        }
+        int temp = arr[a];
+        arr[a] = arr[j];
+        arr[j] = temp;
+        return j;
+    }
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función ordenar(arr, a, b)
+        si a >= b entonces
+            retornar
+        p ← particionar(arr, a, b)
+        ordenar(arr, a, p - 1)
+        ordenar(arr, p + 1, b)
+
+
+    función particionar(arr, a, b)
+        pivote ← arr[a]
+        i ← a + 1
+        j ← b
+        mientras i <= j
+            mientras i <= j y arr[i] < pivote
+                i += 1
+            mientras i <= j y arr[j] > pivote
+                j -= 1
+            si i <= j entonces
+                temp ← arr[i]
+                arr[i] ← arr[j]
+                arr[j] ← temp
+                i += 1
+                j -= 1
+        temp ← arr[a]
+        arr[a] ← arr[j]
+        arr[j] ← temp
+        retornar j
+    ```
+
+=== "Python"
+
+    ```python
+    def ordenar(arr, a, b):
+        if a >= b:
+            return
+        p = particionar(arr, a, b)
+        ordenar(arr, a, p - 1)
+        ordenar(arr, p + 1, b)
+
+
+    def particionar(arr, a, b):
+        pivote = arr[a]
+        i = a + 1
+        j = b
+        while i <= j:
+            while i <= j and arr[i] < pivote:
+                i += 1
+            while i <= j and arr[j] > pivote:
+                j -= 1
+            if i <= j:
+                temp = arr[i]
+                arr[i] = arr[j]
+                arr[j] = temp
+                i += 1
+                j -= 1
+        temp = arr[a]
+        arr[a] = arr[j]
+        arr[j] = temp
+        return j
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    int particionar(int arr[], int a, int b);
+
+    void ordenar(int arr[], int a, int b) {
+        if (a >= b) {
+            return;
+        }
+        int p = particionar(arr, a, b);
+        ordenar(arr, a, p - 1);
+        ordenar(arr, p + 1, b);
+    }
+    int particionar(int arr[], int a, int b) {
+        int pivote = arr[a], i = a + 1, j = b;
+        while (i <= j) {
+            while (i <= j && arr[i] < pivote) {
+                i++;
+            }
+            while (i <= j && arr[j] > pivote) {
+                j--;
+            }
+            if (i <= j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+                i++;
+                j--;
+            }
+        }
+        int temp = arr[a];
+        arr[a] = arr[j];
+        arr[j] = temp;
+        return j;
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr` | Arreglo que se modifica. |
+| `a, b` | Extremos inclusivos del intervalo. |
+| `p` | Posición final del pivote. |
+| `pivote` | Valor original arr[a]. |
+| `i, j` | Índices que recorren la partición. |
+| `temp` | Auxiliar de intercambio. |
+
+**Precondiciones:** arr no nulo; intervalo válido o vacío.
+
+**Resultado:** Ordena arr[a..b] ascendentemente.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [3, 1, 2], a = 0, b = 2`.
+
+    **Prueba de escritorio**
+
+    | Paso | Método | Profundidad | arr | a | b | pivote | i | j | temp | p | Operación ejecutada | Retorno |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | 1 | ordenar | 0 | [3, 1, 2] | 0 | 2 | — | — | — | — | — | Entrada a la llamada. | — |
+    | 2 | ordenar | 0 | [3, 1, 2] | 0 | 2 | — | — | — | — | — | `if a >= b:` | — |
+    | 3 | particionar | 1 | [3, 1, 2] | 0 | 2 | — | — | — | — | — | Entrada a la llamada. | — |
+    | 4 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | — | — | — | — | `pivote = arr[a]` | — |
+    | 5 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 1 | — | — | — | `i = a + 1` | — |
+    | 6 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 1 | 2 | — | — | `j = b` | — |
+    | 7 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 1 | 2 | — | — | `while i <= j:` | — |
+    | 8 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 1 | 2 | — | — | `while i <= j and arr[i] < pivote:` | — |
+    | 9 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 2 | 2 | — | — | `i += 1` | — |
+    | 10 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 2 | 2 | — | — | `while i <= j and arr[i] < pivote:` | — |
+    | 11 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `i += 1` | — |
+    | 12 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `while i <= j and arr[i] < pivote:` | — |
+    | 13 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `while i <= j and arr[j] > pivote:` | — |
+    | 14 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `if i <= j:` | — |
+    | 15 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `while i <= j:` | — |
+    | 16 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | 3 | — | `temp = arr[a]` | — |
+    | 17 | particionar | 1 | [2, 1, 2] | 0 | 2 | 3 | 3 | 2 | 3 | — | `arr[a] = arr[j]` | — |
+    | 18 | particionar | 1 | [2, 1, 3] | 0 | 2 | 3 | 3 | 2 | 3 | — | `arr[j] = temp` | — |
+    | 19 | particionar | 1 | [2, 1, 3] | 0 | 2 | 3 | 3 | 2 | 3 | — | `return j`; Termina la llamada. | 2 |
+    | 20 | ordenar | 0 | [2, 1, 3] | 0 | 2 | — | — | — | — | 2 | `p = particionar(arr, a, b)` | — |
+    | 21 | ordenar | 1 | [2, 1, 3] | 0 | 1 | — | — | — | — | — | Entrada a la llamada. | — |
+    | 22 | ordenar | 1 | [2, 1, 3] | 0 | 1 | — | — | — | — | — | `if a >= b:` | — |
+    | 23 | particionar | 2 | [2, 1, 3] | 0 | 1 | — | — | — | — | — | Entrada a la llamada. | — |
+    | 24 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | — | — | — | — | `pivote = arr[a]` | — |
+    | 25 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 1 | — | — | — | `i = a + 1` | — |
+    | 26 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 1 | 1 | — | — | `j = b` | — |
+    | 27 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 1 | 1 | — | — | `while i <= j:` | — |
+    | 28 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 1 | 1 | — | — | `while i <= j and arr[i] < pivote:` | — |
+    | 29 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `i += 1` | — |
+    | 30 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `while i <= j and arr[i] < pivote:` | — |
+    | 31 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `while i <= j and arr[j] > pivote:` | — |
+    | 32 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `if i <= j:` | — |
+    | 33 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `while i <= j:` | — |
+    | 34 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | 2 | — | `temp = arr[a]` | — |
+    | 35 | particionar | 2 | [1, 1, 3] | 0 | 1 | 2 | 2 | 1 | 2 | — | `arr[a] = arr[j]` | — |
+    | 36 | particionar | 2 | [1, 2, 3] | 0 | 1 | 2 | 2 | 1 | 2 | — | `arr[j] = temp` | — |
+    | 37 | particionar | 2 | [1, 2, 3] | 0 | 1 | 2 | 2 | 1 | 2 | — | `return j`; Termina la llamada. | 1 |
+    | 38 | ordenar | 1 | [1, 2, 3] | 0 | 1 | — | — | — | — | 1 | `p = particionar(arr, a, b)` | — |
+    | 39 | ordenar | 2 | [1, 2, 3] | 0 | 0 | — | — | — | — | — | Entrada a la llamada. | — |
+    | 40 | ordenar | 2 | [1, 2, 3] | 0 | 0 | — | — | — | — | — | `if a >= b:` | — |
+    | 41 | ordenar | 2 | [1, 2, 3] | 0 | 0 | — | — | — | — | — | `return`; Termina la llamada. | sin valor |
+    | 42 | ordenar | 1 | [1, 2, 3] | 0 | 1 | — | — | — | — | 1 | `ordenar(arr, a, p - 1)` | — |
+    | 43 | ordenar | 2 | [1, 2, 3] | 2 | 1 | — | — | — | — | — | Entrada a la llamada. | — |
+    | 44 | ordenar | 2 | [1, 2, 3] | 2 | 1 | — | — | — | — | — | `if a >= b:` | — |
+    | 45 | ordenar | 2 | [1, 2, 3] | 2 | 1 | — | — | — | — | — | `return`; Termina la llamada. | sin valor |
+    | 46 | ordenar | 1 | [1, 2, 3] | 0 | 1 | — | — | — | — | 1 | `ordenar(arr, p + 1, b)`; Termina la llamada. | sin valor |
+    | 47 | ordenar | 0 | [1, 2, 3] | 0 | 2 | — | — | — | — | 2 | `ordenar(arr, a, p - 1)` | — |
+    | 48 | ordenar | 1 | [1, 2, 3] | 3 | 2 | — | — | — | — | — | Entrada a la llamada. | — |
+    | 49 | ordenar | 1 | [1, 2, 3] | 3 | 2 | — | — | — | — | — | `if a >= b:` | — |
+    | 50 | ordenar | 1 | [1, 2, 3] | 3 | 2 | — | — | — | — | — | `return`; Termina la llamada. | sin valor |
+    | 51 | ordenar | 0 | [1, 2, 3] | 0 | 2 | — | — | — | — | 2 | `ordenar(arr, p + 1, b)`; Termina la llamada. | sin valor |
+
+    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-bd4876eac9d6">Código Python · Ordenamiento rápido con pivote inicial</label><textarea id="runner-bd4876eac9d6" spellcheck="false" wrap="off" rows="14">def ordenar(arr, a, b):
+    if a &gt;= b:
+        return
+    p = particionar(arr, a, b)
+    ordenar(arr, a, p - 1)
+    ordenar(arr, p + 1, b)
+
+
+def particionar(arr, a, b):
+    pivote = arr[a]
+    i = a + 1
+    j = b
+    while i &lt;= j:
+        while i &lt;= j and arr[i] &lt; pivote:
+            i += 1
+        while i &lt;= j and arr[j] &gt; pivote:
+            j -= 1
+        if i &lt;= j:
+            temp = arr[i]
+            arr[i] = arr[j]
+            arr[j] = temp
+            i += 1
+            j -= 1
+    temp = arr[a]
+    arr[a] = arr[j]
+    arr[j] = temp
+    return j
+
+# Entradas editables del ejemplo.
+arr = [3, 1, 2]
+a = 0
+b = 2
+
+print(&quot;Arreglo inicial:&quot;, arr)
+ordenar(arr, a, b)
+print(&quot;Arreglo ordenado:&quot;, arr)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+La animación y el contador son adaptaciones Python con operaciones instrumentadas. Incluyen comparaciones, movimientos y control del recorrido según el contador; no se deben interpretar todos los pasos como una sola clase de operación Java. Las opciones descendentes son ampliaciones: los listados del libro ordenan ascendentemente.
+
+El laboratorio ofrece particiones Hoare y Lomuto y varias elecciones de pivote. El listado del libro fija `pivote = arr[a]`; la configuración predeterminada del laboratorio usa pivote medio y no reproduce la misma partición paso a paso.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/sort/sort_algorithms.py).
 
 <!-- book-code:end -->
 

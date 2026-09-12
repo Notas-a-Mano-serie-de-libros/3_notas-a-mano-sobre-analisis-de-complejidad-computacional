@@ -22,22 +22,152 @@ Como los tres recorridos dependen de \(n\), el número total de operaciones crec
 
 <!-- book-code:start -->
 
-Listado original del libro, página 177 (Java).
+#### Multiplicación de matrices cuadradas
 
-```java
-public int[][] multiplicar(int[][] a, int[][] b) {
-    int n = a.length;
-    int[][] resultado = new int[n][n];
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int k = 0; k < n; k++) {
-                resultado[i][j] += a[i][k] * b[k][j];
+Implementación corregida basada en el libro, página 177 (Java).
+
+=== "Java"
+
+    ```java
+    public int[][] multiplicar(int[][] a, int[][] b) {
+        int n = a.length;
+        int[][] resultado = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < n; k++) {
+                    resultado[i][j] = Math.addExact(resultado[i][j], Math.multiplyExact(a[i][k], b[k][j]));
+                }
+            }
+        }
+        return resultado;
+    }
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función multiplicar(a, b)
+        n ← longitud(a)
+        resultado ← [[0] * n for _ in rango(n)]
+        para i en rango(n)
+            para j en rango(n)
+                para k en rango(n)
+                    producto ← a[i][k] * b[k][j]
+                    si no -2147483648 <= producto <= 2147483647 entonces
+                        error OverflowError("El producto no cabe en int de Java")
+                    suma ← resultado[i][j] + producto
+                    si no -2147483648 <= suma <= 2147483647 entonces
+                        error OverflowError("La suma no cabe en int de Java")
+                    resultado[i][j] ← suma
+        retornar resultado
+    ```
+
+=== "Python"
+
+    ```python
+    def multiplicar(a, b):
+        n = len(a)
+        resultado = [[0] * n for _ in range(n)]
+        for i in range(n):
+            for j in range(n):
+                for k in range(n):
+                    producto = a[i][k] * b[k][j]
+                    if not -2147483648 <= producto <= 2147483647:
+                        raise OverflowError("El producto no cabe en int de Java")
+                    suma = resultado[i][j] + producto
+                    if not -2147483648 <= suma <= 2147483647:
+                        raise OverflowError("La suma no cabe en int de Java")
+                    resultado[i][j] = suma
+        return resultado
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    // resultado es una matriz de salida reservada por el llamador.
+    void multiplicar(int n, int a[n][n], int b[n][n], int resultado[n][n]) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                resultado[i][j] = 0;
+                for (int k = 0; k < n; k++) {
+                    int64_t producto = (int64_t) a[i][k] * b[k][j];
+                    if (producto < INT_MIN || producto > INT_MAX) {
+                        abort();
+                    }
+                    int64_t suma = (int64_t) resultado[i][j] + producto;
+                    if (suma < INT_MIN || suma > INT_MAX) {
+                        abort();
+                    }
+                    resultado[i][j] = (int) suma;
+                }
             }
         }
     }
-    return resultado;
-}
-```
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+En C, las dimensiones se reciben como parámetros; las matrices de salida las reserva el llamador. La reserva de memoria se analiza por separado de los ciclos mostrados.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `a, b` | Matrices cuadradas de igual dimensión. |
+| `n` | Cantidad de filas y columnas. |
+| `resultado` | Matriz nueva. |
+| `i, j, k` | Fila, columna e índice de acumulación. |
+
+**Precondiciones:** Matrices no nulas, cuadradas y de igual dimensión; productos y sumas representables en int.
+
+**Resultado:** Devuelve la matriz producto \(a \times b\).
+
+??? example "Ejemplo paso a paso"
+    Entrada: `a = [[1, 2], [3, 4]], b = [[2, 0], [1, 2]]`.
+
+    | Estado | Acción o resultado |
+    | --- | --- |
+    | `i = 0, j = 0; k = 0, 1` | Acumula \(1 \times 2 + 2 \times 1 = 4\). |
+    | `i = 0, j = 1` | Acumula \(1 \times 0 + 2 \times 2 = 4\). |
+    | `Segunda fila` | Obtiene 10 y 8; devuelve [[4, 4], [10, 8]]. |
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-f3bbc29baeb8">Código Python · Multiplicación de matrices cuadradas</label><textarea id="runner-f3bbc29baeb8" spellcheck="false" wrap="off" rows="14">def multiplicar(a, b):
+    n = len(a)
+    resultado = [[0] * n for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            for k in range(n):
+                producto = a[i][k] * b[k][j]
+                if not -2147483648 &lt;= producto &lt;= 2147483647:
+                    raise OverflowError(&quot;El producto no cabe en int de Java&quot;)
+                suma = resultado[i][j] + producto
+                if not -2147483648 &lt;= suma &lt;= 2147483647:
+                    raise OverflowError(&quot;La suma no cabe en int de Java&quot;)
+                resultado[i][j] = suma
+    return resultado
+
+# Entradas editables del ejemplo.
+a = [[1, 2], [3, 4]]
+b = [[2, 0], [1, 2]]
+
+resultado = multiplicar(a, b)
+print(&quot;Resultado:&quot;, resultado)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+El listado Java procede de la página del libro indicada arriba. El laboratorio ejecuta una adaptación en Python; compara el patrón de crecimiento, no los tiempos de Java con los de Python.
+
+El tiempo se promedia por ejecución; la preparación de las entradas se realiza antes de cronometrar. Las gráficas teóricas y las mediciones experimentales se identifican por separado.
+
+El experimento multiplica matrices \(n \times n\) y crea la matriz resultado dentro de la operación medida.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/runtime/complexity_animations.py).
 
 <!-- book-code:end -->
 

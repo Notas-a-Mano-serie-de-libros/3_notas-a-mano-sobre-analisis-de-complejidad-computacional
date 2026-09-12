@@ -24,6 +24,16 @@ La cantidad de ramas generadas sigue la forma factorial, porque cada nivel reduc
 
 El libro no incluye un listado de implementación para este tema.
 
+#### Laboratorio y medición
+
+El listado Java procede de la página del libro indicada arriba. El laboratorio ejecuta una adaptación en Python; compara el patrón de crecimiento, no los tiempos de Java con los de Python.
+
+El tiempo se promedia por ejecución; la preparación de las entradas se realiza antes de cronometrar. Las gráficas teóricas y las mediciones experimentales se identifican por separado.
+
+El laboratorio cuenta permutaciones en Python. No existe un listado equivalente en el libro y no se presenta como transcripción de este.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/runtime/complexity_animations.py).
+
 <!-- book-code:end -->
 
 ### Simulación

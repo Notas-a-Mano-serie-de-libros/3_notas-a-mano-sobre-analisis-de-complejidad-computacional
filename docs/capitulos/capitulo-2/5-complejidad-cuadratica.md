@@ -22,20 +22,116 @@ La estructura de dos ciclos anidados hace que el número de accesos crezca cuadr
 
 <!-- book-code:start -->
 
-Listado original del libro, página 153 (Java).
+#### Recorrido de una matriz rectangular
 
-```java
-public static void imprimirMatriz(int[][] matriz) {
-    int m = matriz.length;
-    int n = m > 0 ? matriz[0].length : 0;
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            System.out.println(matriz[i][j]);
+Implementación corregida basada en el libro, página 153 (Java).
+
+=== "Java"
+
+    ```java
+    public static void imprimirMatriz(int[][] matriz) {
+        int m = matriz.length;
+        int n = m > 0 ? matriz[0].length : 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.println(matriz[i][j]);
+            }
+            System.out.println();
         }
-        System.out.println();
     }
-}
-```
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función imprimirMatriz(matriz)
+        m ← longitud(matriz)
+        n ← longitud(matriz[0]) if m > 0 else 0
+        para i en rango(m)
+            para j en rango(n)
+                imprimir(matriz[i][j])
+            imprimir()
+    ```
+
+=== "Python"
+
+    ```python
+    def imprimirMatriz(matriz):
+        m = len(matriz)
+        n = len(matriz[0]) if m > 0 else 0
+        for i in range(m):
+            for j in range(n):
+                print(matriz[i][j])
+            print()
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    void imprimirMatriz(int m, int n, int matriz[m][n]) {
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                printf("%d\n", matriz[i][j]);
+            }
+            printf("\n");
+        }
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+En C, las dimensiones se reciben como parámetros; las matrices de salida las reserva el llamador. La reserva de memoria se analiza por separado de los ciclos mostrados.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `matriz` | Matriz de enteros. |
+| `m, n` | Cantidad de filas y columnas. |
+| `i, j` | Índices de fila y columna. |
+
+**Precondiciones:** Matriz no nula, con filas no nulas y todas de la misma longitud.
+
+**Resultado:** Imprime los elementos y un salto al terminar cada fila.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `matriz = [[1, 2, 3], [4, 5, 6]]`.
+
+    | Estado | Acción o resultado |
+    | --- | --- |
+    | `m = 2, n = 3` | Determina las dimensiones. |
+    | `i = 0; j = 0, 1, 2` | Imprime 1, 2 y 3; después un salto. |
+    | `i = 1; j = 0, 1, 2` | Imprime 4, 5 y 6; después un salto. |
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-e73ca84ca782">Código Python · Recorrido de una matriz rectangular</label><textarea id="runner-e73ca84ca782" spellcheck="false" wrap="off" rows="14">def imprimirMatriz(matriz):
+    m = len(matriz)
+    n = len(matriz[0]) if m &gt; 0 else 0
+    for i in range(m):
+        for j in range(n):
+            print(matriz[i][j])
+        print()
+
+# Entradas editables del ejemplo.
+matriz = [[1, 2, 3], [4, 5, 6]]
+
+imprimirMatriz(matriz)
+print(&quot;Ejemplo finalizado&quot;)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+El listado Java procede de la página del libro indicada arriba. El laboratorio ejecuta una adaptación en Python; compara el patrón de crecimiento, no los tiempos de Java con los de Python.
+
+El tiempo se promedia por ejecución; la preparación de las entradas se realiza antes de cronometrar. Las gráficas teóricas y las mediciones experimentales se identifican por separado.
+
+El laboratorio suma una matriz cuadrada; el listado del libro imprime una matriz rectangular. Ambos recorren las celdas. La medición omite la impresión y fija \(m = n\).
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/runtime/complexity_animations.py).
 
 <!-- book-code:end -->
 

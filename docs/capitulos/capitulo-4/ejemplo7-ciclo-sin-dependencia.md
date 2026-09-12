@@ -15,15 +15,90 @@ El ciclo ejecuta siempre \(10\,000\) iteraciones. Esa cantidad es fija y no camb
 
 <!-- book-code:start -->
 
-Listado original del libro, página 164 (Java).
+#### Ciclo con límite fijo
 
-```java
-public static void iterar() {
-    for (int i = 0; i < 10000000; i++) {
-        System.out.println(i);
+Implementación corregida basada en el libro, página 164 (Java).
+
+=== "Java"
+
+    ```java
+    public static void iterar() {
+        for (int i = 0; i < 10000000; i++) {
+            System.out.println(i);
+        }
     }
-}
-```
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función iterar()
+        para i en rango(10000000)
+            imprimir(i)
+    ```
+
+=== "Python"
+
+    ```python
+    def iterar():
+        for i in range(10000000):
+            print(i)
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    void iterar() {
+        for (int i = 0; i < 10000000; i++) {
+            printf("%d\n", i);
+        }
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `i` | Índice desde cero hasta 9 999 999. |
+
+**Precondiciones:** No recibe parámetros; dispone de una salida para imprimir.
+
+**Resultado:** Imprime diez millones de valores.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `Inicio del recorrido`.
+
+    | Estado | Acción o resultado |
+    | --- | --- |
+    | `i = 0` | Imprime 0. |
+    | `i = 1` | Imprime 1; continúa hasta 9 999 999. |
+    | `i = 10000000` | Termina. El límite no depende de una entrada n. |
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-201992ad7ecd">Código Python · Ciclo con límite fijo</label><textarea id="runner-201992ad7ecd" spellcheck="false" wrap="off" rows="14">def iterar():
+    for i in range(10000000):
+        print(i)
+
+# Entradas editables del ejemplo.
+
+
+iterar()
+print(&quot;Ejemplo finalizado&quot;)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+Los experimentos ejecutan adaptaciones Python. El tiempo excluye la preparación y se promedia por ejecución. La memoria representa el incremento de pico observado por tracemalloc durante la operación, sin incluir la entrada preparada; no es el tamaño de la memoria de una máquina Java.
+
+El Java imprime 10 000 000 valores. El experimento realiza 10 000 iteraciones sin impresión, para aislar el crecimiento constante respecto del tamaño de entrada.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/runtime/experimental_analysis.py).
 
 <!-- book-code:end -->
 
@@ -39,12 +114,12 @@ public static void iterar() {
 
 ### Simulaciones experimentales
 
-Cada experimento ejecuta el mismo algoritmo para distintos valores de \(n\).
+Cada experimento ejecuta la adaptación Python descrita en «Laboratorio y medición» para distintos valores de \(n\).
 
 - **Máximo \(n\):** determina el mayor tamaño de entrada. El sistema incluye valores intermedios y potencias de diez.
 - **Ejecuciones:** controla cuántas veces se repite la operación para cada valor de \(n\). La gráfica y la tabla muestran el promedio.
 
-La preparación de la entrada se realiza fuera de la medición temporal. En memoria se reporta el espacio adicional utilizado durante la operación.
+La entrada preparada se excluye de la medición. Las reservas realizadas dentro de la operación sí se incluyen; la memoria observada corresponde al incremento de pico de Python.
 
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">

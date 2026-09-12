@@ -420,3 +420,9 @@ def test_chapter_six_reference_notebooks_are_separated():
 
     assert (root / "notebooks" / "ejemplo_recursion.ipynb").exists()
     assert (root / "notebooks" / "comparacion_fibonacci.ipynb").exists()
+def test_experimental_fibonacci_matches_book_values():
+    from capitulo6.runtime.recursive_examples_analysis import EXAMPLES
+
+    expected = (0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55)
+    operation = EXAMPLES["fibonacci"].operation
+    assert tuple(operation(n) for n in range(len(expected))) == expected

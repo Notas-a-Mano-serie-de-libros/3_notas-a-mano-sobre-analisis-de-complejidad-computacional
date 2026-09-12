@@ -1,4 +1,4 @@
-.PHONY: install test lint validate clean-notebooks clean-graphics check docs-install docs-serve docs-build
+.PHONY: book-review install test lint validate clean-notebooks clean-graphics check docs-install docs-serve docs-build
 
 PYTHON ?= python3
 
@@ -38,3 +38,6 @@ docs-serve:
 
 docs-build:
 	$(PYTHON) -m mkdocs build --strict
+
+book-review:
+	$(PYTHON) scripts/review_book_code.py

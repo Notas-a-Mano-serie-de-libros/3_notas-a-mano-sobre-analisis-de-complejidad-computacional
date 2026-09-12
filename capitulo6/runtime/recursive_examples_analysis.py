@@ -35,7 +35,7 @@ def _factorial_calls(n: int) -> int:
 
 def _fibonacci(n: int) -> int:
     if n <= 1:
-        return 1
+        return n
     return _fibonacci(n - 1) + _fibonacci(n - 2)
 
 

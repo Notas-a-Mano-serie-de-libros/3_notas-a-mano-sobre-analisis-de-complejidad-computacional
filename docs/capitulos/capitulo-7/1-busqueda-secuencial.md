@@ -15,17 +15,111 @@ La búsqueda secuencial (o lineal) recorre el arreglo posición por posición, c
 
 <!-- book-code:start -->
 
-Listado original del libro, página 262 (Java).
+#### Búsqueda secuencial iterativa
 
-```java
-public boolean buscar(int[] arr, int x) {
-    for (int i = 0; i < arr.length; i++) {
-        if (arr[i] == x)
-            return true;
+Implementación corregida basada en el libro, página 262 (Java).
+
+=== "Java"
+
+    ```java
+    public boolean buscar(int[] arr, int x) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == x)
+                return true;
+        }
+        return false;
     }
-    return false;
-}
-```
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función buscar(arr, x)
+        para i en rango(longitud(arr))
+            si arr[i] == x entonces
+                retornar verdadero
+        retornar falso
+    ```
+
+=== "Python"
+
+    ```python
+    def buscar(arr, x):
+        for i in range(len(arr)):
+            if arr[i] == x:
+                return True
+        return False
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    bool buscar(int arr[], int n, int x) {
+        for (int i = 0; i < n; i++) {
+            if (arr[i] == x) {
+                return true;
+            }
+        }
+        return false;
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+En C, `n` indica la longitud del arreglo y se recibe como parámetro.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr` | Arreglo de enteros. |
+| `x` | Valor buscado. |
+| `i` | Posición examinada. |
+
+**Precondiciones:** arr no nulo; no requiere orden previo.
+
+**Resultado:** Devuelve true si existe x y false si no existe.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [4, 8, 12], x = 8`.
+
+    **Prueba de escritorio**
+
+    | Paso | Método | Profundidad | arr | x | i | Operación ejecutada | Retorno |
+    | --- | --- | --- | --- | --- | --- | --- | --- |
+    | 1 | buscar | 0 | [4, 8, 12] | 8 | — | Entrada a la llamada. | — |
+    | 2 | buscar | 0 | [4, 8, 12] | 8 | 0 | `for i in range(len(arr)):` | — |
+    | 3 | buscar | 0 | [4, 8, 12] | 8 | 0 | `if arr[i] == x:` | — |
+    | 4 | buscar | 0 | [4, 8, 12] | 8 | 1 | `for i in range(len(arr)):` | — |
+    | 5 | buscar | 0 | [4, 8, 12] | 8 | 1 | `if arr[i] == x:` | — |
+    | 6 | buscar | 0 | [4, 8, 12] | 8 | 1 | `return True`; Termina la llamada. | true |
+
+    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-dfd9f906a528">Código Python · Búsqueda secuencial iterativa</label><textarea id="runner-dfd9f906a528" spellcheck="false" wrap="off" rows="14">def buscar(arr, x):
+    for i in range(len(arr)):
+        if arr[i] == x:
+            return True
+    return False
+
+# Entradas editables del ejemplo.
+arr = [4, 8, 12]
+x = 8
+
+resultado = buscar(arr, x)
+print(&quot;Resultado:&quot;, resultado)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/search/search_metrics.py).
 
 <!-- book-code:end -->
 
@@ -83,7 +177,9 @@ En la implementación iterativa, el algoritmo mantiene únicamente el índice de
 - **Caso promedio.** Si el objetivo puede aparecer con la misma probabilidad en cualquier posición, el algoritmo revisa aproximadamente la mitad del arreglo. El costo esperado es proporcional a \(n/2\), por lo que \(T(n) \in \Theta(n)\) y el espacio auxiliar permanece constante.
 - **Peor caso.** El objetivo está en la última posición o está ausente. Se revisan las \(n\) posiciones, de modo que \(T(n) \in O(n)\) y \(S(n) \in O(1)\).
 
-#### Versión recursiva
+#### Versión recursiva (ampliación teórica)
+
+El libro no incluye un listado recursivo de este algoritmo en las páginas citadas. Este apartado compara el costo de una posible formulación recursiva; no corresponde a otra implementación transcrita.
 
 En la implementación recursiva, cada llamada representa la comparación de una posición. La cantidad de comparaciones se conserva, pero cada llamada queda registrada temporalmente en la pila de ejecución hasta que se alcanza el caso base.
 

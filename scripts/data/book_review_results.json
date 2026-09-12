@@ -1,0 +1,23 @@
+{
+  "source_sha256": "d7c02a0407e98c9e1c0464748ba4d24bd7509dfcfb27304cde0d94e29519aa84",
+  "listings": 72,
+  "method_listings_compiled": 55,
+  "schematic_listings": 17,
+  "compilation_context": "Java 17; imports java.util/java.math, clase Nodo y funciones foo vacías. Versiones corregidas; auxiliar binaria incluida en el listado exponencial.",
+  "checks": {
+    "search_success_cases": 127497,
+    "sort_success_cases": 27918,
+    "scalar_success_cases": 2205,
+    "regressions": {
+      "interpolation_singleton": "sin excepción",
+      "jump_empty": "sin excepción",
+      "exponential_empty": "sin excepción",
+      "radix_empty": "sin excepción",
+      "radix_negative": "sin excepción",
+      "power_min_exponent": "0.0 correcto",
+      "factorial_13_overflow_detected": true,
+      "fibonacci_47_overflow_detected": true
+    }
+  },
+  "version": "corrected"
+}

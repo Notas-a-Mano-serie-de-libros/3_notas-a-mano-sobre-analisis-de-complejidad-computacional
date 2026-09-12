@@ -17,7 +17,161 @@ La ventaja práctica aparece porque los elementos pueden desplazarse grandes dis
 
 <!-- book-code:start -->
 
-El libro no incluye un listado de implementación para este tema.
+#### Shell con separaciones divididas entre dos
+
+Implementación de ampliación del sitio (Java); no es un listado del PDF.
+
+=== "Java"
+
+    ```java
+    public void ordenar(int[] arr) {
+        int n = arr.length;
+        for (int paso = n / 2; paso > 0; paso /= 2) {
+            for (int i = paso; i < n; i++) {
+                int clave = arr[i];
+                int j = i;
+                while (j >= paso && arr[j - paso] > clave) {
+                    arr[j] = arr[j - paso];
+                    j -= paso;
+                }
+                arr[j] = clave;
+            }
+        }
+    }
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función ordenar(arr)
+        n ← longitud(arr)
+        paso ← n div 2
+        mientras paso > 0
+            para i en rango(paso, n)
+                clave ← arr[i]
+                j ← i
+                mientras j >= paso y arr[j - paso] > clave
+                    arr[j] ← arr[j - paso]
+                    j -= paso
+                arr[j] ← clave
+            paso //= 2
+    ```
+
+=== "Python"
+
+    ```python
+    def ordenar(arr):
+        n = len(arr)
+        paso = n // 2
+        while paso > 0:
+            for i in range(paso, n):
+                clave = arr[i]
+                j = i
+                while j >= paso and arr[j - paso] > clave:
+                    arr[j] = arr[j - paso]
+                    j -= paso
+                arr[j] = clave
+            paso //= 2
+    ```
+
+=== "C"
+
+    ```c
+    void ordenar(int arr[], int n) {
+        for (int paso = n / 2; paso > 0; paso /= 2) {
+            for (int i = paso; i < n; i++) {
+                int clave = arr[i];
+                int j = i;
+                while (j >= paso && arr[j - paso] > clave) {
+                    arr[j] = arr[j - paso];
+                    j -= paso;
+                }
+                arr[j] = clave;
+            }
+        }
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+En C, `n` indica la longitud del arreglo y se recibe como parámetro.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr` | Arreglo que se modifica durante el ordenamiento. |
+| `n` | Longitud del arreglo. |
+| `paso` | Separación entre los elementos comparados. |
+| `i` | Posición del elemento que se inserta. |
+| `clave` | Valor del elemento que se inserta. |
+| `j` | Posición actual durante los desplazamientos. |
+
+**Precondiciones:** arr no nulo.
+
+**Resultado:** Ordena arr de menor a mayor; admite el arreglo vacío.
+
+**Explicación:** Esta implementación es una ampliación del sitio; el PDF proporcionado no incluye un listado de Shell.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [3, 1, 2]`.
+
+    **Prueba de escritorio**
+
+    | Paso | Método | Profundidad | arr | n | paso | i | clave | j | Operación ejecutada | Retorno |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | 1 | ordenar | 0 | [3, 1, 2] | — | — | — | — | — | Entrada a la llamada. | — |
+    | 2 | ordenar | 0 | [3, 1, 2] | 3 | — | — | — | — | `n = len(arr)` | — |
+    | 3 | ordenar | 0 | [3, 1, 2] | 3 | 1 | — | — | — | `paso = n // 2` | — |
+    | 4 | ordenar | 0 | [3, 1, 2] | 3 | 1 | — | — | — | `while paso > 0:` | — |
+    | 5 | ordenar | 0 | [3, 1, 2] | 3 | 1 | 1 | — | — | `for i in range(paso, n):` | — |
+    | 6 | ordenar | 0 | [3, 1, 2] | 3 | 1 | 1 | 1 | — | `clave = arr[i]` | — |
+    | 7 | ordenar | 0 | [3, 1, 2] | 3 | 1 | 1 | 1 | 1 | `j = i` | — |
+    | 8 | ordenar | 0 | [3, 1, 2] | 3 | 1 | 1 | 1 | 1 | `while j >= paso and arr[j - paso] > clave:` | — |
+    | 9 | ordenar | 0 | [3, 3, 2] | 3 | 1 | 1 | 1 | 1 | `arr[j] = arr[j - paso]` | — |
+    | 10 | ordenar | 0 | [3, 3, 2] | 3 | 1 | 1 | 1 | 0 | `j -= paso` | — |
+    | 11 | ordenar | 0 | [3, 3, 2] | 3 | 1 | 1 | 1 | 0 | `while j >= paso and arr[j - paso] > clave:` | — |
+    | 12 | ordenar | 0 | [1, 3, 2] | 3 | 1 | 1 | 1 | 0 | `arr[j] = clave` | — |
+    | 13 | ordenar | 0 | [1, 3, 2] | 3 | 1 | 2 | 1 | 0 | `for i in range(paso, n):` | — |
+    | 14 | ordenar | 0 | [1, 3, 2] | 3 | 1 | 2 | 2 | 0 | `clave = arr[i]` | — |
+    | 15 | ordenar | 0 | [1, 3, 2] | 3 | 1 | 2 | 2 | 2 | `j = i` | — |
+    | 16 | ordenar | 0 | [1, 3, 2] | 3 | 1 | 2 | 2 | 2 | `while j >= paso and arr[j - paso] > clave:` | — |
+    | 17 | ordenar | 0 | [1, 3, 3] | 3 | 1 | 2 | 2 | 2 | `arr[j] = arr[j - paso]` | — |
+    | 18 | ordenar | 0 | [1, 3, 3] | 3 | 1 | 2 | 2 | 1 | `j -= paso` | — |
+    | 19 | ordenar | 0 | [1, 3, 3] | 3 | 1 | 2 | 2 | 1 | `while j >= paso and arr[j - paso] > clave:` | — |
+    | 20 | ordenar | 0 | [1, 2, 3] | 3 | 1 | 2 | 2 | 1 | `arr[j] = clave` | — |
+    | 21 | ordenar | 0 | [1, 2, 3] | 3 | 1 | 2 | 2 | 1 | `for i in range(paso, n):` | — |
+    | 22 | ordenar | 0 | [1, 2, 3] | 3 | 0 | 2 | 2 | 1 | `paso //= 2` | — |
+    | 23 | ordenar | 0 | [1, 2, 3] | 3 | 0 | 2 | 2 | 1 | `while paso > 0:`; Termina la llamada. | sin valor |
+
+    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-3bd6cf69710c">Código Python · Shell con separaciones divididas entre dos</label><textarea id="runner-3bd6cf69710c" spellcheck="false" wrap="off" rows="14">def ordenar(arr):
+    n = len(arr)
+    paso = n // 2
+    while paso &gt; 0:
+        for i in range(paso, n):
+            clave = arr[i]
+            j = i
+            while j &gt;= paso and arr[j - paso] &gt; clave:
+                arr[j] = arr[j - paso]
+                j -= paso
+            arr[j] = clave
+        paso //= 2
+
+# Entradas editables del ejemplo.
+arr = [3, 1, 2]
+
+print(&quot;Arreglo inicial:&quot;, arr)
+ordenar(arr)
+print(&quot;Arreglo ordenado:&quot;, arr)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+La animación y el contador son adaptaciones Python con operaciones instrumentadas. Incluyen comparaciones, movimientos y control del recorrido según el contador; no se deben interpretar todos los pasos como una sola clase de operación Java. Las opciones descendentes son ampliaciones: los listados del libro ordenan ascendentemente.
+
+Shell es una ampliación digital y no tiene un listado correspondiente en este libro.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/sort/sort_algorithms.py).
 
 <!-- book-code:end -->
 

@@ -17,39 +17,274 @@ Cada comparación reduce el espacio de búsqueda a la mitad, lo que produce una 
 
 <!-- book-code:start -->
 
-Listado original del libro, página 268 (Java).
+#### Búsqueda binaria iterativa
 
-```java
-public boolean buscar(int[] arr, int a, int b, int x) {
-    while (a <= b) {
-        // Posición en la mitad del rango [a,b]
+Implementación corregida basada en el libro, página 268 (Java).
+
+=== "Java"
+
+    ```java
+    public boolean buscar(int[] arr, int a, int b, int x) {
+        while (a <= b) {
+            // Posición en la mitad del rango [a,b]
+            int m = a + (b - a) / 2;
+            if (arr[m] == x)
+                return true; // Elemento encontrado
+            else if (x > arr[m])
+                a = m + 1; // Buscar en la mitad derecha
+            else
+                b = m - 1; // Buscar en la mitad izquierda
+        }
+        return false; // Elemento no encontrado
+    }
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función buscar(arr, a, b, x)
+        mientras a <= b
+            m ← a + (b - a) div 2
+            si arr[m] == x entonces
+                retornar verdadero
+            si x > arr[m] entonces
+                a ← m + 1
+            si no
+                b ← m - 1
+        retornar falso
+    ```
+
+=== "Python"
+
+    ```python
+    def buscar(arr, a, b, x):
+        while a <= b:
+            m = a + (b - a) // 2
+            if arr[m] == x:
+                return True
+            if x > arr[m]:
+                a = m + 1
+            else:
+                b = m - 1
+        return False
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    bool buscar(int arr[], int a, int b, int x) {
+        while (a <= b) {
+            // Posición en la mitad del rango [a,b]
+            int m = a + (b - a) / 2;
+            if (arr[m] == x) {
+                return true; // Elemento encontrado
+            }
+            else if (x > arr[m]) {
+                a = m + 1; // Buscar en la mitad derecha
+            }
+            else {
+                b = m - 1; // Buscar en la mitad izquierda
+            }
+        }
+        return false; // Elemento no encontrado
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr` | Arreglo ordenado ascendentemente. |
+| `a, b` | Límites inclusivos de búsqueda. |
+| `x` | Valor buscado. |
+| `m` | Índice del punto medio. |
+
+**Precondiciones:** arr no nulo y ordenado; límites válidos para intervalo no vacío. Para el arreglo completo, `a = 0` y `b = arr.length - 1`.
+
+**Resultado:** Devuelve true si encuentra x dentro del intervalo; false en caso contrario.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [1, 3, 5, 7, 9], a = 0, b = 4, x = 7`.
+
+    **Prueba de escritorio**
+
+    | Paso | Método | Profundidad | arr | a | b | x | m | Operación ejecutada | Retorno |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | 1 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | Entrada a la llamada. | — |
+    | 2 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | `while a <= b:` | — |
+    | 3 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 2 | `m = a + (b - a) // 2` | — |
+    | 4 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 2 | `if arr[m] == x:` | — |
+    | 5 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 2 | `if x > arr[m]:` | — |
+    | 6 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 2 | `a = m + 1` | — |
+    | 7 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 2 | `while a <= b:` | — |
+    | 8 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | `m = a + (b - a) // 2` | — |
+    | 9 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | `if arr[m] == x:` | — |
+    | 10 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | `return True`; Termina la llamada. | true |
+
+    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-e7872d7f0991">Código Python · Búsqueda binaria iterativa</label><textarea id="runner-e7872d7f0991" spellcheck="false" wrap="off" rows="14">def buscar(arr, a, b, x):
+    while a &lt;= b:
+        m = a + (b - a) // 2
+        if arr[m] == x:
+            return True
+        if x &gt; arr[m]:
+            a = m + 1
+        else:
+            b = m - 1
+    return False
+
+# Entradas editables del ejemplo.
+arr = [1, 3, 5, 7, 9]
+a = 0
+b = 4
+x = 7
+
+resultado = buscar(arr, a, b, x)
+print(&quot;Resultado:&quot;, resultado)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Búsqueda binaria recursiva
+
+Implementación corregida basada en el libro, página 273 (Java).
+
+=== "Java"
+
+    ```java
+    public boolean buscar(int[] arr, int a, int b, int x) {
+        if (a > b)
+            return false; // Elemento no encontrado
         int m = a + (b - a) / 2;
         if (arr[m] == x)
             return true; // Elemento encontrado
         else if (x > arr[m])
-            a = m + 1; // Buscar en la mitad derecha
+            return buscar(arr, m + 1, b, x); // Busca a la derecha
         else
-            b = m - 1; // Buscar en la mitad izquierda
+            return buscar(arr, a, m - 1, x); // Busca a la izquierda
     }
-    return false; // Elemento no encontrado
-}
-```
+    ```
 
-Listado original del libro, página 273 (Java).
+=== "Pseudocódigo"
 
-```java
-public boolean buscar(int[] arr, int a, int b, int x) {
-    if (a > b)
-        return false; // Elemento no encontrado
-    int m = a + (b - a) / 2;
-    if (arr[m] == x)
-        return true; // Elemento encontrado
-    else if (x > arr[m])
-        return buscar(arr, m + 1, b, x); // Busca a la derecha
-    else
-        return buscar(arr, a, m - 1, x); // Busca a la izquierda
-}
-```
+    ```text
+    función buscar(arr, a, b, x)
+        si a > b entonces
+            retornar falso
+        m ← a + (b - a) div 2
+        si arr[m] == x entonces
+            retornar verdadero
+        si x > arr[m] entonces
+            retornar buscar(arr, m + 1, b, x)
+        retornar buscar(arr, a, m - 1, x)
+    ```
+
+=== "Python"
+
+    ```python
+    def buscar(arr, a, b, x):
+        if a > b:
+            return False
+        m = a + (b - a) // 2
+        if arr[m] == x:
+            return True
+        if x > arr[m]:
+            return buscar(arr, m + 1, b, x)
+        return buscar(arr, a, m - 1, x)
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    bool buscar(int arr[], int a, int b, int x) {
+        if (a > b) {
+            return false; // Elemento no encontrado
+        }
+        int m = a + (b - a) / 2;
+        if (arr[m] == x) {
+            return true; // Elemento encontrado
+        }
+        else if (x > arr[m]) {
+            return buscar(arr, m + 1, b, x); // Busca a la derecha
+        }
+        else {
+            return buscar(arr, a, m - 1, x); // Busca a la izquierda
+        }
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr` | Arreglo ordenado ascendentemente. |
+| `a, b` | Límites inclusivos de búsqueda. |
+| `x` | Valor buscado. |
+| `m` | Índice del punto medio. |
+
+**Precondiciones:** arr no nulo y ordenado; límites válidos para intervalo no vacío. Para el arreglo completo, `a = 0` y `b = arr.length - 1`.
+
+**Resultado:** Devuelve true si encuentra x dentro del intervalo; false en caso contrario.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [1, 3, 5, 7, 9], a = 0, b = 4, x = 7`.
+
+    **Prueba de escritorio**
+
+    | Paso | Método | Profundidad | arr | a | b | x | m | Operación ejecutada | Retorno |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | 1 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | Entrada a la llamada. | — |
+    | 2 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | `if a > b:` | — |
+    | 3 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 2 | `m = a + (b - a) // 2` | — |
+    | 4 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 2 | `if arr[m] == x:` | — |
+    | 5 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 2 | `if x > arr[m]:` | — |
+    | 6 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | — | Entrada a la llamada. | — |
+    | 7 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | — | `if a > b:` | — |
+    | 8 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | `m = a + (b - a) // 2` | — |
+    | 9 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | `if arr[m] == x:` | — |
+    | 10 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | `return True`; Termina la llamada. | true |
+    | 11 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 2 | `return buscar(arr, m + 1, b, x)`; Termina la llamada. | true |
+
+    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-8309d0152ea4">Código Python · Búsqueda binaria recursiva</label><textarea id="runner-8309d0152ea4" spellcheck="false" wrap="off" rows="14">def buscar(arr, a, b, x):
+    if a &gt; b:
+        return False
+    m = a + (b - a) // 2
+    if arr[m] == x:
+        return True
+    if x &gt; arr[m]:
+        return buscar(arr, m + 1, b, x)
+    return buscar(arr, a, m - 1, x)
+
+# Entradas editables del ejemplo.
+arr = [1, 3, 5, 7, 9]
+a = 0
+b = 4
+x = 7
+
+resultado = buscar(arr, a, b, x)
+print(&quot;Resultado:&quot;, resultado)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/search/search_metrics.py).
 
 <!-- book-code:end -->
 

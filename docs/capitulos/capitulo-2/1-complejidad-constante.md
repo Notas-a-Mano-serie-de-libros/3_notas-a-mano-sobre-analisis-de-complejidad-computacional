@@ -26,12 +26,84 @@ La diferencia entre listas pequeñas y grandes aparece en otras operaciones, com
 
 <!-- book-code:start -->
 
-Listado original del libro, página 148 (Java).
+#### Acceso directo a un elemento
 
-```java
-arr[i]; //Accede al elemento i del arreglo "arr"
-m[i][j]; //Accede al elemento i,j del de la matriz "m"
-```
+Implementación corregida basada en el libro, página 148 (Java).
+
+=== "Java"
+
+    ```java
+    arr[i]; //Accede al elemento i del arreglo "arr"
+    m[i][j]; //Accede al elemento i,j del de la matriz "m"
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    arr[i]  # Acceso al elemento i del arreglo.
+    m[i][j]  # Acceso al elemento i, j de la matriz.
+    ```
+
+=== "Python"
+
+    ```python
+    arr[i]  # Acceso al elemento i del arreglo.
+    m[i][j]  # Acceso al elemento i, j de la matriz.
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    arr[i];  // Acceso al elemento i del arreglo.
+    m[i][j];  // Acceso al elemento i, j de la matriz.
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr, m` | Arreglo y matriz de entrada. |
+| `i, j` | Índices válidos, comenzando en cero. |
+
+**Precondiciones:** Estructuras no nulas e índices dentro de sus dimensiones.
+
+**Resultado:** Lee un elemento; son expresiones de acceso, no métodos completos.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [4, 8, 12], i = 1`.
+
+    | Estado | Acción o resultado |
+    | --- | --- |
+    | `i = 1` | Identifica la segunda posición. |
+    | `arr[i]` | El valor leído es 8. |
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-dd0399c316f2">Código Python · Acceso directo a un elemento</label><textarea id="runner-dd0399c316f2" spellcheck="false" wrap="off" rows="14">arr = [4, 8, 12]
+i = 1
+m = [[1, 2], [3, 4]]
+j = 1
+
+arr[i]  # Acceso al elemento i del arreglo.
+m[i][j]  # Acceso al elemento i, j de la matriz.
+print(&quot;arr[i]:&quot;, arr[i])
+print(&quot;m[i][j]:&quot;, m[i][j])
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+El listado Java procede de la página del libro indicada arriba. El laboratorio ejecuta una adaptación en Python; compara el patrón de crecimiento, no los tiempos de Java con los de Python.
+
+El tiempo se promedia por ejecución; la preparación de las entradas se realiza antes de cronometrar. Las gráficas teóricas y las mediciones experimentales se identifican por separado.
+
+El experimento consulta una posición; la estructura de entrada ya existe antes de medir.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/runtime/constant_animation.py).
 
 <!-- book-code:end -->
 

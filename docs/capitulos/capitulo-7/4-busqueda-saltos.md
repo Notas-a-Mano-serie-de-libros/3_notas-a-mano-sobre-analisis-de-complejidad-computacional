@@ -17,27 +17,196 @@ El bloque óptimo de tamaño √n balancea los saltos hacia adelante con la bús
 
 <!-- book-code:start -->
 
-Listado original del libro, página 290 (Java).
+#### Búsqueda por saltos
 
-```java
-public boolean buscar(int[] arr, int x) {
-    int n = arr.length, anterior = 0;
-    int paso = (int) Math.floor(Math.sqrt(n)), delta = paso;
-    // Avanzar en saltos hasta encontrar el rango
-    while (arr[Math.min(delta, n) - 1] < x) {
-        anterior = delta;
-        delta += paso;
-        if (anterior >= n)
-            return false; // Elemento fuera del rango de búsqueda
+Implementación corregida basada en el libro, página 290 (Java).
+
+=== "Java"
+
+    ```java
+    public boolean buscar(int[] arr, int x) {
+        int n = arr.length, anterior = 0;
+        if (n == 0)
+            return false;
+        int paso = (int) Math.floor(Math.sqrt(n)), delta = paso;
+        // Avanzar en saltos hasta encontrar el rango
+        while (arr[Math.min(delta, n) - 1] < x) {
+            anterior = delta;
+            delta = (int) Math.min((long) delta + paso, n);
+            if (anterior >= n)
+                return false; // Elemento fuera del rango de búsqueda
+        }
+        // Realiza la búsqueda lineal en el rango identificado
+        for (int i = anterior; i < Math.min(delta, n); i++) {
+            if (arr[i] == x)
+                return true; // Elemento encontrado
+        }
+        return false; // Elemento no encontrado
     }
-    // Realiza la búsqueda lineal en el rango identificado
-    for (int i = anterior; i < Math.min(delta, n); i++) {
-        if (arr[i] == x)
-            return true; // Elemento encontrado
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función buscar(arr, x)
+        n ← longitud(arr)
+        si n == 0 entonces
+            retornar falso
+        paso ← raízEntera(n)
+        anterior ← 0
+        delta ← paso
+        mientras arr[min(delta, n) - 1] < x
+            anterior ← delta
+            delta ← min(delta + paso, n)
+            si anterior >= n entonces
+                retornar falso
+        para i en rango(anterior, min(delta, n))
+            si arr[i] == x entonces
+                retornar verdadero
+        retornar falso
+    ```
+
+=== "Python"
+
+    ```python
+    from math import isqrt
+
+
+    def buscar(arr, x):
+        n = len(arr)
+        if n == 0:
+            return False
+        paso = isqrt(n)
+        anterior = 0
+        delta = paso
+        while arr[min(delta, n) - 1] < x:
+            anterior = delta
+            delta = min(delta + paso, n)
+            if anterior >= n:
+                return False
+        for i in range(anterior, min(delta, n)):
+            if arr[i] == x:
+                return True
+        return False
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    int64_t minimo(int64_t a, int64_t b) {
+        return a < b ? a : b;
     }
-    return false; // Elemento no encontrado
-}
-```
+
+    bool buscar(int arr[], int n, int x) {
+        int anterior = 0;
+        if (n == 0) {
+            return false;
+        }
+        int paso = (int) floor(sqrt(n)), delta = paso;
+        // Avanzar en saltos hasta encontrar el rango
+        while (arr[minimo(delta, n) - 1] < x) {
+            anterior = delta;
+            delta = (int) minimo((int64_t) delta + paso, n);
+            if (anterior >= n) {
+                return false; // Elemento fuera del rango de búsqueda
+            }
+        }
+        // Realiza la búsqueda lineal en el rango identificado
+        for (int i = anterior; i < minimo(delta, n); i++) {
+            if (arr[i] == x) {
+                return true; // Elemento encontrado
+            }
+        }
+        return false; // Elemento no encontrado
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+En C, `n` indica la longitud del arreglo y se recibe como parámetro.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr` | Arreglo ordenado ascendentemente. |
+| `x` | Valor buscado. |
+| `paso` | Tamaño del salto, floor(sqrt(n)). |
+| `anterior, delta` | Límites del bloque candidato. |
+| `i` | Índice de la búsqueda lineal. |
+
+**Precondiciones:** arr no nulo y ordenado de menor a mayor.
+
+**Resultado:** Devuelve true si encuentra x; false si está ausente.
+
+**Explicación:** El arreglo vacío devuelve false. La actualización del avance se calcula en long y se limita a arr.length antes de convertirla a int; no se exige que la suma o duplicación previa quepa en int.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [1, 3, 5, 7, 9], x = 7`.
+
+    **Prueba de escritorio**
+
+    | Paso | Método | Profundidad | arr | x | n | paso | anterior | delta | i | Operación ejecutada | Retorno |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | 1 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | — | — | — | — | — | Entrada a la llamada. | — |
+    | 2 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | — | — | — | — | `n = len(arr)` | — |
+    | 3 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | — | — | — | — | `if n == 0:` | — |
+    | 4 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | — | — | — | `paso = isqrt(n)` | — |
+    | 5 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 0 | — | — | `anterior = 0` | — |
+    | 6 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 0 | 2 | — | `delta = paso` | — |
+    | 7 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 0 | 2 | — | `while arr[min(delta, n) - 1] < x:` | — |
+    | 8 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 2 | 2 | — | `anterior = delta` | — |
+    | 9 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 2 | 4 | — | `delta = min(delta + paso, n)` | — |
+    | 10 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 2 | 4 | — | `if anterior >= n:` | — |
+    | 11 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 2 | 4 | — | `while arr[min(delta, n) - 1] < x:` | — |
+    | 12 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 2 | 4 | 2 | `for i in range(anterior, min(delta, n)):` | — |
+    | 13 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 2 | 4 | 2 | `if arr[i] == x:` | — |
+    | 14 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 2 | 4 | 3 | `for i in range(anterior, min(delta, n)):` | — |
+    | 15 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 2 | 4 | 3 | `if arr[i] == x:` | — |
+    | 16 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | 2 | 4 | 3 | `return True`; Termina la llamada. | true |
+
+    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-57565cf91e1b">Código Python · Búsqueda por saltos</label><textarea id="runner-57565cf91e1b" spellcheck="false" wrap="off" rows="14">from math import isqrt
+
+
+def buscar(arr, x):
+    n = len(arr)
+    if n == 0:
+        return False
+    paso = isqrt(n)
+    anterior = 0
+    delta = paso
+    while arr[min(delta, n) - 1] &lt; x:
+        anterior = delta
+        delta = min(delta + paso, n)
+        if anterior &gt;= n:
+            return False
+    for i in range(anterior, min(delta, n)):
+        if arr[i] == x:
+            return True
+    return False
+
+# Entradas editables del ejemplo.
+arr = [1, 3, 5, 7, 9]
+x = 7
+
+resultado = buscar(arr, x)
+print(&quot;Resultado:&quot;, resultado)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.
+
+El listado corregido incluye controles para los casos límite; el laboratorio usa su adaptación Python.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/search/search_metrics.py).
 
 <!-- book-code:end -->
 
@@ -95,7 +264,9 @@ En la implementación iterativa, el tamaño del salto se elige como \(\lfloor\sq
 - **Caso promedio.** Se recorren varios bloques y luego una parte del bloque final. Con salto \(\sqrt{n}\), ambas fases quedan acotadas por esa magnitud, así que \(T(n) \in \Theta(\sqrt{n})\).
 - **Peor caso.** El objetivo está cerca del final del último bloque o está ausente dentro del rango permitido. El algoritmo hace hasta \(\sqrt{n}\) saltos y hasta \(\sqrt{n}\) comparaciones lineales, lo que produce \(O(\sqrt{n})\).
 
-#### Versión recursiva
+#### Versión recursiva (ampliación teórica)
+
+El libro no incluye un listado recursivo de este algoritmo en las páginas citadas. Este apartado compara el costo de una posible formulación recursiva; no corresponde a otra implementación transcrita.
 
 En la implementación recursiva, la estructura de fases se mantiene, pero cada salto o avance lineal puede quedar como una llamada pendiente. La pila crece con la cantidad de comparaciones realizadas antes de terminar.
 

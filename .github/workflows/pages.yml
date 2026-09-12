@@ -13,6 +13,11 @@ on:
       - "scripts/editorial_math.py"
       - "scripts/normalize_editorial_math.py"
       - "scripts/validate_editorial_content.py"
+      - "scripts/sync_book_code.py"
+      - "scripts/data/book_code.json"
+      - "scripts/data/book_translations.json"
+      - "scripts/book_code_languages.py"
+      - "scripts/example_runner.py"
   workflow_dispatch:
 
 permissions:

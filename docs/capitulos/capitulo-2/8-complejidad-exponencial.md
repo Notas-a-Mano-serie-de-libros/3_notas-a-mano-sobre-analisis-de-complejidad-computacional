@@ -22,18 +22,133 @@ Esta repetición explica por qué el tiempo crece de forma exponencial cuando \(
 
 <!-- book-code:start -->
 
-Listado original del libro, página 234 (Java).
+#### Fibonacci recursivo
 
-```java
-public static int fibonacci(int n) {
-    if (n == 0)
-        return 0;
-    else if (n == 1)
-        return 1;
-    else
-        return fibonacci(n-1) + fibonacci(n-2);
-}
-```
+Implementación corregida basada en el libro, página 234 (Java).
+
+=== "Java"
+
+    ```java
+    public static int fibonacci(int n) {
+        if (n < 0)
+            throw new IllegalArgumentException("n debe ser no negativo");
+        if (n > 46)
+            throw new ArithmeticException("El resultado no cabe en int");
+        if (n == 0)
+            return 0;
+        else if (n == 1)
+            return 1;
+        else
+            return fibonacci(n-1) + fibonacci(n-2);
+    }
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función fibonacci(n)
+        si n < 0 entonces
+            error ValueError("n debe ser no negativo")
+        si n > 46 entonces
+            error OverflowError("El resultado no cabe en int de Java")
+        si n == 0 entonces
+            retornar 0
+        si n == 1 entonces
+            retornar 1
+        retornar fibonacci(n - 1) + fibonacci(n - 2)
+    ```
+
+=== "Python"
+
+    ```python
+    def fibonacci(n):
+        if n < 0:
+            raise ValueError("n debe ser no negativo")
+        if n > 46:
+            raise OverflowError("El resultado no cabe en int de Java")
+        if n == 0:
+            return 0
+        if n == 1:
+            return 1
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    int fibonacci(int n) {
+        if (n < 0) {
+            abort();
+        }
+        if (n > 46) {
+            abort();
+        }
+        if (n == 0) {
+            return 0;
+        }
+        else if (n == 1) {
+            return 1;
+        }
+        else {
+            return fibonacci(n-1) + fibonacci(n-2);
+        }
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `n` | Índice de Fibonacci. |
+| `fibonacci(n-1), fibonacci(n-2)` | Dos llamadas recursivas. |
+
+**Precondiciones:** n no negativo. Si el resultado no cabe en int, se lanza ArithmeticException en lugar de devolver un valor desbordado.
+
+**Resultado:** Devuelve F(n).
+
+??? example "Ejemplo paso a paso"
+    Entrada: `n = 3`.
+
+    | Estado | Acción o resultado |
+    | --- | --- |
+    | `fibonacci(3)` | Calcula fibonacci(2) + fibonacci(1). |
+    | `fibonacci(2)` | Calcula fibonacci(1) + fibonacci(0) = 1. |
+    | `Retorno` | \(1 + 1 = 2\). |
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-28ef7b871b47">Código Python · Fibonacci recursivo</label><textarea id="runner-28ef7b871b47" spellcheck="false" wrap="off" rows="14">def fibonacci(n):
+    if n &lt; 0:
+        raise ValueError(&quot;n debe ser no negativo&quot;)
+    if n &gt; 46:
+        raise OverflowError(&quot;El resultado no cabe en int de Java&quot;)
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+# Entradas editables del ejemplo.
+n = 3
+
+resultado = fibonacci(n)
+print(&quot;Resultado:&quot;, resultado)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+El listado Java procede de la página del libro indicada arriba. El laboratorio ejecuta una adaptación en Python; compara el patrón de crecimiento, no los tiempos de Java con los de Python.
+
+El tiempo se promedia por ejecución; la preparación de las entradas se realiza antes de cronometrar. Las gráficas teóricas y las mediciones experimentales se identifican por separado.
+
+El experimento ejecuta Fibonacci recursivo sin memoización. La preparación solo fija n; las llamadas se ejecutan dentro de la medición.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo2/runtime/complexity_animations.py).
 
 <!-- book-code:end -->
 

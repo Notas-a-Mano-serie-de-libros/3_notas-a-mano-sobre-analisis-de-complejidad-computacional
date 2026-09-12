@@ -10,15 +10,106 @@ El número de iteraciones es constante, pero la operación ejecutada dentro del 
 
 <!-- book-code:start -->
 
-Listado original del libro, página 166 (Java).
+#### Ciclo fijo con auxiliar
 
-```java
-public static void cicloFijo(int n) {
-    for (int i = 0; i < 1000; i++) {
-        foo(n);
+Implementación corregida basada en el libro, página 166 (Java).
+
+=== "Java"
+
+    ```java
+    public static void cicloFijo(int n) {
+        for (int i = 0; i < 1000; i++) {
+            foo(n);
+        }
     }
-}
-```
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función cicloFijo(n)
+        para i en rango(1000)
+            foo(n)
+    ```
+
+=== "Python"
+
+    ```python
+    def cicloFijo(n):
+        for i in range(1000):
+            foo(n)
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    void foo(int n);
+
+    void cicloFijo(int n) {
+        for (int i = 0; i < 1000; i++) {
+            foo(n);
+        }
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `n` | Entrada que se pasa a foo. |
+| `i` | Contador de las 1000 repeticiones. |
+| `foo` | Auxiliar de costo dependiente de n. |
+
+**Precondiciones:** foo(n) definida y terminante.
+
+**Resultado:** Invoca foo(n) exactamente 1000 veces.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `n = 8`.
+
+    | Estado | Acción o resultado |
+    | --- | --- |
+    | `i = 0` | Primera llamada foo(8). |
+    | `i = 999` | Última llamada foo(8). |
+    | `i = 1000` | Termina; el costo depende de lo que haga foo. |
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-9c08a2cbe90d">Código Python · Ciclo fijo con auxiliar</label><textarea id="runner-9c08a2cbe90d" spellcheck="false" wrap="off" rows="14">def cicloFijo(n):
+    for i in range(1000):
+        foo(n)
+
+# Entradas editables del ejemplo.
+n = 8
+
+# Completa estas auxiliares según el problema que estés analizando.
+def foo1():
+    raise NotImplementedError(&quot;Completa foo1 en el editor&quot;)
+
+
+def foo2():
+    raise NotImplementedError(&quot;Completa foo2 en el editor&quot;)
+
+
+def foo(n):
+    raise NotImplementedError(&quot;Completa foo en el editor&quot;)
+
+cicloFijo(n)
+print(&quot;Ejemplo finalizado&quot;)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+Los experimentos ejecutan adaptaciones Python. El tiempo excluye la preparación y se promedia por ejecución. La memoria representa el incremento de pico observado por tracemalloc durante la operación, sin incluir la entrada preparada; no es el tamaño de la memoria de una máquina Java.
+
+No hay un laboratorio enlazado para este fragmento. El costo de foo debe declararse antes de simplificar.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/capitulo4/runtime/experimental_analysis.py).
 
 <!-- book-code:end -->
 

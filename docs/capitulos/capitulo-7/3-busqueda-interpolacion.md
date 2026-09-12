@@ -46,26 +46,165 @@ Para distribuciones uniformes alcanza O(log(log(n))) en el caso promedio, lo que
 
 <!-- book-code:start -->
 
-Listado original del libro, página 278 (Java).
+#### Búsqueda por interpolación iterativa
 
-```java
-public boolean buscar(int[] arr, int a, int b, int x) {
-    while (a <= b && x >= arr[a] && x <= arr[b]) {
-        int num = (b - a) * (x - arr[a]);
-        int den = arr[b] - arr[a];
-        // Estima el elemento
-        int p = a + (num / den);
-        if (arr[p] == x)
-            return true;
-        else if (x > arr[p])
-            a = p + 1; // Buscar a la derecha del elemento
-        else
-            b = p - 1; // Buscar a la izquierda del elemento
+Implementación corregida basada en el libro, página 278 (Java).
+
+=== "Java"
+
+    ```java
+    public boolean buscar(int[] arr, int a, int b, int x) {
+        while (a <= b && x >= arr[a] && x <= arr[b]) {
+            long num = ((long) b - a) * ((long) x - arr[a]);
+            long den = (long) arr[b] - arr[a];
+            if (den == 0)
+                return arr[a] == x;
+            int p = a + (int) (num / den);
+            if (arr[p] == x)
+                return true;
+            else if (x > arr[p])
+                a = p + 1;
+            else
+                b = p - 1;
+        }
+        return false;
     }
-    // Elemento no encontrado
-    return false;
-}
-```
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función buscar(arr, a, b, x)
+        mientras a <= b y x >= arr[a] y x <= arr[b]
+            num ← (b - a) * (x - arr[a])
+            den ← arr[b] - arr[a]
+            si den == 0 entonces
+                retornar arr[a] == x
+            p ← a + num div den
+            si arr[p] == x entonces
+                retornar verdadero
+            si x > arr[p] entonces
+                a ← p + 1
+            si no
+                b ← p - 1
+        retornar falso
+    ```
+
+=== "Python"
+
+    ```python
+    def buscar(arr, a, b, x):
+        while a <= b and x >= arr[a] and x <= arr[b]:
+            num = (b - a) * (x - arr[a])
+            den = arr[b] - arr[a]
+            if den == 0:
+                return arr[a] == x
+            p = a + num // den
+            if arr[p] == x:
+                return True
+            if x > arr[p]:
+                a = p + 1
+            else:
+                b = p - 1
+        return False
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    bool buscar(int arr[], int a, int b, int x) {
+        while (a <= b && x >= arr[a] && x <= arr[b]) {
+            int64_t num = ((int64_t) b - a) * ((int64_t) x - arr[a]);
+            int64_t den = (int64_t) arr[b] - arr[a];
+            if (den == 0) {
+                return arr[a] == x;
+            }
+            int p = a + (int) (num / den);
+            if (arr[p] == x) {
+                return true;
+            }
+            else if (x > arr[p]) {
+                a = p + 1;
+            }
+            else {
+                b = p - 1;
+            }
+        }
+        return false;
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr` | Arreglo ordenado ascendentemente. |
+| `a, b` | Límites inclusivos. |
+| `x` | Valor buscado. |
+| `num, den` | Numerador y denominador de la estimación. |
+| `p` | Índice estimado. |
+
+**Precondiciones:** arr no nulo y ordenado de menor a mayor. Si el intervalo no está vacío, sus límites deben cumplir \(0 \le a \le b < N\), donde \(N\) es la longitud del arreglo.
+
+**Resultado:** Devuelve true si encuentra x; false cuando agota el intervalo.
+
+**Explicación:** La comprobación `den == 0` resuelve los extremos iguales antes de dividir. Los cálculos num y den se realizan en long; no se exige que sus resultados intermedios quepan en int. Para buscar en todo el arreglo se usa `a = 0` y `b = arr.length - 1`; un arreglo vacío devuelve false.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [10, 20, 30, 40], a = 0, b = 3, x = 30`.
+
+    **Prueba de escritorio**
+
+    | Paso | arr | a | b | x | num | den | p | Acción o resultado |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | 1 | [10, 20, 30, 40] | 0 | 3 | 30 | — | — | — | Recibe los parámetros; las variables locales aún no están declaradas. |
+    | 2 | [10, 20, 30, 40] | 0 | 3 | 30 | — | — | — | El while permite entrar: \(0 \le 3\), \(30 \ge 10\) y \(30 \le 40\). |
+    | 3 | [10, 20, 30, 40] | 0 | 3 | 30 | 60 | — | — | Calcula \(\mathrm{num} = (3 - 0) \cdot (30 - 10) = 60\). |
+    | 4 | [10, 20, 30, 40] | 0 | 3 | 30 | 60 | 30 | — | Calcula \(\mathrm{den} = 40 - 10 = 30\); es distinto de cero y puede dividir. |
+    | 5 | [10, 20, 30, 40] | 0 | 3 | 30 | 60 | 30 | 2 | Calcula \(p = 0 + \frac{60}{30} = 2\). |
+    | 6 | [10, 20, 30, 40] | 0 | 3 | 30 | 60 | 30 | 2 | Consulta `arr[2]`, cuyo valor es 30; coincide con `x` y devuelve `true`. |
+
+    Cada fila muestra los valores después de la acción indicada. «—» significa que la variable todavía no ha sido declarada. El arreglo no cambia durante la búsqueda.
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-1f957a09e689">Código Python · Búsqueda por interpolación iterativa</label><textarea id="runner-1f957a09e689" spellcheck="false" wrap="off" rows="14">def buscar(arr, a, b, x):
+    while a &lt;= b and x &gt;= arr[a] and x &lt;= arr[b]:
+        num = (b - a) * (x - arr[a])
+        den = arr[b] - arr[a]
+        if den == 0:
+            return arr[a] == x
+        p = a + num // den
+        if arr[p] == x:
+            return True
+        if x &gt; arr[p]:
+            a = p + 1
+        else:
+            b = p - 1
+    return False
+
+# Entradas editables del ejemplo.
+arr = [10, 20, 30, 40]
+a = 0
+b = 3
+x = 30
+
+resultado = buscar(arr, a, b, x)
+print(&quot;Resultado:&quot;, resultado)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.
+
+El listado corregido incluye controles para los casos límite; el laboratorio usa su adaptación Python.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/search/search_metrics.py).
 
 <!-- book-code:end -->
 
@@ -123,7 +262,9 @@ En la implementación iterativa, la estimación usa los valores de los extremos 
 - **Caso promedio.** Con datos uniformemente distribuidos, la estimación queda cerca de la posición real y el intervalo se reduce muy rápido. Ese comportamiento lleva a \(T(n) \in \Theta(\log_2(\log_2(n)))\) con espacio constante.
 - **Peor caso.** Cuando los valores están muy desbalanceados, la estimación puede avanzar muy poco en cada iteración. En ese escenario se pueden revisar muchos candidatos y \(T(n) \in O(n)\).
 
-#### Versión recursiva
+#### Versión recursiva (ampliación teórica)
+
+El libro no incluye un listado recursivo de este algoritmo en las páginas citadas. Este apartado compara el costo de una posible formulación recursiva; no corresponde a otra implementación transcrita.
 
 En la implementación recursiva, cada llamada calcula una posición estimada y continúa sobre el subrango que aún puede contener el objetivo. La memoria adicional queda determinada por la cantidad de estimaciones encadenadas.
 

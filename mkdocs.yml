@@ -62,6 +62,7 @@ extra_css:
 extra_javascript:
   - assets/javascripts/mathjax.js
   - assets/javascripts/site.js
+  - assets/javascripts/example-runner.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 nav:

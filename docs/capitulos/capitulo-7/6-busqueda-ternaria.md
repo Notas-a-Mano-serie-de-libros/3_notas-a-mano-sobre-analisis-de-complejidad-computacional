@@ -17,49 +17,324 @@ Aunque cada iteración descarta más que la búsqueda binaria (un tercio en vez 
 
 <!-- book-code:start -->
 
-Listado original del libro, página 307 (Java).
+#### Búsqueda ternaria recursiva
 
-```java
-public boolean buscar(int[] arr, int a, int b, int x) {
-     // Agota el espacio de búsqueda
-    if (a > b)
-        return false;
-    int m1 = a + (b - a) / 3;
-    int m2 = b - (int) Math.ceil((b - a) / 3.0);
-    // Verificar si el valor está en los pivotes
-    if (arr[m1] == x || arr[m2] == x)
-        return true;
-    if (x < arr[m1])
-        return buscar(arr, a, m1 - 1, x);
-    else if (x > arr[m2])
-        return buscar(arr, m2 + 1, b, x);
-    else
-        return buscar(arr, m1 + 1, m2 - 1, x);
-}
-```
+Implementación corregida basada en el libro, página 307 (Java).
 
-Listado original del libro, página 312 (Java).
+=== "Java"
 
-```java
-public boolean buscar(int[] arr, int a, int b, int x) {
-    while (a <= b) {
+    ```java
+    public boolean buscar(int[] arr, int a, int b, int x) {
+         // Agota el espacio de búsqueda
+        if (a > b)
+            return false;
         int m1 = a + (b - a) / 3;
         int m2 = b - (int) Math.ceil((b - a) / 3.0);
+        // Verificar si el valor está en los pivotes
         if (arr[m1] == x || arr[m2] == x)
             return true;
         if (x < arr[m1])
-            b = m1 - 1; // Buscar en el primer tercio
+            return buscar(arr, a, m1 - 1, x);
         else if (x > arr[m2])
-            a = m2 + 1; // Buscar en el último tercio
+            return buscar(arr, m2 + 1, b, x);
+        else
+            return buscar(arr, m1 + 1, m2 - 1, x);
+    }
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función buscar(arr, a, b, x)
+        si a > b entonces
+            retornar falso
+        m1 ← a + (b - a) div 3
+        m2 ← b - (b - a + 2) div 3
+        si arr[m1] == x o arr[m2] == x entonces
+            retornar verdadero
+        si x < arr[m1] entonces
+            retornar buscar(arr, a, m1 - 1, x)
+        si x > arr[m2] entonces
+            retornar buscar(arr, m2 + 1, b, x)
+        retornar buscar(arr, m1 + 1, m2 - 1, x)
+    ```
+
+=== "Python"
+
+    ```python
+    def buscar(arr, a, b, x):
+        if a > b:
+            return False
+        m1 = a + (b - a) // 3
+        m2 = b - (b - a + 2) // 3
+        if arr[m1] == x or arr[m2] == x:
+            return True
+        if x < arr[m1]:
+            return buscar(arr, a, m1 - 1, x)
+        if x > arr[m2]:
+            return buscar(arr, m2 + 1, b, x)
+        return buscar(arr, m1 + 1, m2 - 1, x)
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    bool buscar(int arr[], int a, int b, int x) {
+         // Agota el espacio de búsqueda
+        if (a > b) {
+            return false;
+        }
+        int m1 = a + (b - a) / 3;
+        int m2 = b - (int) ceil((b - a) / 3.0);
+        // Verificar si el valor está en los pivotes
+        if (arr[m1] == x || arr[m2] == x) {
+            return true;
+        }
+        if (x < arr[m1]) {
+            return buscar(arr, a, m1 - 1, x);
+        }
+        else if (x > arr[m2]) {
+            return buscar(arr, m2 + 1, b, x);
+        }
         else {
-            a = m1 + 1; // Buscar en el tercio central
-            b = m2 - 1;
+            return buscar(arr, m1 + 1, m2 - 1, x);
         }
     }
-    // Elemento no encontrado
-    return false;
-}
-```
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr` | Arreglo ordenado ascendentemente. |
+| `a, b` | Límites inclusivos. |
+| `x` | Valor buscado. |
+| `m1, m2` | Dos pivotes del intervalo. |
+
+**Precondiciones:** arr no nulo y ordenado; límites válidos para intervalo no vacío.
+
+**Resultado:** Devuelve true si encuentra x; false al agotar el intervalo.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [1, 3, 5, 7, 9], a = 0, b = 4, x = 7`.
+
+    **Prueba de escritorio**
+
+    | Paso | Método | Profundidad | arr | a | b | x | m1 | m2 | Operación ejecutada | Retorno |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | 1 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | — | Entrada a la llamada. | — |
+    | 2 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | — | `if a > b:` | — |
+    | 3 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | — | `m1 = a + (b - a) // 3` | — |
+    | 4 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `m2 = b - (b - a + 2) // 3` | — |
+    | 5 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if arr[m1] == x or arr[m2] == x:` | — |
+    | 6 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if x < arr[m1]:` | — |
+    | 7 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if x > arr[m2]:` | — |
+    | 8 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | — | — | Entrada a la llamada. | — |
+    | 9 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | — | — | `if a > b:` | — |
+    | 10 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | — | `m1 = a + (b - a) // 3` | — |
+    | 11 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `m2 = b - (b - a + 2) // 3` | — |
+    | 12 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `if arr[m1] == x or arr[m2] == x:` | — |
+    | 13 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `return True`; Termina la llamada. | true |
+    | 14 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `return buscar(arr, m2 + 1, b, x)`; Termina la llamada. | true |
+
+    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-9f32c04be81a">Código Python · Búsqueda ternaria recursiva</label><textarea id="runner-9f32c04be81a" spellcheck="false" wrap="off" rows="14">def buscar(arr, a, b, x):
+    if a &gt; b:
+        return False
+    m1 = a + (b - a) // 3
+    m2 = b - (b - a + 2) // 3
+    if arr[m1] == x or arr[m2] == x:
+        return True
+    if x &lt; arr[m1]:
+        return buscar(arr, a, m1 - 1, x)
+    if x &gt; arr[m2]:
+        return buscar(arr, m2 + 1, b, x)
+    return buscar(arr, m1 + 1, m2 - 1, x)
+
+# Entradas editables del ejemplo.
+arr = [1, 3, 5, 7, 9]
+a = 0
+b = 4
+x = 7
+
+resultado = buscar(arr, a, b, x)
+print(&quot;Resultado:&quot;, resultado)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Búsqueda ternaria iterativa
+
+Implementación corregida basada en el libro, página 312 (Java).
+
+=== "Java"
+
+    ```java
+    public boolean buscar(int[] arr, int a, int b, int x) {
+        while (a <= b) {
+            int m1 = a + (b - a) / 3;
+            int m2 = b - (int) Math.ceil((b - a) / 3.0);
+            if (arr[m1] == x || arr[m2] == x)
+                return true;
+            if (x < arr[m1])
+                b = m1 - 1; // Buscar en el primer tercio
+            else if (x > arr[m2])
+                a = m2 + 1; // Buscar en el último tercio
+            else {
+                a = m1 + 1; // Buscar en el tercio central
+                b = m2 - 1;
+            }
+        }
+        // Elemento no encontrado
+        return false;
+    }
+    ```
+
+=== "Pseudocódigo"
+
+    ```text
+    función buscar(arr, a, b, x)
+        mientras a <= b
+            m1 ← a + (b - a) div 3
+            m2 ← b - (b - a + 2) div 3
+            si arr[m1] == x o arr[m2] == x entonces
+                retornar verdadero
+            si x < arr[m1] entonces
+                b ← m1 - 1
+            si no, si x > arr[m2] entonces
+                a ← m2 + 1
+            si no
+                a ← m1 + 1
+                b ← m2 - 1
+        retornar falso
+    ```
+
+=== "Python"
+
+    ```python
+    def buscar(arr, a, b, x):
+        while a <= b:
+            m1 = a + (b - a) // 3
+            m2 = b - (b - a + 2) // 3
+            if arr[m1] == x or arr[m2] == x:
+                return True
+            if x < arr[m1]:
+                b = m1 - 1
+            elif x > arr[m2]:
+                a = m2 + 1
+            else:
+                a = m1 + 1
+                b = m2 - 1
+        return False
+    ```
+
+=== "C"
+
+    ```c
+    #include <stdbool.h>
+    #include <stdint.h>
+    #include <limits.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <math.h>
+
+    bool buscar(int arr[], int a, int b, int x) {
+        while (a <= b) {
+            int m1 = a + (b - a) / 3;
+            int m2 = b - (int) ceil((b - a) / 3.0);
+            if (arr[m1] == x || arr[m2] == x) {
+                return true;
+            }
+            if (x < arr[m1]) {
+                b = m1 - 1; // Buscar en el primer tercio
+            }
+            else if (x > arr[m2]) {
+                a = m2 + 1; // Buscar en el último tercio
+            }
+            else {
+                a = m1 + 1; // Buscar en el tercio central
+                b = m2 - 1;
+            }
+        }
+        // Elemento no encontrado
+        return false;
+    }
+    ```
+
+Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`.
+
+| Parámetro o variable | Significado |
+| --- | --- |
+| `arr` | Arreglo ordenado ascendentemente. |
+| `a, b` | Límites inclusivos. |
+| `x` | Valor buscado. |
+| `m1, m2` | Dos pivotes del intervalo. |
+
+**Precondiciones:** arr no nulo y ordenado; límites válidos para intervalo no vacío.
+
+**Resultado:** Devuelve true si encuentra x; false al agotar el intervalo.
+
+??? example "Ejemplo paso a paso"
+    Entrada: `arr = [1, 3, 5, 7, 9], a = 0, b = 4, x = 7`.
+
+    **Prueba de escritorio**
+
+    | Paso | Método | Profundidad | arr | a | b | x | m1 | m2 | Operación ejecutada | Retorno |
+    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+    | 1 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | — | Entrada a la llamada. | — |
+    | 2 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | — | `while a <= b:` | — |
+    | 3 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | — | `m1 = a + (b - a) // 3` | — |
+    | 4 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `m2 = b - (b - a + 2) // 3` | — |
+    | 5 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if arr[m1] == x or arr[m2] == x:` | — |
+    | 6 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if x < arr[m1]:` | — |
+    | 7 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `elif x > arr[m2]:` | — |
+    | 8 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 1 | 2 | `a = m2 + 1` | — |
+    | 9 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 1 | 2 | `while a <= b:` | — |
+    | 10 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 2 | `m1 = a + (b - a) // 3` | — |
+    | 11 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `m2 = b - (b - a + 2) // 3` | — |
+    | 12 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `if arr[m1] == x or arr[m2] == x:` | — |
+    | 13 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `return True`; Termina la llamada. | true |
+
+    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-a9fc79021755">Código Python · Búsqueda ternaria iterativa</label><textarea id="runner-a9fc79021755" spellcheck="false" wrap="off" rows="14">def buscar(arr, a, b, x):
+    while a &lt;= b:
+        m1 = a + (b - a) // 3
+        m2 = b - (b - a + 2) // 3
+        if arr[m1] == x or arr[m2] == x:
+            return True
+        if x &lt; arr[m1]:
+            b = m1 - 1
+        elif x &gt; arr[m2]:
+            a = m2 + 1
+        else:
+            a = m1 + 1
+            b = m2 - 1
+    return False
+
+# Entradas editables del ejemplo.
+arr = [1, 3, 5, 7, 9]
+a = 0
+b = 4
+x = 7
+
+resultado = buscar(arr, a, b, x)
+print(&quot;Resultado:&quot;, resultado)
+</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+
+#### Laboratorio y medición
+
+La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.
+
+El contador de ternaria usa un ciclo: mide una adaptación iterativa y cuenta por separado las dos comparaciones con pivotes.
+
+[Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/search/search_metrics.py).
 
 <!-- book-code:end -->
 

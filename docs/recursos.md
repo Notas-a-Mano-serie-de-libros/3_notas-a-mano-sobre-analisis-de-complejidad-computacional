@@ -49,3 +49,7 @@ Los capítulos 2–8 se apoyan en cuadernos Jupyter. Colab es la ruta recomendad
 
 [Explorar el repositorio](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional){ .md-button .md-button--primary }
 [Ir al recorrido](capitulos/index.md){ .md-button }
+
+## Coherencia de las implementaciones
+
+Cada código de Pages identifica su versión, parámetros, precondiciones y resultado. Los ejemplos paso a paso utilizan los nombres del listado. Las notas «Laboratorio y medición» explican la adaptación que ejecuta Colab. Consulta la [correspondencia por implementación](correspondencia.md#implementaciones-y-ejemplos).

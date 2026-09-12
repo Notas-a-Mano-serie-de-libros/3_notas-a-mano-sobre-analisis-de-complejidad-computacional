@@ -183,6 +183,8 @@ El material se distribuye con fines académicos bajo la licencia [Creative Commo
 
 ### Coherencia de los códigos publicados con el libro
 
-Los listados de Pages se conservan en `scripts/data/book_code.json`, con su página de origen y la huella SHA-256 del PDF de referencia. Se publican en Java con los nombres, parámetros, comentarios y cuerpos del libro, incluidas sus variantes. Los ejemplos de complejidad del capítulo 2 remiten a listados de los capítulos donde se desarrollan esos algoritmos. Shell y la sección de complejidad factorial no tienen un listado correspondiente en el libro.
+Los listados de Pages se conservan en `scripts/data/book_code.json`, con su página de origen y la huella SHA-256 del PDF de referencia. Se publican en Java con los nombres y firmas principales del libro, incluidas sus variantes y las correcciones solicitadas. Los ejemplos de complejidad del capítulo 2 remiten a listados de los capítulos donde se desarrollan esos algoritmos. Shell y la sección de complejidad factorial no tienen un listado correspondiente en el libro.
 
 `python scripts/sync_book_code.py` actualiza los bloques de implementación sin reconstruir las páginas. `python scripts/sync_book_code.py --check` comprueba su igualdad con el catálogo. La regeneración de capítulos aplica esta sincronización al finalizar, y la validación editorial también la verifica.
+
+El catálogo también conserva títulos de variantes, parámetros, precondiciones, trazas y notas de medición. El catálogo incorpora las correcciones de funcionamiento solicitadas por el autor, incluida la declaración de la matriz. Los códigos actualizados y sus explicaciones se presentan en cada sección de los capítulos. `make book-review` requiere un JDK y reproduce las comprobaciones de Java sobre los 72 listados inventariados, con el contexto de prueba documentado.
