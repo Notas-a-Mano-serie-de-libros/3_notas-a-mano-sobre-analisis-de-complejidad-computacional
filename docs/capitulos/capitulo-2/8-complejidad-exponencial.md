@@ -18,42 +18,24 @@ Esta repetición explica por qué el tiempo crece de forma exponencial cuando \(
 
 ---
 
-### Código del ejemplo
+### Código del libro asociado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función fibonacci(n)
-        si n ≤ 1 entonces retornar n
-        retornar fibonacci(n - 1) + fibonacci(n - 2)
-    ```
+Listado original del libro, página 234 (Java).
 
-=== "Python"
+```java
+public static int fibonacci(int n) {
+    if (n == 0)
+        return 0;
+    else if (n == 1)
+        return 1;
+    else
+        return fibonacci(n-1) + fibonacci(n-2);
+}
+```
 
-    ```python
-    def fibonacci(n):
-        if n <= 1:
-            return n
-        return fibonacci(n - 1) + fibonacci(n - 2)
-    ```
-
-=== "Java"
-
-    ```java
-    static long fibonacci(int n) {
-        if (n <= 1) return n;
-        return fibonacci(n - 1) + fibonacci(n - 2);
-    }
-    ```
-
-=== "C"
-
-    ```c
-    long fibonacci(int n) {
-        if (n <= 1) return n;
-        return fibonacci(n - 1) + fibonacci(n - 2);
-    }
-    ```
+<!-- book-code:end -->
 
 ### Simulación
 

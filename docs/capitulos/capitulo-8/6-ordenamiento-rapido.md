@@ -17,48 +17,41 @@ En el caso promedio logra O(n log(n)) con una constante menor que el ordenamient
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    si bajo < alto
-        p ← particionar(A,bajo,alto)
-        quicksort(A,bajo,p-1)
-        quicksort(A,p+1,alto)
-    ```
+Listado original del libro, página 349 (Java).
 
-=== "Python"
-
-    ```python
-    def quicksort(a, lo, hi):
-        if lo < hi:
-            p = partition(a, lo, hi)
-            quicksort(a, lo, p - 1)
-            quicksort(a, p + 1, hi)
-    ```
-
-=== "Java"
-
-    ```java
-    static void quicksort(int[] a, int lo, int hi) {
-        if (lo < hi) {
-            int p = partition(a, lo, hi);
-            quicksort(a, lo, p - 1);
-            quicksort(a, p + 1, hi);
+```java
+public void ordenar(int[] arr, int a, int b) {
+    if (a >= b)
+        return;
+    int p = particionar(arr, a, b);
+    ordenar(arr, a, p - 1);
+    ordenar(arr, p + 1, b);
+}
+public int particionar(int[] arr, int a, int b) {
+    int pivote = arr[a], i = a + 1, j = b;
+    while (i <= j) {
+        while (i <= j && arr[i] < pivote)
+            i++;
+        while (i <= j && arr[j] > pivote)
+            j--;
+        if (i <= j) {
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+            i++;
+            j--;
         }
     }
-    ```
+    int temp = arr[a];
+    arr[a] = arr[j];
+    arr[j] = temp;
+    return j;
+}
+```
 
-=== "C"
-
-    ```c
-    void quicksort(int a[], int lo, int hi) {
-        if (lo < hi) {
-            int p = partition(a, lo, hi);
-            quicksort(a, lo, p - 1);
-            quicksort(a, p + 1, hi);
-        }
-    }
-    ```
+<!-- book-code:end -->
 
 ### Complejidad
 

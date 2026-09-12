@@ -11,47 +11,25 @@
 
 #### Código
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función potenciaRápida(x, n)
-        si n = 0 entonces retornar 1
-        mitad ← potenciaRápida(x, ⌊n / 2⌋)
-        si n es impar entonces retornar mitad × mitad × x
-        retornar mitad × mitad
-    ```
+Listado original del libro, página 243 (Java).
 
-=== "Python"
+```java
+public static double potencia(int a, int n) {
+    if (n == 0)
+        return 1;
+    int absExponente = Math.abs(n);
+    double mitad = potencia(a, absExponente / 2);
+    if (absExponente % 2 == 0)
+        mitad = mitad * mitad;
+    else
+        mitad = mitad * mitad * a;
+    return n < 0 ? 1.0 / mitad : mitad;
+}
+```
 
-    ```python
-    def potencia_rapida(x, n):
-        if n == 0:
-            return 1
-        mitad = potencia_rapida(x, n // 2)
-        if n % 2:
-            return mitad * mitad * x
-        return mitad * mitad
-    ```
-
-=== "Java"
-
-    ```java
-    static double potenciaRapida(double x, int n) {
-        if (n == 0) return 1;
-        double mitad = potenciaRapida(x, n / 2);
-        return n % 2 == 1 ? mitad * mitad * x : mitad * mitad;
-    }
-    ```
-
-=== "C"
-
-    ```c
-    double potenciaRapida(double x, int n) {
-        if (n == 0) return 1;
-        double mitad = potenciaRapida(x, n / 2);
-        return n % 2 ? mitad * mitad * x : mitad * mitad;
-    }
-    ```
+<!-- book-code:end -->
 
 #### Análisis
 
@@ -61,7 +39,7 @@ El resultado recursivo se calcula una sola vez y se reutiliza. Como el exponente
 T(n)=T(\lfloor n/2\rfloor)+\Theta(1)\in\Theta(\log_2(n)).
 \]
 
-La profundidad de llamadas sigue la misma cantidad de divisiones, de modo que \(S(n)\in\Theta(\log_2(n))\). Llamar dos veces a `potencia_rapida(x, n // 2)` cambiaría radicalmente el árbol y desperdiciaría el resultado compartido.
+La profundidad de llamadas sigue la misma cantidad de divisiones, de modo que \(S(n)\in\Theta(\log_2(n))\). Llamar dos veces a `potencia(a, absExponente / 2)` cambiaría radicalmente el árbol y desperdiciaría el resultado compartido.
 
 #### Simulación
 

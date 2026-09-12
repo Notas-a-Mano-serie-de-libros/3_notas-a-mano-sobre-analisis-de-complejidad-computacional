@@ -18,42 +18,39 @@ La simulación se centra en observar cómo el costo crece al ordenar entradas ca
 
 ---
 
-### Código del ejemplo
+### Código del libro asociado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función ordenar(A)
-        retornar mezclaOrdenada(A)
-    ```
+Listado original del libro, página 247 (Java).
 
-=== "Python"
-
-    ```python
-    def ordenar_lista(lista):
-        return sorted(lista)
-    ```
-
-=== "Java"
-
-    ```java
-    static void ordenar(int[] a) {
-        java.util.Arrays.sort(a);
+```java
+public void ordenar(int[] arr, int a, int b) {
+    if (a >= b)
+        return;
+    int m = a + (b - a) / 2;
+    ordenar(arr, a, m);
+    ordenar(arr, m + 1, b);
+    combinar(arr, a, m, b);
+}
+public void combinar(int[] arr, int a, int m, int b) {
+    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);
+    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);
+    int i = 0, j = 0, k = a;
+    while (i < izquierda.length && j < derecha.length) {
+        if (izquierda[i] <= derecha[j])
+            arr[k++] = izquierda[i++];
+        else
+            arr[k++] = derecha[j++];
     }
-    ```
+    while (i < izquierda.length)
+        arr[k++] = izquierda[i++];
+    while (j < derecha.length)
+        arr[k++] = derecha[j++];
+}
+```
 
-=== "C"
-
-    ```c
-    int comparar(const void *x, const void *y) {
-        return (*(const int *)x > *(const int *)y) -
-               (*(const int *)x < *(const int *)y);
-    }
-
-    void ordenar(int a[], int n) {
-        qsort(a, n, sizeof(int), comparar);
-    }
-    ```
+<!-- book-code:end -->
 
 ### Simulación
 

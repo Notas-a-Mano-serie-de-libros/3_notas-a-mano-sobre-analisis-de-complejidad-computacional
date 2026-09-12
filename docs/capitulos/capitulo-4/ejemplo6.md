@@ -8,67 +8,27 @@ Este ejemplo combina un ciclo externo, dos ciclos internos y llamadas a funcione
 
 ## Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    procedimiento imprimirElementos(m, n)
-        para i ← 0 hasta m - 1
-            imprimir i
-            para j ← 0 hasta n - 1
-                imprimir j
-            para k ← n; k > 1; k ← ⌊k / 2⌋
-                imprimir k
-                foo2()
-            foo1()
-    ```
+Listado original del libro, página 161 (Java).
 
-=== "Python"
-
-    ```python
-    def imprimir_elementos(m, n):
-        for i in range(m):
-            print(i)
-            for j in range(n):
-                print(j)
-            k = n
-            while k > 1:
-                print(k)
-                foo2()
-                k //= 2
-            foo1()
-    ```
-
-=== "Java"
-
-    ```java
-    static void imprimirElementos(int m, int n) {
-        for (int i = 0; i < m; i++) {
-            System.out.println(i);
-            for (int j = 0; j < n; j++) System.out.println(j);
-            for (int k = n; k > 1; k /= 2) {
-                System.out.println(k);
-                foo2();
-            }
-            foo1();
+```java
+public static void imprimirElementos(int m, int n) {
+    for (int i = 0; i < m; i++) {
+        System.out.println(i);
+        for (int j = 0; j < n; j++) {
+            System.out.println(j);
         }
-    }
-    ```
-
-=== "C"
-
-    ```c
-    void imprimirElementos(int m, int n) {
-        for (int i = 0; i < m; i++) {
-            printf("%d\n", i);
-            for (int j = 0; j < n; j++) printf("%d\n", j);
-            for (int k = n; k > 1; k /= 2) {
-                printf("%d\n", k);
-                foo2();
-            }
-            foo1();
+        for (int k = n; k > 1; k = k/2) {
+            System.out.println(k);
+            foo2();
         }
+        foo1();
     }
-    ```
+}
+```
+
+<!-- book-code:end -->
 
 ## Análisis esperado
 

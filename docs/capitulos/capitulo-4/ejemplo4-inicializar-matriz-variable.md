@@ -13,54 +13,23 @@ Este algoritmo recibe \(n\) y construye internamente una matriz de \(n\times n\)
 
 ### Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    procedimiento crearYRecorrer(n)
-        matriz ← nueva matriz n × n inicializada en 0
-        para cada fila en matriz
-            para cada elemento en fila
-                visitar elemento
-    ```
+Listado original del libro, página 156 (Java).
 
-=== "Python"
-
-    ```python
-    def imprimir_matriz_creada(n):
-        matriz = [[0 for _ in range(n)] for _ in range(n)]
-        for fila in matriz:
-            for elemento in fila:
-                _ = elemento
-    ```
-
-=== "Java"
-
-    ```java
-    static void crearYRecorrer(int n) {
-        int[][] matriz = new int[n][n];
-        for (int[] fila : matriz) {
-            for (int elemento : fila) {
-                int visitado = elemento;
-            }
+```java
+public static int[][] inicializarMatriz(int m, int n) {
+    int matriz = new int[m][n];
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            matriz[i][j] = 1;
         }
     }
-    ```
+    return matriz;
+}
+```
 
-=== "C"
-
-    ```c
-    void crearYRecorrer(int n) {
-        int (*matriz)[n] = calloc(n, sizeof *matriz);
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++) {
-                int visitado = matriz[i][j];
-            }
-        free(matriz);
-    }
-    ```
-
-
----
+<!-- book-code:end -->
 
 ### Análisis esperado
 

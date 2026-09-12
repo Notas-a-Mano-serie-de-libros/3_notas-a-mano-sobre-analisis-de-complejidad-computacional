@@ -15,69 +15,43 @@ Cada comparación reduce el espacio de búsqueda a la mitad, lo que produce una 
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    izq ← 0; der ← longitud(A)-1
-    mientras izq ≤ der
-        m ← ⌊(izq+der)/2⌋
-        si A[m] = x retornar m
-        si A[m] < x: izq ← m+1; si no: der ← m-1
-    retornar -1
-    ```
+Listado original del libro, página 268 (Java).
 
-=== "Python"
-
-    ```python
-    lo, hi = 0, len(a) - 1
-    while lo <= hi:
-        m = (lo + hi) // 2
-        if a[m] == x:
-            return m
-        if a[m] < x:
-            lo = m + 1
-        else:
-            hi = m - 1
-    return -1
-    ```
-
-=== "Java"
-
-    ```java
-    int lo = 0;
-    int hi = a.length - 1;
-    while (lo <= hi) {
-        int m = lo + (hi - lo) / 2;
-        if (a[m] == x) {
-            return m;
-        }
-        if (a[m] < x) {
-            lo = m + 1;
-        } else {
-            hi = m - 1;
-        }
+```java
+public boolean buscar(int[] arr, int a, int b, int x) {
+    while (a <= b) {
+        // Posición en la mitad del rango [a,b]
+        int m = a + (b - a) / 2;
+        if (arr[m] == x)
+            return true; // Elemento encontrado
+        else if (x > arr[m])
+            a = m + 1; // Buscar en la mitad derecha
+        else
+            b = m - 1; // Buscar en la mitad izquierda
     }
-    return -1;
-    ```
+    return false; // Elemento no encontrado
+}
+```
 
-=== "C"
+Listado original del libro, página 273 (Java).
 
-    ```c
-    int lo = 0;
-    int hi = n - 1;
-    while (lo <= hi) {
-        int m = lo + (hi - lo) / 2;
-        if (a[m] == x) {
-            return m;
-        }
-        if (a[m] < x) {
-            lo = m + 1;
-        } else {
-            hi = m - 1;
-        }
-    }
-    return -1;
-    ```
+```java
+public boolean buscar(int[] arr, int a, int b, int x) {
+    if (a > b)
+        return false; // Elemento no encontrado
+    int m = a + (b - a) / 2;
+    if (arr[m] == x)
+        return true; // Elemento encontrado
+    else if (x > arr[m])
+        return buscar(arr, m + 1, b, x); // Busca a la derecha
+    else
+        return buscar(arr, a, m - 1, x); // Busca a la izquierda
+}
+```
+
+<!-- book-code:end -->
 
 ### Complejidad: versión iterativa y versión recursiva
 

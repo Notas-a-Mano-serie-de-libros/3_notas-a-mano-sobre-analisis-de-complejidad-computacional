@@ -15,60 +15,11 @@ La ventaja práctica aparece porque los elementos pueden desplazarse grandes dis
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    salto ← ⌊n/2⌋
-    mientras salto > 0
-        aplicar inserción entre elementos separados por salto
-        salto ← ⌊salto/2⌋
-    ```
+El libro no incluye un listado de implementación para este tema.
 
-=== "Python"
-
-    ```python
-    gap = len(a) // 2
-    while gap:
-        for i in range(gap, len(a)):
-            v, j = a[i], i
-            while j >= gap and a[j - gap] > v:
-                a[j] = a[j - gap]
-                j -= gap
-            a[j] = v
-        gap //= 2
-    ```
-
-=== "Java"
-
-    ```java
-    for (int g = a.length / 2; g > 0; g /= 2) {
-        for (int i = g; i < a.length; i++) {
-            int v = a[i];
-            int j = i;
-            while (j >= g && a[j - g] > v) {
-                a[j] = a[j - g];
-                j -= g;
-            }
-            a[j] = v;
-        }
-    }
-    ```
-
-=== "C"
-
-    ```c
-    for (int g = n / 2; g > 0; g /= 2) {
-        for (int i = g; i < n; i++) {
-            int v = a[i];
-            int j = i;
-            while (j >= g && a[j - g] > v) {
-                a[j] = a[j - g];
-                j -= g;
-            }
-            a[j] = v;
-        }
-    }
-    ```
+<!-- book-code:end -->
 
 ### Complejidad
 

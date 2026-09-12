@@ -15,51 +15,29 @@ Es especialmente eficaz cuando el objetivo está cerca del inicio del arreglo, y
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    si A[0] = x retornar 0
-    i ← 1
-    mientras i < longitud(A) y A[i] ≤ x: i ← 2i
-    aplicar búsqueda binaria en [i/2, min(i,n-1)]
-    ```
+Listado original del libro, página 298 (Java).
 
-=== "Python"
-
-    ```python
-    if a and a[0] == x:
-        return 0
-    i = 1
-    while i < len(a) and a[i] <= x:
-        i *= 2
-    return binaria(a, x, i // 2, min(i, len(a) - 1))
-    ```
-
-=== "Java"
-
-    ```java
-    if (a.length > 0 && a[0] == x) {
-        return 0;
-    }
+```java
+public boolean buscar(int[] arr, int x) {
+    int n = arr.length;
+    // Verificar si el primer elemento es el buscado
+    if (arr[0] == x)
+        return true;
+    // Encuentra el rango utilizando crecimiento exponencial
     int i = 1;
-    while (i < a.length && a[i] <= x) {
+    while (i < n && arr[i] <= x)
         i *= 2;
-    }
-    return binaria(a, x, i / 2, Math.min(i, a.length - 1));
-    ```
+    // Determina los limites y ejecuta la búsqueda binaria
+    int a = i/2;
+    int b = Math.min(i, n - 1);
+    // Invoca la función que aplica la búsqueda
+    return busquedaBinaria(arr, a, b, x);
+}
+```
 
-=== "C"
-
-    ```c
-    if (n > 0 && a[0] == x) {
-        return 0;
-    }
-    int i = 1;
-    while (i < n && a[i] <= x) {
-        i *= 2;
-    }
-    return binaria(a, x, i / 2, i < n ? i : n - 1);
-    ```
+<!-- book-code:end -->
 
 ### Complejidad: versión iterativa y versión recursiva
 

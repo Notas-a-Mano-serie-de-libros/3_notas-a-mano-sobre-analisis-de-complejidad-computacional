@@ -8,37 +8,19 @@ El número de iteraciones es constante, pero la operación ejecutada dentro del 
 
 ## Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    procedimiento cicloFijo(n)
-        repetir 1 000 veces
-            foo(n)
-    ```
+Listado original del libro, página 166 (Java).
 
-=== "Python"
-
-    ```python
-    def ciclo_fijo(n):
-        for _ in range(1_000):
-            foo(n)
-    ```
-
-=== "Java"
-
-    ```java
-    static void cicloFijo(int n) {
-        for (int i = 0; i < 1_000; i++) foo(n);
+```java
+public static void cicloFijo(int n) {
+    for (int i = 0; i < 1000; i++) {
+        foo(n);
     }
-    ```
+}
+```
 
-=== "C"
-
-    ```c
-    void cicloFijo(int n) {
-        for (int i = 0; i < 1000; i++) foo(n);
-    }
-    ```
+<!-- book-code:end -->
 
 ## Análisis esperado
 

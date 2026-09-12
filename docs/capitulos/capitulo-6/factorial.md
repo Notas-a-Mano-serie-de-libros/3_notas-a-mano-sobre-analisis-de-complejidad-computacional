@@ -11,40 +11,20 @@
 
 #### Código
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función factorial(n)
-        si n ≤ 1 entonces retornar 1
-        retornar n × factorial(n - 1)
-    ```
+Listado original del libro, página 229 (Java).
 
-=== "Python"
+```java
+public static int factorial(int n) {
+    if (n <= 1)
+        return 1;
+    else
+        return n * factorial(n-1);
+}
+```
 
-    ```python
-    def factorial(n):
-        if n <= 1:
-            return 1
-        return n * factorial(n - 1)
-    ```
-
-=== "Java"
-
-    ```java
-    static long factorial(int n) {
-        if (n <= 1) return 1;
-        return n * factorial(n - 1);
-    }
-    ```
-
-=== "C"
-
-    ```c
-    long factorial(int n) {
-        if (n <= 1) return 1;
-        return n * factorial(n - 1);
-    }
-    ```
+<!-- book-code:end -->
 
 #### Análisis
 

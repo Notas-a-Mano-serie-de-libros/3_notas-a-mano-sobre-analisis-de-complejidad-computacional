@@ -15,53 +15,40 @@ Garantiza O(n log(n)) en todos los casos, lo que lo hace predecible y eficiente,
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    si longitud(A) ≤ 1 retornar A
-    dividir A en dos mitades
-    ordenar recursivamente cada mitad
-    combinar ambas mitades ordenadas
-    ```
+Listado original del libro, página 341 (Java).
 
-=== "Python"
-
-    ```python
-    def merge_sort(a):
-        if len(a) <= 1:
-            return a
-        m = len(a) // 2
-        return merge(merge_sort(a[:m]), merge_sort(a[m:]))
-    ```
-
-=== "Java"
-
-    ```java
-    static int[] mergeSort(int[] a) {
-        if (a.length <= 1) {
-            return a;
-        }
-        int m = a.length / 2;
-        return merge(
-            mergeSort(java.util.Arrays.copyOfRange(a, 0, m)),
-            mergeSort(java.util.Arrays.copyOfRange(a, m, a.length))
-        );
+```java
+public void ordenar(int[] arr, int a, int b) {
+    if (a >= b)
+        return;
+    // Calcula el pivote que separa el arreglo en dos
+    int m = a + (b - a) / 2;
+    // Etapa de división
+    ordenar(arr, a, m);
+    ordenar(arr, m + 1, b);
+    // Etapa de combinación
+    combinar(arr, a, m, b);
+}
+public void combinar(int[] arr, int a, int m, int b) {
+    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);
+    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);
+    int i = 0, j = 0, k = a;
+    while (i < izquierda.length && j < derecha.length) {
+        if (izquierda[i] <= derecha[j])
+            arr[k++] = izquierda[i++];
+        else
+            arr[k++] = derecha[j++];
     }
-    ```
+    while (i < izquierda.length)
+        arr[k++] = izquierda[i++];
+    while (j < derecha.length)
+        arr[k++] = derecha[j++];
+}
+```
 
-=== "C"
-
-    ```c
-    void mergeSort(int a[], int lo, int hi) {
-        if (lo >= hi) {
-            return;
-        }
-        int m = lo + (hi - lo) / 2;
-        mergeSort(a, lo, m);
-        mergeSort(a, m + 1, hi);
-        merge(a, lo, m, hi);
-    }
-    ```
+<!-- book-code:end -->
 
 ### Complejidad
 

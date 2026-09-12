@@ -18,46 +18,23 @@ Cada elemento se evalúa una vez. Por eso el tiempo de ejecución observado tien
 
 ---
 
-### Código del ejemplo
+### Código del libro asociado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función buscar(A, objetivo)
-        para i ← 0 hasta longitud(A) - 1
-            si A[i] = objetivo entonces retornar i
-        retornar -1
-    ```
+Listado original del libro, página 262 (Java).
 
-=== "Python"
-
-    ```python
-    def buscar_elemento(lista, objetivo):
-        for indice, valor in enumerate(lista):
-            if valor == objetivo:
-                return indice
-        return -1
-    ```
-
-=== "Java"
-
-    ```java
-    static int buscar(int[] a, int objetivo) {
-        for (int i = 0; i < a.length; i++)
-            if (a[i] == objetivo) return i;
-        return -1;
+```java
+public boolean buscar(int[] arr, int x) {
+    for (int i = 0; i < arr.length; i++) {
+        if (arr[i] == x)
+            return true;
     }
-    ```
+    return false;
+}
+```
 
-=== "C"
-
-    ```c
-    int buscar(const int a[], int n, int objetivo) {
-        for (int i = 0; i < n; i++)
-            if (a[i] == objetivo) return i;
-        return -1;
-    }
-    ```
+<!-- book-code:end -->
 
 ### Simulación
 

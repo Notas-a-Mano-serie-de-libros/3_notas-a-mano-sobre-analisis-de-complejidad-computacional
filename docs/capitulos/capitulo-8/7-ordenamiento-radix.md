@@ -15,41 +15,44 @@ La versión implementada aquí usa radix LSD en base 10. Su comportamiento depen
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    exp ← 1
-    mientras máximo(A)/exp > 0
-        ordenar establemente por el dígito exp
-        exp ← 10·exp
-    ```
+Listado original del libro, página 363 (Java).
 
-=== "Python"
-
-    ```python
-    exp, maximum = 1, max(a, default=0)
-    while maximum // exp:
-        counting_digit(a, exp)
-        exp *= 10
-    ```
-
-=== "Java"
-
-    ```java
-    int max = java.util.Arrays.stream(a).max().orElse(0);
-    for (int exp = 1; max / exp > 0; exp *= 10) {
-        countingDigit(a, exp);
+```java
+public void ordenar(int[] arr) {
+    // Obtiene el elemento más grande del arreglo
+    int max = Arrays.stream(arr).max().getAsInt();
+    // Obtiene la cantidad de dígitos (iteraciones)
+    int d = (int) Math.floor(Math.log10(max)) + 1;
+    for (int i = 1; i <= d; i++)
+        ordenarPorDigito(arr, i);
+}
+public void ordenarPorDigito(int[] arr, int i) {
+    int n = arr.length;
+    int exp = (int) Math.pow(10, i - 1);
+    // Arreglo que representa los buckets (b=10)
+    int[] conteo = new int[10];
+    // Arreglo parcialmente ordenado
+    int[] salida = new int[n];
+    // Paso 1: Cuenta elementos por bucket
+    for (int valor : arr)
+        conteo[(valor / exp) % 10]++;
+    // Paso 2: Calcula la suma acumulada
+    for (int j = 1; j < 10; j++)
+        conteo[j] += conteo[j - 1];
+    // Paso 3: Inserta los elementos en la nueva posición
+    for (int j = n - 1; j >= 0; j--) {
+        int d = (arr[j] / exp) % 10;
+        salida[conteo[d] - 1] = arr[j];
+        conteo[d]--;
     }
-    ```
+    // Actualiza el arreglo original con el nuevo orden
+    System.arraycopy(salida, 0, arr, 0, n);
+}
+```
 
-=== "C"
-
-    ```c
-    int max = maximo(a, n);
-    for (int exp = 1; max / exp > 0; exp *= 10) {
-        countingDigit(a, n, exp);
-    }
-    ```
+<!-- book-code:end -->
 
 ### Complejidad
 

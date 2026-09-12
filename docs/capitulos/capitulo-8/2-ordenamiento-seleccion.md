@@ -13,54 +13,58 @@ El ordenamiento por selección busca el elemento mínimo en el subarreglo no ord
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    para i ← 0 hasta n-2
-        mínimo ← i
-        buscar el menor en A[i+1:n]
-        intercambiar A[i] y A[mínimo]
-    ```
+Listado original del libro, página 327 (Java).
 
-=== "Python"
-
-    ```python
-    for i in range(len(a) - 1):
-        m = min(range(i, len(a)), key=a.__getitem__)
-        a[i], a[m] = a[m], a[i]
-    ```
-
-=== "Java"
-
-    ```java
-    for (int i = 0; i < a.length - 1; i++) {
-        int m = i;
-        for (int j = i + 1; j < a.length; j++) {
-            if (a[j] < a[m]) {
-                m = j;
+```java
+public static void ordenar(int[] arr) {
+    for (int i = 0; i < arr.length - 1; i++) {
+         // Candidato inicial
+        int max = 0;
+        for (int j = 1; j < arr.length - i; j++) {
+            if (arr[j] > arr[max]) { // Aplica el criterio
+                max = j;
             }
         }
-        int t = a[i];
-        a[i] = a[m];
-        a[m] = t;
+        // Intercambia el candidato con el extremo derecho
+        int temp = arr[max];
+        arr[max] = arr[arr.length - 1 - i];
+        arr[arr.length - 1 - i] = temp;
     }
-    ```
+}
+```
 
-=== "C"
+Listado original del libro, página 329 (Java).
 
-    ```c
-    for (int i = 0; i < n - 1; i++) {
-        int m = i;
-        for (int j = i + 1; j < n; j++) {
-            if (a[j] < a[m]) {
-                m = j;
-            }
+```java
+public static void ordenar(int[] arr) {
+    int a = 0, b = arr.length - 1;
+    while (a < b) {
+        int min = a, max = a;
+        for (int j = a; j <= b; j++) {
+            if (arr[j] < arr[min])
+                min = j;
+            if (arr[j] > arr[max])
+                max = j;
         }
-        int t = a[i];
-        a[i] = a[m];
-        a[m] = t;
+        // Intercambia el mínimo con el extremo izquierdo
+        int temp = arr[a];
+        arr[a] = arr[min];
+        arr[min] = temp;
+        if (max == a)
+            max = min;
+        // Intercambia el máximo con el extremo derecho
+        temp = arr[b];
+        arr[b] = arr[max];
+        arr[max] = temp;
+        a++;
+        b--;
     }
-    ```
+}
+```
+
+<!-- book-code:end -->
 
 ### Complejidad
 

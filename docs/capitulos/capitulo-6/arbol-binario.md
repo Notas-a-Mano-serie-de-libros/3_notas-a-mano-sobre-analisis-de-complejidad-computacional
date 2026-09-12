@@ -11,46 +11,24 @@
 
 #### Código
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función buscar(raíz, valor)
-        si raíz = nulo entonces retornar falso
-        si raíz.valor = valor entonces retornar verdadero
-        retornar buscar(raíz.izquierdo, valor) o buscar(raíz.derecho, valor)
-    ```
+Listado original del libro, página 254 (Java).
 
-=== "Python"
+```java
+public static boolean buscar(Nodo raiz, int valor) {
+    if (raiz == null)
+        return false;
+    if (valor == raiz.dato)
+        return true;
+    if (valor < raiz.dato)
+        return buscar(raiz.izquierdo, valor);
+    else
+        return buscar(raiz.derecho, valor);
+}
+```
 
-    ```python
-    def buscar(raiz, valor):
-        if raiz is None:
-            return False
-        if raiz.valor == valor:
-            return True
-        return buscar(raiz.izquierdo, valor) or buscar(raiz.derecho, valor)
-    ```
-
-=== "Java"
-
-    ```java
-    static boolean buscar(Nodo raiz, int valor) {
-        if (raiz == null) return false;
-        if (raiz.valor == valor) return true;
-        return buscar(raiz.izquierdo, valor) || buscar(raiz.derecho, valor);
-    }
-    ```
-
-=== "C"
-
-    ```c
-    bool buscar(const Nodo *raiz, int valor) {
-        if (raiz == NULL) return false;
-        if (raiz->valor == valor) return true;
-        return buscar(raiz->izquierdo, valor) ||
-               buscar(raiz->derecho, valor);
-    }
-    ```
+<!-- book-code:end -->
 
 #### Análisis
 

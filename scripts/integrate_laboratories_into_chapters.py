@@ -443,7 +443,7 @@ El resultado recursivo se calcula una sola vez y se reutiliza. Como el exponente
 T(n)=T(\lfloor n/2\rfloor)+\Theta(1)\in\Theta(\log_2(n)).
 \]
 
-La profundidad de llamadas sigue la misma cantidad de divisiones, de modo que \(S(n)\in\Theta(\log_2(n))\). Llamar dos veces a `potencia_rapida(x, n // 2)` cambiaría radicalmente el árbol y desperdiciaría el resultado compartido.
+La profundidad de llamadas sigue la misma cantidad de divisiones, de modo que \(S(n)\in\Theta(\log_2(n))\). Llamar dos veces a `potencia(a, absExponente / 2)` cambiaría radicalmente el árbol y desperdiciaría el resultado compartido.
 
 #### Simulación
 
@@ -1764,4 +1764,9 @@ if __name__ == "__main__":
         build_chapter(chapter_number)
         build_sectioned_chapter(chapter_number)
     sync_published_sections()
+    try:
+        from scripts.sync_book_code import sync
+    except ModuleNotFoundError:
+        from sync_book_code import sync
+    sync()
     print("Capítulos, botones de Colab y figuras de las explicaciones sincronizados.")

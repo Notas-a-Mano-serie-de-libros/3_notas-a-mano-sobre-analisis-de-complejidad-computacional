@@ -18,58 +18,13 @@ La cantidad de ramas generadas sigue la forma factorial, porque cada nivel reduc
 
 ---
 
-### Código del ejemplo
+### Código del libro asociado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función contarPermutaciones(A)
-        si longitud(A) ≤ 1 entonces retornar 1
-        total ← 0
-        para i ← 0 hasta longitud(A) - 1
-            total ← total + contarPermutaciones(A sin A[i])
-        retornar total
-    ```
+El libro no incluye un listado de implementación para este tema.
 
-=== "Python"
-
-    ```python
-    def contar_permutaciones(lista):
-        if len(lista) <= 1:
-            return 1
-        total = 0
-        for indice in range(len(lista)):
-            restante = lista[:indice] + lista[indice + 1:]
-            total += contar_permutaciones(restante)
-        return total
-    ```
-
-=== "Java"
-
-    ```java
-    static long contarPermutaciones(java.util.List<Integer> a) {
-        if (a.size() <= 1) return 1;
-        long total = 0;
-        for (int i = 0; i < a.size(); i++) {
-            var restante = new java.util.ArrayList<>(a);
-            restante.remove(i);
-            total += contarPermutaciones(restante);
-        }
-        return total;
-    }
-    ```
-
-=== "C"
-
-    ```c
-    long contarPermutaciones(int n) {
-        if (n <= 1) return 1;
-        long total = 0;
-        for (int i = 0; i < n; i++)
-            total += contarPermutaciones(n - 1);
-        return total;
-    }
-    ```
+<!-- book-code:end -->
 
 ### Simulación
 

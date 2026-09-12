@@ -13,50 +13,24 @@ El algoritmo recorre una matriz cuadrada de \(n\times n\). La matriz se prepara 
 
 ### Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    procedimiento recorrerMatriz(matriz)
-        para cada fila en matriz
-            para cada elemento en fila
-                visitar elemento
-    ```
+Listado original del libro, página 153 (Java).
 
-=== "Python"
-
-    ```python
-    def imprimir_matriz(matriz):
-        for fila in matriz:
-            for elemento in fila:
-                _ = elemento
-    ```
-
-=== "Java"
-
-    ```java
-    static void recorrerMatriz(int[][] matriz) {
-        for (int[] fila : matriz) {
-            for (int elemento : fila) {
-                int visitado = elemento;
-            }
+```java
+public static void imprimirMatriz(int[][] matriz) {
+    int m = matriz.length;
+    int n = m > 0 ? matriz[0].length : 0;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            System.out.println(matriz[i][j]);
         }
+        System.out.println();
     }
-    ```
+}
+```
 
-=== "C"
-
-    ```c
-    void recorrerMatriz(int filas, int columnas, int matriz[filas][columnas]) {
-        for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas; j++) {
-                int visitado = matriz[i][j];
-            }
-        }
-    }
-    ```
-
-
----
+<!-- book-code:end -->
 
 ### Análisis esperado
 

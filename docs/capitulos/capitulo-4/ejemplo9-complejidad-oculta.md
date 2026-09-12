@@ -13,63 +13,26 @@ El algoritmo de Fibonacci es iterativo, pero los enteros crecen con \(n\). La si
 
 ### Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función fibonacciGrande(n)
-        si n ≤ 1 entonces retornar n
-        a ← 0; b ← 1
-        para i ← 2 hasta n
-            (a, b) ← (b, a + b)
-        retornar b
-    ```
+Listado original del libro, página 167 (Java).
 
-=== "Python"
-
-    ```python
-    def fib_big(n):
-        if n <= 1:
-            return n
-        a, b = 0, 1
-        for _ in range(2, n + 1):
-            a, b = b, a + b
-        return b
-    ```
-
-=== "Java"
-
-    ```java
-    static java.math.BigInteger fibGrande(int n) {
-        if (n <= 1) return java.math.BigInteger.valueOf(n);
-        var a = java.math.BigInteger.ZERO;
-        var b = java.math.BigInteger.ONE;
-        for (int i = 2; i <= n; i++) {
-            var siguiente = a.add(b);
-            a = b; b = siguiente;
-        }
-        return b;
+```java
+public BigInteger fibonacciBigInteger(int n) {
+    if (n <= 1)
+        return BigInteger.valueOf(n);
+    BigInteger a = BigInteger.ZERO;
+    BigInteger b = BigInteger.ONE;
+    for (int i = 2; i <= n; i++) {
+        BigInteger c = a.add(b);
+        a = b;
+        b = c;
     }
-    ```
+    return b;
+}
+```
 
-=== "C"
-
-    ```c
-    /* Para conservar enteros arbitrariamente grandes se usa GMP. */
-    void fibGrande(unsigned n, mpz_t resultado) {
-        mpz_t a, b, siguiente;
-        mpz_inits(a, b, siguiente, NULL);
-        mpz_set_ui(b, 1);
-        for (unsigned i = 2; i <= n; i++) {
-            mpz_add(siguiente, a, b);
-            mpz_set(a, b); mpz_set(b, siguiente);
-        }
-        mpz_set(resultado, n == 0 ? a : b);
-        mpz_clears(a, b, siguiente, NULL);
-    }
-    ```
-
-
----
+<!-- book-code:end -->
 
 ### Análisis esperado
 

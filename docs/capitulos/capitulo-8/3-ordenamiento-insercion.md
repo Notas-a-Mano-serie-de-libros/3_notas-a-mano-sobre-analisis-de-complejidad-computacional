@@ -15,50 +15,25 @@ Es muy eficiente para arreglos casi ordenados (O(n) en el mejor caso) y es el al
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    para i ← 1 hasta n-1
-        clave ← A[i]; j ← i-1
-        desplazar valores mayores que clave
-        insertar clave en j+1
-    ```
+Listado original del libro, página 333 (Java).
 
-=== "Python"
-
-    ```python
-    for i in range(1, len(a)):
-        key, j = a[i], i - 1
-        while j >= 0 and a[j] > key:
-            a[j + 1], j = a[j], j - 1
-        a[j + 1] = key
-    ```
-
-=== "Java"
-
-    ```java
-    for (int i = 1; i < a.length; i++) {
-        int k = a[i];
-        int j = i - 1;
-        while (j >= 0 && a[j] > k) {
-            a[j + 1] = a[j--];
+```java
+public static void ordenar(int[] arr) {
+    for (int i = 1; i < arr.length; i++) {
+        int clave = arr[i], j = i - 1;
+         // Aplica el criterio
+        while (j >= 0 && arr[j] > clave) {
+            arr[j + 1] = arr[j];
+            j--;
         }
-        a[j + 1] = k;
+        arr[j + 1] = clave;
     }
-    ```
+}
+```
 
-=== "C"
-
-    ```c
-    for (int i = 1; i < n; i++) {
-        int k = a[i];
-        int j = i - 1;
-        while (j >= 0 && a[j] > k) {
-            a[j + 1] = a[j--];
-        }
-        a[j + 1] = k;
-    }
-    ```
+<!-- book-code:end -->
 
 ### Complejidad
 

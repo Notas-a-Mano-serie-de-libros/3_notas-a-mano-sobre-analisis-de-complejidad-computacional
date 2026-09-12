@@ -18,51 +18,26 @@ La estructura de dos ciclos anidados hace que el número de accesos crezca cuadr
 
 ---
 
-### Código del ejemplo
+### Código del libro asociado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función sumarMatriz(M)
-        suma ← 0
-        para cada fila en M
-            para cada valor en fila
-                suma ← suma + valor
-        retornar suma
-    ```
+Listado original del libro, página 153 (Java).
 
-=== "Python"
-
-    ```python
-    def recorrer_matriz(matriz):
-        suma = 0
-        for fila in matriz:
-            for valor in fila:
-                suma += valor
-        return suma
-    ```
-
-=== "Java"
-
-    ```java
-    static long sumarMatriz(int[][] m) {
-        long suma = 0;
-        for (int[] fila : m)
-            for (int valor : fila) suma += valor;
-        return suma;
+```java
+public static void imprimirMatriz(int[][] matriz) {
+    int m = matriz.length;
+    int n = m > 0 ? matriz[0].length : 0;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            System.out.println(matriz[i][j]);
+        }
+        System.out.println();
     }
-    ```
+}
+```
 
-=== "C"
-
-    ```c
-    long sumarMatriz(int filas, int columnas, int m[filas][columnas]) {
-        long suma = 0;
-        for (int i = 0; i < filas; i++)
-            for (int j = 0; j < columnas; j++) suma += m[i][j];
-        return suma;
-    }
-    ```
+<!-- book-code:end -->
 
 ### Simulación
 

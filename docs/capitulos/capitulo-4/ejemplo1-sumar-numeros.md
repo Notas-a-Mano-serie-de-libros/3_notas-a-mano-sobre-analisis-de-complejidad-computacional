@@ -13,38 +13,17 @@ Este ejemplo analiza una secuencia de una sola operación aritmética. El tamañ
 
 ### Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función sumar(a, b)
-        retornar a + b
-    ```
+Listado original del libro, página 150 (Java).
 
-=== "Python"
+```java
+public static int sumar(int a, int b) {
+    return a + b;
+}
+```
 
-    ```python
-    def sumar(a, b):
-        return a + b
-    ```
-
-=== "Java"
-
-    ```java
-    static double sumar(double a, double b) {
-        return a + b;
-    }
-    ```
-
-=== "C"
-
-    ```c
-    double sumar(double a, double b) {
-        return a + b;
-    }
-    ```
-
-
----
+<!-- book-code:end -->
 
 ### Análisis esperado
 

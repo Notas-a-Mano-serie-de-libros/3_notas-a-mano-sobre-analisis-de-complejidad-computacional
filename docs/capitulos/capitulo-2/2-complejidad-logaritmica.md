@@ -18,66 +18,29 @@ Si el valor central no es el buscado, la mitad que no puede contener la respuest
 
 ---
 
-### Código del ejemplo
+### Código del libro asociado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función búsquedaBinaria(A, objetivo)
-        bajo ← 0; alto ← longitud(A) - 1
-        mientras bajo ≤ alto
-            medio ← ⌊(bajo + alto) / 2⌋
-            si A[medio] = objetivo entonces retornar medio
-            si A[medio] < objetivo entonces bajo ← medio + 1
-            en otro caso alto ← medio - 1
-        retornar -1
-    ```
+Listado original del libro, página 268 (Java).
 
-=== "Python"
-
-    ```python
-    def busqueda_binaria(lista, objetivo):
-        bajo, alto = 0, len(lista) - 1
-        while bajo <= alto:
-            medio = (bajo + alto) // 2
-            if lista[medio] == objetivo:
-                return medio
-            if lista[medio] < objetivo:
-                bajo = medio + 1
-            else:
-                alto = medio - 1
-        return -1
-    ```
-
-=== "Java"
-
-    ```java
-    static int busquedaBinaria(int[] a, int objetivo) {
-        int bajo = 0, alto = a.length - 1;
-        while (bajo <= alto) {
-            int medio = bajo + (alto - bajo) / 2;
-            if (a[medio] == objetivo) return medio;
-            if (a[medio] < objetivo) bajo = medio + 1;
-            else alto = medio - 1;
-        }
-        return -1;
+```java
+public boolean buscar(int[] arr, int a, int b, int x) {
+    while (a <= b) {
+        // Posición en la mitad del rango [a,b]
+        int m = a + (b - a) / 2;
+        if (arr[m] == x)
+            return true; // Elemento encontrado
+        else if (x > arr[m])
+            a = m + 1; // Buscar en la mitad derecha
+        else
+            b = m - 1; // Buscar en la mitad izquierda
     }
-    ```
+    return false; // Elemento no encontrado
+}
+```
 
-=== "C"
-
-    ```c
-    int busquedaBinaria(const int a[], int n, int objetivo) {
-        int bajo = 0, alto = n - 1;
-        while (bajo <= alto) {
-            int medio = bajo + (alto - bajo) / 2;
-            if (a[medio] == objetivo) return medio;
-            if (a[medio] < objetivo) bajo = medio + 1;
-            else alto = medio - 1;
-        }
-        return -1;
-    }
-    ```
+<!-- book-code:end -->
 
 ### Simulación
 

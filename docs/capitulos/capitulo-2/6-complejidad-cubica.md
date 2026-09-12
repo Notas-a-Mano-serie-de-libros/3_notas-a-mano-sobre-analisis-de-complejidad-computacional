@@ -18,57 +18,28 @@ Como los tres recorridos dependen de \(n\), el número total de operaciones crec
 
 ---
 
-### Código del ejemplo
+### Código del libro asociado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función multiplicar(A, B, n)
-        C ← matriz n × n inicializada en 0
-        para i ← 0 hasta n - 1
-            para j ← 0 hasta n - 1
-                para k ← 0 hasta n - 1
-                    C[i,j] ← C[i,j] + A[i,k] × B[k,j]
-        retornar C
-    ```
+Listado original del libro, página 177 (Java).
 
-=== "Python"
-
-    ```python
-    def multiplicar_matrices(a, b):
-        n = len(a)
-        c = [[0] * n for _ in range(n)]
-        for i in range(n):
-            for j in range(n):
-                for k in range(n):
-                    c[i][j] += a[i][k] * b[k][j]
-        return c
-    ```
-
-=== "Java"
-
-    ```java
-    static int[][] multiplicar(int[][] a, int[][] b) {
-        int n = a.length;
-        int[][] c = new int[n][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                for (int k = 0; k < n; k++) c[i][j] += a[i][k] * b[k][j];
-        return c;
-    }
-    ```
-
-=== "C"
-
-    ```c
-    void multiplicar(int n, int a[n][n], int b[n][n], int c[n][n]) {
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++) {
-                c[i][j] = 0;
-                for (int k = 0; k < n; k++) c[i][j] += a[i][k] * b[k][j];
+```java
+public int[][] multiplicar(int[][] a, int[][] b) {
+    int n = a.length;
+    int[][] resultado = new int[n][n];
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < n; k++) {
+                resultado[i][j] += a[i][k] * b[k][j];
             }
+        }
     }
-    ```
+    return resultado;
+}
+```
+
+<!-- book-code:end -->
 
 ### Simulación
 

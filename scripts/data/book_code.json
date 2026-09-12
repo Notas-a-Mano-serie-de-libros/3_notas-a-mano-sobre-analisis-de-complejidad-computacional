@@ -1,0 +1,248 @@
+{
+  "source": "3__Notas_a_mano_sobre_análisis_de_complejidad_computacional-2.pdf",
+  "source_sha256": "d7c02a0407e98c9e1c0464748ba4d24bd7509dfcfb27304cde0d94e29519aa84",
+  "pages": {
+    "capitulo-2/1-complejidad-constante.md": [
+      {
+        "folio": 148,
+        "code": "arr[i]; //Accede al elemento i del arreglo \"arr\"\nm[i][j]; //Accede al elemento i,j del de la matriz \"m\""
+      }
+    ],
+    "capitulo-2/2-complejidad-logaritmica.md": [
+      {
+        "folio": 268,
+        "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b) {\n        // Posición en la mitad del rango [a,b]\n        int m = a + (b - a) / 2;\n        if (arr[m] == x)\n            return true; // Elemento encontrado\n        else if (x > arr[m])\n            a = m + 1; // Buscar en la mitad derecha\n        else\n            b = m - 1; // Buscar en la mitad izquierda\n    }\n    return false; // Elemento no encontrado\n}"
+      }
+    ],
+    "capitulo-2/3-complejidad-lineal.md": [
+      {
+        "folio": 262,
+        "code": "public boolean buscar(int[] arr, int x) {\n    for (int i = 0; i < arr.length; i++) {\n        if (arr[i] == x)\n            return true;\n    }\n    return false;\n}"
+      }
+    ],
+    "capitulo-2/4-complejidad-log-lineal.md": [
+      {
+        "folio": 247,
+        "code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    int m = a + (b - a) / 2;\n    ordenar(arr, a, m);\n    ordenar(arr, m + 1, b);\n    combinar(arr, a, m, b);\n}\npublic void combinar(int[] arr, int a, int m, int b) {\n    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);\n    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);\n    int i = 0, j = 0, k = a;\n    while (i < izquierda.length && j < derecha.length) {\n        if (izquierda[i] <= derecha[j])\n            arr[k++] = izquierda[i++];\n        else\n            arr[k++] = derecha[j++];\n    }\n    while (i < izquierda.length)\n        arr[k++] = izquierda[i++];\n    while (j < derecha.length)\n        arr[k++] = derecha[j++];\n}"
+      }
+    ],
+    "capitulo-2/5-complejidad-cuadratica.md": [
+      {
+        "folio": 153,
+        "code": "public static void imprimirMatriz(int[][] matriz) {\n    int m = matriz.length;\n    int n = m > 0 ? matriz[0].length : 0;\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j++) {\n            System.out.println(matriz[i][j]);\n        }\n        System.out.println();\n    }\n}"
+      }
+    ],
+    "capitulo-2/6-complejidad-cubica.md": [
+      {
+        "folio": 177,
+        "code": "public int[][] multiplicar(int[][] a, int[][] b) {\n    int n = a.length;\n    int[][] resultado = new int[n][n];\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < n; j++) {\n            for (int k = 0; k < n; k++) {\n                resultado[i][j] += a[i][k] * b[k][j];\n            }\n        }\n    }\n    return resultado;\n}"
+      }
+    ],
+    "capitulo-2/8-complejidad-exponencial.md": [
+      {
+        "folio": 234,
+        "code": "public static int fibonacci(int n) {\n    if (n == 0)\n        return 0;\n    else if (n == 1)\n        return 1;\n    else\n        return fibonacci(n-1) + fibonacci(n-2);\n}"
+      }
+    ],
+    "capitulo-2/9-complejidad-factorial.md": [],
+    "capitulo-4/ejemplo1-sumar-numeros.md": [
+      {
+        "folio": 150,
+        "code": "public static int sumar(int a, int b) {\n    return a + b;\n}"
+      }
+    ],
+    "capitulo-4/ejemplo2-imprimir-elementos-arreglo.md": [
+      {
+        "folio": 151,
+        "code": "public static void imprimirElementos(int[] arr) {\n    for (int i = 0; i < arr.length; i++) {\n        System.out.println(arr[i]);\n    }\n}"
+      }
+    ],
+    "capitulo-4/ejemplo3-imprimir-elementos-matriz.md": [
+      {
+        "folio": 153,
+        "code": "public static void imprimirMatriz(int[][] matriz) {\n    int m = matriz.length;\n    int n = m > 0 ? matriz[0].length : 0;\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j++) {\n            System.out.println(matriz[i][j]);\n        }\n        System.out.println();\n    }\n}"
+      }
+    ],
+    "capitulo-4/ejemplo4-inicializar-matriz-variable.md": [
+      {
+        "folio": 156,
+        "code": "public static int[][] inicializarMatriz(int m, int n) {\n    int matriz = new int[m][n];\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j++) {\n            matriz[i][j] = 1;\n        }\n    }\n    return matriz;\n}"
+      }
+    ],
+    "capitulo-4/ejemplo5-ciclos-incremento-no-lineal.md": [
+      {
+        "folio": 158,
+        "code": "public static void recorrerMatrizVacia(int m, int n) {\n    int[][] matriz = new int[m][n];\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j+=2) {\n            // Sin operaciones internas en este ciclo\n        }\n    }\n}"
+      }
+    ],
+    "capitulo-4/ejemplo6.md": [
+      {
+        "folio": 161,
+        "code": "public static void imprimirElementos(int m, int n) {\n    for (int i = 0; i < m; i++) {\n        System.out.println(i);\n        for (int j = 0; j < n; j++) {\n            System.out.println(j);\n        }\n        for (int k = n; k > 1; k = k/2) {\n            System.out.println(k);\n            foo2();\n        }\n        foo1();\n    }\n}"
+      }
+    ],
+    "capitulo-4/ejemplo7-ciclo-sin-dependencia.md": [
+      {
+        "folio": 164,
+        "code": "public static void iterar() {\n    for (int i = 0; i < 10000000; i++) {\n        System.out.println(i);\n    }\n}"
+      }
+    ],
+    "capitulo-4/ejemplo8.md": [
+      {
+        "folio": 166,
+        "code": "public static void cicloFijo(int n) {\n    for (int i = 0; i < 1000; i++) {\n        foo(n);\n    }\n}"
+      }
+    ],
+    "capitulo-4/ejemplo9-complejidad-oculta.md": [
+      {
+        "folio": 167,
+        "code": "public BigInteger fibonacciBigInteger(int n) {\n    if (n <= 1)\n        return BigInteger.valueOf(n);\n    BigInteger a = BigInteger.ZERO;\n    BigInteger b = BigInteger.ONE;\n    for (int i = 2; i <= n; i++) {\n        BigInteger c = a.add(b);\n        a = b;\n        b = c;\n    }\n    return b;\n}"
+      }
+    ],
+    "capitulo-4/ejemplo10.md": [
+      {
+        "folio": 170,
+        "code": "if (g(n)) {\n    // Se cumple g(n)\n} else if (h(n)) {\n    // Se cumple h(n)\n} else {\n    r(n);\n}"
+      },
+      {
+        "folio": 170,
+        "code": "if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n} else {\n    r(n);\n}"
+      },
+      {
+        "folio": 171,
+        "code": "if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n} else {\n    s(n); // O(1)\n}"
+      },
+      {
+        "folio": 172,
+        "code": "if (!h(n) && !g(n)) {\n    s(n);\n} else if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n}"
+      },
+      {
+        "folio": 173,
+        "code": "if (var) {\n    s(n);\n} else if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n}"
+      }
+    ],
+    "capitulo-6/factorial.md": [
+      {
+        "folio": 229,
+        "code": "public static int factorial(int n) {\n    if (n <= 1)\n        return 1;\n    else\n        return n * factorial(n-1);\n}"
+      }
+    ],
+    "capitulo-6/fibonacci.md": [
+      {
+        "folio": 234,
+        "code": "public static int fibonacci(int n) {\n    if (n == 0)\n        return 0;\n    else if (n == 1)\n        return 1;\n    else\n        return fibonacci(n-1) + fibonacci(n-2);\n}"
+      },
+      {
+        "folio": 242,
+        "code": "public static int fibonacci(int n) {\n    if (n <= 1)\n        return n;\n    int a = 0, b = 1;\n    for (int i = 2; i <= n; i++) {\n        int c = a + b;\n        a = b;\n        b = c;\n    }\n    return b;\n}"
+      }
+    ],
+    "capitulo-6/potencia.md": [
+      {
+        "folio": 243,
+        "code": "public static double potencia(int a, int n) {\n    if (n == 0)\n        return 1;\n    int absExponente = Math.abs(n);\n    double mitad = potencia(a, absExponente / 2);\n    if (absExponente % 2 == 0)\n        mitad = mitad * mitad;\n    else\n        mitad = mitad * mitad * a;\n    return n < 0 ? 1.0 / mitad : mitad;\n}"
+      }
+    ],
+    "capitulo-6/merge-sort.md": [
+      {
+        "folio": 247,
+        "code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    int m = a + (b - a) / 2;\n    ordenar(arr, a, m);\n    ordenar(arr, m + 1, b);\n    combinar(arr, a, m, b);\n}\npublic void combinar(int[] arr, int a, int m, int b) {\n    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);\n    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);\n    int i = 0, j = 0, k = a;\n    while (i < izquierda.length && j < derecha.length) {\n        if (izquierda[i] <= derecha[j])\n            arr[k++] = izquierda[i++];\n        else\n            arr[k++] = derecha[j++];\n    }\n    while (i < izquierda.length)\n        arr[k++] = izquierda[i++];\n    while (j < derecha.length)\n        arr[k++] = derecha[j++];\n}"
+      }
+    ],
+    "capitulo-6/arbol-binario.md": [
+      {
+        "folio": 254,
+        "code": "public static boolean buscar(Nodo raiz, int valor) {\n    if (raiz == null)\n        return false;\n    if (valor == raiz.dato)\n        return true;\n    if (valor < raiz.dato)\n        return buscar(raiz.izquierdo, valor);\n    else\n        return buscar(raiz.derecho, valor);\n}"
+      }
+    ],
+    "capitulo-7/1-busqueda-secuencial.md": [
+      {
+        "folio": 262,
+        "code": "public boolean buscar(int[] arr, int x) {\n    for (int i = 0; i < arr.length; i++) {\n        if (arr[i] == x)\n            return true;\n    }\n    return false;\n}"
+      }
+    ],
+    "capitulo-7/2-busqueda-binaria.md": [
+      {
+        "folio": 268,
+        "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b) {\n        // Posición en la mitad del rango [a,b]\n        int m = a + (b - a) / 2;\n        if (arr[m] == x)\n            return true; // Elemento encontrado\n        else if (x > arr[m])\n            a = m + 1; // Buscar en la mitad derecha\n        else\n            b = m - 1; // Buscar en la mitad izquierda\n    }\n    return false; // Elemento no encontrado\n}"
+      },
+      {
+        "folio": 273,
+        "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    if (a > b)\n        return false; // Elemento no encontrado\n    int m = a + (b - a) / 2;\n    if (arr[m] == x)\n        return true; // Elemento encontrado\n    else if (x > arr[m])\n        return buscar(arr, m + 1, b, x); // Busca a la derecha\n    else\n        return buscar(arr, a, m - 1, x); // Busca a la izquierda\n}"
+      }
+    ],
+    "capitulo-7/3-busqueda-interpolacion.md": [
+      {
+        "folio": 278,
+        "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b && x >= arr[a] && x <= arr[b]) {\n        int num = (b - a) * (x - arr[a]);\n        int den = arr[b] - arr[a];\n        // Estima el elemento\n        int p = a + (num / den);\n        if (arr[p] == x)\n            return true;\n        else if (x > arr[p])\n            a = p + 1; // Buscar a la derecha del elemento\n        else\n            b = p - 1; // Buscar a la izquierda del elemento\n    }\n    // Elemento no encontrado\n    return false;\n}"
+      }
+    ],
+    "capitulo-7/4-busqueda-saltos.md": [
+      {
+        "folio": 290,
+        "code": "public boolean buscar(int[] arr, int x) {\n    int n = arr.length, anterior = 0;\n    int paso = (int) Math.floor(Math.sqrt(n)), delta = paso;\n    // Avanzar en saltos hasta encontrar el rango\n    while (arr[Math.min(delta, n) - 1] < x) {\n        anterior = delta;\n        delta += paso;\n        if (anterior >= n)\n            return false; // Elemento fuera del rango de búsqueda\n    }\n    // Realiza la búsqueda lineal en el rango identificado\n    for (int i = anterior; i < Math.min(delta, n); i++) {\n        if (arr[i] == x)\n            return true; // Elemento encontrado\n    }\n    return false; // Elemento no encontrado\n}"
+      }
+    ],
+    "capitulo-7/5-busqueda-exponencial.md": [
+      {
+        "folio": 298,
+        "code": "public boolean buscar(int[] arr, int x) {\n    int n = arr.length;\n    // Verificar si el primer elemento es el buscado\n    if (arr[0] == x)\n        return true;\n    // Encuentra el rango utilizando crecimiento exponencial\n    int i = 1;\n    while (i < n && arr[i] <= x)\n        i *= 2;\n    // Determina los limites y ejecuta la búsqueda binaria\n    int a = i/2;\n    int b = Math.min(i, n - 1);\n    // Invoca la función que aplica la búsqueda\n    return busquedaBinaria(arr, a, b, x);\n}"
+      }
+    ],
+    "capitulo-7/6-busqueda-ternaria.md": [
+      {
+        "folio": 307,
+        "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n     // Agota el espacio de búsqueda\n    if (a > b)\n        return false;\n    int m1 = a + (b - a) / 3;\n    int m2 = b - (int) Math.ceil((b - a) / 3.0);\n    // Verificar si el valor está en los pivotes\n    if (arr[m1] == x || arr[m2] == x)\n        return true;\n    if (x < arr[m1])\n        return buscar(arr, a, m1 - 1, x);\n    else if (x > arr[m2])\n        return buscar(arr, m2 + 1, b, x);\n    else\n        return buscar(arr, m1 + 1, m2 - 1, x);\n}"
+      },
+      {
+        "folio": 312,
+        "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b) {\n        int m1 = a + (b - a) / 3;\n        int m2 = b - (int) Math.ceil((b - a) / 3.0);\n        if (arr[m1] == x || arr[m2] == x)\n            return true;\n        if (x < arr[m1])\n            b = m1 - 1; // Buscar en el primer tercio\n        else if (x > arr[m2])\n            a = m2 + 1; // Buscar en el último tercio\n        else {\n            a = m1 + 1; // Buscar en el tercio central\n            b = m2 - 1;\n        }\n    }\n    // Elemento no encontrado\n    return false;\n}"
+      }
+    ],
+    "capitulo-8/1-ordenamiento-burbuja.md": [
+      {
+        "folio": 321,
+        "code": "public void ordenar(int[] arr) {\n    for (int i = 0; i < arr.length - 1; i++) {\n        for (int j = 0; j < arr.length - 1 - i; j++) {\n            if (arr[j] > arr[j + 1]) {\n                int temp = arr[j];\n                arr[j] = arr[j + 1];\n                arr[j + 1] = temp;\n            }\n        }\n    }\n}"
+      },
+      {
+        "folio": 323,
+        "code": "public void ordenar(int[] arr) {\n    for (int i = arr.length - 1; i > 0; i--) {\n        boolean intercambiado = false; // Bandera de control\n        for (int j = 0; j < i; j++) {\n            if (arr[j] > arr[j + 1]) {\n                int temp = arr[j];\n                arr[j] = arr[j + 1];\n                arr[j + 1] = temp;\n                intercambiado = true;\n            }\n        }\n        // El arreglo se considera ordenado\n        if (!intercambiado)\n            break;\n    }\n}"
+      }
+    ],
+    "capitulo-8/2-ordenamiento-seleccion.md": [
+      {
+        "folio": 327,
+        "code": "public static void ordenar(int[] arr) {\n    for (int i = 0; i < arr.length - 1; i++) {\n         // Candidato inicial\n        int max = 0;\n        for (int j = 1; j < arr.length - i; j++) {\n            if (arr[j] > arr[max]) { // Aplica el criterio\n                max = j;\n            }\n        }\n        // Intercambia el candidato con el extremo derecho\n        int temp = arr[max];\n        arr[max] = arr[arr.length - 1 - i];\n        arr[arr.length - 1 - i] = temp;\n    }\n}"
+      },
+      {
+        "folio": 329,
+        "code": "public static void ordenar(int[] arr) {\n    int a = 0, b = arr.length - 1;\n    while (a < b) {\n        int min = a, max = a;\n        for (int j = a; j <= b; j++) {\n            if (arr[j] < arr[min])\n                min = j;\n            if (arr[j] > arr[max])\n                max = j;\n        }\n        // Intercambia el mínimo con el extremo izquierdo\n        int temp = arr[a];\n        arr[a] = arr[min];\n        arr[min] = temp;\n        if (max == a)\n            max = min;\n        // Intercambia el máximo con el extremo derecho\n        temp = arr[b];\n        arr[b] = arr[max];\n        arr[max] = temp;\n        a++;\n        b--;\n    }\n}"
+      }
+    ],
+    "capitulo-8/3-ordenamiento-insercion.md": [
+      {
+        "folio": 333,
+        "code": "public static void ordenar(int[] arr) {\n    for (int i = 1; i < arr.length; i++) {\n        int clave = arr[i], j = i - 1;\n         // Aplica el criterio\n        while (j >= 0 && arr[j] > clave) {\n            arr[j + 1] = arr[j];\n            j--;\n        }\n        arr[j + 1] = clave;\n    }\n}"
+      }
+    ],
+    "capitulo-8/4-ordenamiento-shell.md": [],
+    "capitulo-8/5-ordenamiento-mezcla.md": [
+      {
+        "folio": 341,
+        "code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    // Calcula el pivote que separa el arreglo en dos\n    int m = a + (b - a) / 2;\n    // Etapa de división\n    ordenar(arr, a, m);\n    ordenar(arr, m + 1, b);\n    // Etapa de combinación\n    combinar(arr, a, m, b);\n}\npublic void combinar(int[] arr, int a, int m, int b) {\n    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);\n    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);\n    int i = 0, j = 0, k = a;\n    while (i < izquierda.length && j < derecha.length) {\n        if (izquierda[i] <= derecha[j])\n            arr[k++] = izquierda[i++];\n        else\n            arr[k++] = derecha[j++];\n    }\n    while (i < izquierda.length)\n        arr[k++] = izquierda[i++];\n    while (j < derecha.length)\n        arr[k++] = derecha[j++];\n}"
+      }
+    ],
+    "capitulo-8/6-ordenamiento-rapido.md": [
+      {
+        "folio": 349,
+        "code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    int p = particionar(arr, a, b);\n    ordenar(arr, a, p - 1);\n    ordenar(arr, p + 1, b);\n}\npublic int particionar(int[] arr, int a, int b) {\n    int pivote = arr[a], i = a + 1, j = b;\n    while (i <= j) {\n        while (i <= j && arr[i] < pivote)\n            i++;\n        while (i <= j && arr[j] > pivote)\n            j--;\n        if (i <= j) {\n            int temp = arr[i];\n            arr[i] = arr[j];\n            arr[j] = temp;\n            i++;\n            j--;\n        }\n    }\n    int temp = arr[a];\n    arr[a] = arr[j];\n    arr[j] = temp;\n    return j;\n}"
+      }
+    ],
+    "capitulo-8/7-ordenamiento-radix.md": [
+      {
+        "folio": 363,
+        "code": "public void ordenar(int[] arr) {\n    // Obtiene el elemento más grande del arreglo\n    int max = Arrays.stream(arr).max().getAsInt();\n    // Obtiene la cantidad de dígitos (iteraciones)\n    int d = (int) Math.floor(Math.log10(max)) + 1;\n    for (int i = 1; i <= d; i++)\n        ordenarPorDigito(arr, i);\n}\npublic void ordenarPorDigito(int[] arr, int i) {\n    int n = arr.length;\n    int exp = (int) Math.pow(10, i - 1);\n    // Arreglo que representa los buckets (b=10)\n    int[] conteo = new int[10];\n    // Arreglo parcialmente ordenado\n    int[] salida = new int[n];\n    // Paso 1: Cuenta elementos por bucket\n    for (int valor : arr)\n        conteo[(valor / exp) % 10]++;\n    // Paso 2: Calcula la suma acumulada\n    for (int j = 1; j < 10; j++)\n        conteo[j] += conteo[j - 1];\n    // Paso 3: Inserta los elementos en la nueva posición\n    for (int j = n - 1; j >= 0; j--) {\n        int d = (arr[j] / exp) % 10;\n        salida[conteo[d] - 1] = arr[j];\n        conteo[d]--;\n    }\n    // Actualiza el arreglo original con el nuevo orden\n    System.arraycopy(salida, 0, arr, 0, n);\n}"
+      }
+    ]
+  }
+}

@@ -15,50 +15,46 @@ Es el algoritmo de ordenamiento más intuitivo pero también el menos eficiente 
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    para fin ← n-1 hasta 1
-        para i ← 0 hasta fin-1
-            si A[i] > A[i+1] intercambiar
-    ```
+Listado original del libro, página 321 (Java).
 
-=== "Python"
-
-    ```python
-    for end in range(len(a) - 1, 0, -1):
-        for i in range(end):
-            if a[i] > a[i + 1]:
-                a[i], a[i + 1] = a[i + 1], a[i]
-    ```
-
-=== "Java"
-
-    ```java
-    for (int e = a.length - 1; e > 0; e--) {
-        for (int i = 0; i < e; i++) {
-            if (a[i] > a[i + 1]) {
-                int t = a[i];
-                a[i] = a[i + 1];
-                a[i + 1] = t;
+```java
+public void ordenar(int[] arr) {
+    for (int i = 0; i < arr.length - 1; i++) {
+        for (int j = 0; j < arr.length - 1 - i; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
             }
         }
     }
-    ```
+}
+```
 
-=== "C"
+Listado original del libro, página 323 (Java).
 
-    ```c
-    for (int e = n - 1; e > 0; e--) {
-        for (int i = 0; i < e; i++) {
-            if (a[i] > a[i + 1]) {
-                int t = a[i];
-                a[i] = a[i + 1];
-                a[i + 1] = t;
+```java
+public void ordenar(int[] arr) {
+    for (int i = arr.length - 1; i > 0; i--) {
+        boolean intercambiado = false; // Bandera de control
+        for (int j = 0; j < i; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+                intercambiado = true;
             }
         }
+        // El arreglo se considera ordenado
+        if (!intercambiado)
+            break;
     }
-    ```
+}
+```
+
+<!-- book-code:end -->
 
 ### Complejidad
 

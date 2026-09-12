@@ -44,75 +44,30 @@ Para distribuciones uniformes alcanza O(log(log(n))) en el caso promedio, lo que
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    mientras bajo ≤ alto y x está entre A[bajo] y A[alto]
-        p ← bajo + (x-A[bajo])(alto-bajo)/(A[alto]-A[bajo])
-        comparar A[p] y acotar el intervalo
-    retornar -1
-    ```
+Listado original del libro, página 278 (Java).
 
-=== "Python"
-
-    ```python
-    lo, hi = 0, len(a) - 1
-    while lo <= hi and a[lo] <= x <= a[hi]:
-        if a[hi] == a[lo]:
-            return lo if a[lo] == x else -1
-        p = lo + (x - a[lo]) * (hi - lo) // (a[hi] - a[lo])
-        if a[p] == x:
-            return p
-        if a[p] < x:
-            lo = p + 1
-        else:
-            hi = p - 1
-    return -1
-    ```
-
-=== "Java"
-
-    ```java
-    int lo = 0;
-    int hi = a.length - 1;
-    while (lo <= hi && x >= a[lo] && x <= a[hi]) {
-        if (a[hi] == a[lo]) {
-            return a[lo] == x ? lo : -1;
-        }
-        int p = lo + (x - a[lo]) * (hi - lo) / (a[hi] - a[lo]);
-        if (a[p] == x) {
-            return p;
-        }
-        if (a[p] < x) {
-            lo = p + 1;
-        } else {
-            hi = p - 1;
-        }
+```java
+public boolean buscar(int[] arr, int a, int b, int x) {
+    while (a <= b && x >= arr[a] && x <= arr[b]) {
+        int num = (b - a) * (x - arr[a]);
+        int den = arr[b] - arr[a];
+        // Estima el elemento
+        int p = a + (num / den);
+        if (arr[p] == x)
+            return true;
+        else if (x > arr[p])
+            a = p + 1; // Buscar a la derecha del elemento
+        else
+            b = p - 1; // Buscar a la izquierda del elemento
     }
-    return -1;
-    ```
+    // Elemento no encontrado
+    return false;
+}
+```
 
-=== "C"
-
-    ```c
-    int lo = 0;
-    int hi = n - 1;
-    while (lo <= hi && x >= a[lo] && x <= a[hi]) {
-        if (a[hi] == a[lo]) {
-            return a[lo] == x ? lo : -1;
-        }
-        int p = lo + (x - a[lo]) * (hi - lo) / (a[hi] - a[lo]);
-        if (a[p] == x) {
-            return p;
-        }
-        if (a[p] < x) {
-            lo = p + 1;
-        } else {
-            hi = p - 1;
-        }
-    }
-    return -1;
-    ```
+<!-- book-code:end -->
 
 ### Complejidad: versión iterativa y versión recursiva
 

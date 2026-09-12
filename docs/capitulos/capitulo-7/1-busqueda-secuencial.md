@@ -13,44 +13,21 @@ La búsqueda secuencial (o lineal) recorre el arreglo posición por posición, c
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    para i ← 0 hasta longitud(A)-1
-        si A[i] = x entonces retornar i
-    retornar -1
-    ```
+Listado original del libro, página 262 (Java).
 
-=== "Python"
-
-    ```python
-    for i, v in enumerate(a):
-        if v == x:
-            return i
-    return -1
-    ```
-
-=== "Java"
-
-    ```java
-    for (int i = 0; i < a.length; i++) {
-        if (a[i] == x) {
-            return i;
-        }
+```java
+public boolean buscar(int[] arr, int x) {
+    for (int i = 0; i < arr.length; i++) {
+        if (arr[i] == x)
+            return true;
     }
-    return -1;
-    ```
+    return false;
+}
+```
 
-=== "C"
-
-    ```c
-    for (int i = 0; i < n; i++) {
-        if (a[i] == x) {
-            return i;
-        }
-    }
-    return -1;
-    ```
+<!-- book-code:end -->
 
 ### Complejidad: versión iterativa y versión recursiva
 

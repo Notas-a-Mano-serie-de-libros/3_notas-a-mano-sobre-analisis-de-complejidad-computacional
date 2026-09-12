@@ -11,48 +11,37 @@
 
 #### Código
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función mergeSort(A)
-        si longitud(A) ≤ 1 entonces retornar A
-        m ← ⌊longitud(A) / 2⌋
-        retornar combinar(mergeSort(A[0:m]), mergeSort(A[m:]))
-    ```
+Listado original del libro, página 247 (Java).
 
-=== "Python"
-
-    ```python
-    def merge_sort(a):
-        if len(a) <= 1:
-            return a
-        m = len(a) // 2
-        return combinar(merge_sort(a[:m]), merge_sort(a[m:]))
-    ```
-
-=== "Java"
-
-    ```java
-    static int[] mergeSort(int[] a) {
-        if (a.length <= 1) return a;
-        int m = a.length / 2;
-        return combinar(
-            mergeSort(java.util.Arrays.copyOfRange(a, 0, m)),
-            mergeSort(java.util.Arrays.copyOfRange(a, m, a.length)));
+```java
+public void ordenar(int[] arr, int a, int b) {
+    if (a >= b)
+        return;
+    int m = a + (b - a) / 2;
+    ordenar(arr, a, m);
+    ordenar(arr, m + 1, b);
+    combinar(arr, a, m, b);
+}
+public void combinar(int[] arr, int a, int m, int b) {
+    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);
+    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);
+    int i = 0, j = 0, k = a;
+    while (i < izquierda.length && j < derecha.length) {
+        if (izquierda[i] <= derecha[j])
+            arr[k++] = izquierda[i++];
+        else
+            arr[k++] = derecha[j++];
     }
-    ```
+    while (i < izquierda.length)
+        arr[k++] = izquierda[i++];
+    while (j < derecha.length)
+        arr[k++] = derecha[j++];
+}
+```
 
-=== "C"
-
-    ```c
-    void mergeSort(int a[], int inicio, int fin) {
-        if (inicio >= fin) return;
-        int medio = inicio + (fin - inicio) / 2;
-        mergeSort(a, inicio, medio);
-        mergeSort(a, medio + 1, fin);
-        combinar(a, inicio, medio, fin);
-    }
-    ```
+<!-- book-code:end -->
 
 #### Análisis
 

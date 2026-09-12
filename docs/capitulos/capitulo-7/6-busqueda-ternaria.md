@@ -15,89 +15,53 @@ Aunque cada iteración descarta más que la búsqueda binaria (un tercio en vez 
 
 ### Implementación
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    mientras izq ≤ der
-        m1 ← izq+(der-izq)/3; m2 ← der-(der-izq)/3
-        comparar x con A[m1] y A[m2]
-        conservar uno de los tres intervalos
-    retornar -1
-    ```
+Listado original del libro, página 307 (Java).
 
-=== "Python"
+```java
+public boolean buscar(int[] arr, int a, int b, int x) {
+     // Agota el espacio de búsqueda
+    if (a > b)
+        return false;
+    int m1 = a + (b - a) / 3;
+    int m2 = b - (int) Math.ceil((b - a) / 3.0);
+    // Verificar si el valor está en los pivotes
+    if (arr[m1] == x || arr[m2] == x)
+        return true;
+    if (x < arr[m1])
+        return buscar(arr, a, m1 - 1, x);
+    else if (x > arr[m2])
+        return buscar(arr, m2 + 1, b, x);
+    else
+        return buscar(arr, m1 + 1, m2 - 1, x);
+}
+```
 
-    ```python
-    lo, hi = 0, len(a) - 1
-    while lo <= hi:
-        third = (hi - lo) // 3
-        m1, m2 = lo + third, hi - third
-        if a[m1] == x:
-            return m1
-        if a[m2] == x:
-            return m2
-        if x < a[m1]:
-            hi = m1 - 1
-        elif x > a[m2]:
-            lo = m2 + 1
-        else:
-            lo, hi = m1 + 1, m2 - 1
-    return -1
-    ```
+Listado original del libro, página 312 (Java).
 
-=== "Java"
-
-    ```java
-    int lo = 0;
-    int hi = a.length - 1;
-    while (lo <= hi) {
-        int t = (hi - lo) / 3;
-        int m1 = lo + t;
-        int m2 = hi - t;
-        if (a[m1] == x) {
-            return m1;
-        }
-        if (a[m2] == x) {
-            return m2;
-        }
-        if (x < a[m1]) {
-            hi = m1 - 1;
-        } else if (x > a[m2]) {
-            lo = m2 + 1;
-        } else {
-            lo = m1 + 1;
-            hi = m2 - 1;
+```java
+public boolean buscar(int[] arr, int a, int b, int x) {
+    while (a <= b) {
+        int m1 = a + (b - a) / 3;
+        int m2 = b - (int) Math.ceil((b - a) / 3.0);
+        if (arr[m1] == x || arr[m2] == x)
+            return true;
+        if (x < arr[m1])
+            b = m1 - 1; // Buscar en el primer tercio
+        else if (x > arr[m2])
+            a = m2 + 1; // Buscar en el último tercio
+        else {
+            a = m1 + 1; // Buscar en el tercio central
+            b = m2 - 1;
         }
     }
-    return -1;
-    ```
+    // Elemento no encontrado
+    return false;
+}
+```
 
-=== "C"
-
-    ```c
-    int lo = 0;
-    int hi = n - 1;
-    while (lo <= hi) {
-        int t = (hi - lo) / 3;
-        int m1 = lo + t;
-        int m2 = hi - t;
-        if (a[m1] == x) {
-            return m1;
-        }
-        if (a[m2] == x) {
-            return m2;
-        }
-        if (x < a[m1]) {
-            hi = m1 - 1;
-        } else if (x > a[m2]) {
-            lo = m2 + 1;
-        } else {
-            lo = m1 + 1;
-            hi = m2 - 1;
-        }
-    }
-    return -1;
-    ```
+<!-- book-code:end -->
 
 ### Complejidad: versión iterativa y versión recursiva
 

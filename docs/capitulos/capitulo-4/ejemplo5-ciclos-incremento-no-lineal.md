@@ -13,53 +13,22 @@ El ciclo interior avanza de dos en dos, pero continúa recorriendo una cantidad 
 
 ### Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    procedimiento recorrerConSaltos(n)
-        matriz ← nueva matriz n × n
-        para i ← 0 hasta n - 1
-            para j ← 0 hasta n - 1 con paso 2
-                visitar matriz[i][j]
-    ```
+Listado original del libro, página 158 (Java).
 
-=== "Python"
-
-    ```python
-    def recorrer_matriz_vacia(n):
-        matriz = [[0 for _ in range(n)] for _ in range(n)]
-        for i in range(n):
-            for j in range(0, n, 2):
-                _ = matriz[i][j]
-    ```
-
-=== "Java"
-
-    ```java
-    static void recorrerConSaltos(int n) {
-        int[][] matriz = new int[n][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j += 2) {
-                int visitado = matriz[i][j];
-            }
+```java
+public static void recorrerMatrizVacia(int m, int n) {
+    int[][] matriz = new int[m][n];
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j+=2) {
+            // Sin operaciones internas en este ciclo
+        }
     }
-    ```
+}
+```
 
-=== "C"
-
-    ```c
-    void recorrerConSaltos(int n) {
-        int (*matriz)[n] = calloc(n, sizeof *matriz);
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j += 2) {
-                int visitado = matriz[i][j];
-            }
-        free(matriz);
-    }
-    ```
-
-
----
+<!-- book-code:end -->
 
 ### Análisis esperado
 

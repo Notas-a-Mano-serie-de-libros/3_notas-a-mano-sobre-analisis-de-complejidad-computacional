@@ -11,48 +11,29 @@
 
 ### Algoritmo simulado: acceder a una posición de un arreglo
 
-El ejemplo implementa el acceso a una posición específica de una lista o arreglo. En la función, `lista` representa la estructura de datos, `indice` representa la posición que se desea consultar y el valor leído se devuelve directamente.
+El ejemplo implementa el acceso a una posición específica de una lista o arreglo. En el listado del libro, `arr` representa el arreglo e `i` la posición que se desea consultar.
 
 El acceso por índice tiene comportamiento constante porque la posición del elemento se calcula directamente. La ejecución requiere conocer la referencia inicial de la estructura y el desplazamiento asociado al índice. Con esa información, el entorno de ejecución puede ubicar el elemento solicitado mediante una operación directa de acceso.
 
-La lista puede contener muchos elementos, pero el acceso a `lista[indice]` consulta una sola posición. La operación realizada para leer el elemento central de una lista de 100 posiciones tiene la misma forma que la operación realizada para leer el elemento central de una lista de 1.000.000 de posiciones: se identifica un índice válido y se recupera el dato ubicado en esa posición.
+La lista puede contener muchos elementos, pero el acceso a `arr[i]` consulta una sola posición. La operación realizada para leer el elemento central de una lista de 100 posiciones tiene la misma forma que la operación realizada para leer el elemento central de una lista de 1.000.000 de posiciones: se identifica un índice válido y se recupera el dato ubicado en esa posición.
 
 La diferencia entre listas pequeñas y grandes aparece en otras operaciones, como construir la lista, recorrerla completa, copiarla o buscar un valor desconocido. En cambio, cuando el índice ya está determinado, el acceso se concentra en una única ubicación.
 
 
 ---
 
-### Código del ejemplo
+### Código del libro asociado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    función acceder(arreglo, índice)
-        retornar arreglo[índice]
-    ```
+Listado original del libro, página 148 (Java).
 
-=== "Python"
+```java
+arr[i]; //Accede al elemento i del arreglo "arr"
+m[i][j]; //Accede al elemento i,j del de la matriz "m"
+```
 
-    ```python
-    def acceder_posicion(lista, indice):
-        return lista[indice]
-    ```
-
-=== "Java"
-
-    ```java
-    static int acceder(int[] arreglo, int indice) {
-        return arreglo[indice];
-    }
-    ```
-
-=== "C"
-
-    ```c
-    int acceder(const int arreglo[], int indice) {
-        return arreglo[indice];
-    }
-    ```
+<!-- book-code:end -->
 
 ### Simulación
 

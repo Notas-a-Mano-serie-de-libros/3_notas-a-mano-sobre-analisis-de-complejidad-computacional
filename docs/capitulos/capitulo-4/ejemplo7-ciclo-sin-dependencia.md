@@ -13,44 +13,19 @@ El ciclo ejecuta siempre \(10\,000\) iteraciones. Esa cantidad es fija y no camb
 
 ### Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    procedimiento iterar()
-        para i ← 0 hasta 9 999
-            visitar i
-    ```
+Listado original del libro, página 164 (Java).
 
-=== "Python"
-
-    ```python
-    def iterar():
-        for i in range(10_000):
-            _ = i
-    ```
-
-=== "Java"
-
-    ```java
-    static void iterar() {
-        for (int i = 0; i < 10_000; i++) {
-            int visitado = i;
-        }
+```java
+public static void iterar() {
+    for (int i = 0; i < 10000000; i++) {
+        System.out.println(i);
     }
-    ```
+}
+```
 
-=== "C"
-
-    ```c
-    void iterar(void) {
-        for (int i = 0; i < 10000; i++) {
-            int visitado = i;
-        }
-    }
-    ```
-
-
----
+<!-- book-code:end -->
 
 ### Análisis esperado
 

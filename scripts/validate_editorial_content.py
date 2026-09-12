@@ -63,16 +63,11 @@ def main() -> int:
             if child.count('class="section-return') != 1:
                 errors.append(f"{page.relative_to(ROOT)}: falta navegación entre secciones")
 
-    expected_tabs = {2: 8, 4: 10, 6: 5, 7: 6, 8: 7}
-    for chapter, count in expected_tabs.items():
-        source = "\n".join(
-            page.read_text(encoding="utf-8")
-            for page in (DOCS / "capitulos" / f"capitulo-{chapter}").glob("*.md")
-        )
-        for language in ("Pseudocódigo", "Python", "Java", "C"):
-            found = source.count(f'=== "{language}"')
-            if found != count:
-                errors.append(f"capítulo {chapter}: {language}: se esperaban {count} selectores y hay {found}")
+    try:
+        from scripts.sync_book_code import sync
+    except ModuleNotFoundError:
+        from sync_book_code import sync
+    errors.extend(sync(check=True))
 
     for chapter in (7, 8):
         path = (

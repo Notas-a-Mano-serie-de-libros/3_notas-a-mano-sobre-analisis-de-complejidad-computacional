@@ -13,44 +13,19 @@ El algoritmo visita una vez cada posición de un arreglo de tamaño \(n\). La si
 
 ### Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    procedimiento recorrer(arreglo)
-        para cada elemento en arreglo
-            visitar elemento
-    ```
+Listado original del libro, página 151 (Java).
 
-=== "Python"
-
-    ```python
-    def imprimir_elementos(arr):
-        for elemento in arr:
-            _ = elemento
-    ```
-
-=== "Java"
-
-    ```java
-    static void recorrer(int[] arreglo) {
-        for (int elemento : arreglo) {
-            int visitado = elemento;
-        }
+```java
+public static void imprimirElementos(int[] arr) {
+    for (int i = 0; i < arr.length; i++) {
+        System.out.println(arr[i]);
     }
-    ```
+}
+```
 
-=== "C"
-
-    ```c
-    void recorrer(const int arreglo[], int n) {
-        for (int i = 0; i < n; i++) {
-            int visitado = arreglo[i];
-        }
-    }
-    ```
-
-
----
+<!-- book-code:end -->
 
 ### Análisis esperado
 

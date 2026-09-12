@@ -8,47 +8,69 @@ Este ejemplo estudia cómo el orden de evaluación de condiciones modifica los c
 
 ## Código analizado
 
-=== "Pseudocódigo"
+<!-- book-code:start -->
 
-    ```text
-    si h(n) entonces
-        resolver caso frecuente
-    si no, si g(n) entonces
-        resolver segundo caso
-    si no
-        r(n)
-    ```
+Listado original del libro, página 170 (Java).
 
-=== "Python"
+```java
+if (g(n)) {
+    // Se cumple g(n)
+} else if (h(n)) {
+    // Se cumple h(n)
+} else {
+    r(n);
+}
+```
 
-    ```python
-    def resolver(n):
-        if h(n):
-            return caso_frecuente(n)
-        if g(n):
-            return segundo_caso(n)
-        return r(n)
-    ```
+Listado original del libro, página 170 (Java).
 
-=== "Java"
+```java
+if (h(n)) {
+    // Se cumple h(n)
+} else if (g(n)) {
+    // Se cumple g(n)
+} else {
+    r(n);
+}
+```
 
-    ```java
-    static Resultado resolver(int n) {
-        if (h(n)) return casoFrecuente(n);
-        if (g(n)) return segundoCaso(n);
-        return r(n);
-    }
-    ```
+Listado original del libro, página 171 (Java).
 
-=== "C"
+```java
+if (h(n)) {
+    // Se cumple h(n)
+} else if (g(n)) {
+    // Se cumple g(n)
+} else {
+    s(n); // O(1)
+}
+```
 
-    ```c
-    Resultado resolver(int n) {
-        if (h(n)) return casoFrecuente(n);
-        if (g(n)) return segundoCaso(n);
-        return r(n);
-    }
-    ```
+Listado original del libro, página 172 (Java).
+
+```java
+if (!h(n) && !g(n)) {
+    s(n);
+} else if (h(n)) {
+    // Se cumple h(n)
+} else if (g(n)) {
+    // Se cumple g(n)
+}
+```
+
+Listado original del libro, página 173 (Java).
+
+```java
+if (var) {
+    s(n);
+} else if (h(n)) {
+    // Se cumple h(n)
+} else if (g(n)) {
+    // Se cumple g(n)
+}
+```
+
+<!-- book-code:end -->
 
 ## Análisis esperado
 
