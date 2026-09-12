@@ -15,7 +15,7 @@
 
 ##### Potencia por división del exponente
 
-Implementación corregida basada en el libro, página 243 (Java).
+Implementación basada en el libro, página 243 (Java).
 
 === "Java"
 
@@ -130,7 +130,28 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `potenciaAbsoluta(0.5, 1) = 0.5` | Resuelve la mitad. |
     | \(0.5 \times 0.5 \times 0.5\) | Devuelve 0.125. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-0f3471be4e4e">Código Python · Potencia por división del exponente</label><textarea id="runner-0f3471be4e4e" spellcheck="false" wrap="off" rows="14">def potencia(a, n):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-0f3471be4e4e">Código Python · Potencia por división del exponente</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">potencia</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ZeroDivisionError</span><span class="p">(</span><span class="s2">"Cero no admite exponente negativo"</span><span class="p">)</span>
+    <span class="n">absExponente</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">a</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">potenciaAbsoluta</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">absExponente</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">potenciaAbsoluta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
+    <span class="n">mitad</span> <span class="o">=</span> <span class="n">potenciaAbsoluta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">n</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">mitad</span> <span class="o">=</span> <span class="n">mitad</span> <span class="o">*</span> <span class="n">mitad</span>
+    <span class="k">return</span> <span class="n">mitad</span> <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">mitad</span> <span class="o">*</span> <span class="n">a</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">n</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span>
+
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">potencia</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-0f3471be4e4e" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def potencia(a, n):
     if a == 0 and n &lt; 0:
         raise ZeroDivisionError(&quot;Cero no admite exponente negativo&quot;)
     absExponente = abs(n)
@@ -151,7 +172,7 @@ n = -3
 
 resultado = potencia(a, n)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 ##### Laboratorio y medición
 

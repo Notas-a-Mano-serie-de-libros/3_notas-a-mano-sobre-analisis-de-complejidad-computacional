@@ -17,7 +17,7 @@ El ciclo interior avanza de dos en dos, pero continúa recorriendo una cantidad 
 
 #### Ciclo interior con paso dos
 
-Implementación corregida basada en el libro, página 158 (Java).
+Implementación basada en el libro, página 158 (Java).
 
 === "Java"
 
@@ -97,7 +97,19 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `i = 0; j = 0, 2` | Ejecuta el control del ciclo, con cuerpo vacío. |
     | `i = 1; j = 0, 2` | Repite en la segunda fila. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-822a694e4b44">Código Python · Ciclo interior con paso dos</label><textarea id="runner-822a694e4b44" spellcheck="false" wrap="off" rows="14">def recorrerMatrizVacia(m, n):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-822a694e4b44">Código Python · Ciclo interior con paso dos</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">recorrerMatrizVacia</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">matriz</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">pass</span>  <span class="c1"># Sin operaciones internas.</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">m</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">recorrerMatrizVacia</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Ejemplo finalizado"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-822a694e4b44" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def recorrerMatrizVacia(m, n):
     matriz = [[0] * n for _ in range(m)]
     for i in range(m):
         for j in range(0, n, 2):
@@ -109,7 +121,7 @@ n = 3
 
 recorrerMatrizVacia(m, n)
 print(&quot;Ejemplo finalizado&quot;)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

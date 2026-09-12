@@ -17,7 +17,7 @@ El ciclo ejecuta siempre \(10\,000\) iteraciones. Esa cantidad es fija y no camb
 
 #### Ciclo con límite fijo
 
-Implementación corregida basada en el libro, página 164 (Java).
+Implementación basada en el libro, página 164 (Java).
 
 === "Java"
 
@@ -81,7 +81,16 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `i = 1` | Imprime 1; continúa hasta 9 999 999. |
     | `i = 10000000` | Termina. El límite no depende de una entrada n. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-201992ad7ecd">Código Python · Ciclo con límite fijo</label><textarea id="runner-201992ad7ecd" spellcheck="false" wrap="off" rows="14">def iterar():
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-201992ad7ecd">Código Python · Ciclo con límite fijo</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">iterar</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000000</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+
+
+<span class="n">iterar</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Ejemplo finalizado"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-201992ad7ecd" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def iterar():
     for i in range(10000000):
         print(i)
 
@@ -90,7 +99,7 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
 
 iterar()
 print(&quot;Ejemplo finalizado&quot;)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

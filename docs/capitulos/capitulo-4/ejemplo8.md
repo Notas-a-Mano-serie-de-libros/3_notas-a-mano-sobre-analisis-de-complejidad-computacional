@@ -12,7 +12,7 @@ El número de iteraciones es constante, pero la operación ejecutada dentro del 
 
 #### Ciclo fijo con auxiliar
 
-Implementación corregida basada en el libro, página 166 (Java).
+Implementación basada en el libro, página 166 (Java).
 
 === "Java"
 
@@ -80,7 +80,28 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `i = 999` | Última llamada foo(8). |
     | `i = 1000` | Termina; el costo depende de lo que haga foo. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-9c08a2cbe90d">Código Python · Ciclo fijo con auxiliar</label><textarea id="runner-9c08a2cbe90d" spellcheck="false" wrap="off" rows="14">def cicloFijo(n):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-9c08a2cbe90d">Código Python · Ciclo fijo con auxiliar</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">cicloFijo</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="n">foo</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># Completa estas auxiliares según el problema que estés analizando.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">foo1</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo1 en el editor"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">foo2</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo2 en el editor"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo en el editor"</span><span class="p">)</span>
+
+<span class="n">cicloFijo</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Ejemplo finalizado"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-9c08a2cbe90d" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def cicloFijo(n):
     for i in range(1000):
         foo(n)
 
@@ -101,7 +122,7 @@ def foo(n):
 
 cicloFijo(n)
 print(&quot;Ejemplo finalizado&quot;)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

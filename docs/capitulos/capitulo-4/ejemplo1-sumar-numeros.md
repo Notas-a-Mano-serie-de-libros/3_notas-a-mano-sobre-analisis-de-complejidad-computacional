@@ -17,7 +17,7 @@ Este ejemplo analiza una secuencia de una sola operación aritmética. El tamañ
 
 #### Suma de dos enteros
 
-Implementación corregida basada en el libro, página 150 (Java).
+Implementación basada en el libro, página 150 (Java).
 
 === "Java"
 
@@ -88,7 +88,19 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `a = 2, b = 3` | Se reciben los operandos. |
     | `a + b` | Se devuelve 5. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-be0f6b02d91f">Código Python · Suma de dos enteros</label><textarea id="runner-be0f6b02d91f" spellcheck="false" wrap="off" rows="14">def sumar(a, b):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-be0f6b02d91f">Código Python · Suma de dos enteros</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">sumar</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">resultado</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">2147483648</span> <span class="o">&lt;=</span> <span class="n">resultado</span> <span class="o">&lt;=</span> <span class="mi">2147483647</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">"El resultado no cabe en int de Java"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">resultado</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">sumar</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-be0f6b02d91f" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def sumar(a, b):
     resultado = a + b
     if not -2147483648 &lt;= resultado &lt;= 2147483647:
         raise OverflowError(&quot;El resultado no cabe en int de Java&quot;)
@@ -100,7 +112,7 @@ b = 3
 
 resultado = sumar(a, b)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

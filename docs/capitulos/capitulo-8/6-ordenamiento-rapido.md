@@ -21,7 +21,7 @@ En el caso promedio logra O(n log(n)) con una constante menor que el ordenamient
 
 #### Ordenamiento rápido con pivote inicial
 
-Implementación corregida basada en el libro, página 349 (Java).
+Implementación basada en el libro, página 349 (Java).
 
 === "Java"
 
@@ -178,68 +178,43 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
 
 **Resultado:** Ordena arr[a..b] ascendentemente.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [3, 1, 2], a = 0, b = 2`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-bd4876eac9d6">Código Python · Ordenamiento rápido con pivote inicial</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;=</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">particionar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 
-    **Prueba de escritorio**
 
-    | Paso | Método | Profundidad | arr | a | b | pivote | i | j | temp | p | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | ordenar | 0 | [3, 1, 2] | 0 | 2 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 2 | ordenar | 0 | [3, 1, 2] | 0 | 2 | — | — | — | — | — | `if a >= b:` | — |
-    | 3 | particionar | 1 | [3, 1, 2] | 0 | 2 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 4 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | — | — | — | — | `pivote = arr[a]` | — |
-    | 5 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 1 | — | — | — | `i = a + 1` | — |
-    | 6 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 1 | 2 | — | — | `j = b` | — |
-    | 7 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 1 | 2 | — | — | `while i <= j:` | — |
-    | 8 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 1 | 2 | — | — | `while i <= j and arr[i] < pivote:` | — |
-    | 9 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 2 | 2 | — | — | `i += 1` | — |
-    | 10 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 2 | 2 | — | — | `while i <= j and arr[i] < pivote:` | — |
-    | 11 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `i += 1` | — |
-    | 12 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `while i <= j and arr[i] < pivote:` | — |
-    | 13 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `while i <= j and arr[j] > pivote:` | — |
-    | 14 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `if i <= j:` | — |
-    | 15 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | — | — | `while i <= j:` | — |
-    | 16 | particionar | 1 | [3, 1, 2] | 0 | 2 | 3 | 3 | 2 | 3 | — | `temp = arr[a]` | — |
-    | 17 | particionar | 1 | [2, 1, 2] | 0 | 2 | 3 | 3 | 2 | 3 | — | `arr[a] = arr[j]` | — |
-    | 18 | particionar | 1 | [2, 1, 3] | 0 | 2 | 3 | 3 | 2 | 3 | — | `arr[j] = temp` | — |
-    | 19 | particionar | 1 | [2, 1, 3] | 0 | 2 | 3 | 3 | 2 | 3 | — | `return j`; Termina la llamada. | 2 |
-    | 20 | ordenar | 0 | [2, 1, 3] | 0 | 2 | — | — | — | — | 2 | `p = particionar(arr, a, b)` | — |
-    | 21 | ordenar | 1 | [2, 1, 3] | 0 | 1 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 22 | ordenar | 1 | [2, 1, 3] | 0 | 1 | — | — | — | — | — | `if a >= b:` | — |
-    | 23 | particionar | 2 | [2, 1, 3] | 0 | 1 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 24 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | — | — | — | — | `pivote = arr[a]` | — |
-    | 25 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 1 | — | — | — | `i = a + 1` | — |
-    | 26 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 1 | 1 | — | — | `j = b` | — |
-    | 27 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 1 | 1 | — | — | `while i <= j:` | — |
-    | 28 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 1 | 1 | — | — | `while i <= j and arr[i] < pivote:` | — |
-    | 29 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `i += 1` | — |
-    | 30 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `while i <= j and arr[i] < pivote:` | — |
-    | 31 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `while i <= j and arr[j] > pivote:` | — |
-    | 32 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `if i <= j:` | — |
-    | 33 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | — | — | `while i <= j:` | — |
-    | 34 | particionar | 2 | [2, 1, 3] | 0 | 1 | 2 | 2 | 1 | 2 | — | `temp = arr[a]` | — |
-    | 35 | particionar | 2 | [1, 1, 3] | 0 | 1 | 2 | 2 | 1 | 2 | — | `arr[a] = arr[j]` | — |
-    | 36 | particionar | 2 | [1, 2, 3] | 0 | 1 | 2 | 2 | 1 | 2 | — | `arr[j] = temp` | — |
-    | 37 | particionar | 2 | [1, 2, 3] | 0 | 1 | 2 | 2 | 1 | 2 | — | `return j`; Termina la llamada. | 1 |
-    | 38 | ordenar | 1 | [1, 2, 3] | 0 | 1 | — | — | — | — | 1 | `p = particionar(arr, a, b)` | — |
-    | 39 | ordenar | 2 | [1, 2, 3] | 0 | 0 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 40 | ordenar | 2 | [1, 2, 3] | 0 | 0 | — | — | — | — | — | `if a >= b:` | — |
-    | 41 | ordenar | 2 | [1, 2, 3] | 0 | 0 | — | — | — | — | — | `return`; Termina la llamada. | sin valor |
-    | 42 | ordenar | 1 | [1, 2, 3] | 0 | 1 | — | — | — | — | 1 | `ordenar(arr, a, p - 1)` | — |
-    | 43 | ordenar | 2 | [1, 2, 3] | 2 | 1 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 44 | ordenar | 2 | [1, 2, 3] | 2 | 1 | — | — | — | — | — | `if a >= b:` | — |
-    | 45 | ordenar | 2 | [1, 2, 3] | 2 | 1 | — | — | — | — | — | `return`; Termina la llamada. | sin valor |
-    | 46 | ordenar | 1 | [1, 2, 3] | 0 | 1 | — | — | — | — | 1 | `ordenar(arr, p + 1, b)`; Termina la llamada. | sin valor |
-    | 47 | ordenar | 0 | [1, 2, 3] | 0 | 2 | — | — | — | — | 2 | `ordenar(arr, a, p - 1)` | — |
-    | 48 | ordenar | 1 | [1, 2, 3] | 3 | 2 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 49 | ordenar | 1 | [1, 2, 3] | 3 | 2 | — | — | — | — | — | `if a >= b:` | — |
-    | 50 | ordenar | 1 | [1, 2, 3] | 3 | 2 | — | — | — | — | — | `return`; Termina la llamada. | sin valor |
-    | 51 | ordenar | 0 | [1, 2, 3] | 0 | 2 | — | — | — | — | 2 | `ordenar(arr, p + 1, b)`; Termina la llamada. | sin valor |
+<span class="k">def</span><span class="w"> </span><span class="nf">particionar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">pivote</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">b</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">j</span><span class="p">:</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">j</span> <span class="ow">and</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">pivote</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">j</span> <span class="ow">and</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">pivote</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">j</span><span class="p">:</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+    <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
+    <span class="k">return</span> <span class="n">j</span>
 
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">2</span>
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-bd4876eac9d6">Código Python · Ordenamiento rápido con pivote inicial</label><textarea id="runner-bd4876eac9d6" spellcheck="false" wrap="off" rows="14">def ordenar(arr, a, b):
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo inicial:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo ordenado:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-bd4876eac9d6" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def ordenar(arr, a, b):
     if a &gt;= b:
         return
     p = particionar(arr, a, b)
@@ -275,7 +250,7 @@ b = 2
 print(&quot;Arreglo inicial:&quot;, arr)
 ordenar(arr, a, b)
 print(&quot;Arreglo ordenado:&quot;, arr)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

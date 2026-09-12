@@ -17,7 +17,7 @@ La búsqueda secuencial (o lineal) recorre el arreglo posición por posición, c
 
 #### Búsqueda secuencial iterativa
 
-Implementación corregida basada en el libro, página 262 (Java).
+Implementación basada en el libro, página 262 (Java).
 
 === "Java"
 
@@ -85,23 +85,19 @@ En C, `n` indica la longitud del arreglo y se recibe como parámetro.
 
 **Resultado:** Devuelve true si existe x y false si no existe.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [4, 8, 12], x = 8`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-dfd9f906a528">Código Python · Búsqueda secuencial iterativa</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
 
-    **Prueba de escritorio**
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mi">8</span>
 
-    | Paso | Método | Profundidad | arr | x | i | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | buscar | 0 | [4, 8, 12] | 8 | — | Entrada a la llamada. | — |
-    | 2 | buscar | 0 | [4, 8, 12] | 8 | 0 | `for i in range(len(arr)):` | — |
-    | 3 | buscar | 0 | [4, 8, 12] | 8 | 0 | `if arr[i] == x:` | — |
-    | 4 | buscar | 0 | [4, 8, 12] | 8 | 1 | `for i in range(len(arr)):` | — |
-    | 5 | buscar | 0 | [4, 8, 12] | 8 | 1 | `if arr[i] == x:` | — |
-    | 6 | buscar | 0 | [4, 8, 12] | 8 | 1 | `return True`; Termina la llamada. | true |
-
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
-
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-dfd9f906a528">Código Python · Búsqueda secuencial iterativa</label><textarea id="runner-dfd9f906a528" spellcheck="false" wrap="off" rows="14">def buscar(arr, x):
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-dfd9f906a528" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def buscar(arr, x):
     for i in range(len(arr)):
         if arr[i] == x:
             return True
@@ -113,7 +109,7 @@ x = 8
 
 resultado = buscar(arr, x)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

@@ -17,7 +17,7 @@ El algoritmo visita una vez cada posición de un arreglo de tamaño \(n\). La si
 
 #### Recorrido de un arreglo
 
-Implementación corregida basada en el libro, página 151 (Java).
+Implementación basada en el libro, página 151 (Java).
 
 === "Java"
 
@@ -84,7 +84,16 @@ En C, `n` indica la longitud del arreglo y se recibe como parámetro.
     | `i = 1` | Imprime arr[1] = 8. |
     | `i = 2` | Termina porque `i = arr.length`. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-600c8cbef08a">Código Python · Recorrido de un arreglo</label><textarea id="runner-600c8cbef08a" spellcheck="false" wrap="off" rows="14">def imprimirElementos(arr):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-600c8cbef08a">Código Python · Recorrido de un arreglo</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">imprimirElementos</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+
+<span class="n">imprimirElementos</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Ejemplo finalizado"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-600c8cbef08a" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def imprimirElementos(arr):
     for i in range(len(arr)):
         print(arr[i])
 
@@ -93,7 +102,7 @@ arr = [4, 8]
 
 imprimirElementos(arr)
 print(&quot;Ejemplo finalizado&quot;)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

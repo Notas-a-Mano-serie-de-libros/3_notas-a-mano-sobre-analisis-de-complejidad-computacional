@@ -24,7 +24,7 @@ La simulación se centra en observar cómo el costo crece al ordenar entradas ca
 
 #### Ordenamiento por mezcla y combinación
 
-Implementación corregida basada en el libro, página 247 (Java).
+Implementación basada en el libro, página 247 (Java).
 
 === "Java"
 
@@ -197,79 +197,47 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
 
 **Resultado:** Ordena arr[a..b] en orden ascendente; no devuelve un arreglo nuevo.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [3, 1, 2], a = 0, b = 2`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-e32ce151575f">Código Python · Ordenamiento por mezcla y combinación</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;=</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+    <span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">combinar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
 
-    **Prueba de escritorio**
 
-    | Paso | Método | Profundidad | arr | a | b | m | izquierda | derecha | i | j | k | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | ordenar | 0 | [3, 1, 2] | 0 | 2 | — | — | — | — | — | — | Entrada a la llamada. | — |
-    | 2 | ordenar | 0 | [3, 1, 2] | 0 | 2 | — | — | — | — | — | — | `if a >= b:` | — |
-    | 3 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 1 | — | — | — | — | — | `m = a + (b - a) // 2` | — |
-    | 4 | ordenar | 1 | [3, 1, 2] | 0 | 1 | — | — | — | — | — | — | Entrada a la llamada. | — |
-    | 5 | ordenar | 1 | [3, 1, 2] | 0 | 1 | — | — | — | — | — | — | `if a >= b:` | — |
-    | 6 | ordenar | 1 | [3, 1, 2] | 0 | 1 | 0 | — | — | — | — | — | `m = a + (b - a) // 2` | — |
-    | 7 | ordenar | 2 | [3, 1, 2] | 0 | 0 | — | — | — | — | — | — | Entrada a la llamada. | — |
-    | 8 | ordenar | 2 | [3, 1, 2] | 0 | 0 | — | — | — | — | — | — | `if a >= b:` | — |
-    | 9 | ordenar | 2 | [3, 1, 2] | 0 | 0 | — | — | — | — | — | — | `return`; Termina la llamada. | sin valor |
-    | 10 | ordenar | 1 | [3, 1, 2] | 0 | 1 | 0 | — | — | — | — | — | `ordenar(arr, a, m)` | — |
-    | 11 | ordenar | 2 | [3, 1, 2] | 1 | 1 | — | — | — | — | — | — | Entrada a la llamada. | — |
-    | 12 | ordenar | 2 | [3, 1, 2] | 1 | 1 | — | — | — | — | — | — | `if a >= b:` | — |
-    | 13 | ordenar | 2 | [3, 1, 2] | 1 | 1 | — | — | — | — | — | — | `return`; Termina la llamada. | sin valor |
-    | 14 | ordenar | 1 | [3, 1, 2] | 0 | 1 | 0 | — | — | — | — | — | `ordenar(arr, m + 1, b)` | — |
-    | 15 | combinar | 2 | [3, 1, 2] | 0 | 1 | 0 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 16 | combinar | 2 | [3, 1, 2] | 0 | 1 | 0 | [3] | — | — | — | — | `izquierda = arr[a:m + 1]` | — |
-    | 17 | combinar | 2 | [3, 1, 2] | 0 | 1 | 0 | [3] | [1] | — | — | — | `derecha = arr[m + 1:b + 1]` | — |
-    | 18 | combinar | 2 | [3, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | — | — | `i = 0` | — |
-    | 19 | combinar | 2 | [3, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 0 | — | `j = 0` | — |
-    | 20 | combinar | 2 | [3, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 0 | 0 | `k = a` | — |
-    | 21 | combinar | 2 | [3, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 0 | 0 | `while i < len(izquierda) and j < len(derecha):` | — |
-    | 22 | combinar | 2 | [3, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 0 | 0 | `if izquierda[i] <= derecha[j]:` | — |
-    | 23 | combinar | 2 | [1, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 0 | 0 | `arr[k] = derecha[j]` | — |
-    | 24 | combinar | 2 | [1, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 1 | 0 | `j += 1` | — |
-    | 25 | combinar | 2 | [1, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 1 | 1 | `k += 1` | — |
-    | 26 | combinar | 2 | [1, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 1 | 1 | `while i < len(izquierda) and j < len(derecha):` | — |
-    | 27 | combinar | 2 | [1, 1, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 1 | 1 | `while i < len(izquierda):` | — |
-    | 28 | combinar | 2 | [1, 3, 2] | 0 | 1 | 0 | [3] | [1] | 0 | 1 | 1 | `arr[k] = izquierda[i]` | — |
-    | 29 | combinar | 2 | [1, 3, 2] | 0 | 1 | 0 | [3] | [1] | 1 | 1 | 1 | `i += 1` | — |
-    | 30 | combinar | 2 | [1, 3, 2] | 0 | 1 | 0 | [3] | [1] | 1 | 1 | 2 | `k += 1` | — |
-    | 31 | combinar | 2 | [1, 3, 2] | 0 | 1 | 0 | [3] | [1] | 1 | 1 | 2 | `while i < len(izquierda):` | — |
-    | 32 | combinar | 2 | [1, 3, 2] | 0 | 1 | 0 | [3] | [1] | 1 | 1 | 2 | `while j < len(derecha):`; Termina la llamada. | sin valor |
-    | 33 | ordenar | 1 | [1, 3, 2] | 0 | 1 | 0 | — | — | — | — | — | `combinar(arr, a, m, b)`; Termina la llamada. | sin valor |
-    | 34 | ordenar | 0 | [1, 3, 2] | 0 | 2 | 1 | — | — | — | — | — | `ordenar(arr, a, m)` | — |
-    | 35 | ordenar | 1 | [1, 3, 2] | 2 | 2 | — | — | — | — | — | — | Entrada a la llamada. | — |
-    | 36 | ordenar | 1 | [1, 3, 2] | 2 | 2 | — | — | — | — | — | — | `if a >= b:` | — |
-    | 37 | ordenar | 1 | [1, 3, 2] | 2 | 2 | — | — | — | — | — | — | `return`; Termina la llamada. | sin valor |
-    | 38 | ordenar | 0 | [1, 3, 2] | 0 | 2 | 1 | — | — | — | — | — | `ordenar(arr, m + 1, b)` | — |
-    | 39 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 40 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | — | — | — | — | `izquierda = arr[a:m + 1]` | — |
-    | 41 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | — | — | — | `derecha = arr[m + 1:b + 1]` | — |
-    | 42 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 0 | — | — | `i = 0` | — |
-    | 43 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 0 | 0 | — | `j = 0` | — |
-    | 44 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 0 | 0 | 0 | `k = a` | — |
-    | 45 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 0 | 0 | 0 | `while i < len(izquierda) and j < len(derecha):` | — |
-    | 46 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 0 | 0 | 0 | `if izquierda[i] <= derecha[j]:` | — |
-    | 47 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 0 | 0 | 0 | `arr[k] = izquierda[i]` | — |
-    | 48 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 0 | 0 | `i += 1` | — |
-    | 49 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 0 | 1 | `k += 1` | — |
-    | 50 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 0 | 1 | `while i < len(izquierda) and j < len(derecha):` | — |
-    | 51 | combinar | 1 | [1, 3, 2] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 0 | 1 | `if izquierda[i] <= derecha[j]:` | — |
-    | 52 | combinar | 1 | [1, 2, 2] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 0 | 1 | `arr[k] = derecha[j]` | — |
-    | 53 | combinar | 1 | [1, 2, 2] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 1 | 1 | `j += 1` | — |
-    | 54 | combinar | 1 | [1, 2, 2] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 1 | 2 | `k += 1` | — |
-    | 55 | combinar | 1 | [1, 2, 2] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 1 | 2 | `while i < len(izquierda) and j < len(derecha):` | — |
-    | 56 | combinar | 1 | [1, 2, 2] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 1 | 2 | `while i < len(izquierda):` | — |
-    | 57 | combinar | 1 | [1, 2, 3] | 0 | 2 | 1 | [1, 3] | [2] | 1 | 1 | 2 | `arr[k] = izquierda[i]` | — |
-    | 58 | combinar | 1 | [1, 2, 3] | 0 | 2 | 1 | [1, 3] | [2] | 2 | 1 | 2 | `i += 1` | — |
-    | 59 | combinar | 1 | [1, 2, 3] | 0 | 2 | 1 | [1, 3] | [2] | 2 | 1 | 3 | `k += 1` | — |
-    | 60 | combinar | 1 | [1, 2, 3] | 0 | 2 | 1 | [1, 3] | [2] | 2 | 1 | 3 | `while i < len(izquierda):` | — |
-    | 61 | combinar | 1 | [1, 2, 3] | 0 | 2 | 1 | [1, 3] | [2] | 2 | 1 | 3 | `while j < len(derecha):`; Termina la llamada. | sin valor |
-    | 62 | ordenar | 0 | [1, 2, 3] | 0 | 2 | 1 | — | — | — | — | — | `combinar(arr, a, m, b)`; Termina la llamada. | sin valor |
+<span class="k">def</span><span class="w"> </span><span class="nf">combinar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">izquierda</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">:</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">derecha</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">izquierda</span><span class="p">)</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">derecha</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">izquierda</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">derecha</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">izquierda</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">derecha</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">izquierda</span><span class="p">):</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">izquierda</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">derecha</span><span class="p">):</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">derecha</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">2</span>
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-e32ce151575f">Código Python · Ordenamiento por mezcla y combinación</label><textarea id="runner-e32ce151575f" spellcheck="false" wrap="off" rows="14">def ordenar(arr, a, b):
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo inicial:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo ordenado:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-e32ce151575f" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def ordenar(arr, a, b):
     if a &gt;= b:
         return
     m = a + (b - a) // 2
@@ -309,7 +277,7 @@ b = 2
 print(&quot;Arreglo inicial:&quot;, arr)
 ordenar(arr, a, b)
 print(&quot;Arreglo ordenado:&quot;, arr)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

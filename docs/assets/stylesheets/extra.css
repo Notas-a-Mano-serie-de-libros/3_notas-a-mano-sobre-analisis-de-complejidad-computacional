@@ -1098,3 +1098,40 @@ input {
 .example-runner-actions button:focus-visible, .example-runner textarea:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
 .example-runner [data-status] { font-size: .75rem; }
 .example-runner [data-output] { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 20rem; overflow: auto; padding: .6rem; background: var(--md-code-bg-color); }
+
+/* La capa Pygments conserva los colores de los bloques Python de Pages. */
+.python-code-editor { position: relative; margin-top: .5rem; }
+.python-code-editor > .highlight { position: absolute; inset: 0; margin: 0; pointer-events: none; }
+.python-code-editor > .highlight pre,
+.python-code-editor textarea {
+  margin: 0;
+  padding: .6rem;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: .2rem;
+  font: .75rem/1.5 var(--md-code-font-family);
+  letter-spacing: normal;
+  tab-size: 4;
+  white-space: pre;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  box-sizing: border-box;
+}
+.python-code-editor > .highlight pre { height: 100%; overflow: hidden; background: var(--md-code-bg-color); }
+.python-code-editor > .highlight code { display: block; padding: 0; margin: 0; background: none; font: inherit; }
+.python-code-editor textarea {
+  position: relative;
+  height: 20rem;
+  min-height: 8rem;
+  background: transparent;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--md-code-fg-color);
+}
+.python-code-editor textarea::selection {
+  background: var(--md-accent-fg-color--transparent);
+  color: var(--md-code-fg-color);
+  -webkit-text-fill-color: var(--md-code-fg-color);
+}
+.python-code-editor .md-clipboard { display: none; }
+.example-runner-actions button { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; }
+.example-runner-actions .button-icon { display: inline-flex; align-items: center; justify-content: center; width: .8rem; line-height: 1; }

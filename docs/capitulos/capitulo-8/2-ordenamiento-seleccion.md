@@ -17,7 +17,7 @@ El ordenamiento por selección busca el elemento mínimo en el subarreglo no ord
 
 #### Selección: máximo hacia el extremo derecho
 
-Implementación corregida basada en el libro, página 327 (Java).
+Implementación basada en el libro, página 327 (Java).
 
 === "Java"
 
@@ -109,37 +109,23 @@ En C, `n` indica la longitud del arreglo y se recibe como parámetro.
 
 **Resultado:** Ordena el arreglo ascendentemente.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [3, 1, 2]`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-4990a158436a">Código Python · Selección: máximo hacia el extremo derecho</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="nb">max</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="nb">max</span><span class="p">]:</span>
+                <span class="nb">max</span> <span class="o">=</span> <span class="n">j</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="nb">max</span><span class="p">]</span>
+        <span class="n">arr</span><span class="p">[</span><span class="nb">max</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">]</span>
+        <span class="n">arr</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
 
-    **Prueba de escritorio**
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
 
-    | Paso | Método | Profundidad | arr | i | max | j | temp | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | ordenar | 0 | [3, 1, 2] | — | — | — | — | Entrada a la llamada. | — |
-    | 2 | ordenar | 0 | [3, 1, 2] | 0 | — | — | — | `for i in range(len(arr) - 1):` | — |
-    | 3 | ordenar | 0 | [3, 1, 2] | 0 | 0 | — | — | `max = 0` | — |
-    | 4 | ordenar | 0 | [3, 1, 2] | 0 | 0 | 1 | — | `for j in range(1, len(arr) - i):` | — |
-    | 5 | ordenar | 0 | [3, 1, 2] | 0 | 0 | 1 | — | `if arr[j] > arr[max]:` | — |
-    | 6 | ordenar | 0 | [3, 1, 2] | 0 | 0 | 2 | — | `for j in range(1, len(arr) - i):` | — |
-    | 7 | ordenar | 0 | [3, 1, 2] | 0 | 0 | 2 | — | `if arr[j] > arr[max]:` | — |
-    | 8 | ordenar | 0 | [3, 1, 2] | 0 | 0 | 2 | — | `for j in range(1, len(arr) - i):` | — |
-    | 9 | ordenar | 0 | [3, 1, 2] | 0 | 0 | 2 | 3 | `temp = arr[max]` | — |
-    | 10 | ordenar | 0 | [2, 1, 2] | 0 | 0 | 2 | 3 | `arr[max] = arr[len(arr) - 1 - i]` | — |
-    | 11 | ordenar | 0 | [2, 1, 3] | 0 | 0 | 2 | 3 | `arr[len(arr) - 1 - i] = temp` | — |
-    | 12 | ordenar | 0 | [2, 1, 3] | 1 | 0 | 2 | 3 | `for i in range(len(arr) - 1):` | — |
-    | 13 | ordenar | 0 | [2, 1, 3] | 1 | 0 | 2 | 3 | `max = 0` | — |
-    | 14 | ordenar | 0 | [2, 1, 3] | 1 | 0 | 1 | 3 | `for j in range(1, len(arr) - i):` | — |
-    | 15 | ordenar | 0 | [2, 1, 3] | 1 | 0 | 1 | 3 | `if arr[j] > arr[max]:` | — |
-    | 16 | ordenar | 0 | [2, 1, 3] | 1 | 0 | 1 | 3 | `for j in range(1, len(arr) - i):` | — |
-    | 17 | ordenar | 0 | [2, 1, 3] | 1 | 0 | 1 | 2 | `temp = arr[max]` | — |
-    | 18 | ordenar | 0 | [1, 1, 3] | 1 | 0 | 1 | 2 | `arr[max] = arr[len(arr) - 1 - i]` | — |
-    | 19 | ordenar | 0 | [1, 2, 3] | 1 | 0 | 1 | 2 | `arr[len(arr) - 1 - i] = temp` | — |
-    | 20 | ordenar | 0 | [1, 2, 3] | 1 | 0 | 1 | 2 | `for i in range(len(arr) - 1):`; Termina la llamada. | sin valor |
-
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
-
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-4990a158436a">Código Python · Selección: máximo hacia el extremo derecho</label><textarea id="runner-4990a158436a" spellcheck="false" wrap="off" rows="14">def ordenar(arr):
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo inicial:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo ordenado:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-4990a158436a" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def ordenar(arr):
     for i in range(len(arr) - 1):
         max = 0
         for j in range(1, len(arr) - i):
@@ -155,11 +141,11 @@ arr = [3, 1, 2]
 print(&quot;Arreglo inicial:&quot;, arr)
 ordenar(arr)
 print(&quot;Arreglo ordenado:&quot;, arr)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Selección: mínimo y máximo en cada pasada
 
-Implementación corregida basada en el libro, página 329 (Java).
+Implementación basada en el libro, página 329 (Java).
 
 === "Java"
 
@@ -296,45 +282,35 @@ En C, `n` indica la longitud del arreglo y se recibe como parámetro.
 
 **Resultado:** Fija un mínimo a la izquierda y un máximo a la derecha.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [3, 1, 2]`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-31cc71510d45">Código Python · Selección: mínimo y máximo en cada pasada</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">:</span>
+        <span class="nb">min</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="nb">max</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="p">[</span><span class="nb">min</span><span class="p">]:</span>
+                <span class="nb">min</span> <span class="o">=</span> <span class="n">j</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="nb">max</span><span class="p">]:</span>
+                <span class="nb">max</span> <span class="o">=</span> <span class="n">j</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="nb">min</span><span class="p">]</span>
+        <span class="n">arr</span><span class="p">[</span><span class="nb">min</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
+        <span class="k">if</span> <span class="nb">max</span> <span class="o">==</span> <span class="n">a</span><span class="p">:</span>
+            <span class="nb">max</span> <span class="o">=</span> <span class="nb">min</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">b</span><span class="p">]</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="nb">max</span><span class="p">]</span>
+        <span class="n">arr</span><span class="p">[</span><span class="nb">max</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
+        <span class="n">a</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">b</span> <span class="o">-=</span> <span class="mi">1</span>
 
-    **Prueba de escritorio**
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
 
-    | Paso | Método | Profundidad | arr | a | b | min | max | j | temp | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | ordenar | 0 | [3, 1, 2] | — | — | — | — | — | — | Entrada a la llamada. | — |
-    | 2 | ordenar | 0 | [3, 1, 2] | 0 | — | — | — | — | — | `a = 0` | — |
-    | 3 | ordenar | 0 | [3, 1, 2] | 0 | 2 | — | — | — | — | `b = len(arr) - 1` | — |
-    | 4 | ordenar | 0 | [3, 1, 2] | 0 | 2 | — | — | — | — | `while a < b:` | — |
-    | 5 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 0 | — | — | — | `min = a` | — |
-    | 6 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 0 | 0 | — | — | `max = a` | — |
-    | 7 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 0 | 0 | 0 | — | `for j in range(a, b + 1):` | — |
-    | 8 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 0 | 0 | 0 | — | `if arr[j] < arr[min]:` | — |
-    | 9 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 0 | 0 | 0 | — | `if arr[j] > arr[max]:` | — |
-    | 10 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 0 | 0 | 1 | — | `for j in range(a, b + 1):` | — |
-    | 11 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 0 | 0 | 1 | — | `if arr[j] < arr[min]:` | — |
-    | 12 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 1 | 0 | 1 | — | `min = j` | — |
-    | 13 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 1 | 0 | 1 | — | `if arr[j] > arr[max]:` | — |
-    | 14 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 1 | 0 | 2 | — | `for j in range(a, b + 1):` | — |
-    | 15 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 1 | 0 | 2 | — | `if arr[j] < arr[min]:` | — |
-    | 16 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 1 | 0 | 2 | — | `if arr[j] > arr[max]:` | — |
-    | 17 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 1 | 0 | 2 | — | `for j in range(a, b + 1):` | — |
-    | 18 | ordenar | 0 | [3, 1, 2] | 0 | 2 | 1 | 0 | 2 | 3 | `temp = arr[a]` | — |
-    | 19 | ordenar | 0 | [1, 1, 2] | 0 | 2 | 1 | 0 | 2 | 3 | `arr[a] = arr[min]` | — |
-    | 20 | ordenar | 0 | [1, 3, 2] | 0 | 2 | 1 | 0 | 2 | 3 | `arr[min] = temp` | — |
-    | 21 | ordenar | 0 | [1, 3, 2] | 0 | 2 | 1 | 0 | 2 | 3 | `if max == a:` | — |
-    | 22 | ordenar | 0 | [1, 3, 2] | 0 | 2 | 1 | 1 | 2 | 3 | `max = min` | — |
-    | 23 | ordenar | 0 | [1, 3, 2] | 0 | 2 | 1 | 1 | 2 | 2 | `temp = arr[b]` | — |
-    | 24 | ordenar | 0 | [1, 3, 3] | 0 | 2 | 1 | 1 | 2 | 2 | `arr[b] = arr[max]` | — |
-    | 25 | ordenar | 0 | [1, 2, 3] | 0 | 2 | 1 | 1 | 2 | 2 | `arr[max] = temp` | — |
-    | 26 | ordenar | 0 | [1, 2, 3] | 1 | 2 | 1 | 1 | 2 | 2 | `a += 1` | — |
-    | 27 | ordenar | 0 | [1, 2, 3] | 1 | 1 | 1 | 1 | 2 | 2 | `b -= 1` | — |
-    | 28 | ordenar | 0 | [1, 2, 3] | 1 | 1 | 1 | 1 | 2 | 2 | `while a < b:`; Termina la llamada. | sin valor |
-
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
-
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-31cc71510d45">Código Python · Selección: mínimo y máximo en cada pasada</label><textarea id="runner-31cc71510d45" spellcheck="false" wrap="off" rows="14">def ordenar(arr):
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo inicial:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo ordenado:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-31cc71510d45" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def ordenar(arr):
     a = 0
     b = len(arr) - 1
     while a &lt; b:
@@ -362,7 +338,7 @@ arr = [3, 1, 2]
 print(&quot;Arreglo inicial:&quot;, arr)
 ordenar(arr)
 print(&quot;Arreglo ordenado:&quot;, arr)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

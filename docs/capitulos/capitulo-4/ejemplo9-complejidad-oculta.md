@@ -17,7 +17,7 @@ El algoritmo de Fibonacci es iterativo, pero los enteros crecen con \(n\). La si
 
 #### Fibonacci con enteros de precisión arbitraria
 
-Implementación corregida basada en el libro, página 167 (Java).
+Implementación basada en el libro, página 167 (Java).
 
 === "Java"
 
@@ -131,7 +131,25 @@ La versión C requiere GMP (`gmp.h` y enlace con `-lgmp`) para conservar la prec
     | `i = 3; c = 2` | Actualiza a = 1, b = 2. |
     | `i = 4; c = 3` | Actualiza a = 2, b = 3; devuelve 3. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-99de70187345">Código Python · Fibonacci con enteros de precisión arbitraria</label><textarea id="runner-99de70187345" spellcheck="false" wrap="off" rows="14">def fibonacciBigInteger(n):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-99de70187345">Código Python · Fibonacci con enteros de precisión arbitraria</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">fibonacciBigInteger</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"n debe ser no negativo"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">n</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">c</span>
+    <span class="k">return</span> <span class="n">b</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">fibonacciBigInteger</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-99de70187345" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def fibonacciBigInteger(n):
     if n &lt; 0:
         raise ValueError(&quot;n debe ser no negativo&quot;)
     if n &lt;= 1:
@@ -149,7 +167,7 @@ n = 4
 
 resultado = fibonacciBigInteger(n)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

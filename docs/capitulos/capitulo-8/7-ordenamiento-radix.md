@@ -19,7 +19,7 @@ La versión implementada aquí usa radix LSD en base 10. Su comportamiento depen
 
 #### Radix decimal para enteros con signo
 
-Implementación corregida basada en el libro, página 363 (Java).
+Implementación basada en el libro, página 363 (Java).
 
 === "Java"
 
@@ -235,76 +235,49 @@ En C, `n` indica la longitud del arreglo y se recibe como parámetro.
 
 **Resultado:** Ordena enteros de todo el rango de int, incluidas entradas negativas y vacías, mediante claves desplazadas y pasadas estables.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [21, 13, 12]`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-96a3e8c5dc4e">Código Python · Radix decimal para enteros con signo</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">arr</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">minimo</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">maximo</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">rango</span> <span class="o">=</span> <span class="n">maximo</span> <span class="o">-</span> <span class="n">minimo</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">rango</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">rango</span> <span class="o">//=</span> <span class="mi">10</span>
+        <span class="n">d</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">ordenarPorDigito</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
 
-    **Prueba de escritorio**
 
-    | Paso | Método | Profundidad | arr | min | max | rango | d | i | n | exp | conteo | salida | valor | j | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | ordenar | 0 | [21, 13, 12] | — | — | — | — | — | — | — | — | — | — | — | Entrada a la llamada. | — |
-    | 2 | ordenar | 0 | [21, 13, 12] | — | — | — | — | — | — | — | — | — | — | — | `if not arr:` | — |
-    | 3 | ordenar | 0 | [21, 13, 12] | 12 | — | — | — | — | — | — | — | — | — | — | `minimo = min(arr)` | — |
-    | 4 | ordenar | 0 | [21, 13, 12] | 12 | 21 | — | — | — | — | — | — | — | — | — | `maximo = max(arr)` | — |
-    | 5 | ordenar | 0 | [21, 13, 12] | 12 | 21 | 9 | — | — | — | — | — | — | — | — | `rango = maximo - minimo` | — |
-    | 6 | ordenar | 0 | [21, 13, 12] | 12 | 21 | 9 | 1 | — | — | — | — | — | — | — | `d = 1` | — |
-    | 7 | ordenar | 0 | [21, 13, 12] | 12 | 21 | 9 | 1 | — | — | — | — | — | — | — | `while rango >= 10:` | — |
-    | 8 | ordenar | 0 | [21, 13, 12] | 12 | 21 | 9 | 1 | 1 | — | — | — | — | — | — | `for i in range(1, d + 1):` | — |
-    | 9 | ordenarPorDigito | 1 | [21, 13, 12] | — | — | — | — | 1 | — | — | — | — | — | — | Entrada a la llamada. | — |
-    | 10 | ordenarPorDigito | 1 | [21, 13, 12] | — | — | — | — | 1 | — | — | — | — | — | — | `if not 1 <= i <= 10:` | — |
-    | 11 | ordenarPorDigito | 1 | [21, 13, 12] | — | — | — | — | 1 | — | — | — | — | — | — | `if not arr:` | — |
-    | 12 | ordenarPorDigito | 1 | [21, 13, 12] | — | — | — | — | 1 | 3 | — | — | — | — | — | `n = len(arr)` | — |
-    | 13 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | — | — | — | — | — | `minimo = min(arr)` | — |
-    | 14 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | — | — | — | — | `exp = 1` | — |
-    | 15 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | — | — | — | — | `for j in range(1, i):` | — |
-    | 16 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] | — | — | — | `conteo = [0] * 10` | — |
-    | 17 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] | [0, 0, 0] | — | — | `salida = [0] * n` | — |
-    | 18 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] | [0, 0, 0] | 21 | — | `for valor in arr:` | — |
-    | 19 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 21 | — | `conteo[(valor - minimo) // exp % 10] += 1` | — |
-    | 20 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [0, 0, 0, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 13 | — | `for valor in arr:` | — |
-    | 21 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [0, 1, 0, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 13 | — | `conteo[(valor - minimo) // exp % 10] += 1` | — |
-    | 22 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [0, 1, 0, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | — | `for valor in arr:` | — |
-    | 23 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 1, 0, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | — | `conteo[(valor - minimo) // exp % 10] += 1` | — |
-    | 24 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 1, 0, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | — | `for valor in arr:` | — |
-    | 25 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 1, 0, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | 1 | `for j in range(1, 10):` | — |
-    | 26 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 0, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | 1 | `conteo[j] += conteo[j - 1]` | — |
-    | 27 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 0, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | 2 | `for j in range(1, 10):` | — |
-    | 28 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | 2 | `conteo[j] += conteo[j - 1]` | — |
-    | 29 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 0, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | 3 | `for j in range(1, 10):` | — |
-    | 30 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | 3 | `conteo[j] += conteo[j - 1]` | — |
-    | 31 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 0, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | 4 | `for j in range(1, 10):` | — |
-    | 32 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | 4 | `conteo[j] += conteo[j - 1]` | — |
-    | 33 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 0, 0, 0, 0, 1] | [0, 0, 0] | 12 | 5 | `for j in range(1, 10):` | — |
-    | 34 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 0, 0, 0, 1] | [0, 0, 0] | 12 | 5 | `conteo[j] += conteo[j - 1]` | — |
-    | 35 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 0, 0, 0, 1] | [0, 0, 0] | 12 | 6 | `for j in range(1, 10):` | — |
-    | 36 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 0, 0, 1] | [0, 0, 0] | 12 | 6 | `conteo[j] += conteo[j - 1]` | — |
-    | 37 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 0, 0, 1] | [0, 0, 0] | 12 | 7 | `for j in range(1, 10):` | — |
-    | 38 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 2, 0, 1] | [0, 0, 0] | 12 | 7 | `conteo[j] += conteo[j - 1]` | — |
-    | 39 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 2, 0, 1] | [0, 0, 0] | 12 | 8 | `for j in range(1, 10):` | — |
-    | 40 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 2, 2, 1] | [0, 0, 0] | 12 | 8 | `conteo[j] += conteo[j - 1]` | — |
-    | 41 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 2, 2, 1] | [0, 0, 0] | 12 | 9 | `for j in range(1, 10):` | — |
-    | 42 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 2, 2, 3] | [0, 0, 0] | 12 | 9 | `conteo[j] += conteo[j - 1]` | — |
-    | 43 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 2, 2, 3] | [0, 0, 0] | 12 | 9 | `for j in range(1, 10):` | — |
-    | 44 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | — | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 2, 2, 3] | [0, 0, 0] | 12 | 2 | `for j in range(n - 1, -1, -1):` | — |
-    | 45 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 0 | 1 | 3 | 1 | [1, 2, 2, 2, 2, 2, 2, 2, 2, 3] | [0, 0, 0] | 12 | 2 | `d = (arr[j] - minimo) // exp % 10` | — |
-    | 46 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 0 | 1 | 3 | 1 | [0, 2, 2, 2, 2, 2, 2, 2, 2, 3] | [0, 0, 0] | 12 | 2 | `conteo[d] -= 1` | — |
-    | 47 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 0 | 1 | 3 | 1 | [0, 2, 2, 2, 2, 2, 2, 2, 2, 3] | [12, 0, 0] | 12 | 2 | `salida[conteo[d]] = arr[j]` | — |
-    | 48 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 0 | 1 | 3 | 1 | [0, 2, 2, 2, 2, 2, 2, 2, 2, 3] | [12, 0, 0] | 12 | 1 | `for j in range(n - 1, -1, -1):` | — |
-    | 49 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 1 | 1 | 3 | 1 | [0, 2, 2, 2, 2, 2, 2, 2, 2, 3] | [12, 0, 0] | 12 | 1 | `d = (arr[j] - minimo) // exp % 10` | — |
-    | 50 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 1 | 1 | 3 | 1 | [0, 1, 2, 2, 2, 2, 2, 2, 2, 3] | [12, 0, 0] | 12 | 1 | `conteo[d] -= 1` | — |
-    | 51 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 1 | 1 | 3 | 1 | [0, 1, 2, 2, 2, 2, 2, 2, 2, 3] | [12, 13, 0] | 12 | 1 | `salida[conteo[d]] = arr[j]` | — |
-    | 52 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 1 | 1 | 3 | 1 | [0, 1, 2, 2, 2, 2, 2, 2, 2, 3] | [12, 13, 0] | 12 | 0 | `for j in range(n - 1, -1, -1):` | — |
-    | 53 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 9 | 1 | 3 | 1 | [0, 1, 2, 2, 2, 2, 2, 2, 2, 3] | [12, 13, 0] | 12 | 0 | `d = (arr[j] - minimo) // exp % 10` | — |
-    | 54 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 9 | 1 | 3 | 1 | [0, 1, 2, 2, 2, 2, 2, 2, 2, 2] | [12, 13, 0] | 12 | 0 | `conteo[d] -= 1` | — |
-    | 55 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 9 | 1 | 3 | 1 | [0, 1, 2, 2, 2, 2, 2, 2, 2, 2] | [12, 13, 21] | 12 | 0 | `salida[conteo[d]] = arr[j]` | — |
-    | 56 | ordenarPorDigito | 1 | [21, 13, 12] | 12 | — | — | 9 | 1 | 3 | 1 | [0, 1, 2, 2, 2, 2, 2, 2, 2, 2] | [12, 13, 21] | 12 | 0 | `for j in range(n - 1, -1, -1):` | — |
-    | 57 | ordenarPorDigito | 1 | [12, 13, 21] | 12 | — | — | 9 | 1 | 3 | 1 | [0, 1, 2, 2, 2, 2, 2, 2, 2, 2] | [12, 13, 21] | 12 | 0 | `arr[:] = salida`; Termina la llamada. | sin valor |
-    | 58 | ordenar | 0 | [12, 13, 21] | 12 | 21 | 9 | 1 | 1 | — | — | — | — | — | — | `ordenarPorDigito(arr, i)` | — |
-    | 59 | ordenar | 0 | [12, 13, 21] | 12 | 21 | 9 | 1 | 1 | — | — | — | — | — | — | `for i in range(1, d + 1):`; Termina la llamada. | sin valor |
+<span class="k">def</span><span class="w"> </span><span class="nf">ordenarPorDigito</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Dígito fuera del rango de int de Java"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">arr</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">minimo</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="n">exp</span> <span class="o">*=</span> <span class="mi">10</span>
+    <span class="n">conteo</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span>
+    <span class="n">salida</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="k">for</span> <span class="n">valor</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">:</span>
+        <span class="n">conteo</span><span class="p">[(</span><span class="n">valor</span> <span class="o">-</span> <span class="n">minimo</span><span class="p">)</span> <span class="o">//</span> <span class="n">exp</span> <span class="o">%</span> <span class="mi">10</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="n">conteo</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="n">conteo</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">minimo</span><span class="p">)</span> <span class="o">//</span> <span class="n">exp</span> <span class="o">%</span> <span class="mi">10</span>
+        <span class="n">conteo</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">salida</span><span class="p">[</span><span class="n">conteo</span><span class="p">[</span><span class="n">d</span><span class="p">]]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+    <span class="n">arr</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">salida</span>
 
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">21</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-96a3e8c5dc4e">Código Python · Radix decimal para enteros con signo</label><textarea id="runner-96a3e8c5dc4e" spellcheck="false" wrap="off" rows="14">def ordenar(arr):
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo inicial:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo ordenado:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-96a3e8c5dc4e" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def ordenar(arr):
     if not arr:
         return
     minimo = min(arr)
@@ -346,13 +319,13 @@ arr = [21, 13, 12]
 print(&quot;Arreglo inicial:&quot;, arr)
 ordenar(arr)
 print(&quot;Arreglo ordenado:&quot;, arr)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 
 La animación y el contador son adaptaciones Python con operaciones instrumentadas. Incluyen comparaciones, movimientos y control del recorrido según el contador; no se deben interpretar todos los pasos como una sola clase de operación Java. Las opciones descendentes son ampliaciones: los listados del libro ordenan ascendentemente.
 
-El listado corregido usa base decimal y desplaza las claves por el mínimo para admitir valores negativos. La adaptación del laboratorio puede representar esas claves de otra manera.
+El listado usa base decimal y desplaza las claves por el mínimo para admitir valores negativos. La adaptación del laboratorio puede representar esas claves de otra manera.
 
 [Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/sort/sort_algorithms.py).
 

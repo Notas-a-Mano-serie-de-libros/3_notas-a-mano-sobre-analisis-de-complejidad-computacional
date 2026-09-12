@@ -15,7 +15,7 @@
 
 ##### Factorial recursivo
 
-Implementación corregida basada en el libro, página 229 (Java).
+Implementación basada en el libro, página 229 (Java).
 
 === "Java"
 
@@ -113,7 +113,21 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `factorial(1) = 1` | Caso base. |
     | `Retorno` | \(2 \times 1 = 2\); luego \(3 \times 2 = 6\). |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-c8aa4c6cf900">Código Python · Factorial recursivo</label><textarea id="runner-c8aa4c6cf900" spellcheck="false" wrap="off" rows="14">def factorial(n):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-c8aa4c6cf900">Código Python · Factorial recursivo</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"n debe ser no negativo"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">"El factorial no cabe en int de Java"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-c8aa4c6cf900" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def factorial(n):
     if n &lt; 0:
         raise ValueError(&quot;n debe ser no negativo&quot;)
     if n &gt; 12:
@@ -127,7 +141,7 @@ n = 3
 
 resultado = factorial(n)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 ##### Laboratorio y medición
 

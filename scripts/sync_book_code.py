@@ -33,7 +33,7 @@ def render(listings: list[dict], level: int = 4, detail: dict | None = None) -> 
         if listing["folio"] == "shell":
             parts.append("Implementación de ampliación del sitio (Java); no es un listado del PDF.")
         else:
-            parts.append(f"Implementación corregida basada en el libro, página {listing['folio']} (Java).")
+            parts.append(f"Implementación basada en el libro, página {listing['folio']} (Java).")
         parts.append(language_tabs(listing))
         parts.append(
             "Java presenta la implementación de referencia; las otras pestañas traducen esta misma variante. En pseudocódigo, `rango(inicio, fin, paso)` excluye `fin`. Python usa enteros de precisión arbitraria; donde Java limita el resultado a `int`, se conserva esa comprobación. En C se usa `int` de 32 bits y `int64_t` para los cálculos ampliados; los errores de dominio o desbordamiento se señalan con `abort()`."
@@ -58,19 +58,21 @@ def render(listings: list[dict], level: int = 4, detail: dict | None = None) -> 
             parts.append("**Explicación:** " + listing["explanation"])
         if listing.get("note"):
             parts.append('!!! note "Explicación de la implementación"\n    ' + listing["note"])
-        example = '??? example "Ejemplo paso a paso"\n    Entrada: `' + listing["example"] + "`."
-        if listing.get("desktop_trace"):
-            trace = listing["desktop_trace"]
-            columns = trace["columns"]
-            example += "\n\n    **Prueba de escritorio**\n\n    | " + " | ".join(columns) + " |\n"
-            example += "    | " + " | ".join("---" for _ in columns) + " |\n"
-            example += "\n".join("    | " + " | ".join(row) + " |" for row in trace["rows"])
-            example += "\n\n    " + trace["legend"]
-        else:
-            example += "\n\n    | Estado | Acción o resultado |\n    | --- | --- |\n"
-            example += "\n".join(f"    | {format_state(state)} | {action} |" for state, action in listing["trace"])
-        parts.append(example)
-        parts.append(render_runner(listing))
+        executable_only = listing["folio"] in {247, 254, 262, 268, 273, 278, 290, 298, 307, 312, 321, 323, 327, 329, 333, 341, 349, 363, "shell"}
+        if not executable_only:
+            example = '??? example "Ejemplo paso a paso"\n    Entrada: `' + listing["example"] + "`."
+            if listing.get("desktop_trace"):
+                trace = listing["desktop_trace"]
+                columns = trace["columns"]
+                example += "\n\n    **Prueba de escritorio**\n\n    | " + " | ".join(columns) + " |\n"
+                example += "    | " + " | ".join("---" for _ in columns) + " |\n"
+                example += "\n".join("    | " + " | ".join(row) + " |" for row in trace["rows"])
+                example += "\n\n    " + trace["legend"]
+            else:
+                example += "\n\n    | Estado | Acción o resultado |\n    | --- | --- |\n"
+                example += "\n".join(f"    | {format_state(state)} | {action} |" for state, action in listing["trace"])
+            parts.append(example)
+        parts.append(render_runner(listing, executable_only=executable_only))
 
     if detail:
         parts.append("#" * level + " Laboratorio y medición")

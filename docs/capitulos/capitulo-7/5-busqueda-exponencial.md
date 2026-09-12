@@ -19,7 +19,7 @@ Es especialmente eficaz cuando el objetivo está cerca del inicio del arreglo, y
 
 #### Búsqueda exponencial con búsqueda binaria auxiliar
 
-Implementación corregida basada en el libro, página 298 (Java).
+Implementación basada en el libro, página 298 (Java).
 
 === "Java"
 
@@ -179,7 +179,7 @@ En C, `n` indica la longitud del arreglo y se recibe como parámetro.
 | `x` | Valor buscado. |
 | `i` | Límite que se duplica. |
 | `a, b` | Intervalo que se envía a la auxiliar. |
-| `busquedaBinaria` | Auxiliar incluida en el listado corregido. |
+| `busquedaBinaria` | Auxiliar incluida en el listado. |
 
 **Precondiciones:** arr no nulo y ordenado de menor a mayor.
 
@@ -187,35 +187,38 @@ En C, `n` indica la longitud del arreglo y se recibe como parámetro.
 
 **Explicación:** El arreglo vacío devuelve false. La actualización del avance se calcula en long y se limita a arr.length antes de convertirla a int; no se exige que la suma o duplicación previa quepa en int.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [1, 3, 5, 7, 9], x = 7`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-64abd99494fb">Código Python · Búsqueda exponencial con búsqueda binaria auxiliar</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="ow">and</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">x</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">busquedaBinaria</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
-    **Prueba de escritorio**
 
-    | Paso | Método | Profundidad | arr | x | n | i | a | b | m | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | — | — | — | — | — | Entrada a la llamada. | — |
-    | 2 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | — | — | — | — | `n = len(arr)` | — |
-    | 3 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | — | — | — | — | `if n == 0:` | — |
-    | 4 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | — | — | — | — | `if arr[0] == x:` | — |
-    | 5 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 1 | — | — | — | `i = 1` | — |
-    | 6 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 1 | — | — | — | `while i < n and arr[i] <= x:` | — |
-    | 7 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | — | — | — | `i = min(i * 2, n)` | — |
-    | 8 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 2 | — | — | — | `while i < n and arr[i] <= x:` | — |
-    | 9 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 4 | — | — | — | `i = min(i * 2, n)` | — |
-    | 10 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 4 | — | — | — | `while i < n and arr[i] <= x:` | — |
-    | 11 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 4 | 2 | — | — | `a = i // 2` | — |
-    | 12 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 4 | 2 | 4 | — | `b = min(i, n - 1)` | — |
-    | 13 | busquedaBinaria | 1 | [1, 3, 5, 7, 9] | 7 | — | — | 2 | 4 | — | Entrada a la llamada. | — |
-    | 14 | busquedaBinaria | 1 | [1, 3, 5, 7, 9] | 7 | — | — | 2 | 4 | — | `while a <= b:` | — |
-    | 15 | busquedaBinaria | 1 | [1, 3, 5, 7, 9] | 7 | — | — | 2 | 4 | 3 | `m = a + (b - a) // 2` | — |
-    | 16 | busquedaBinaria | 1 | [1, 3, 5, 7, 9] | 7 | — | — | 2 | 4 | 3 | `if arr[m] == x:` | — |
-    | 17 | busquedaBinaria | 1 | [1, 3, 5, 7, 9] | 7 | — | — | 2 | 4 | 3 | `return True`; Termina la llamada. | true |
-    | 18 | buscar | 0 | [1, 3, 5, 7, 9] | 7 | 5 | 4 | 2 | 4 | — | `return busquedaBinaria(arr, a, b, x)`; Termina la llamada. | true |
+<span class="k">def</span><span class="w"> </span><span class="nf">busquedaBinaria</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">while</span> <span class="n">a</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">m</span><span class="p">]:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">m</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="kc">False</span>
 
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mi">7</span>
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-64abd99494fb">Código Python · Búsqueda exponencial con búsqueda binaria auxiliar</label><textarea id="runner-64abd99494fb" spellcheck="false" wrap="off" rows="14">def buscar(arr, x):
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-64abd99494fb" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def buscar(arr, x):
     n = len(arr)
     if n == 0:
         return False
@@ -246,13 +249,13 @@ x = 7
 
 resultado = buscar(arr, x)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 
 La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.
 
-El listado corregido incluye controles para los casos límite; el laboratorio usa su adaptación Python.
+El listado incluye controles para los casos límite; el laboratorio usa su adaptación Python.
 
 [Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/search/search_metrics.py).
 

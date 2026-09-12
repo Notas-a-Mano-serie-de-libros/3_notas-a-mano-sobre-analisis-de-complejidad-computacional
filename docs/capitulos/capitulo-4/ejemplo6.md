@@ -12,7 +12,7 @@ Este ejemplo combina un ciclo externo, dos ciclos internos y llamadas a funcione
 
 #### Ciclos secuenciales dentro de un ciclo
 
-Implementación corregida basada en el libro, página 161 (Java).
+Implementación basada en el libro, página 161 (Java).
 
 === "Java"
 
@@ -115,7 +115,37 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `k = 4, 2` | Imprime cada k y llama a foo2 dos veces. |
     | `foo1()` | Ejecuta una llamada al terminar la repetición exterior. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-db7ad92b2a9a">Código Python · Ciclos secuenciales dentro de un ciclo</label><textarea id="runner-db7ad92b2a9a" spellcheck="false" wrap="off" rows="14">def imprimirElementos(m, n):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-db7ad92b2a9a">Código Python · Ciclos secuenciales dentro de un ciclo</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">imprimirElementos</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="k">while</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">foo2</span><span class="p">()</span>
+            <span class="n">k</span> <span class="o">//=</span> <span class="mi">2</span>
+        <span class="n">foo1</span><span class="p">()</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">m</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># Completa estas auxiliares según el problema que estés analizando.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">foo1</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo1 en el editor"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">foo2</span><span class="p">():</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo2 en el editor"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo en el editor"</span><span class="p">)</span>
+
+<span class="n">imprimirElementos</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Ejemplo finalizado"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-db7ad92b2a9a" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def imprimirElementos(m, n):
     for i in range(m):
         print(i)
         for j in range(n):
@@ -145,7 +175,7 @@ def foo(n):
 
 imprimirElementos(m, n)
 print(&quot;Ejemplo finalizado&quot;)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

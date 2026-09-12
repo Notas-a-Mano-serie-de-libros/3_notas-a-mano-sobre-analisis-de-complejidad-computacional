@@ -24,7 +24,7 @@ Como los tres recorridos dependen de \(n\), el número total de operaciones crec
 
 #### Multiplicación de matrices cuadradas
 
-Implementación corregida basada en el libro, página 177 (Java).
+Implementación basada en el libro, página 177 (Java).
 
 === "Java"
 
@@ -136,7 +136,28 @@ En C, las dimensiones se reciben como parámetros; las matrices de salida las re
     | `i = 0, j = 1` | Acumula \(1 \times 0 + 2 \times 2 = 4\). |
     | `Segunda fila` | Obtiene 10 y 8; devuelve [[4, 4], [10, 8]]. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-f3bbc29baeb8">Código Python · Multiplicación de matrices cuadradas</label><textarea id="runner-f3bbc29baeb8" spellcheck="false" wrap="off" rows="14">def multiplicar(a, b):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-f3bbc29baeb8">Código Python · Multiplicación de matrices cuadradas</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">multiplicar</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">resultado</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">producto</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">b</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">2147483648</span> <span class="o">&lt;=</span> <span class="n">producto</span> <span class="o">&lt;=</span> <span class="mi">2147483647</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">"El producto no cabe en int de Java"</span><span class="p">)</span>
+                <span class="n">suma</span> <span class="o">=</span> <span class="n">resultado</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">producto</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mi">2147483648</span> <span class="o">&lt;=</span> <span class="n">suma</span> <span class="o">&lt;=</span> <span class="mi">2147483647</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">OverflowError</span><span class="p">(</span><span class="s2">"La suma no cabe en int de Java"</span><span class="p">)</span>
+                <span class="n">resultado</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">suma</span>
+    <span class="k">return</span> <span class="n">resultado</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">a</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+<span class="n">b</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">multiplicar</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-f3bbc29baeb8" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def multiplicar(a, b):
     n = len(a)
     resultado = [[0] * n for _ in range(n)]
     for i in range(n):
@@ -157,7 +178,7 @@ b = [[2, 0], [1, 2]]
 
 resultado = multiplicar(a, b)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

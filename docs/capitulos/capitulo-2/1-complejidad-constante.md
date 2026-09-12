@@ -28,7 +28,7 @@ La diferencia entre listas pequeñas y grandes aparece en otras operaciones, com
 
 #### Acceso directo a un elemento
 
-Implementación corregida basada en el libro, página 148 (Java).
+Implementación basada en el libro, página 148 (Java).
 
 === "Java"
 
@@ -84,7 +84,16 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `i = 1` | Identifica la segunda posición. |
     | `arr[i]` | El valor leído es 8. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-dd0399c316f2">Código Python · Acceso directo a un elemento</label><textarea id="runner-dd0399c316f2" spellcheck="false" wrap="off" rows="14">arr = [4, 8, 12]
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-dd0399c316f2">Código Python · Acceso directo a un elemento</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">m</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+<span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># Acceso al elemento i del arreglo.</span>
+<span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>  <span class="c1"># Acceso al elemento i, j de la matriz.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"arr[i]:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"m[i][j]:"</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+</code></pre></div><textarea id="runner-dd0399c316f2" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">arr = [4, 8, 12]
 i = 1
 m = [[1, 2], [3, 4]]
 j = 1
@@ -93,7 +102,7 @@ arr[i]  # Acceso al elemento i del arreglo.
 m[i][j]  # Acceso al elemento i, j de la matriz.
 print(&quot;arr[i]:&quot;, arr[i])
 print(&quot;m[i][j]:&quot;, m[i][j])
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

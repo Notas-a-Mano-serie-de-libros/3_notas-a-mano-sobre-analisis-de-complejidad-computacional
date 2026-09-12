@@ -3925,7 +3925,7 @@
           "x": "Valor buscado.",
           "i": "Límite que se duplica.",
           "a, b": "Intervalo que se envía a la auxiliar.",
-          "busquedaBinaria": "Auxiliar incluida en el listado corregido."
+          "busquedaBinaria": "Auxiliar incluida en el listado."
         },
         "preconditions": "arr no nulo y ordenado de menor a mayor.",
         "result": "Devuelve el resultado booleano de la búsqueda auxiliar.",
@@ -9973,7 +9973,7 @@
     "capitulo-7/3-busqueda-interpolacion.md": {
       "relation": [
         "La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.",
-        "El listado corregido incluye controles para los casos límite; el laboratorio usa su adaptación Python."
+        "El listado incluye controles para los casos límite; el laboratorio usa su adaptación Python."
       ],
       "patches": [
         [
@@ -9986,7 +9986,7 @@
     "capitulo-7/4-busqueda-saltos.md": {
       "relation": [
         "La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.",
-        "El listado corregido incluye controles para los casos límite; el laboratorio usa su adaptación Python."
+        "El listado incluye controles para los casos límite; el laboratorio usa su adaptación Python."
       ],
       "patches": [
         [
@@ -9999,7 +9999,7 @@
     "capitulo-7/5-busqueda-exponencial.md": {
       "relation": [
         "La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.",
-        "El listado corregido incluye controles para los casos límite; el laboratorio usa su adaptación Python."
+        "El listado incluye controles para los casos límite; el laboratorio usa su adaptación Python."
       ],
       "patches": [
         [
@@ -10073,7 +10073,7 @@
     "capitulo-8/7-ordenamiento-radix.md": {
       "relation": [
         "La animación y el contador son adaptaciones Python con operaciones instrumentadas. Incluyen comparaciones, movimientos y control del recorrido según el contador; no se deben interpretar todos los pasos como una sola clase de operación Java. Las opciones descendentes son ampliaciones: los listados del libro ordenan ascendentemente.",
-        "El listado corregido usa base decimal y desplaza las claves por el mínimo para admitir valores negativos. La adaptación del laboratorio puede representar esas claves de otra manera."
+        "El listado usa base decimal y desplaza las claves por el mínimo para admitir valores negativos. La adaptación del laboratorio puede representar esas claves de otra manera."
       ],
       "patches": [],
       "source": "core/sort/sort_algorithms.py"

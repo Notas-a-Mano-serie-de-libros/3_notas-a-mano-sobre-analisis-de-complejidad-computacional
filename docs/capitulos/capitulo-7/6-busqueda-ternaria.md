@@ -19,7 +19,7 @@ Aunque cada iteración descarta más que la búsqueda binaria (un tercio en vez 
 
 #### Búsqueda ternaria recursiva
 
-Implementación corregida basada en el libro, página 307 (Java).
+Implementación basada en el libro, página 307 (Java).
 
 === "Java"
 
@@ -122,31 +122,28 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
 
 **Resultado:** Devuelve true si encuentra x; false al agotar el intervalo.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [1, 3, 5, 7, 9], a = 0, b = 4, x = 7`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-9f32c04be81a">Código Python · Búsqueda ternaria recursiva</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">m1</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span>
+    <span class="n">m2</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span>
+    <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">m1</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">arr</span><span class="p">[</span><span class="n">m2</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">m1</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">m1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">m2</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">m2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">m1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
-    **Prueba de escritorio**
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mi">7</span>
 
-    | Paso | Método | Profundidad | arr | a | b | x | m1 | m2 | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | — | Entrada a la llamada. | — |
-    | 2 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | — | `if a > b:` | — |
-    | 3 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | — | `m1 = a + (b - a) // 3` | — |
-    | 4 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `m2 = b - (b - a + 2) // 3` | — |
-    | 5 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if arr[m1] == x or arr[m2] == x:` | — |
-    | 6 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if x < arr[m1]:` | — |
-    | 7 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if x > arr[m2]:` | — |
-    | 8 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | — | — | Entrada a la llamada. | — |
-    | 9 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | — | — | `if a > b:` | — |
-    | 10 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | — | `m1 = a + (b - a) // 3` | — |
-    | 11 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `m2 = b - (b - a + 2) // 3` | — |
-    | 12 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `if arr[m1] == x or arr[m2] == x:` | — |
-    | 13 | buscar | 1 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `return True`; Termina la llamada. | true |
-    | 14 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `return buscar(arr, m2 + 1, b, x)`; Termina la llamada. | true |
-
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
-
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-9f32c04be81a">Código Python · Búsqueda ternaria recursiva</label><textarea id="runner-9f32c04be81a" spellcheck="false" wrap="off" rows="14">def buscar(arr, a, b, x):
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-9f32c04be81a" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def buscar(arr, a, b, x):
     if a &gt; b:
         return False
     m1 = a + (b - a) // 3
@@ -167,11 +164,11 @@ x = 7
 
 resultado = buscar(arr, a, b, x)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Búsqueda ternaria iterativa
 
-Implementación corregida basada en el libro, página 312 (Java).
+Implementación basada en el libro, página 312 (Java).
 
 === "Java"
 
@@ -280,30 +277,30 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
 
 **Resultado:** Devuelve true si encuentra x; false al agotar el intervalo.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [1, 3, 5, 7, 9], a = 0, b = 4, x = 7`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-a9fc79021755">Código Python · Búsqueda ternaria iterativa</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">while</span> <span class="n">a</span> <span class="o">&lt;=</span> <span class="n">b</span><span class="p">:</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span>
+        <span class="n">m2</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">m1</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span> <span class="ow">or</span> <span class="n">arr</span><span class="p">[</span><span class="n">m2</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">m1</span><span class="p">]:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">m1</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">m2</span><span class="p">]:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">m2</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">m1</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">m2</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="kc">False</span>
 
-    **Prueba de escritorio**
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mi">7</span>
 
-    | Paso | Método | Profundidad | arr | a | b | x | m1 | m2 | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | — | Entrada a la llamada. | — |
-    | 2 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | — | — | `while a <= b:` | — |
-    | 3 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | — | `m1 = a + (b - a) // 3` | — |
-    | 4 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `m2 = b - (b - a + 2) // 3` | — |
-    | 5 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if arr[m1] == x or arr[m2] == x:` | — |
-    | 6 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `if x < arr[m1]:` | — |
-    | 7 | buscar | 0 | [1, 3, 5, 7, 9] | 0 | 4 | 7 | 1 | 2 | `elif x > arr[m2]:` | — |
-    | 8 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 1 | 2 | `a = m2 + 1` | — |
-    | 9 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 1 | 2 | `while a <= b:` | — |
-    | 10 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 2 | `m1 = a + (b - a) // 3` | — |
-    | 11 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `m2 = b - (b - a + 2) // 3` | — |
-    | 12 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `if arr[m1] == x or arr[m2] == x:` | — |
-    | 13 | buscar | 0 | [1, 3, 5, 7, 9] | 3 | 4 | 7 | 3 | 3 | `return True`; Termina la llamada. | true |
-
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
-
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-a9fc79021755">Código Python · Búsqueda ternaria iterativa</label><textarea id="runner-a9fc79021755" spellcheck="false" wrap="off" rows="14">def buscar(arr, a, b, x):
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-a9fc79021755" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def buscar(arr, a, b, x):
     while a &lt;= b:
         m1 = a + (b - a) // 3
         m2 = b - (b - a + 2) // 3
@@ -326,7 +323,7 @@ x = 7
 
 resultado = buscar(arr, a, b, x)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

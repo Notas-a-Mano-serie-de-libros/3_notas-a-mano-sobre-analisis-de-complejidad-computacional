@@ -48,7 +48,7 @@ Para distribuciones uniformes alcanza O(log(log(n))) en el caso promedio, lo que
 
 #### Búsqueda por interpolación iterativa
 
-Implementación corregida basada en el libro, página 278 (Java).
+Implementación basada en el libro, página 278 (Java).
 
 === "Java"
 
@@ -157,23 +157,30 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
 
 **Explicación:** La comprobación `den == 0` resuelve los extremos iguales antes de dividir. Los cálculos num y den se realizan en long; no se exige que sus resultados intermedios quepan en int. Para buscar en todo el arreglo se usa `a = 0` y `b = arr.length - 1`; un arreglo vacío devuelve false.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [10, 20, 30, 40], a = 0, b = 3, x = 30`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-1f957a09e689">Código Python · Búsqueda por interpolación iterativa</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">while</span> <span class="n">a</span> <span class="o">&lt;=</span> <span class="n">b</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">arr</span><span class="p">[</span><span class="n">b</span><span class="p">]:</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">])</span>
+        <span class="n">den</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">-</span> <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">den</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">arr</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">num</span> <span class="o">//</span> <span class="n">den</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">p</span><span class="p">]:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="kc">False</span>
 
-    **Prueba de escritorio**
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mi">30</span>
 
-    | Paso | arr | a | b | x | num | den | p | Acción o resultado |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | [10, 20, 30, 40] | 0 | 3 | 30 | — | — | — | Recibe los parámetros; las variables locales aún no están declaradas. |
-    | 2 | [10, 20, 30, 40] | 0 | 3 | 30 | — | — | — | El while permite entrar: \(0 \le 3\), \(30 \ge 10\) y \(30 \le 40\). |
-    | 3 | [10, 20, 30, 40] | 0 | 3 | 30 | 60 | — | — | Calcula \(\mathrm{num} = (3 - 0) \cdot (30 - 10) = 60\). |
-    | 4 | [10, 20, 30, 40] | 0 | 3 | 30 | 60 | 30 | — | Calcula \(\mathrm{den} = 40 - 10 = 30\); es distinto de cero y puede dividir. |
-    | 5 | [10, 20, 30, 40] | 0 | 3 | 30 | 60 | 30 | 2 | Calcula \(p = 0 + \frac{60}{30} = 2\). |
-    | 6 | [10, 20, 30, 40] | 0 | 3 | 30 | 60 | 30 | 2 | Consulta `arr[2]`, cuyo valor es 30; coincide con `x` y devuelve `true`. |
-
-    Cada fila muestra los valores después de la acción indicada. «—» significa que la variable todavía no ha sido declarada. El arreglo no cambia durante la búsqueda.
-
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-1f957a09e689">Código Python · Búsqueda por interpolación iterativa</label><textarea id="runner-1f957a09e689" spellcheck="false" wrap="off" rows="14">def buscar(arr, a, b, x):
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">buscar</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-1f957a09e689" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def buscar(arr, a, b, x):
     while a &lt;= b and x &gt;= arr[a] and x &lt;= arr[b]:
         num = (b - a) * (x - arr[a])
         den = arr[b] - arr[a]
@@ -196,13 +203,13 @@ x = 30
 
 resultado = buscar(arr, a, b, x)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 
 La animación ejecuta una adaptación Python y registra estados visuales; sus pasos de interfaz no equivalen necesariamente a comparaciones del Java. El contador de eficiencia usa búsquedas sobre un objetivo presente y promedia ensayos. El tiempo teórico se estima a partir de una operación calibrada; no es una medición del listado Java.
 
-El listado corregido incluye controles para los casos límite; el laboratorio usa su adaptación Python.
+El listado incluye controles para los casos límite; el laboratorio usa su adaptación Python.
 
 [Consultar la adaptación y sus mediciones](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/core/search/search_metrics.py).
 

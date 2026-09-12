@@ -7,6 +7,10 @@ import hashlib
 import html
 import re
 
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import PythonLexer
+
 try:
     from scripts.book_code_languages import translations
 except ModuleNotFoundError:
@@ -74,18 +78,26 @@ def foo(n):
     return source + "\n\n# Entradas editables del ejemplo.\n" + setup + "\n\n" + finish + "\n"
 
 
-def render_runner(listing: dict) -> str:
+def render_runner(listing: dict, executable_only: bool = False) -> str:
     key = hashlib.sha256((str(listing["folio"]) + listing["code"]).encode()).hexdigest()[:12]
-    code = html.escape(runnable_example(listing))
+    source = runnable_example(listing)
+    code = html.escape(source)
+    colored = highlight(source, PythonLexer(), HtmlFormatter(nowrap=True))
     title = html.escape(listing["title"], quote=True)
+    intro = (
+        "El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador."
+        if executable_only
+        else "Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador."
+    )
     return (
         f'<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p>'
-        "<p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p>"
+        f"<p>{intro}</p>"
         f'<details><summary>Editar código y entradas</summary><label for="runner-{key}">Código Python · {title}</label>'
-        f'<textarea id="runner-{key}" spellcheck="false" wrap="off" rows="14">{code}</textarea></details>'
-        '<div class="example-runner-actions"><button type="button" data-run>Ejecutar</button>'
-        '<button type="button" data-stop disabled>Detener</button>'
-        '<button type="button" data-reset>Restablecer ejemplo</button></div>'
+        f'<div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code>{colored}</code></pre></div>'
+        f'<textarea id="runner-{key}" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">{code}</textarea></div></details>'
+        '<div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button>'
+        '<button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button>'
+        '<button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div>'
         '<p data-status role="status">Listo para ejecutar.</p>'
         '<pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>'
     )

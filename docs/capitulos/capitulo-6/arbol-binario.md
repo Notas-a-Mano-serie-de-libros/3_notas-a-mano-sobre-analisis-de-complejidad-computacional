@@ -15,7 +15,7 @@
 
 ##### Búsqueda en un árbol binario de búsqueda
 
-Implementación corregida basada en el libro, página 254 (Java).
+Implementación basada en el libro, página 254 (Java).
 
 === "Java"
 
@@ -101,15 +101,25 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
 
 **Resultado:** Devuelve true si encuentra valor; false si llega a null.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `Raíz 5, hijo izquierdo 3; valor = 3`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-eabf1fdbb839">Código Python · Búsqueda en un árbol binario de búsqueda</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">buscar</span><span class="p">(</span><span class="n">raiz</span><span class="p">,</span> <span class="n">valor</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">raiz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">valor</span> <span class="o">==</span> <span class="n">raiz</span><span class="o">.</span><span class="n">dato</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">valor</span> <span class="o">&lt;</span> <span class="n">raiz</span><span class="o">.</span><span class="n">dato</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">buscar</span><span class="p">(</span><span class="n">raiz</span><span class="o">.</span><span class="n">izquierdo</span><span class="p">,</span> <span class="n">valor</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">buscar</span><span class="p">(</span><span class="n">raiz</span><span class="o">.</span><span class="n">derecho</span><span class="p">,</span> <span class="n">valor</span><span class="p">)</span>
 
-    | Estado | Acción o resultado |
-    | --- | --- |
-    | `raiz.dato = 5` | 3 < 5: continúa por izquierdo. |
-    | `raiz.dato = 3` | Coincide con valor; devuelve true. |
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleNamespace</span>
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-eabf1fdbb839">Código Python · Búsqueda en un árbol binario de búsqueda</label><textarea id="runner-eabf1fdbb839" spellcheck="false" wrap="off" rows="14">def buscar(raiz, valor):
+<span class="n">raiz</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">(</span><span class="n">dato</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">izquierdo</span><span class="o">=</span><span class="n">SimpleNamespace</span><span class="p">(</span>
+    <span class="n">dato</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">izquierdo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">derecho</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> <span class="n">derecho</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">valor</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">buscar</span><span class="p">(</span><span class="n">raiz</span><span class="p">,</span> <span class="n">valor</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-eabf1fdbb839" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def buscar(raiz, valor):
     if raiz is None:
         return False
     if valor == raiz.dato:
@@ -127,7 +137,7 @@ valor = 3
 
 resultado = buscar(raiz, valor)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 ##### Laboratorio y medición
 

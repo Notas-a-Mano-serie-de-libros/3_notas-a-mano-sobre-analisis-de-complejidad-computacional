@@ -17,7 +17,7 @@ El código recibe una matriz rectangular de \(m\) filas y \(n\) columnas. El lab
 
 #### Recorrido de una matriz rectangular
 
-Implementación corregida basada en el libro, página 153 (Java).
+Implementación basada en el libro, página 153 (Java).
 
 === "Java"
 
@@ -101,7 +101,20 @@ En C, las dimensiones se reciben como parámetros; las matrices de salida las re
     | `i = 0; j = 0, 1, 2` | Imprime 1, 2 y 3; después un salto. |
     | `i = 1; j = 0, 1, 2` | Imprime 4, 5 y 6; después un salto. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-e73ca84ca782">Código Python · Recorrido de una matriz rectangular</label><textarea id="runner-e73ca84ca782" spellcheck="false" wrap="off" rows="14">def imprimirMatriz(matriz):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-e73ca84ca782">Código Python · Recorrido de una matriz rectangular</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">imprimirMatriz</span><span class="p">(</span><span class="n">matriz</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matriz</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matriz</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">matriz</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">()</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">matriz</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]]</span>
+
+<span class="n">imprimirMatriz</span><span class="p">(</span><span class="n">matriz</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Ejemplo finalizado"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-e73ca84ca782" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def imprimirMatriz(matriz):
     m = len(matriz)
     n = len(matriz[0]) if m &gt; 0 else 0
     for i in range(m):
@@ -114,7 +127,7 @@ matriz = [[1, 2, 3], [4, 5, 6]]
 
 imprimirMatriz(matriz)
 print(&quot;Ejemplo finalizado&quot;)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

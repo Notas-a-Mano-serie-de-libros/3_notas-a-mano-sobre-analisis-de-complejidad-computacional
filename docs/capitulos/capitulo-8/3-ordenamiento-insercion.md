@@ -19,7 +19,7 @@ Es muy eficiente para arreglos casi ordenados (O(n) en el mejor caso) y es el al
 
 #### Inserción mediante desplazamientos
 
-Implementación corregida basada en el libro, página 333 (Java).
+Implementación basada en el libro, página 333 (Java).
 
 === "Java"
 
@@ -101,35 +101,22 @@ En C, `n` indica la longitud del arreglo y se recibe como parámetro.
 
 **Resultado:** Ordena ascendentemente, conservando el orden de valores iguales.
 
-??? example "Ejemplo paso a paso"
-    Entrada: `arr = [3, 1, 2]`.
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-fc52378a9813">Código Python · Inserción mediante desplazamientos</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)):</span>
+        <span class="n">clave</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">clave</span><span class="p">:</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">arr</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">clave</span>
 
-    **Prueba de escritorio**
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
 
-    | Paso | Método | Profundidad | arr | i | clave | j | Operación ejecutada | Retorno |
-    | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-    | 1 | ordenar | 0 | [3, 1, 2] | — | — | — | Entrada a la llamada. | — |
-    | 2 | ordenar | 0 | [3, 1, 2] | 1 | — | — | `for i in range(1, len(arr)):` | — |
-    | 3 | ordenar | 0 | [3, 1, 2] | 1 | 1 | — | `clave = arr[i]` | — |
-    | 4 | ordenar | 0 | [3, 1, 2] | 1 | 1 | 0 | `j = i - 1` | — |
-    | 5 | ordenar | 0 | [3, 1, 2] | 1 | 1 | 0 | `while j >= 0 and arr[j] > clave:` | — |
-    | 6 | ordenar | 0 | [3, 3, 2] | 1 | 1 | 0 | `arr[j + 1] = arr[j]` | — |
-    | 7 | ordenar | 0 | [3, 3, 2] | 1 | 1 | -1 | `j -= 1` | — |
-    | 8 | ordenar | 0 | [3, 3, 2] | 1 | 1 | -1 | `while j >= 0 and arr[j] > clave:` | — |
-    | 9 | ordenar | 0 | [1, 3, 2] | 1 | 1 | -1 | `arr[j + 1] = clave` | — |
-    | 10 | ordenar | 0 | [1, 3, 2] | 2 | 1 | -1 | `for i in range(1, len(arr)):` | — |
-    | 11 | ordenar | 0 | [1, 3, 2] | 2 | 2 | -1 | `clave = arr[i]` | — |
-    | 12 | ordenar | 0 | [1, 3, 2] | 2 | 2 | 1 | `j = i - 1` | — |
-    | 13 | ordenar | 0 | [1, 3, 2] | 2 | 2 | 1 | `while j >= 0 and arr[j] > clave:` | — |
-    | 14 | ordenar | 0 | [1, 3, 3] | 2 | 2 | 1 | `arr[j + 1] = arr[j]` | — |
-    | 15 | ordenar | 0 | [1, 3, 3] | 2 | 2 | 0 | `j -= 1` | — |
-    | 16 | ordenar | 0 | [1, 3, 3] | 2 | 2 | 0 | `while j >= 0 and arr[j] > clave:` | — |
-    | 17 | ordenar | 0 | [1, 2, 3] | 2 | 2 | 0 | `arr[j + 1] = clave` | — |
-    | 18 | ordenar | 0 | [1, 2, 3] | 2 | 2 | 0 | `for i in range(1, len(arr)):`; Termina la llamada. | sin valor |
-
-    Cada fila muestra el estado después de la operación indicada de la traducción Python de esta variante. «—» indica una variable aún no declarada en esa llamada o un retorno todavía pendiente. La profundidad inicial es 0; cada llamada anidada la incrementa en 1.
-
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-fc52378a9813">Código Python · Inserción mediante desplazamientos</label><textarea id="runner-fc52378a9813" spellcheck="false" wrap="off" rows="14">def ordenar(arr):
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo inicial:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+<span class="n">ordenar</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Arreglo ordenado:"</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-fc52378a9813" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def ordenar(arr):
     for i in range(1, len(arr)):
         clave = arr[i]
         j = i - 1
@@ -144,7 +131,7 @@ arr = [3, 1, 2]
 print(&quot;Arreglo inicial:&quot;, arr)
 ordenar(arr)
 print(&quot;Arreglo ordenado:&quot;, arr)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

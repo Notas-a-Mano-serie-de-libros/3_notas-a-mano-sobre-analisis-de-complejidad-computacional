@@ -12,7 +12,7 @@ Este ejemplo estudia cómo el orden de evaluación de condiciones modifica los c
 
 #### Evaluación de condiciones y ruta alternativa: orden original
 
-Implementación corregida basada en el libro, página 170 (Java).
+Implementación basada en el libro, página 170 (Java).
 
 === "Java"
 
@@ -82,7 +82,33 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `h(n) = true` | Selecciona la segunda rama. |
     | `r(n)` | No se ejecuta. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-e6aa5726127a">Código Python · Evaluación de condiciones y ruta alternativa: orden original</label><textarea id="runner-e6aa5726127a" spellcheck="false" wrap="off" rows="14">n = 3
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-e6aa5726127a">Código Python · Evaluación de condiciones y ruta alternativa: orden original</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">var</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># Valores de los predicados para esta prueba de escritorio.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa r(n)"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa s(n)"</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple g(n)</span>
+<span class="k">elif</span> <span class="n">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple h(n)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">r</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Evaluación de condiciones completada"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-e6aa5726127a" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">n = 3
 var = False
 
 # Valores de los predicados para esta prueba de escritorio.
@@ -107,11 +133,11 @@ elif h(n):
     pass  # Se cumple h(n)
 else:
     r(n)
-print(&quot;Evaluación de condiciones completada&quot;)</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+print(&quot;Evaluación de condiciones completada&quot;)</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Evaluación de condiciones y ruta alternativa: condiciones reordenadas
 
-Implementación corregida basada en el libro, página 170 (Java).
+Implementación basada en el libro, página 170 (Java).
 
 === "Java"
 
@@ -180,7 +206,33 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `h(n) = true` | Selecciona la primera rama. |
     | `g(n), r(n)` | No se evalúan ni ejecutan en esta ruta. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-7dadf59bf6e8">Código Python · Evaluación de condiciones y ruta alternativa: condiciones reordenadas</label><textarea id="runner-7dadf59bf6e8" spellcheck="false" wrap="off" rows="14">n = 3
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-7dadf59bf6e8">Código Python · Evaluación de condiciones y ruta alternativa: condiciones reordenadas</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">var</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># Valores de los predicados para esta prueba de escritorio.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa r(n)"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa s(n)"</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple h(n)</span>
+<span class="k">elif</span> <span class="n">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple g(n)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">r</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Evaluación de condiciones completada"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-7dadf59bf6e8" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">n = 3
 var = False
 
 # Valores de los predicados para esta prueba de escritorio.
@@ -205,11 +257,11 @@ elif g(n):
     pass  # Se cumple g(n)
 else:
     r(n)
-print(&quot;Evaluación de condiciones completada&quot;)</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+print(&quot;Evaluación de condiciones completada&quot;)</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Evaluación de condiciones y ruta alternativa
 
-Implementación corregida basada en el libro, página 171 (Java).
+Implementación basada en el libro, página 171 (Java).
 
 === "Java"
 
@@ -278,7 +330,33 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `h(n) = true` | Selecciona la primera rama. |
     | `g(n), s(n)` | No se evalúan ni ejecutan en esta ruta. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-14c69ffc07a3">Código Python · Evaluación de condiciones y ruta alternativa</label><textarea id="runner-14c69ffc07a3" spellcheck="false" wrap="off" rows="14">n = 3
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-14c69ffc07a3">Código Python · Evaluación de condiciones y ruta alternativa</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">var</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># Valores de los predicados para esta prueba de escritorio.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa r(n)"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa s(n)"</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple h(n)</span>
+<span class="k">elif</span> <span class="n">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple g(n)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">s</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Evaluación de condiciones completada"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-14c69ffc07a3" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">n = 3
 var = False
 
 # Valores de los predicados para esta prueba de escritorio.
@@ -303,11 +381,11 @@ elif g(n):
     pass  # Se cumple g(n)
 else:
     s(n)
-print(&quot;Evaluación de condiciones completada&quot;)</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+print(&quot;Evaluación de condiciones completada&quot;)</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Evaluación de condiciones y ruta alternativa
 
-Implementación corregida basada en el libro, página 172 (Java).
+Implementación basada en el libro, página 172 (Java).
 
 === "Java"
 
@@ -377,7 +455,33 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `h(n) = true` | Vuelve a evaluar h(n) y toma su rama. |
     | `s(n)` | No se ejecuta. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-3ce31ecc35dd">Código Python · Evaluación de condiciones y ruta alternativa</label><textarea id="runner-3ce31ecc35dd" spellcheck="false" wrap="off" rows="14">n = 3
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-3ce31ecc35dd">Código Python · Evaluación de condiciones y ruta alternativa</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">var</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># Valores de los predicados para esta prueba de escritorio.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa r(n)"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa s(n)"</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">h</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">s</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple h(n)</span>
+<span class="k">elif</span> <span class="n">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple g(n)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Evaluación de condiciones completada"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-3ce31ecc35dd" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">n = 3
 var = False
 
 # Valores de los predicados para esta prueba de escritorio.
@@ -402,11 +506,11 @@ elif h(n):
     pass  # Se cumple h(n)
 elif g(n):
     pass  # Se cumple g(n)
-print(&quot;Evaluación de condiciones completada&quot;)</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+print(&quot;Evaluación de condiciones completada&quot;)</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Evaluación de condiciones y ruta alternativa
 
-Implementación corregida basada en el libro, página 173 (Java).
+Implementación basada en el libro, página 173 (Java).
 
 === "Java"
 
@@ -476,7 +580,33 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `h(n) = true` | Selecciona la rama de h(n). |
     | `g(n)` | No se evalúa en esta ruta. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-d5912a571cd2">Código Python · Evaluación de condiciones y ruta alternativa</label><textarea id="runner-d5912a571cd2" spellcheck="false" wrap="off" rows="14">n = 3
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-d5912a571cd2">Código Python · Evaluación de condiciones y ruta alternativa</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">var</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1"># Valores de los predicados para esta prueba de escritorio.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa r(n)"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">s</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Se ejecuta la alternativa s(n)"</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">var</span><span class="p">:</span>
+    <span class="n">s</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">h</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple h(n)</span>
+<span class="k">elif</span> <span class="n">g</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">pass</span>  <span class="c1"># Se cumple g(n)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Evaluación de condiciones completada"</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-d5912a571cd2" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">n = 3
 var = False
 
 # Valores de los predicados para esta prueba de escritorio.
@@ -501,7 +631,7 @@ elif h(n):
     pass  # Se cumple h(n)
 elif g(n):
     pass  # Se cumple g(n)
-print(&quot;Evaluación de condiciones completada&quot;)</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+print(&quot;Evaluación de condiciones completada&quot;)</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

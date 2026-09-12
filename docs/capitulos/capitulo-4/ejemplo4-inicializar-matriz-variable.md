@@ -17,7 +17,7 @@ Este algoritmo recibe \(m\) y \(n\), crea una matriz rectangular de \(m\times n\
 
 #### Inicialización de una matriz rectangular
 
-Implementación corregida basada en el libro, página 156 (Java).
+Implementación basada en el libro, página 156 (Java).
 
 === "Java"
 
@@ -99,7 +99,20 @@ En C, las dimensiones se reciben como parámetros; las matrices de salida las re
     | `i = 1; j = 0, 1, 2` | Escribe 1 en la segunda fila. |
     | `return matriz` | Devuelve [[1, 1, 1], [1, 1, 1]]. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-7d3e0b987ac9">Código Python · Inicialización de una matriz rectangular</label><textarea id="runner-7d3e0b987ac9" spellcheck="false" wrap="off" rows="14">def inicializarMatriz(m, n):
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-7d3e0b987ac9">Código Python · Inicialización de una matriz rectangular</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">inicializarMatriz</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">matriz</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">matriz</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">matriz</span>
+
+<span class="c1"># Entradas editables del ejemplo.</span>
+<span class="n">m</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">resultado</span> <span class="o">=</span> <span class="n">inicializarMatriz</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Resultado:"</span><span class="p">,</span> <span class="n">resultado</span><span class="p">)</span>
+</code></pre></div><textarea id="runner-7d3e0b987ac9" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def inicializarMatriz(m, n):
     matriz = [[0] * n for _ in range(m)]
     for i in range(m):
         for j in range(n):
@@ -112,7 +125,7 @@ n = 3
 
 resultado = inicializarMatriz(m, n)
 print(&quot;Resultado:&quot;, resultado)
-</textarea></details><div class="example-runner-actions"><button type="button" data-run>Ejecutar</button><button type="button" data-stop disabled>Detener</button><button type="button" data-reset>Restablecer ejemplo</button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 
