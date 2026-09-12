@@ -28,27 +28,75 @@ Aunque cada iteración descarta más que la búsqueda binaria (un tercio en vez 
 === "Python"
 
     ```python
-    lo, hi = 0, len(a)-1
+    lo, hi = 0, len(a) - 1
     while lo <= hi:
-        third = (hi-lo)//3; m1, m2 = lo+third, hi-third
-        if a[m1] == x: return m1
-        if a[m2] == x: return m2
-        if x < a[m1]: hi = m1-1
-        elif x > a[m2]: lo = m2+1
-        else: lo, hi = m1+1, m2-1
+        third = (hi - lo) // 3
+        m1, m2 = lo + third, hi - third
+        if a[m1] == x:
+            return m1
+        if a[m2] == x:
+            return m2
+        if x < a[m1]:
+            hi = m1 - 1
+        elif x > a[m2]:
+            lo = m2 + 1
+        else:
+            lo, hi = m1 + 1, m2 - 1
     return -1
     ```
 
 === "Java"
 
     ```java
-    int lo=0,hi=a.length-1; while(lo<=hi){int t=(hi-lo)/3,m1=lo+t,m2=hi-t;if(a[m1]==x)return m1;if(a[m2]==x)return m2;if(x<a[m1])hi=m1-1;else if(x>a[m2])lo=m2+1;else{lo=m1+1;hi=m2-1;}}return -1;
+    int lo = 0;
+    int hi = a.length - 1;
+    while (lo <= hi) {
+        int t = (hi - lo) / 3;
+        int m1 = lo + t;
+        int m2 = hi - t;
+        if (a[m1] == x) {
+            return m1;
+        }
+        if (a[m2] == x) {
+            return m2;
+        }
+        if (x < a[m1]) {
+            hi = m1 - 1;
+        } else if (x > a[m2]) {
+            lo = m2 + 1;
+        } else {
+            lo = m1 + 1;
+            hi = m2 - 1;
+        }
+    }
+    return -1;
     ```
 
 === "C"
 
     ```c
-    int lo=0,hi=n-1; while(lo<=hi){int t=(hi-lo)/3,m1=lo+t,m2=hi-t;if(a[m1]==x)return m1;if(a[m2]==x)return m2;if(x<a[m1])hi=m1-1;else if(x>a[m2])lo=m2+1;else{lo=m1+1;hi=m2-1;}}return -1;
+    int lo = 0;
+    int hi = n - 1;
+    while (lo <= hi) {
+        int t = (hi - lo) / 3;
+        int m1 = lo + t;
+        int m2 = hi - t;
+        if (a[m1] == x) {
+            return m1;
+        }
+        if (a[m2] == x) {
+            return m2;
+        }
+        if (x < a[m1]) {
+            hi = m1 - 1;
+        } else if (x > a[m2]) {
+            lo = m2 + 1;
+        } else {
+            lo = m1 + 1;
+            hi = m2 - 1;
+        }
+    }
+    return -1;
     ```
 
 ### Complejidad: versión iterativa y versión recursiva

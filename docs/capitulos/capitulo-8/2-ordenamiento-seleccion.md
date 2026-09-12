@@ -25,7 +25,7 @@ El ordenamiento por selección busca el elemento mínimo en el subarreglo no ord
 === "Python"
 
     ```python
-    for i in range(len(a)-1):
+    for i in range(len(a) - 1):
         m = min(range(i, len(a)), key=a.__getitem__)
         a[i], a[m] = a[m], a[i]
     ```
@@ -33,13 +33,33 @@ El ordenamiento por selección busca el elemento mínimo en el subarreglo no ord
 === "Java"
 
     ```java
-    for(int i=0;i<a.length-1;i++){int m=i;for(int j=i+1;j<a.length;j++)if(a[j]<a[m])m=j;int t=a[i];a[i]=a[m];a[m]=t;}
+    for (int i = 0; i < a.length - 1; i++) {
+        int m = i;
+        for (int j = i + 1; j < a.length; j++) {
+            if (a[j] < a[m]) {
+                m = j;
+            }
+        }
+        int t = a[i];
+        a[i] = a[m];
+        a[m] = t;
+    }
     ```
 
 === "C"
 
     ```c
-    for(int i=0;i<n-1;i++){int m=i;for(int j=i+1;j<n;j++)if(a[j]<a[m])m=j;int t=a[i];a[i]=a[m];a[m]=t;}
+    for (int i = 0; i < n - 1; i++) {
+        int m = i;
+        for (int j = i + 1; j < n; j++) {
+            if (a[j] < a[m]) {
+                m = j;
+            }
+        }
+        int t = a[i];
+        a[i] = a[m];
+        a[m] = t;
+    }
     ```
 
 ### Complejidad

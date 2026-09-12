@@ -27,28 +27,47 @@ El bloque óptimo de tamaño √n balancea los saltos hacia adelante con la bús
 
     ```python
     from math import isqrt
+
     step = max(1, isqrt(len(a)))
     prev = 0
-    while prev < len(a) and a[min(prev+step, len(a))-1] < x: prev += step
-    for i in range(prev, min(prev+step, len(a))):
-        if a[i] == x: return i
+    while prev < len(a) and a[min(prev + step, len(a)) - 1] < x:
+        prev += step
+    for i in range(prev, min(prev + step, len(a))):
+        if a[i] == x:
+            return i
     return -1
     ```
 
 === "Java"
 
     ```java
-    int step=(int)Math.sqrt(a.length), prev=0;
-    while(prev<a.length && a[Math.min(prev+step,a.length)-1]<x) prev+=step;
-    for(int i=prev;i<Math.min(prev+step,a.length);i++) if(a[i]==x)return i; return -1;
+    int step = (int) Math.sqrt(a.length);
+    int prev = 0;
+    while (prev < a.length && a[Math.min(prev + step, a.length) - 1] < x) {
+        prev += step;
+    }
+    for (int i = prev; i < Math.min(prev + step, a.length); i++) {
+        if (a[i] == x) {
+            return i;
+        }
+    }
+    return -1;
     ```
 
 === "C"
 
     ```c
-    int step=(int)sqrt(n), prev=0;
-    while(prev<n && a[(prev+step<n?prev+step:n)-1]<x) prev+=step;
-    for(int i=prev;i<n && i<prev+step;i++) if(a[i]==x)return i; return -1;
+    int step = (int) sqrt(n);
+    int prev = 0;
+    while (prev < n && a[(prev + step < n ? prev + step : n) - 1] < x) {
+        prev += step;
+    }
+    for (int i = prev; i < n && i < prev + step; i++) {
+        if (a[i] == x) {
+            return i;
+        }
+    }
+    return -1;
     ```
 
 ### Complejidad: versión iterativa y versión recursiva

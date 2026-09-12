@@ -32,19 +32,32 @@ En el caso promedio logra O(n log(n)) con una constante menor que el ordenamient
     def quicksort(a, lo, hi):
         if lo < hi:
             p = partition(a, lo, hi)
-            quicksort(a, lo, p-1); quicksort(a, p+1, hi)
+            quicksort(a, lo, p - 1)
+            quicksort(a, p + 1, hi)
     ```
 
 === "Java"
 
     ```java
-    static void quicksort(int[]a,int lo,int hi){if(lo<hi){int p=partition(a,lo,hi);quicksort(a,lo,p-1);quicksort(a,p+1,hi);}}
+    static void quicksort(int[] a, int lo, int hi) {
+        if (lo < hi) {
+            int p = partition(a, lo, hi);
+            quicksort(a, lo, p - 1);
+            quicksort(a, p + 1, hi);
+        }
+    }
     ```
 
 === "C"
 
     ```c
-    void quicksort(int a[],int lo,int hi){if(lo<hi){int p=partition(a,lo,hi);quicksort(a,lo,p-1);quicksort(a,p+1,hi);}}
+    void quicksort(int a[], int lo, int hi) {
+        if (lo < hi) {
+            int p = partition(a, lo, hi);
+            quicksort(a, lo, p - 1);
+            quicksort(a, p + 1, hi);
+        }
+    }
     ```
 
 ### Complejidad

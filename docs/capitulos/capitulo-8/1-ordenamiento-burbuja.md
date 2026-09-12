@@ -26,21 +26,38 @@ Es el algoritmo de ordenamiento más intuitivo pero también el menos eficiente 
 === "Python"
 
     ```python
-    for end in range(len(a)-1, 0, -1):
+    for end in range(len(a) - 1, 0, -1):
         for i in range(end):
-            if a[i] > a[i+1]: a[i], a[i+1] = a[i+1], a[i]
+            if a[i] > a[i + 1]:
+                a[i], a[i + 1] = a[i + 1], a[i]
     ```
 
 === "Java"
 
     ```java
-    for(int e=a.length-1;e>0;e--) for(int i=0;i<e;i++) if(a[i]>a[i+1]){int t=a[i];a[i]=a[i+1];a[i+1]=t;}
+    for (int e = a.length - 1; e > 0; e--) {
+        for (int i = 0; i < e; i++) {
+            if (a[i] > a[i + 1]) {
+                int t = a[i];
+                a[i] = a[i + 1];
+                a[i + 1] = t;
+            }
+        }
+    }
     ```
 
 === "C"
 
     ```c
-    for(int e=n-1;e>0;e--) for(int i=0;i<e;i++) if(a[i]>a[i+1]){int t=a[i];a[i]=a[i+1];a[i+1]=t;}
+    for (int e = n - 1; e > 0; e--) {
+        for (int i = 0; i < e; i++) {
+            if (a[i] > a[i + 1]) {
+                int t = a[i];
+                a[i] = a[i + 1];
+                a[i + 1] = t;
+            }
+        }
+    }
     ```
 
 ### Complejidad

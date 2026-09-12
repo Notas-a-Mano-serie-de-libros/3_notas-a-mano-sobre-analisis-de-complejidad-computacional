@@ -28,21 +28,39 @@ Garantiza O(n log(n)) en todos los casos, lo que lo hace predecible y eficiente,
 
     ```python
     def merge_sort(a):
-        if len(a) <= 1: return a
-        m = len(a)//2
+        if len(a) <= 1:
+            return a
+        m = len(a) // 2
         return merge(merge_sort(a[:m]), merge_sort(a[m:]))
     ```
 
 === "Java"
 
     ```java
-    static int[] mergeSort(int[] a){if(a.length<=1)return a;int m=a.length/2;return merge(mergeSort(java.util.Arrays.copyOfRange(a,0,m)),mergeSort(java.util.Arrays.copyOfRange(a,m,a.length)));}
+    static int[] mergeSort(int[] a) {
+        if (a.length <= 1) {
+            return a;
+        }
+        int m = a.length / 2;
+        return merge(
+            mergeSort(java.util.Arrays.copyOfRange(a, 0, m)),
+            mergeSort(java.util.Arrays.copyOfRange(a, m, a.length))
+        );
+    }
     ```
 
 === "C"
 
     ```c
-    void mergeSort(int a[],int lo,int hi){if(lo>=hi)return;int m=lo+(hi-lo)/2;mergeSort(a,lo,m);mergeSort(a,m+1,hi);merge(a,lo,m,hi);}
+    void mergeSort(int a[], int lo, int hi) {
+        if (lo >= hi) {
+            return;
+        }
+        int m = lo + (hi - lo) / 2;
+        mergeSort(a, lo, m);
+        mergeSort(a, m + 1, hi);
+        merge(a, lo, m, hi);
+    }
     ```
 
 ### Complejidad

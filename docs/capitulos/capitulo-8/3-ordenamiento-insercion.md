@@ -28,21 +28,36 @@ Es muy eficiente para arreglos casi ordenados (O(n) en el mejor caso) y es el al
 
     ```python
     for i in range(1, len(a)):
-        key, j = a[i], i-1
-        while j >= 0 and a[j] > key: a[j+1], j = a[j], j-1
-        a[j+1] = key
+        key, j = a[i], i - 1
+        while j >= 0 and a[j] > key:
+            a[j + 1], j = a[j], j - 1
+        a[j + 1] = key
     ```
 
 === "Java"
 
     ```java
-    for(int i=1;i<a.length;i++){int k=a[i],j=i-1;while(j>=0&&a[j]>k){a[j+1]=a[j--];}a[j+1]=k;}
+    for (int i = 1; i < a.length; i++) {
+        int k = a[i];
+        int j = i - 1;
+        while (j >= 0 && a[j] > k) {
+            a[j + 1] = a[j--];
+        }
+        a[j + 1] = k;
+    }
     ```
 
 === "C"
 
     ```c
-    for(int i=1;i<n;i++){int k=a[i],j=i-1;while(j>=0&&a[j]>k){a[j+1]=a[j--];}a[j+1]=k;}
+    for (int i = 1; i < n; i++) {
+        int k = a[i];
+        int j = i - 1;
+        while (j >= 0 && a[j] > k) {
+            a[j + 1] = a[j--];
+        }
+        a[j + 1] = k;
+    }
     ```
 
 ### Complejidad

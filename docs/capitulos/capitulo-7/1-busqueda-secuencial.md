@@ -25,21 +25,30 @@ La búsqueda secuencial (o lineal) recorre el arreglo posición por posición, c
 
     ```python
     for i, v in enumerate(a):
-        if v == x: return i
+        if v == x:
+            return i
     return -1
     ```
 
 === "Java"
 
     ```java
-    for (int i=0;i<a.length;i++) if (a[i]==x) return i;
+    for (int i = 0; i < a.length; i++) {
+        if (a[i] == x) {
+            return i;
+        }
+    }
     return -1;
     ```
 
 === "C"
 
     ```c
-    for (int i=0;i<n;i++) if (a[i]==x) return i;
+    for (int i = 0; i < n; i++) {
+        if (a[i] == x) {
+            return i;
+        }
+    }
     return -1;
     ```
 

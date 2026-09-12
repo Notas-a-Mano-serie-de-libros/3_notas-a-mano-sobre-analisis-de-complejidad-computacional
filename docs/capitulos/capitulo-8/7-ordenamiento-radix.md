@@ -36,13 +36,19 @@ La versión implementada aquí usa radix LSD en base 10. Su comportamiento depen
 === "Java"
 
     ```java
-    int max=java.util.Arrays.stream(a).max().orElse(0);for(int exp=1;max/exp>0;exp*=10)countingDigit(a,exp);
+    int max = java.util.Arrays.stream(a).max().orElse(0);
+    for (int exp = 1; max / exp > 0; exp *= 10) {
+        countingDigit(a, exp);
+    }
     ```
 
 === "C"
 
     ```c
-    int max=maximo(a,n);for(int exp=1;max/exp>0;exp*=10)countingDigit(a,n,exp);
+    int max = maximo(a, n);
+    for (int exp = 1; max / exp > 0; exp *= 10) {
+        countingDigit(a, n, exp);
+    }
     ```
 
 ### Complejidad

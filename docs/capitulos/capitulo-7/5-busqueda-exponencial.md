@@ -27,26 +27,38 @@ Es especialmente eficaz cuando el objetivo está cerca del inicio del arreglo, y
 === "Python"
 
     ```python
-    if a and a[0] == x: return 0
+    if a and a[0] == x:
+        return 0
     i = 1
-    while i < len(a) and a[i] <= x: i *= 2
-    return binaria(a, x, i//2, min(i, len(a)-1))
+    while i < len(a) and a[i] <= x:
+        i *= 2
+    return binaria(a, x, i // 2, min(i, len(a) - 1))
     ```
 
 === "Java"
 
     ```java
-    if(a.length>0&&a[0]==x)return 0; int i=1;
-    while(i<a.length&&a[i]<=x)i*=2;
-    return binaria(a,x,i/2,Math.min(i,a.length-1));
+    if (a.length > 0 && a[0] == x) {
+        return 0;
+    }
+    int i = 1;
+    while (i < a.length && a[i] <= x) {
+        i *= 2;
+    }
+    return binaria(a, x, i / 2, Math.min(i, a.length - 1));
     ```
 
 === "C"
 
     ```c
-    if(n>0&&a[0]==x)return 0; int i=1;
-    while(i<n&&a[i]<=x)i*=2;
-    return binaria(a,x,i/2,i<n?i:n-1);
+    if (n > 0 && a[0] == x) {
+        return 0;
+    }
+    int i = 1;
+    while (i < n && a[i] <= x) {
+        i *= 2;
+    }
+    return binaria(a, x, i / 2, i < n ? i : n - 1);
     ```
 
 ### Complejidad: versión iterativa y versión recursiva

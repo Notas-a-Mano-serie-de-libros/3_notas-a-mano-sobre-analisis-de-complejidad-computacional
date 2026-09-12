@@ -663,26 +663,458 @@ CHAPTER6_CODE = {
     },
 }
 
-# Los capítulos algorítmicos también deben ser legibles sin abrir Colab.  Estas
-# implementaciones son deliberadamente compactas: el texto explica el algoritmo
-# y el selector permite comparar su traducción, no cuatro explicaciones repetidas.
+# Los capítulos algorítmicos también deben ser legibles sin abrir Colab.
+# Conservar la sangría y los saltos de línea de cada lenguaje; en Java y C,
+# usar llaves explícitas para todos los bloques de control.
 CHAPTER7_CODE = {
-    "1-busqueda-secuencial": ("para i ← 0 hasta longitud(A)-1\n    si A[i] = x entonces retornar i\nretornar -1", "for i, v in enumerate(a):\n    if v == x: return i\nreturn -1", "for (int i=0;i<a.length;i++) if (a[i]==x) return i;\nreturn -1;", "for (int i=0;i<n;i++) if (a[i]==x) return i;\nreturn -1;"),
-    "2-busqueda-binaria": ("izq ← 0; der ← longitud(A)-1\nmientras izq ≤ der\n    m ← ⌊(izq+der)/2⌋\n    si A[m] = x retornar m\n    si A[m] < x: izq ← m+1; si no: der ← m-1\nretornar -1", "lo, hi = 0, len(a)-1\nwhile lo <= hi:\n    m = (lo+hi)//2\n    if a[m] == x: return m\n    if a[m] < x: lo = m+1\n    else: hi = m-1\nreturn -1", "int lo=0, hi=a.length-1;\nwhile(lo<=hi){ int m=lo+(hi-lo)/2; if(a[m]==x)return m; if(a[m]<x)lo=m+1; else hi=m-1; }\nreturn -1;", "int lo=0, hi=n-1;\nwhile(lo<=hi){ int m=lo+(hi-lo)/2; if(a[m]==x)return m; if(a[m]<x)lo=m+1; else hi=m-1; }\nreturn -1;"),
-    "3-busqueda-interpolacion": ("mientras bajo ≤ alto y x está entre A[bajo] y A[alto]\n    p ← bajo + (x-A[bajo])(alto-bajo)/(A[alto]-A[bajo])\n    comparar A[p] y acotar el intervalo\nretornar -1", "lo, hi = 0, len(a)-1\nwhile lo <= hi and a[lo] <= x <= a[hi]:\n    if a[hi] == a[lo]: return lo if a[lo] == x else -1\n    p = lo + (x-a[lo])*(hi-lo)//(a[hi]-a[lo])\n    if a[p] == x: return p\n    if a[p] < x: lo = p+1\n    else: hi = p-1\nreturn -1", "int lo=0,hi=a.length-1;\nwhile(lo<=hi && x>=a[lo] && x<=a[hi]){ if(a[hi]==a[lo]) return a[lo]==x?lo:-1; int p=lo+(x-a[lo])*(hi-lo)/(a[hi]-a[lo]); if(a[p]==x)return p; if(a[p]<x)lo=p+1; else hi=p-1; } return -1;", "int lo=0,hi=n-1;\nwhile(lo<=hi && x>=a[lo] && x<=a[hi]){ if(a[hi]==a[lo]) return a[lo]==x?lo:-1; int p=lo+(x-a[lo])*(hi-lo)/(a[hi]-a[lo]); if(a[p]==x)return p; if(a[p]<x)lo=p+1; else hi=p-1; } return -1;"),
-    "4-busqueda-saltos": ("paso ← ⌊√longitud(A)⌋\nsaltar bloques hasta superar x\nbuscar secuencialmente en el bloque candidato", "from math import isqrt\nstep = max(1, isqrt(len(a)))\nprev = 0\nwhile prev < len(a) and a[min(prev+step, len(a))-1] < x: prev += step\nfor i in range(prev, min(prev+step, len(a))):\n    if a[i] == x: return i\nreturn -1", "int step=(int)Math.sqrt(a.length), prev=0;\nwhile(prev<a.length && a[Math.min(prev+step,a.length)-1]<x) prev+=step;\nfor(int i=prev;i<Math.min(prev+step,a.length);i++) if(a[i]==x)return i; return -1;", "int step=(int)sqrt(n), prev=0;\nwhile(prev<n && a[(prev+step<n?prev+step:n)-1]<x) prev+=step;\nfor(int i=prev;i<n && i<prev+step;i++) if(a[i]==x)return i; return -1;"),
-    "5-busqueda-exponencial": ("si A[0] = x retornar 0\ni ← 1\nmientras i < longitud(A) y A[i] ≤ x: i ← 2i\naplicar búsqueda binaria en [i/2, min(i,n-1)]", "if a and a[0] == x: return 0\ni = 1\nwhile i < len(a) and a[i] <= x: i *= 2\nreturn binaria(a, x, i//2, min(i, len(a)-1))", "if(a.length>0&&a[0]==x)return 0; int i=1;\nwhile(i<a.length&&a[i]<=x)i*=2;\nreturn binaria(a,x,i/2,Math.min(i,a.length-1));", "if(n>0&&a[0]==x)return 0; int i=1;\nwhile(i<n&&a[i]<=x)i*=2;\nreturn binaria(a,x,i/2,i<n?i:n-1);"),
-    "6-busqueda-ternaria": ("mientras izq ≤ der\n    m1 ← izq+(der-izq)/3; m2 ← der-(der-izq)/3\n    comparar x con A[m1] y A[m2]\n    conservar uno de los tres intervalos\nretornar -1", "lo, hi = 0, len(a)-1\nwhile lo <= hi:\n    third = (hi-lo)//3; m1, m2 = lo+third, hi-third\n    if a[m1] == x: return m1\n    if a[m2] == x: return m2\n    if x < a[m1]: hi = m1-1\n    elif x > a[m2]: lo = m2+1\n    else: lo, hi = m1+1, m2-1\nreturn -1", "int lo=0,hi=a.length-1; while(lo<=hi){int t=(hi-lo)/3,m1=lo+t,m2=hi-t;if(a[m1]==x)return m1;if(a[m2]==x)return m2;if(x<a[m1])hi=m1-1;else if(x>a[m2])lo=m2+1;else{lo=m1+1;hi=m2-1;}}return -1;", "int lo=0,hi=n-1; while(lo<=hi){int t=(hi-lo)/3,m1=lo+t,m2=hi-t;if(a[m1]==x)return m1;if(a[m2]==x)return m2;if(x<a[m1])hi=m1-1;else if(x>a[m2])lo=m2+1;else{lo=m1+1;hi=m2-1;}}return -1;"),
+    "1-busqueda-secuencial": (
+        """para i ← 0 hasta longitud(A)-1
+    si A[i] = x entonces retornar i
+retornar -1""",
+        """for i, v in enumerate(a):
+    if v == x:
+        return i
+return -1""",
+        """for (int i = 0; i < a.length; i++) {
+    if (a[i] == x) {
+        return i;
+    }
+}
+return -1;""",
+        """for (int i = 0; i < n; i++) {
+    if (a[i] == x) {
+        return i;
+    }
+}
+return -1;""",
+    ),
+    "2-busqueda-binaria": (
+        """izq ← 0; der ← longitud(A)-1
+mientras izq ≤ der
+    m ← ⌊(izq+der)/2⌋
+    si A[m] = x retornar m
+    si A[m] < x: izq ← m+1; si no: der ← m-1
+retornar -1""",
+        """lo, hi = 0, len(a) - 1
+while lo <= hi:
+    m = (lo + hi) // 2
+    if a[m] == x:
+        return m
+    if a[m] < x:
+        lo = m + 1
+    else:
+        hi = m - 1
+return -1""",
+        """int lo = 0;
+int hi = a.length - 1;
+while (lo <= hi) {
+    int m = lo + (hi - lo) / 2;
+    if (a[m] == x) {
+        return m;
+    }
+    if (a[m] < x) {
+        lo = m + 1;
+    } else {
+        hi = m - 1;
+    }
+}
+return -1;""",
+        """int lo = 0;
+int hi = n - 1;
+while (lo <= hi) {
+    int m = lo + (hi - lo) / 2;
+    if (a[m] == x) {
+        return m;
+    }
+    if (a[m] < x) {
+        lo = m + 1;
+    } else {
+        hi = m - 1;
+    }
+}
+return -1;""",
+    ),
+    "3-busqueda-interpolacion": (
+        """mientras bajo ≤ alto y x está entre A[bajo] y A[alto]
+    p ← bajo + (x-A[bajo])(alto-bajo)/(A[alto]-A[bajo])
+    comparar A[p] y acotar el intervalo
+retornar -1""",
+        """lo, hi = 0, len(a) - 1
+while lo <= hi and a[lo] <= x <= a[hi]:
+    if a[hi] == a[lo]:
+        return lo if a[lo] == x else -1
+    p = lo + (x - a[lo]) * (hi - lo) // (a[hi] - a[lo])
+    if a[p] == x:
+        return p
+    if a[p] < x:
+        lo = p + 1
+    else:
+        hi = p - 1
+return -1""",
+        """int lo = 0;
+int hi = a.length - 1;
+while (lo <= hi && x >= a[lo] && x <= a[hi]) {
+    if (a[hi] == a[lo]) {
+        return a[lo] == x ? lo : -1;
+    }
+    int p = lo + (x - a[lo]) * (hi - lo) / (a[hi] - a[lo]);
+    if (a[p] == x) {
+        return p;
+    }
+    if (a[p] < x) {
+        lo = p + 1;
+    } else {
+        hi = p - 1;
+    }
+}
+return -1;""",
+        """int lo = 0;
+int hi = n - 1;
+while (lo <= hi && x >= a[lo] && x <= a[hi]) {
+    if (a[hi] == a[lo]) {
+        return a[lo] == x ? lo : -1;
+    }
+    int p = lo + (x - a[lo]) * (hi - lo) / (a[hi] - a[lo]);
+    if (a[p] == x) {
+        return p;
+    }
+    if (a[p] < x) {
+        lo = p + 1;
+    } else {
+        hi = p - 1;
+    }
+}
+return -1;""",
+    ),
+    "4-busqueda-saltos": (
+        """paso ← ⌊√longitud(A)⌋
+saltar bloques hasta superar x
+buscar secuencialmente en el bloque candidato""",
+        """from math import isqrt
+
+step = max(1, isqrt(len(a)))
+prev = 0
+while prev < len(a) and a[min(prev + step, len(a)) - 1] < x:
+    prev += step
+for i in range(prev, min(prev + step, len(a))):
+    if a[i] == x:
+        return i
+return -1""",
+        """int step = (int) Math.sqrt(a.length);
+int prev = 0;
+while (prev < a.length && a[Math.min(prev + step, a.length) - 1] < x) {
+    prev += step;
+}
+for (int i = prev; i < Math.min(prev + step, a.length); i++) {
+    if (a[i] == x) {
+        return i;
+    }
+}
+return -1;""",
+        """int step = (int) sqrt(n);
+int prev = 0;
+while (prev < n && a[(prev + step < n ? prev + step : n) - 1] < x) {
+    prev += step;
+}
+for (int i = prev; i < n && i < prev + step; i++) {
+    if (a[i] == x) {
+        return i;
+    }
+}
+return -1;""",
+    ),
+    "5-busqueda-exponencial": (
+        """si A[0] = x retornar 0
+i ← 1
+mientras i < longitud(A) y A[i] ≤ x: i ← 2i
+aplicar búsqueda binaria en [i/2, min(i,n-1)]""",
+        """if a and a[0] == x:
+    return 0
+i = 1
+while i < len(a) and a[i] <= x:
+    i *= 2
+return binaria(a, x, i // 2, min(i, len(a) - 1))""",
+        """if (a.length > 0 && a[0] == x) {
+    return 0;
+}
+int i = 1;
+while (i < a.length && a[i] <= x) {
+    i *= 2;
+}
+return binaria(a, x, i / 2, Math.min(i, a.length - 1));""",
+        """if (n > 0 && a[0] == x) {
+    return 0;
+}
+int i = 1;
+while (i < n && a[i] <= x) {
+    i *= 2;
+}
+return binaria(a, x, i / 2, i < n ? i : n - 1);""",
+    ),
+    "6-busqueda-ternaria": (
+        """mientras izq ≤ der
+    m1 ← izq+(der-izq)/3; m2 ← der-(der-izq)/3
+    comparar x con A[m1] y A[m2]
+    conservar uno de los tres intervalos
+retornar -1""",
+        """lo, hi = 0, len(a) - 1
+while lo <= hi:
+    third = (hi - lo) // 3
+    m1, m2 = lo + third, hi - third
+    if a[m1] == x:
+        return m1
+    if a[m2] == x:
+        return m2
+    if x < a[m1]:
+        hi = m1 - 1
+    elif x > a[m2]:
+        lo = m2 + 1
+    else:
+        lo, hi = m1 + 1, m2 - 1
+return -1""",
+        """int lo = 0;
+int hi = a.length - 1;
+while (lo <= hi) {
+    int t = (hi - lo) / 3;
+    int m1 = lo + t;
+    int m2 = hi - t;
+    if (a[m1] == x) {
+        return m1;
+    }
+    if (a[m2] == x) {
+        return m2;
+    }
+    if (x < a[m1]) {
+        hi = m1 - 1;
+    } else if (x > a[m2]) {
+        lo = m2 + 1;
+    } else {
+        lo = m1 + 1;
+        hi = m2 - 1;
+    }
+}
+return -1;""",
+        """int lo = 0;
+int hi = n - 1;
+while (lo <= hi) {
+    int t = (hi - lo) / 3;
+    int m1 = lo + t;
+    int m2 = hi - t;
+    if (a[m1] == x) {
+        return m1;
+    }
+    if (a[m2] == x) {
+        return m2;
+    }
+    if (x < a[m1]) {
+        hi = m1 - 1;
+    } else if (x > a[m2]) {
+        lo = m2 + 1;
+    } else {
+        lo = m1 + 1;
+        hi = m2 - 1;
+    }
+}
+return -1;""",
+    ),
 }
 
 CHAPTER8_CODE = {
-    "1-ordenamiento-burbuja": ("para fin ← n-1 hasta 1\n    para i ← 0 hasta fin-1\n        si A[i] > A[i+1] intercambiar", "for end in range(len(a)-1, 0, -1):\n    for i in range(end):\n        if a[i] > a[i+1]: a[i], a[i+1] = a[i+1], a[i]", "for(int e=a.length-1;e>0;e--) for(int i=0;i<e;i++) if(a[i]>a[i+1]){int t=a[i];a[i]=a[i+1];a[i+1]=t;}", "for(int e=n-1;e>0;e--) for(int i=0;i<e;i++) if(a[i]>a[i+1]){int t=a[i];a[i]=a[i+1];a[i+1]=t;}"),
-    "2-ordenamiento-seleccion": ("para i ← 0 hasta n-2\n    mínimo ← i\n    buscar el menor en A[i+1:n]\n    intercambiar A[i] y A[mínimo]", "for i in range(len(a)-1):\n    m = min(range(i, len(a)), key=a.__getitem__)\n    a[i], a[m] = a[m], a[i]", "for(int i=0;i<a.length-1;i++){int m=i;for(int j=i+1;j<a.length;j++)if(a[j]<a[m])m=j;int t=a[i];a[i]=a[m];a[m]=t;}", "for(int i=0;i<n-1;i++){int m=i;for(int j=i+1;j<n;j++)if(a[j]<a[m])m=j;int t=a[i];a[i]=a[m];a[m]=t;}"),
-    "3-ordenamiento-insercion": ("para i ← 1 hasta n-1\n    clave ← A[i]; j ← i-1\n    desplazar valores mayores que clave\n    insertar clave en j+1", "for i in range(1, len(a)):\n    key, j = a[i], i-1\n    while j >= 0 and a[j] > key: a[j+1], j = a[j], j-1\n    a[j+1] = key", "for(int i=1;i<a.length;i++){int k=a[i],j=i-1;while(j>=0&&a[j]>k){a[j+1]=a[j--];}a[j+1]=k;}", "for(int i=1;i<n;i++){int k=a[i],j=i-1;while(j>=0&&a[j]>k){a[j+1]=a[j--];}a[j+1]=k;}"),
-    "4-ordenamiento-shell": ("salto ← ⌊n/2⌋\nmientras salto > 0\n    aplicar inserción entre elementos separados por salto\n    salto ← ⌊salto/2⌋", "gap = len(a)//2\nwhile gap:\n    for i in range(gap, len(a)):\n        v, j = a[i], i\n        while j >= gap and a[j-gap] > v: a[j] = a[j-gap]; j -= gap\n        a[j] = v\n    gap //= 2", "for(int g=a.length/2;g>0;g/=2)for(int i=g;i<a.length;i++){int v=a[i],j=i;while(j>=g&&a[j-g]>v){a[j]=a[j-g];j-=g;}a[j]=v;}", "for(int g=n/2;g>0;g/=2)for(int i=g;i<n;i++){int v=a[i],j=i;while(j>=g&&a[j-g]>v){a[j]=a[j-g];j-=g;}a[j]=v;}"),
-    "5-ordenamiento-mezcla": ("si longitud(A) ≤ 1 retornar A\ndividir A en dos mitades\nordenar recursivamente cada mitad\ncombinar ambas mitades ordenadas", "def merge_sort(a):\n    if len(a) <= 1: return a\n    m = len(a)//2\n    return merge(merge_sort(a[:m]), merge_sort(a[m:]))", "static int[] mergeSort(int[] a){if(a.length<=1)return a;int m=a.length/2;return merge(mergeSort(java.util.Arrays.copyOfRange(a,0,m)),mergeSort(java.util.Arrays.copyOfRange(a,m,a.length)));}", "void mergeSort(int a[],int lo,int hi){if(lo>=hi)return;int m=lo+(hi-lo)/2;mergeSort(a,lo,m);mergeSort(a,m+1,hi);merge(a,lo,m,hi);}"),
-    "6-ordenamiento-rapido": ("si bajo < alto\n    p ← particionar(A,bajo,alto)\n    quicksort(A,bajo,p-1)\n    quicksort(A,p+1,alto)", "def quicksort(a, lo, hi):\n    if lo < hi:\n        p = partition(a, lo, hi)\n        quicksort(a, lo, p-1); quicksort(a, p+1, hi)", "static void quicksort(int[]a,int lo,int hi){if(lo<hi){int p=partition(a,lo,hi);quicksort(a,lo,p-1);quicksort(a,p+1,hi);}}", "void quicksort(int a[],int lo,int hi){if(lo<hi){int p=partition(a,lo,hi);quicksort(a,lo,p-1);quicksort(a,p+1,hi);}}"),
-    "7-ordenamiento-radix": ("exp ← 1\nmientras máximo(A)/exp > 0\n    ordenar establemente por el dígito exp\n    exp ← 10·exp", "exp, maximum = 1, max(a, default=0)\nwhile maximum // exp:\n    counting_digit(a, exp)\n    exp *= 10", "int max=java.util.Arrays.stream(a).max().orElse(0);for(int exp=1;max/exp>0;exp*=10)countingDigit(a,exp);", "int max=maximo(a,n);for(int exp=1;max/exp>0;exp*=10)countingDigit(a,n,exp);"),
+    "1-ordenamiento-burbuja": (
+        """para fin ← n-1 hasta 1
+    para i ← 0 hasta fin-1
+        si A[i] > A[i+1] intercambiar""",
+        """for end in range(len(a) - 1, 0, -1):
+    for i in range(end):
+        if a[i] > a[i + 1]:
+            a[i], a[i + 1] = a[i + 1], a[i]""",
+        """for (int e = a.length - 1; e > 0; e--) {
+    for (int i = 0; i < e; i++) {
+        if (a[i] > a[i + 1]) {
+            int t = a[i];
+            a[i] = a[i + 1];
+            a[i + 1] = t;
+        }
+    }
+}""",
+        """for (int e = n - 1; e > 0; e--) {
+    for (int i = 0; i < e; i++) {
+        if (a[i] > a[i + 1]) {
+            int t = a[i];
+            a[i] = a[i + 1];
+            a[i + 1] = t;
+        }
+    }
+}""",
+    ),
+    "2-ordenamiento-seleccion": (
+        """para i ← 0 hasta n-2
+    mínimo ← i
+    buscar el menor en A[i+1:n]
+    intercambiar A[i] y A[mínimo]""",
+        """for i in range(len(a) - 1):
+    m = min(range(i, len(a)), key=a.__getitem__)
+    a[i], a[m] = a[m], a[i]""",
+        """for (int i = 0; i < a.length - 1; i++) {
+    int m = i;
+    for (int j = i + 1; j < a.length; j++) {
+        if (a[j] < a[m]) {
+            m = j;
+        }
+    }
+    int t = a[i];
+    a[i] = a[m];
+    a[m] = t;
+}""",
+        """for (int i = 0; i < n - 1; i++) {
+    int m = i;
+    for (int j = i + 1; j < n; j++) {
+        if (a[j] < a[m]) {
+            m = j;
+        }
+    }
+    int t = a[i];
+    a[i] = a[m];
+    a[m] = t;
+}""",
+    ),
+    "3-ordenamiento-insercion": (
+        """para i ← 1 hasta n-1
+    clave ← A[i]; j ← i-1
+    desplazar valores mayores que clave
+    insertar clave en j+1""",
+        """for i in range(1, len(a)):
+    key, j = a[i], i - 1
+    while j >= 0 and a[j] > key:
+        a[j + 1], j = a[j], j - 1
+    a[j + 1] = key""",
+        """for (int i = 1; i < a.length; i++) {
+    int k = a[i];
+    int j = i - 1;
+    while (j >= 0 && a[j] > k) {
+        a[j + 1] = a[j--];
+    }
+    a[j + 1] = k;
+}""",
+        """for (int i = 1; i < n; i++) {
+    int k = a[i];
+    int j = i - 1;
+    while (j >= 0 && a[j] > k) {
+        a[j + 1] = a[j--];
+    }
+    a[j + 1] = k;
+}""",
+    ),
+    "4-ordenamiento-shell": (
+        """salto ← ⌊n/2⌋
+mientras salto > 0
+    aplicar inserción entre elementos separados por salto
+    salto ← ⌊salto/2⌋""",
+        """gap = len(a) // 2
+while gap:
+    for i in range(gap, len(a)):
+        v, j = a[i], i
+        while j >= gap and a[j - gap] > v:
+            a[j] = a[j - gap]
+            j -= gap
+        a[j] = v
+    gap //= 2""",
+        """for (int g = a.length / 2; g > 0; g /= 2) {
+    for (int i = g; i < a.length; i++) {
+        int v = a[i];
+        int j = i;
+        while (j >= g && a[j - g] > v) {
+            a[j] = a[j - g];
+            j -= g;
+        }
+        a[j] = v;
+    }
+}""",
+        """for (int g = n / 2; g > 0; g /= 2) {
+    for (int i = g; i < n; i++) {
+        int v = a[i];
+        int j = i;
+        while (j >= g && a[j - g] > v) {
+            a[j] = a[j - g];
+            j -= g;
+        }
+        a[j] = v;
+    }
+}""",
+    ),
+    "5-ordenamiento-mezcla": (
+        """si longitud(A) ≤ 1 retornar A
+dividir A en dos mitades
+ordenar recursivamente cada mitad
+combinar ambas mitades ordenadas""",
+        """def merge_sort(a):
+    if len(a) <= 1:
+        return a
+    m = len(a) // 2
+    return merge(merge_sort(a[:m]), merge_sort(a[m:]))""",
+        """static int[] mergeSort(int[] a) {
+    if (a.length <= 1) {
+        return a;
+    }
+    int m = a.length / 2;
+    return merge(
+        mergeSort(java.util.Arrays.copyOfRange(a, 0, m)),
+        mergeSort(java.util.Arrays.copyOfRange(a, m, a.length))
+    );
+}""",
+        """void mergeSort(int a[], int lo, int hi) {
+    if (lo >= hi) {
+        return;
+    }
+    int m = lo + (hi - lo) / 2;
+    mergeSort(a, lo, m);
+    mergeSort(a, m + 1, hi);
+    merge(a, lo, m, hi);
+}""",
+    ),
+    "6-ordenamiento-rapido": (
+        """si bajo < alto
+    p ← particionar(A,bajo,alto)
+    quicksort(A,bajo,p-1)
+    quicksort(A,p+1,alto)""",
+        """def quicksort(a, lo, hi):
+    if lo < hi:
+        p = partition(a, lo, hi)
+        quicksort(a, lo, p - 1)
+        quicksort(a, p + 1, hi)""",
+        """static void quicksort(int[] a, int lo, int hi) {
+    if (lo < hi) {
+        int p = partition(a, lo, hi);
+        quicksort(a, lo, p - 1);
+        quicksort(a, p + 1, hi);
+    }
+}""",
+        """void quicksort(int a[], int lo, int hi) {
+    if (lo < hi) {
+        int p = partition(a, lo, hi);
+        quicksort(a, lo, p - 1);
+        quicksort(a, p + 1, hi);
+    }
+}""",
+    ),
+    "7-ordenamiento-radix": (
+        """exp ← 1
+mientras máximo(A)/exp > 0
+    ordenar establemente por el dígito exp
+    exp ← 10·exp""",
+        """exp, maximum = 1, max(a, default=0)
+while maximum // exp:
+    counting_digit(a, exp)
+    exp *= 10""",
+        """int max = java.util.Arrays.stream(a).max().orElse(0);
+for (int exp = 1; max / exp > 0; exp *= 10) {
+    countingDigit(a, exp);
+}""",
+        """int max = maximo(a, n);
+for (int exp = 1; max / exp > 0; exp *= 10) {
+    countingDigit(a, n, exp);
+}""",
+    ),
 }
 
 

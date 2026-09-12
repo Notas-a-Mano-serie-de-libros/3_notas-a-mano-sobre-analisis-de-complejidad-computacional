@@ -56,28 +56,62 @@ Para distribuciones uniformes alcanza O(log(log(n))) en el caso promedio, lo que
 === "Python"
 
     ```python
-    lo, hi = 0, len(a)-1
+    lo, hi = 0, len(a) - 1
     while lo <= hi and a[lo] <= x <= a[hi]:
-        if a[hi] == a[lo]: return lo if a[lo] == x else -1
-        p = lo + (x-a[lo])*(hi-lo)//(a[hi]-a[lo])
-        if a[p] == x: return p
-        if a[p] < x: lo = p+1
-        else: hi = p-1
+        if a[hi] == a[lo]:
+            return lo if a[lo] == x else -1
+        p = lo + (x - a[lo]) * (hi - lo) // (a[hi] - a[lo])
+        if a[p] == x:
+            return p
+        if a[p] < x:
+            lo = p + 1
+        else:
+            hi = p - 1
     return -1
     ```
 
 === "Java"
 
     ```java
-    int lo=0,hi=a.length-1;
-    while(lo<=hi && x>=a[lo] && x<=a[hi]){ if(a[hi]==a[lo]) return a[lo]==x?lo:-1; int p=lo+(x-a[lo])*(hi-lo)/(a[hi]-a[lo]); if(a[p]==x)return p; if(a[p]<x)lo=p+1; else hi=p-1; } return -1;
+    int lo = 0;
+    int hi = a.length - 1;
+    while (lo <= hi && x >= a[lo] && x <= a[hi]) {
+        if (a[hi] == a[lo]) {
+            return a[lo] == x ? lo : -1;
+        }
+        int p = lo + (x - a[lo]) * (hi - lo) / (a[hi] - a[lo]);
+        if (a[p] == x) {
+            return p;
+        }
+        if (a[p] < x) {
+            lo = p + 1;
+        } else {
+            hi = p - 1;
+        }
+    }
+    return -1;
     ```
 
 === "C"
 
     ```c
-    int lo=0,hi=n-1;
-    while(lo<=hi && x>=a[lo] && x<=a[hi]){ if(a[hi]==a[lo]) return a[lo]==x?lo:-1; int p=lo+(x-a[lo])*(hi-lo)/(a[hi]-a[lo]); if(a[p]==x)return p; if(a[p]<x)lo=p+1; else hi=p-1; } return -1;
+    int lo = 0;
+    int hi = n - 1;
+    while (lo <= hi && x >= a[lo] && x <= a[hi]) {
+        if (a[hi] == a[lo]) {
+            return a[lo] == x ? lo : -1;
+        }
+        int p = lo + (x - a[lo]) * (hi - lo) / (a[hi] - a[lo]);
+        if (a[p] == x) {
+            return p;
+        }
+        if (a[p] < x) {
+            lo = p + 1;
+        } else {
+            hi = p - 1;
+        }
+    }
+    return -1;
     ```
 
 ### Complejidad: versión iterativa y versión recursiva

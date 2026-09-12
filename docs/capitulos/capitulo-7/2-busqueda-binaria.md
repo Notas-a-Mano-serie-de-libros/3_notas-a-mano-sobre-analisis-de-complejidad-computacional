@@ -29,28 +29,53 @@ Cada comparación reduce el espacio de búsqueda a la mitad, lo que produce una 
 === "Python"
 
     ```python
-    lo, hi = 0, len(a)-1
+    lo, hi = 0, len(a) - 1
     while lo <= hi:
-        m = (lo+hi)//2
-        if a[m] == x: return m
-        if a[m] < x: lo = m+1
-        else: hi = m-1
+        m = (lo + hi) // 2
+        if a[m] == x:
+            return m
+        if a[m] < x:
+            lo = m + 1
+        else:
+            hi = m - 1
     return -1
     ```
 
 === "Java"
 
     ```java
-    int lo=0, hi=a.length-1;
-    while(lo<=hi){ int m=lo+(hi-lo)/2; if(a[m]==x)return m; if(a[m]<x)lo=m+1; else hi=m-1; }
+    int lo = 0;
+    int hi = a.length - 1;
+    while (lo <= hi) {
+        int m = lo + (hi - lo) / 2;
+        if (a[m] == x) {
+            return m;
+        }
+        if (a[m] < x) {
+            lo = m + 1;
+        } else {
+            hi = m - 1;
+        }
+    }
     return -1;
     ```
 
 === "C"
 
     ```c
-    int lo=0, hi=n-1;
-    while(lo<=hi){ int m=lo+(hi-lo)/2; if(a[m]==x)return m; if(a[m]<x)lo=m+1; else hi=m-1; }
+    int lo = 0;
+    int hi = n - 1;
+    while (lo <= hi) {
+        int m = lo + (hi - lo) / 2;
+        if (a[m] == x) {
+            return m;
+        }
+        if (a[m] < x) {
+            lo = m + 1;
+        } else {
+            hi = m - 1;
+        }
+    }
     return -1;
     ```
 
