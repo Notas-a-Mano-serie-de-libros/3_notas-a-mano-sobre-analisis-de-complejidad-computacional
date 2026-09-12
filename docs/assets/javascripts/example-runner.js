@@ -19,7 +19,6 @@
       if (kind) { const span = document.createElement("span"); span.className = kind; span.textContent = value; fragment.append(span); }
       else fragment.append(document.createTextNode(value));
     }
-    fragment.append(document.createTextNode("\n"));
     code.replaceChildren(fragment);
   };
   let worker = null;
@@ -41,28 +40,55 @@
     document.querySelectorAll("[data-example-runner]").forEach((panel) => {
       if (panel.dataset.initialized) return;
       panel.dataset.initialized = "true";
-      const editor = panel.querySelector("textarea");
-      const initial = editor.value;
-      const colored = panel.querySelector(".python-code-editor code");
-      const preview = panel.querySelector(".python-code-editor pre");
-      const initialHighlight = colored.innerHTML;
-      const syncScroll = () => { preview.scrollTop = editor.scrollTop; preview.scrollLeft = editor.scrollLeft; };
-      editor.addEventListener("input", () => { repaint(editor, colored); syncScroll(); });
-      editor.addEventListener("scroll", syncScroll);
-      editor.addEventListener("keydown", (event) => {
-        if (event.key !== "Tab" || event.shiftKey) return;
-        event.preventDefault();
-        editor.setRangeText("    ", editor.selectionStart, editor.selectionEnd, "end");
-        repaint(editor, colored);
-        syncScroll();
+      const lines = [...panel.querySelectorAll("[data-code-line]")];
+      const editableLines = lines.filter(line => line.hasAttribute("data-editable"));
+      const initial = editableLines.map(line => line.innerHTML);
+      const source = () => lines.map(line => line.textContent).join("\n") + "\n";
+      const refreshLine = (line) => {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(line);
+        let offset = line.textContent.length;
+        if (selection.rangeCount && line.contains(selection.anchorNode)) {
+          range.setEnd(selection.anchorNode, selection.anchorOffset);
+          offset = range.toString().length;
+        }
+        const value = line.textContent.replace(/[\r\n]/g, " ");
+        repaint({ value }, line);
+        const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+        let node;
+        while ((node = walker.nextNode())) {
+          if (offset <= node.length) {
+            selection.setBaseAndExtent(node, offset, node, offset);
+            return;
+          }
+          offset -= node.length;
+        }
+      };
+      editableLines.forEach(line => {
+        line.addEventListener("beforeinput", event => {
+          if (["insertParagraph", "insertLineBreak"].includes(event.inputType)) event.preventDefault();
+        });
+        line.addEventListener("keydown", event => {
+          if (event.key === "Enter") event.preventDefault();
+        });
+        line.addEventListener("input", () => refreshLine(line));
+        line.addEventListener("paste", event => {
+          event.preventDefault();
+          const selection = window.getSelection();
+          if (!selection.rangeCount) return;
+          const range = selection.getRangeAt(0);
+          if (!line.contains(range.commonAncestorContainer)) return;
+          range.deleteContents();
+          const text = document.createTextNode(event.clipboardData.getData("text/plain").replace(/[\r\n]+/g, " "));
+          range.insertNode(text);
+          selection.setBaseAndExtent(text, text.length, text, text.length);
+          refreshLine(line);
+        });
       });
       panel.querySelector("[data-reset]").addEventListener("click", () => {
         if (active === panel) finish("Ejecución detenida.", undefined, true);
-        editor.value = initial;
-        colored.innerHTML = initialHighlight;
-        editor.scrollTop = 0;
-        editor.scrollLeft = 0;
-        syncScroll();
+        editableLines.forEach((line, index) => { line.innerHTML = initial[index]; });
         panel.querySelector("[data-status]").textContent = "Ejemplo restablecido.";
         panel.querySelector("[data-output]").textContent = "El resultado aparecerá aquí.";
       });
@@ -90,7 +116,7 @@
           };
         }
         timeout = setTimeout(() => finish("La carga de Python tardó demasiado. Vuelve a intentar.", undefined, true), 90000);
-        worker.postMessage({ code: editor.value });
+        worker.postMessage({ code: source() });
       });
     });
   };

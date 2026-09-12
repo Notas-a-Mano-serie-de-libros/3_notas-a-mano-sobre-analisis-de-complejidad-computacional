@@ -80,49 +80,7 @@ Java presenta la implementación de referencia; las otras pestañas traducen est
     | `i = 999` | Última llamada foo(8). |
     | `i = 1000` | Termina; el costo depende de lo que haga foo. |
 
-<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Editar código y entradas</summary><label for="runner-9c08a2cbe90d">Código Python · Ciclo fijo con auxiliar</label><div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code><span class="k">def</span><span class="w"> </span><span class="nf">cicloFijo</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-        <span class="n">foo</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-
-<span class="c1"># Entradas editables del ejemplo.</span>
-<span class="n">n</span> <span class="o">=</span> <span class="mi">8</span>
-
-<span class="c1"># Completa estas auxiliares según el problema que estés analizando.</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">foo1</span><span class="p">():</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo1 en el editor"</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">foo2</span><span class="p">():</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo2 en el editor"</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo en el editor"</span><span class="p">)</span>
-
-<span class="n">cicloFijo</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Ejemplo finalizado"</span><span class="p">)</span>
-</code></pre></div><textarea id="runner-9c08a2cbe90d" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">def cicloFijo(n):
-    for i in range(1000):
-        foo(n)
-
-# Entradas editables del ejemplo.
-n = 8
-
-# Completa estas auxiliares según el problema que estés analizando.
-def foo1():
-    raise NotImplementedError(&quot;Completa foo1 en el editor&quot;)
-
-
-def foo2():
-    raise NotImplementedError(&quot;Completa foo2 en el editor&quot;)
-
-
-def foo(n):
-    raise NotImplementedError(&quot;Completa foo en el editor&quot;)
-
-cicloFijo(n)
-print(&quot;Ejemplo finalizado&quot;)
-</textarea></div></details><div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button><button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button><button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
+<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p><p>Modifica las entradas del ejemplo y consulta el resultado aquí. La primera ejecución carga Python en el navegador.</p><details><summary>Ver código y editar entradas</summary><p>Solo las líneas de entrada resaltadas son editables. La implementación y la llamada al algoritmo son de solo lectura.</p><div id="runner-9c08a2cbe90d" class="python-code-editor highlight" aria-label="Código Python · Ciclo fijo con auxiliar"><pre><code><span class="python-code-line" data-code-line><span class="k">def</span><span class="w"> </span><span class="nf">cicloFijo</span><span class="p">(</span><span class="n">n</span><span class="p">):</span></span><span class="python-code-line" data-code-line>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span></span><span class="python-code-line" data-code-line>        <span class="n">foo</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></span><span class="python-code-line" data-code-line></span><span class="python-code-line" data-code-line><span class="c1"># Entradas editables del ejemplo.</span></span><span class="python-code-line" data-code-line contenteditable="plaintext-only" role="textbox" aria-label="Entrada editable, línea 6" spellcheck="false" data-editable><span class="n">n</span> <span class="o">=</span> <span class="mi">8</span></span><span class="python-code-line" data-code-line></span><span class="python-code-line" data-code-line><span class="c1"># Completa estas auxiliares según el problema que estés analizando.</span></span><span class="python-code-line" data-code-line><span class="k">def</span><span class="w"> </span><span class="nf">foo1</span><span class="p">():</span></span><span class="python-code-line" data-code-line>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo1 en el editor"</span><span class="p">)</span></span><span class="python-code-line" data-code-line></span><span class="python-code-line" data-code-line></span><span class="python-code-line" data-code-line><span class="k">def</span><span class="w"> </span><span class="nf">foo2</span><span class="p">():</span></span><span class="python-code-line" data-code-line>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo2 en el editor"</span><span class="p">)</span></span><span class="python-code-line" data-code-line></span><span class="python-code-line" data-code-line></span><span class="python-code-line" data-code-line><span class="k">def</span><span class="w"> </span><span class="nf">foo</span><span class="p">(</span><span class="n">n</span><span class="p">):</span></span><span class="python-code-line" data-code-line>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"Completa foo en el editor"</span><span class="p">)</span></span><span class="python-code-line" data-code-line></span><span class="python-code-line" data-code-line><span class="n">cicloFijo</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></span><span class="python-code-line" data-code-line><span class="nb">print</span><span class="p">(</span><span class="s2">"Ejemplo finalizado"</span><span class="p">)</span></span></code></pre></div></details><div class="example-runner-actions"><button type="button" data-run><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg><span>Ejecutar</span></button><button type="button" data-stop disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6h12v12H6z"/></svg><span>Detener</span></button><button type="button" data-reset><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg><span>Restablecer ejemplo</span></button></div><p data-status role="status">Listo para ejecutar.</p><pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>
 
 #### Laboratorio y medición
 

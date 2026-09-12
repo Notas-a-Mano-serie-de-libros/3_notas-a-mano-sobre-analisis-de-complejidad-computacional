@@ -81,23 +81,40 @@ def foo(n):
 def render_runner(listing: dict, executable_only: bool = False) -> str:
     key = hashlib.sha256((str(listing["folio"]) + listing["code"]).encode()).hexdigest()[:12]
     source = runnable_example(listing)
-    code = html.escape(source)
-    colored = highlight(source, PythonLexer(), HtmlFormatter(nowrap=True))
+    editable = set()
+    implementation = translations(listing)["Python"]
+    implementation_start = source.find(implementation)
+    implementation_end = implementation_start + len(implementation)
+    offsets = [0]
+    for line in source.splitlines(keepends=True):
+        offsets.append(offsets[-1] + len(line))
+    for node in ast.parse(source).body:
+        if isinstance(node, ast.Assign) and not any(
+            isinstance(target, ast.Name) and target.id == "resultado" for target in node.targets
+        ) and not implementation_start <= offsets[node.lineno - 1] < implementation_end:
+            editable.update(range(node.lineno, node.end_lineno + 1))
+    rows = []
+    for number, line in enumerate(source.splitlines(), 1):
+        colored = highlight(line, PythonLexer(), HtmlFormatter(nowrap=True)).rstrip("\n")
+        attrs = (' contenteditable="plaintext-only" role="textbox" '
+                 f'aria-label="Entrada editable, línea {number}" spellcheck="false" data-editable') if number in editable else ''
+        rows.append(f'<span class="python-code-line" data-code-line{attrs}>{colored}</span>')
+    editor_html = "".join(rows)
     title = html.escape(listing["title"], quote=True)
     intro = (
         "El navegador facilita la ejecución de código Python desde Pages. Puedes usar el ejemplo de forma remota, modificar sus entradas y ver los resultados sin instalar Python; el código se ejecuta en tu navegador."
         if executable_only
-        else "Modifica las entradas o el código y consulta el resultado aquí. La primera ejecución carga Python en el navegador."
+        else "Modifica las entradas del ejemplo y consulta el resultado aquí. La primera ejecución carga Python en el navegador."
     )
     return (
         f'<div class="example-runner" data-example-runner><p><strong>Ejecutar este ejemplo</strong> · Python</p>'
         f"<p>{intro}</p>"
-        f'<details><summary>Editar código y entradas</summary><label for="runner-{key}">Código Python · {title}</label>'
-        f'<div class="python-code-editor"><div class="highlight" aria-hidden="true"><pre><code>{colored}</code></pre></div>'
-        f'<textarea id="runner-{key}" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="14">{code}</textarea></div></details>'
-        '<div class="example-runner-actions"><button type="button" data-run><span class="button-icon" aria-hidden="true">▶</span><span>Ejecutar</span></button>'
-        '<button type="button" data-stop disabled><span class="button-icon" aria-hidden="true">■</span><span>Detener</span></button>'
-        '<button type="button" data-reset><span class="button-icon" aria-hidden="true">↻</span><span>Restablecer ejemplo</span></button></div>'
+        '<details><summary>Ver código y editar entradas</summary>'
+        '<p>Solo las líneas de entrada resaltadas son editables. La implementación y la llamada al algoritmo son de solo lectura.</p>'
+        f'<div id="runner-{key}" class="python-code-editor highlight" aria-label="Código Python · {title}"><pre><code>{editor_html}</code></pre></div></details>'
+        '<div class="example-runner-actions"><button type="button" data-run><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg><span>Ejecutar</span></button>'
+        '<button type="button" data-stop disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6h12v12H6z"/></svg><span>Detener</span></button>'
+        '<button type="button" data-reset><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg><span>Restablecer ejemplo</span></button></div>'
         '<p data-status role="status">Listo para ejecutar.</p>'
         '<pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></div>'
     )

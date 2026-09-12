@@ -1085,7 +1085,7 @@ input {
   border-radius: .2rem;
   tab-size: 4;
 }
-.example-runner-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.example-runner-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; width: 100%; gap: .5rem; }
 .example-runner-actions button {
   padding: .4rem .7rem;
   border: 1px solid var(--md-primary-fg-color);
@@ -1099,39 +1099,22 @@ input {
 .example-runner [data-status] { font-size: .75rem; }
 .example-runner [data-output] { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 20rem; overflow: auto; padding: .6rem; background: var(--md-code-bg-color); }
 
-/* La capa Pygments conserva los colores de los bloques Python de Pages. */
-.python-code-editor { position: relative; margin-top: .5rem; }
-.python-code-editor > .highlight { position: absolute; inset: 0; margin: 0; pointer-events: none; }
-.python-code-editor > .highlight pre,
-.python-code-editor textarea {
-  margin: 0;
-  padding: .6rem;
-  border: 1px solid var(--md-default-fg-color--lighter);
-  border-radius: .2rem;
-  font: .75rem/1.5 var(--md-code-font-family);
-  letter-spacing: normal;
-  tab-size: 4;
-  white-space: pre;
-  overflow: auto;
-  scrollbar-gutter: stable;
-  box-sizing: border-box;
+/* Un único panel: código de solo lectura y líneas de entrada editables. */
+.python-code-editor { margin-top: .5rem; }
+.python-code-editor pre {
+  margin: 0; padding: .6rem; max-height: 24rem; overflow: auto;
+  border: 1px solid var(--md-default-fg-color--lighter); border-radius: .2rem;
+  font: .75rem/1.5 var(--md-code-font-family); tab-size: 4;
+  background: var(--md-code-bg-color);
 }
-.python-code-editor > .highlight pre { height: 100%; overflow: hidden; background: var(--md-code-bg-color); }
-.python-code-editor > .highlight code { display: block; padding: 0; margin: 0; background: none; font: inherit; }
-.python-code-editor textarea {
-  position: relative;
-  height: 20rem;
-  min-height: 8rem;
-  background: transparent;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  caret-color: var(--md-code-fg-color);
-}
-.python-code-editor textarea::selection {
+.python-code-editor pre > code { display: block; padding: 0; margin: 0; font: inherit; background: none; }
+.python-code-line { display: block; min-height: 1.5em; white-space: pre; }
+.python-code-line[data-editable] {
   background: var(--md-accent-fg-color--transparent);
-  color: var(--md-code-fg-color);
-  -webkit-text-fill-color: var(--md-code-fg-color);
+  box-shadow: inset 3px 0 var(--md-accent-fg-color);
+  cursor: text;
 }
+.python-code-line[data-editable]:focus { outline: 1px solid var(--md-accent-fg-color); }
 .python-code-editor .md-clipboard { display: none; }
-.example-runner-actions button { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; }
-.example-runner-actions .button-icon { display: inline-flex; align-items: center; justify-content: center; width: .8rem; line-height: 1; }
+.example-runner-actions button { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; min-height: 2rem; font: inherit; line-height: 1.2; }
+.example-runner-actions .button-icon { display: block; width: 1em; height: 1em; flex: 0 0 1em; fill: currentColor; }
