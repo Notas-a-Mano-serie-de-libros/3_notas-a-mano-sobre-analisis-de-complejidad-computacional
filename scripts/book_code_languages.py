@@ -67,9 +67,15 @@ def translations(listing: dict) -> dict[str, str]:
 
 
 def language_tabs(listing: dict) -> str:
+    try:
+        from scripts.java_examples import java_example
+    except ModuleNotFoundError:
+        from java_examples import java_example
     names = {"Java": "java", "Pseudocódigo": "text", "Python": "python", "C": "c"}
     result = []
     for label, code in translations(listing).items():
+        if label == "Java":
+            code = java_example(listing)[0]
         lines = "\n".join("    " + line if line else "" for line in code.splitlines())
         result.append(f'=== "{label}"\n\n    ```{names[label]}\n{lines}\n    ```')
     return "\n\n".join(result)

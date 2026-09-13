@@ -34,9 +34,11 @@ docs-install:
 	$(PYTHON) -m pip install -r requirements-docs.txt
 
 docs-serve:
+	$(PYTHON) scripts/build_java_examples.py
 	$(PYTHON) -m mkdocs serve
 
 docs-build:
+	$(PYTHON) scripts/build_java_examples.py
 	$(PYTHON) -m mkdocs build --strict
 
 book-review:

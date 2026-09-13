@@ -1,4 +1,7 @@
 (() => {
+  const javaURL = new URL("java-runtime.html", document.currentScript.src);
+  let javaFrame = null;
+  let javaJob = 0;
   const workerURL = new URL("python-worker.js", document.currentScript.src);
   const keywords = new Set("False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield".split(" "));
   const builtins = new Set("abs all any bool dict enumerate float int isinstance len list max min object print range repr reversed set sorted str sum super tuple type ValueError OverflowError ZeroDivisionError NotImplementedError".split(" "));
@@ -13,6 +16,7 @@
       if (value.startsWith("#")) kind = "c1";
       else if (/^[rRuUbBfF]{0,2}["']/.test(value)) kind = "s";
       else if (/^(?:\d|\.\d)/.test(value)) kind = /[.eEjJ]/.test(value) ? "mf" : "mi";
+      else if (editor.java && ["true", "false", "null"].includes(value)) kind = "kc";
       else if (keywords.has(value)) { kind = ["and", "or", "not", "in", "is"].includes(value) ? "ow" : ["True", "False", "None"].includes(value) ? "kc" : ["import", "from", "as"].includes(value) ? "kn" : "k"; if (value === "def" || value === "class") expectedName = value === "def" ? "nf" : "nc"; }
       else if (/^[A-Za-z_]/.test(value)) { kind = expectedName || (builtins.has(value) ? "nb" : "n"); expectedName = null; }
       else if (/^[-+*\/%&|^~<>=]/.test(value) || value === ":=") kind = "o";
@@ -33,17 +37,37 @@
       if (output !== undefined) active.querySelector("[data-output]").textContent = output;
     }
     active = null;
-    if (terminate) { worker?.terminate(); worker = null; }
+    if (terminate) { worker?.terminate(); worker = null; javaFrame?.remove(); javaFrame = null; javaJob++; }
   };
+  window.addEventListener("message", ({ source, origin, data }) => {
+    if (origin !== location.origin || source !== javaFrame?.contentWindow || data.job !== javaJob || !active) return;
+    if (data.type === "java-loading") {
+      active.querySelector("[data-status]").textContent = data.message;
+    } else if (data.type === "java-ready") {
+      active.querySelector("[data-status]").textContent = "Ejecutando Java…";
+      clearTimeout(timeout);
+      timeout = setTimeout(() => finish("Ejecución detenida: superó 10 segundos. Prueba entradas más pequeñas.", undefined, true), 10000);
+    } else if (data.type === "java-done") {
+      finish(data.error ? "Revisa el error mostrado en el resultado." : "Ejecución completada.", data.output);
+    }
+  });
   const initialize = () => {
     if (active && !active.isConnected) finish("Ejecución detenida al cambiar de página.", undefined, true);
     document.querySelectorAll("[data-example-runner]").forEach((panel) => {
       if (panel.dataset.initialized) return;
       panel.dataset.initialized = "true";
       const lines = [...panel.querySelectorAll("[data-code-line]")];
-      const editableLines = lines.filter(line => line.hasAttribute("data-editable"));
+      const editableLines = [...panel.querySelectorAll("[data-editable]")];
       const initial = editableLines.map(line => line.innerHTML);
-      const source = () => lines.map(line => line.textContent).join("\n") + "\n";
+      const language = panel.querySelector("[data-runner-language]");
+      const source = () => [...panel.querySelectorAll('[data-language="python"] [data-code-line]')].map(line => line.textContent).join("\n") + "\n";
+      language.addEventListener("change", () => {
+        if (active === panel) finish("Ejecución detenida al cambiar de lenguaje.", undefined, true);
+        panel.querySelectorAll("[data-language]").forEach(editor => { editor.hidden = editor.dataset.language !== language.value; });
+        panel.querySelector(".java-runtime-credit").hidden = language.value !== "java";
+        panel.querySelector("[data-status]").textContent = "Listo para ejecutar.";
+        panel.querySelector("[data-output]").textContent = "El resultado aparecerá aquí.";
+      });
       const refreshLine = (line) => {
         const selection = window.getSelection();
         const range = document.createRange();
@@ -54,7 +78,7 @@
           offset = range.toString().length;
         }
         const value = line.textContent.replace(/[\r\n]/g, " ");
-        repaint({ value }, line);
+        repaint({ value, java: line.hasAttribute("data-java-input") }, line);
         const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
         let node;
         while ((node = walker.nextNode())) {
@@ -98,8 +122,27 @@
         active = panel;
         panel.querySelector("[data-run]").disabled = true;
         panel.querySelector("[data-stop]").disabled = false;
-        panel.querySelector("[data-status]").textContent = "Preparando Python… La primera carga puede tardar unos segundos.";
+        panel.querySelector("[data-status]").textContent = "Preparando " + (language.value === "java" ? "Java" : "Python") + "… La primera carga puede tardar unos segundos.";
         panel.querySelector("[data-output]").textContent = "";
+        if (language.value === "java") {
+          const editor = panel.querySelector('[data-language="java"]');
+          const encoded = [...editor.querySelectorAll("[data-java-input]")].map(line => line.textContent).join("\n");
+          const job = ++javaJob;
+          const payload = { type: "run-java", job, className: editor.dataset.javaClass, encoded };
+          const send = () => javaFrame.contentWindow.postMessage(payload, location.origin);
+          if (!javaFrame) {
+            javaFrame = document.createElement("iframe");
+            javaFrame.className = "java-runtime-frame";
+            javaFrame.setAttribute("aria-hidden", "true");
+            javaFrame.tabIndex = -1;
+            javaFrame.title = "Entorno de ejecución Java";
+            javaFrame.src = javaURL.href;
+            javaFrame.addEventListener("load", send, { once: true });
+            document.body.append(javaFrame);
+          } else send();
+          timeout = setTimeout(() => finish("La carga de Java tardó demasiado. Vuelve a intentar.", undefined, true), 90000);
+          return;
+        }
         if (!worker) {
           try { worker = new Worker(workerURL, { type: "module" }); }
           catch (error) { finish("No se pudo iniciar Python.", error.message, true); return; }

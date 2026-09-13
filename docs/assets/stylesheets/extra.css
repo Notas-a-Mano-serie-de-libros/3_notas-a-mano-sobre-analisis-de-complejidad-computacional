@@ -1107,14 +1107,22 @@ input {
   font: .75rem/1.5 var(--md-code-font-family); tab-size: 4;
   background: var(--md-code-bg-color);
 }
-.python-code-editor pre > code { display: block; padding: 0; margin: 0; font: inherit; background: none; }
+.python-code-editor pre > code { display: block; padding: 0; margin: 0; font: inherit; background: none; min-width: max-content; }
 .python-code-line { display: block; min-height: 1.5em; white-space: pre; }
 .python-code-line[data-editable] {
   background: var(--md-accent-fg-color--transparent);
-  box-shadow: inset 3px 0 var(--md-accent-fg-color);
   cursor: text;
 }
-.python-code-line[data-editable]:focus { outline: 1px solid var(--md-accent-fg-color); }
+.python-code-line[data-editable]:focus { outline: none; }
 .python-code-editor .md-clipboard { display: none; }
 .example-runner-actions button { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; min-height: 2rem; font: inherit; line-height: 1.2; }
 .example-runner-actions .button-icon { display: block; width: 1em; height: 1em; flex: 0 0 1em; fill: currentColor; }
+
+.python-code-editor[hidden] { display: none !important; }
+.python-code-editor [data-java-input] { display: inline-block; min-width: 1ch; }
+.python-code-line:has([data-java-input]) { background: var(--md-accent-fg-color--transparent); }
+.python-code-editor [data-java-input]:focus { outline: none; }
+.example-runner select { font: inherit; padding: .3rem .6rem; border: 1px solid var(--md-default-fg-color--lighter); border-radius: .2rem; background: var(--md-code-bg-color); color: var(--md-code-fg-color); }
+.example-runner .java-runtime-credit { font-size: .7rem; }
+
+.java-runtime-frame { position: fixed; bottom: 0; right: 0; width: 1px; height: 1px; opacity: .01; pointer-events: none; border: 0; }

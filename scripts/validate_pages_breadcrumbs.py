@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 BREADCRUMB_MARKER = '<nav class="editorial-breadcrumb'
-EXCLUDED_PAGES = {"index.html", "404.html", "404/index.html"}
+EXCLUDED_PAGES = {"index.html", "404.html", "404/index.html", "assets/javascripts/java-runtime.html"}
 
 
 def validate(site_dir: Path) -> list[str]:

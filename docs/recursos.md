@@ -1,13 +1,13 @@
 # Cómo usar los laboratorios
 
-El sitio concentra las explicaciones de los laboratorios; el código ejecutable permanece en los cuadernos del repositorio. De esta manera, Pages funciona como espacio de lectura y Colab como espacio de experimentación.
+El sitio reúne las explicaciones y ejemplos ejecutables en Java y Python. Los cuadernos del repositorio amplían la experimentación con controles, animaciones y mediciones en Colab.
 
 ## Cómo se distribuye el contenido
 
 | Soporte | Contenido principal |
 | --- | --- |
 | Obra | Desarrollo completo, contexto y progresión editorial. |
-| GitHub Pages | Explicaciones de los laboratorios, ecuaciones, análisis e interpretación. |
+| GitHub Pages | Explicaciones, ecuaciones, análisis y ejemplos ejecutables en Java y Python. |
 | Notebook | Código, controles, animaciones, tablas y resultados ejecutables. |
 | Google Colab | Entorno inmediato para ejecutar el notebook. |
 
@@ -20,6 +20,12 @@ Cada notebook incluye un enlace hacia su explicación específica en Pages. Al f
 ## 1. Leer y orientar el estudio
 
 Usa el recorrido por capítulos para ubicar conceptos generales y entra en cada sección para consultar el desarrollo asociado a una simulación concreta. La búsqueda del sitio permite encontrar términos dentro de todo el complemento digital.
+
+## Ejecutar ejemplos en Pages
+
+Abre **Ver código y editar entradas**, elige **Java** o **Python** y modifica los valores resaltados. El algoritmo permanece en solo lectura. Pulsa **Ejecutar** para ver el resultado, **Detener** para cancelar o **Restablecer ejemplo** para recuperar las entradas originales. Cada lenguaje conserva sus entradas al cambiar de selección.
+
+La ejecución ocurre en tu navegador: Java utiliza [CheerpJ](https://cheerpj.com/) y Python utiliza [Pyodide](https://pyodide.org/). La primera carga necesita conexión a Internet. En Java, el `main` invoca la función presentada; `Entradas` lee los valores editables usando los argumentos del programa. Los ejemplos conceptuales con funciones `foo` requieren una definición propia del problema y muestran esa limitación al ejecutarse.
 
 ## 2. Ejecutar en Google Colab
 

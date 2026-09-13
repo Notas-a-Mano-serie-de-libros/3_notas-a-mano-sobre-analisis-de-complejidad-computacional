@@ -18,6 +18,9 @@ on:
       - "scripts/data/book_translations.json"
       - "scripts/book_code_languages.py"
       - "scripts/example_runner.py"
+      - "scripts/java_examples.py"
+      - "scripts/build_java_examples.py"
+      - "scripts/java/**"
   workflow_dispatch:
 
 permissions:
@@ -44,6 +47,12 @@ jobs:
         run: python -m pip install -r requirements-docs.txt
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Compile Java examples
+        run: python scripts/build_java_examples.py
       - name: Build documentation
         run: python -m mkdocs build --strict
       - name: Validate editorial structure and equations
