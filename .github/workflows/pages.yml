@@ -1,0 +1,136 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+      - "simulaciones/**"
+      - "common/**"
+      - "core/**"
+      - "recursos/**"
+      - "mkdocs.yml"
+      - "requirements-ci.txt"
+      - "requirements-docs.txt"
+      - "requirements-lock.txt"
+      - ".github/workflows/pages.yml"
+      - "desarrollo/scripts/integrate_laboratories_into_chapters.py"
+      - "desarrollo/scripts/editorial_math.py"
+      - "desarrollo/scripts/normalize_editorial_math.py"
+      - "desarrollo/scripts/validate_editorial_content.py"
+      - "desarrollo/scripts/validate_book_structure.py"
+      - "desarrollo/scripts/validate_page_assets.py"
+      - "desarrollo/scripts/validate_external_references.py"
+      - "desarrollo/scripts/data/book_structure.json"
+      - "desarrollo/scripts/sync_book_code.py"
+      - "desarrollo/scripts/data/book_code.json"
+      - "desarrollo/scripts/data/book_pdf_listings.json"
+      - "desarrollo/scripts/data/book_translations.json"
+      - "desarrollo/scripts/book_code_languages.py"
+      - "desarrollo/scripts/example_runner.py"
+      - "desarrollo/scripts/java_examples.py"
+      - "desarrollo/scripts/build_java_examples.py"
+      - "desarrollo/scripts/c_examples.py"
+      - "desarrollo/scripts/build_c_examples.py"
+      - "desarrollo/scripts/sync_page_assets.py"
+      - "desarrollo/scripts/sync_local_execution.py"
+      - "desarrollo/scripts/data/page_asset_sources.json"
+      - "desarrollo/scripts/check_c_examples.mjs"
+      - "desarrollo/scripts/c/**"
+      - "desarrollo/scripts/java/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements-ci.txt
+            requirements-docs.txt
+            requirements-lock.txt
+      - name: Install documentation and simulation dependencies
+        run: |
+          python -m pip install -r requirements-ci.txt -c requirements-lock.txt
+          python -m pip install -r requirements-docs.txt -c requirements-lock.txt
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Compile Java examples
+        run: python desarrollo/scripts/build_java_examples.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate C WebAssembly examples
+        run: |
+          python desarrollo/scripts/build_c_examples.py --check
+          node desarrollo/scripts/check_c_examples.mjs
+      - name: Build documentation
+        run: |
+          python desarrollo/scripts/sync_page_assets.py
+          python desarrollo/scripts/sync_local_execution.py
+          python -m mkdocs build --strict
+      - name: Verify generated page assets are synchronized
+        run: python desarrollo/scripts/sync_page_assets.py --check
+      - name: Verify local execution instructions are synchronized
+        run: python desarrollo/scripts/sync_local_execution.py --check
+      - name: Validate book structure
+        run: python desarrollo/scripts/validate_book_structure.py
+      - name: Validate page assets
+        run: python desarrollo/scripts/validate_page_assets.py
+      - name: Validate editorial content and equations
+        run: python desarrollo/scripts/validate_editorial_content.py
+      - name: Validate repository paths
+        run: python desarrollo/scripts/validate_repository_paths.py
+      - name: Validate external references
+        run: python desarrollo/scripts/validate_external_references.py
+      - name: Audit Python dependencies
+        run: python -m pip_audit -r requirements-ci.txt -r requirements-docs.txt
+      - name: Validate Colab bootstrap files
+        run: python desarrollo/scripts/validate_colab_bootstrap.py
+      - name: Validate Colab links
+        run: python desarrollo/scripts/validate_colab_links.py
+      - name: Validate notebook launchers
+        run: python desarrollo/scripts/validate_notebook_launchers.py
+      - name: Validate size budgets
+        run: python desarrollo/scripts/validate_size_budgets.py
+      - name: Validate widget contracts
+        run: python desarrollo/scripts/validate_widget_contracts.py
+      - name: Audit simulation notebook references
+        run: python desarrollo/scripts/audit_simulation_references.py
+      - name: Validate breadcrumbs on every content page
+        run: python desarrollo/scripts/validate_pages_breadcrumbs.py --site-dir site
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    name: Deploy site
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

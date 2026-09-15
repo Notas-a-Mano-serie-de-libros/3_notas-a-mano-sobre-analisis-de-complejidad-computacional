@@ -1,0 +1,4 @@
+-c requirements-lock.txt
+-r requirements-ci.txt
+-r requirements-docs.txt
+pre-commit

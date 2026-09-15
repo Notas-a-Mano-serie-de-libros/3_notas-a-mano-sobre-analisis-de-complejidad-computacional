@@ -1,0 +1,56 @@
+name: Release Artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build-artifacts:
+    name: Build release artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements-ci.txt
+            requirements-lock.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-ci.txt -c requirements-lock.txt
+      - name: Validate project
+        run: make validate PYTHON=python
+      - name: Build reports
+        run: |
+          mkdir -p artifacts
+          python desarrollo/scripts/benchmark_animations.py --repeats 3 --max-ms 1500 --output artifacts/animation-benchmark.json --json
+          python desarrollo/scripts/validate_benchmark_report.py --report artifacts/animation-benchmark.json
+          python desarrollo/scripts/validate_repository_paths.py > artifacts/repository-paths.txt
+          python desarrollo/scripts/validate_colab_bootstrap.py > artifacts/colab-bootstrap.txt
+          python desarrollo/scripts/validate_colab_links.py > artifacts/colab-links.txt
+      - name: Package project
+        run: |
+          mkdir -p artifacts/package
+          rsync -a \
+            --exclude '.git' \
+            --exclude '.pytest_cache' \
+            --exclude '.ruff_cache' \
+            --exclude '__pycache__' \
+            --exclude 'artifacts' \
+            ./ artifacts/package/
+          cd artifacts/package
+          zip -qr ../proyecto-notas-a-mano.zip .
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: artifacts
+          if-no-files-found: error
