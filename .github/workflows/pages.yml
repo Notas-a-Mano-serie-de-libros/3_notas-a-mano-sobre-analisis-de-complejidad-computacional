@@ -70,7 +70,7 @@ jobs:
           python -m pip install -r requirements-docs.txt -c requirements-lock.txt
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
