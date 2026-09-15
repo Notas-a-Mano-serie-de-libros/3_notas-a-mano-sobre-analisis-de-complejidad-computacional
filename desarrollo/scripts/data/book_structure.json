@@ -1,0 +1,27 @@
+{
+  "pages": [
+    {"book_section": "1", "path": "docs/capitulos/capitulo-1.md", "heading": "Capítulo 1 · Introducción"},
+    {"book_section": "2", "path": "docs/capitulos/capitulo-2.md", "heading": "Capítulo 2 · Fundamentos del análisis de algoritmos"},
+    {"book_section": "3", "path": "docs/capitulos/capitulo-3.md", "heading": "Capítulo 3 · Notación asintótica"},
+    {"book_section": "3.2", "path": "docs/capitulos/capitulo-3/notacion-asintotica-representacion-generica.md", "heading": "3.2 Comportamiento asintótico general"},
+    {"book_section": "3.3", "path": "docs/capitulos/capitulo-3/familias-de-funciones.md", "heading": "3.3 Familias de funciones"},
+    {"book_section": "3.4", "path": "docs/capitulos/capitulo-3/ejemplos-concretos-notaciones.md", "heading": "3.4 Notación asintótica simplificada"},
+    {"book_section": "3.5", "path": "docs/capitulos/capitulo-3/0-comparacion-notaciones-asintoticas.md", "heading": "3.5 Tipos de notación asintótica"},
+    {"book_section": "3.5.1.1", "path": "docs/capitulos/capitulo-3/1-notacion-big-o.md", "heading": "3.5.1.1 Notación Big-O"},
+    {"book_section": "3.5.1.2", "path": "docs/capitulos/capitulo-3/2-notacion-little-o.md", "heading": "3.5.1.2 Notación little-o"},
+    {"book_section": "3.5.2.1", "path": "docs/capitulos/capitulo-3/3-notacion-big-omega.md", "heading": "3.5.2.1 Notación Big-Ω"},
+    {"book_section": "3.5.2.2", "path": "docs/capitulos/capitulo-3/4-notacion-little-omega.md", "heading": "3.5.2.2 Notación little-ω"},
+    {"book_section": "3.5.3", "path": "docs/capitulos/capitulo-3/5-notacion-theta.md", "heading": "3.5.3 Notación Θ"},
+    {"book_section": "4", "path": "docs/capitulos/capitulo-4.md", "heading": "Capítulo 4 · Análisis de algoritmos estructurados"},
+    {"book_section": "5", "path": "docs/capitulos/capitulo-5.md", "heading": "Capítulo 5 · Relaciones de recurrencia y análisis de complejidad"},
+    {"book_section": "5.5", "path": "docs/capitulos/capitulo-5/solucion-relaciones-recurrencia.md", "heading": "5.5 Solución de relaciones de recurrencia"},
+    {"book_section": "5.5.2", "path": "docs/capitulos/capitulo-5/sustitucion-iterativa.md", "heading": "5.5.2 Sustitución iterativa"},
+    {"book_section": "5.5.3", "path": "docs/capitulos/capitulo-5/arbol-recurrencia.md", "heading": "5.5.3 Árbol de recurrencia"},
+    {"book_section": "5.5.4", "path": "docs/capitulos/capitulo-5/teorema-maestro.md", "heading": "5.5.4 Teorema maestro"},
+    {"book_section": "5.5.5", "path": "docs/capitulos/capitulo-5/ecuacion-caracteristica.md", "heading": "5.5.5 Ecuación característica"},
+    {"book_section": "6", "path": "docs/capitulos/capitulo-6.md", "heading": "Capítulo 6 · Análisis de algoritmos recursivos"},
+    {"book_section": "7", "path": "docs/capitulos/capitulo-7.md", "heading": "Capítulo 7 · Análisis de algoritmos de búsqueda clásicos"},
+    {"book_section": "8", "path": "docs/capitulos/capitulo-8.md", "heading": "Capítulo 8 · Análisis de algoritmos de ordenamiento clásicos"},
+    {"book_section": "9", "path": "docs/capitulos/capitulo-9.md", "heading": "Capítulo 9 · Reflexiones finales"}
+  ]
+}

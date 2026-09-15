@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% macro route_panel(position) %}
+  <nav class="editorial-breadcrumb route-panel route-panel--{{ position }}" aria-label="Ubicación y navegación de la lectura">
+    <ol class="route-panel__trail">
+      <li><a href="{{ nav.homepage.url | url }}">Inicio</a></li>
+      {% if page.parent and page.parent.parent %}
+        {% set grandparent_url = page.parent.parent.url or (page.parent.parent.children[0].url if page.parent.parent.children else none) %}
+        <li>{% if grandparent_url %}<a href="{{ grandparent_url | url }}">{{ page.parent.parent.title }}</a>{% else %}<span>{{ page.parent.parent.title }}</span>{% endif %}</li>
+      {% endif %}
+      {% if page.parent %}
+        {% set parent_url = page.parent.url or (page.parent.children[0].url if page.parent.children else none) %}
+        <li>{% if parent_url %}<a href="{{ parent_url | url }}">{{ page.parent.title }}</a>{% else %}<span>{{ page.parent.title }}</span>{% endif %}</li>
+      {% endif %}
+      <li aria-current="page"><span>{{ page.title }}</span></li>
+    </ol>
+  </nav>
+{% endmacro %}
+
+{% macro reading_card() %}
+  {% set source = page.file.src_uri %}
+  {% if "/capitulo-2/" in source %}
+    {% set purpose = "Reconocer el patrón de crecimiento presentado en «" ~ page.title ~ "» y relacionarlo con el costo del algoritmo." %}
+    {% set prerequisite = "Identifica el tamaño de entrada y distingue el valor de los datos de la cantidad de operaciones." %}
+    {% set route = "Examina la función de crecimiento, interpreta sus propiedades y contrasta el comportamiento en la simulación." %}
+    {% set duration = "Entre 8 y 12 minutos, sin contar la experimentación." %}
+  {% elif "/capitulo-3/" in source %}
+    {% set purpose = "Interpretar el contenido de «" ~ page.title ~ "» mediante su definición formal y su relación con otras funciones." %}
+    {% set prerequisite = "Repasa funciones, desigualdades, límites y cuantificadores antes de estudiar la definición." %}
+    {% set route = "Lee la definición, identifica sus elementos y comprueba la relación sobre los ejemplos." %}
+    {% set duration = "Entre 10 y 15 minutos, sin contar la experimentación." %}
+  {% elif "/capitulo-4/" in source %}
+    {% set purpose = "Aplicar el procedimiento de análisis al problema «" ~ page.title ~ "», separando tiempo y espacio." %}
+    {% set prerequisite = "Distingue secuencias, decisiones, ciclos, llamadas y variables auxiliares." %}
+    {% set route = "Descompón el código, cuenta sus operaciones y verifica el resultado con el ejemplo ejecutable." %}
+    {% set duration = "Entre 8 y 15 minutos, incluida la revisión del código." %}
+  {% elif "/capitulo-5/" in source %}
+    {% set purpose = "Resolver o clasificar el problema presentado en «" ~ page.title ~ "» a partir de la forma y las condiciones de la recurrencia." %}
+    {% set prerequisite = "Repasa sucesiones, sumatorias, logaritmos y las condiciones iniciales de una recurrencia." %}
+    {% set route = "Identifica la forma, aplica el método compatible y comprueba que la solución satisface las condiciones." %}
+    {% set duration = "Entre 12 y 20 minutos, según el desarrollo algebraico." %}
+  {% elif "/capitulo-6/" in source %}
+    {% set purpose = "Derivar el tiempo y el espacio del algoritmo presentado en «" ~ page.title ~ "» desde sus llamadas recursivas." %}
+    {% set prerequisite = "Identifica el caso base, el tamaño de cada subproblema y la información conservada en la pila." %}
+    {% set route = "Construye la recurrencia, determina su profundidad y contrasta el análisis con el código." %}
+    {% set duration = "Entre 10 y 18 minutos, incluida la revisión del código." %}
+  {% elif "/capitulo-7/" in source %}
+    {% set purpose = "Explicar el algoritmo «" ~ page.title ~ "» y reconocer las condiciones que determinan sus casos de complejidad." %}
+    {% set prerequisite = "Comprueba si el arreglo debe estar ordenado y qué supuestos se hacen sobre la distribución de sus valores." %}
+    {% set route = "Relaciona las comparaciones con el intervalo examinado, ejecuta el código y compara sus casos." %}
+    {% set duration = "Entre 12 y 18 minutos, sin contar la simulación en Colab." %}
+  {% elif "/capitulo-8/" in source %}
+    {% set purpose = "Explicar el algoritmo «" ~ page.title ~ "» y relacionar sus operaciones con el tiempo y la memoria utilizados." %}
+    {% set prerequisite = "Distingue comparaciones, intercambios, desplazamientos, estabilidad y memoria auxiliar." %}
+    {% set route = "Sigue la transformación del arreglo, ejecuta el código y compara los casos de complejidad." %}
+    {% set duration = "Entre 12 y 20 minutos, sin contar la simulación en Colab." %}
+  {% endif %}
+  <aside class="reading-card" aria-label="Orientación de la sección">
+    <div><strong>Propósito</strong><span>{{ purpose }}</span></div>
+    <div><strong>Antes de empezar</strong><span>{{ prerequisite }}</span></div>
+    <div><strong>Ruta</strong><span>{{ route }}</span></div>
+    <div><strong>Tiempo estimado</strong><span>{{ duration }}</span></div>
+  </aside>
+{% endmacro %}
+
+{% macro reading_progress() %}
+  {% if page.parent and page.parent.children %}
+    {% set position = namespace(current=0, total=0) %}
+    {% for item in page.parent.children %}
+      {% if item.is_page %}
+        {% set position.total = position.total + 1 %}
+        {% if item.url == page.url %}{% set position.current = position.total %}{% endif %}
+      {% endif %}
+    {% endfor %}
+    {% if position.current %}
+    <aside class="reading-progress" data-reading-progress data-page-key="{{ page.url }}" aria-label="Progreso de lectura">
+      <div>
+        <strong>Sección {{ position.current }} de {{ position.total }}</strong>
+        <span data-reading-progress-summary></span>
+      </div>
+      <progress value="{{ position.current }}" max="{{ position.total }}" aria-label="Posición dentro del grupo de secciones">{{ position.current }} de {{ position.total }}</progress>
+      <button type="button" data-reading-complete aria-pressed="false">
+        <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4Z"/></svg>
+        <span data-reading-complete-label>Marcar como leída</span>
+      </button>
+    </aside>
+    {% endif %}
+  {% endif %}
+{% endmacro %}
+
+{% from "section_closings.html" import learning_close with context %}
+
+{% block extrahead %}
+  {{ super() }}
+  <meta name="author" content="Carlos Eduardo Orozco Garcés, César Jesús Pardo Calvache y Mauro Callejas Cuervo">
+  <meta name="book-edition" content="Segunda edición, 2026">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ page.title }} · Notas a mano sobre análisis de complejidad computacional">
+  <meta property="og:description" content="Explicación, análisis y recursos de {{ page.title }} para la segunda edición de la obra.">
+{% endblock %}
+
+{% block content %}
+  {% set is_chapter_section = page.file and page.file.src_uri.startswith('capitulos/capitulo-') and page.file.src_uri.count('/') > 1 %}
+  {% if page != nav.homepage %}{{ route_panel("top") }}{% endif %}
+  {% if is_chapter_section %}{{ reading_progress() }}{{ reading_card() }}{% endif %}
+  {{ super() }}
+  {% if is_chapter_section %}{{ learning_close() }}{% endif %}
+  <dialog class="figure-lightbox" aria-label="Ampliación de figura">
+    <button class="figure-lightbox__close" type="button" aria-label="Cerrar imagen ampliada">Cerrar</button>
+    <img alt="">
+    <p></p>
+  </dialog>
+{% endblock %}
