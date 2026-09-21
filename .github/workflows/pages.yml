@@ -69,7 +69,7 @@ jobs:
           python -m pip install -r requirements-ci.txt -c requirements-lock.txt
           python -m pip install -r requirements-docs.txt -c requirements-lock.txt
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
