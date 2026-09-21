@@ -76,7 +76,7 @@ jobs:
           java-version: "17"
       - name: Compile Java examples
         run: python desarrollo/scripts/build_java_examples.py
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
       - name: Validate C WebAssembly examples
