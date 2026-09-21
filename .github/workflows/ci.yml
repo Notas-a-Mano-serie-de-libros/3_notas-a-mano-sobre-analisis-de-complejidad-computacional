@@ -84,7 +84,7 @@ jobs:
           python -m pytest -q --junitxml=artifacts/pytest-${{ matrix.python-version }}.xml
       - name: Upload pytest report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pytest-${{ matrix.python-version }}
           path: artifacts/pytest-${{ matrix.python-version }}.xml
@@ -113,7 +113,7 @@ jobs:
           python desarrollo/scripts/validate_benchmark_report.py --report artifacts/animation-benchmark.json
       - name: Upload benchmark report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: animation-benchmark
           path: artifacts/animation-benchmark.json
@@ -142,7 +142,7 @@ jobs:
           python -m pip_audit -r requirements-ci.txt --progress-spinner off --format json --output artifacts/pip-audit.json
       - name: Upload dependency audit
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pip-audit
           path: artifacts/pip-audit.json
