@@ -133,3 +133,40 @@ flowchart LR
     El sitio orienta, resume y conecta los recursos de la obra. No reemplaza sus definiciones, demostraciones, implementaciones ni análisis completos.
 
 Para reportar una errata o compartir una propuesta, visita la [fe de erratas](erratas.md) o [Comentarios y sugerencias](comentarios-sugerencias.md).
+
+## Tu experiencia con el libro
+
+Tu valoración ayuda a mejorar las explicaciones y los recursos de próximas ediciones. Los comentarios pasan por revisión editorial antes de aparecer públicamente.
+
+<section class="reader-feedback" data-reader-feedback data-api-base="https://notas-a-mano-opiniones.carlos940807.chatgpt.site">
+  <div class="reader-feedback__summary" aria-live="polite">
+    <div><strong data-review-average>—</strong><span aria-hidden="true">★</span></div>
+    <p><b data-review-total>Sin valoraciones publicadas</b><small>Experiencia de quienes han consultado este contenido</small></p>
+  </div>
+  <div class="reader-feedback__grid">
+    <form class="reader-feedback__form" data-review-form novalidate>
+      <h3>Comparte tu valoración</h3>
+      <fieldset class="reader-feedback__stars">
+        <legend>Calificación</legend>
+        <div role="radiogroup" aria-label="Calificación de una a cinco estrellas">
+          <input type="radio" id="rating-5" name="rating" value="5" required><label for="rating-5" title="5 estrellas">★</label>
+          <input type="radio" id="rating-4" name="rating" value="4"><label for="rating-4" title="4 estrellas">★</label>
+          <input type="radio" id="rating-3" name="rating" value="3"><label for="rating-3" title="3 estrellas">★</label>
+          <input type="radio" id="rating-2" name="rating" value="2"><label for="rating-2" title="2 estrellas">★</label>
+          <input type="radio" id="rating-1" name="rating" value="1"><label for="rating-1" title="1 estrella">★</label>
+        </div>
+      </fieldset>
+      <label>Comentario<textarea name="comment" minlength="12" maxlength="1200" rows="4" required placeholder="Cuéntanos qué te resultó útil y qué podríamos mejorar"></textarea></label>
+      <label data-review-name-field>Nombre<input type="text" name="name" minlength="2" maxlength="80" autocomplete="name" required></label>
+      <label class="reader-feedback__privacy"><input type="checkbox" name="isAnonymous"><span>Publicar de forma anónima</span></label>
+      <label class="reader-feedback__honeypot" aria-hidden="true">Sitio web<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+      <div data-turnstile></div>
+      <button class="md-button md-button--primary" type="submit" disabled><span aria-hidden="true">✦</span> Enviar para revisión</button>
+      <p class="reader-feedback__status" data-review-status role="status" aria-live="polite">Preparando el formulario…</p>
+    </form>
+    <div class="reader-feedback__comments">
+      <div class="reader-feedback__comments-heading"><h3>Comentarios publicados</h3><span data-comments-count></span></div>
+      <div data-review-list><p class="reader-feedback__empty">Cargando comentarios…</p></div>
+    </div>
+  </div>
+</section>

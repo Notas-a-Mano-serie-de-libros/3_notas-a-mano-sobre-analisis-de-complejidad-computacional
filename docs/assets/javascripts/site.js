@@ -104,10 +104,77 @@ function prepareAccessibleTables(root = document) {
   });
 }
 
+function prepareReaderFeedback(root = document) {
+  root.querySelectorAll("[data-reader-feedback]").forEach(async (panel) => {
+    if (panel.dataset.initialized) return;
+    panel.dataset.initialized = "true";
+    const api = panel.dataset.apiBase;
+    const form = panel.querySelector("[data-review-form]");
+    const submit = form.querySelector("button[type='submit']");
+    const status = panel.querySelector("[data-review-status]");
+    const anonymous = form.elements.isAnonymous;
+    const name = form.elements.name;
+    let turnstileWidget = null;
+
+    const renderReviews = (data) => {
+      panel.querySelector("[data-review-average]").textContent = data.total ? Number(data.average).toFixed(1).replace(".", ",") : "—";
+      panel.querySelector("[data-review-total]").textContent = data.total === 1 ? "1 valoración publicada" : `${data.total || 0} valoraciones publicadas`;
+      panel.querySelector("[data-comments-count]").textContent = data.items?.length ? `${data.items.length} recientes` : "";
+      const list = panel.querySelector("[data-review-list]");
+      list.replaceChildren();
+      if (!data.items?.length) {
+        const empty = document.createElement("p"); empty.className = "reader-feedback__empty"; empty.textContent = "Todavía no hay comentarios publicados."; list.append(empty); return;
+      }
+      data.items.forEach((item) => {
+        const article = document.createElement("article"); article.className = "reader-feedback__comment";
+        const header = document.createElement("div");
+        const author = document.createElement("strong"); author.textContent = item.name || "Anónimo";
+        const stars = document.createElement("span"); stars.className = "reader-feedback__comment-stars"; stars.setAttribute("aria-label", `${item.rating} de 5 estrellas`); stars.textContent = `${"★".repeat(item.rating)}${"☆".repeat(5 - item.rating)}`;
+        const comment = document.createElement("p"); comment.textContent = item.comment;
+        const date = document.createElement("time"); date.dateTime = item.createdAt; date.textContent = new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(new Date(item.createdAt));
+        header.append(author, stars); article.append(header, comment, date); list.append(article);
+      });
+    };
+
+    const loadReviews = async () => {
+      try { const response = await fetch(`${api}/api/reviews`); if (response.ok) renderReviews(await response.json()); } catch (_error) { panel.querySelector("[data-review-list]").innerHTML = '<p class="reader-feedback__empty">Los comentarios no están disponibles temporalmente.</p>'; }
+    };
+
+    anonymous.addEventListener("change", () => { name.disabled = anonymous.checked; name.required = !anonymous.checked; if (anonymous.checked) name.value = ""; });
+    await loadReviews();
+    try {
+      const configResponse = await fetch(`${api}/api/config`);
+      const config = await configResponse.json();
+      if (!configResponse.ok || !config.acceptingReviews || !config.turnstileSiteKey) throw new Error("unavailable");
+      await new Promise((resolve, reject) => {
+        if (window.turnstile) return resolve();
+        const script = document.createElement("script"); script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; script.async = true; script.defer = true; script.onload = resolve; script.onerror = reject; document.head.append(script);
+      });
+      turnstileWidget = window.turnstile.render(panel.querySelector("[data-turnstile]"), { sitekey: config.turnstileSiteKey, action: "book_review", theme: "auto" });
+      submit.disabled = false; status.textContent = "Tu comentario no se publicará hasta que sea revisado.";
+    } catch (_error) { status.textContent = "La recepción de comentarios estará disponible próximamente."; }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity() || submit.disabled || turnstileWidget === null) return;
+      const token = window.turnstile.getResponse(turnstileWidget);
+      if (!token) { status.textContent = "Completa la verificación antes de enviar."; return; }
+      const values = new FormData(form); submit.disabled = true; status.textContent = "Enviando para revisión…";
+      try {
+        const response = await fetch(`${api}/api/reviews`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ rating: Number(values.get("rating")), comment: values.get("comment"), name: values.get("name"), isAnonymous: values.get("isAnonymous") === "on", website: values.get("website"), turnstileToken: token }) });
+        const data = await response.json(); status.textContent = data.message || "No fue posible procesar la solicitud.";
+        if (response.ok) form.reset();
+      } catch (_error) { status.textContent = "No fue posible enviar el comentario. Intenta nuevamente."; }
+      window.turnstile.reset(turnstileWidget); submit.disabled = false;
+    });
+  });
+}
+
 function preparePageEnhancements() {
   prepareEditorialFigures();
   prepareReadingProgress();
   prepareAccessibleTables();
+  prepareReaderFeedback();
 }
 
 if (typeof document$ !== "undefined") {
