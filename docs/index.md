@@ -161,7 +161,7 @@ Tu valoración ayuda a mejorar las explicaciones y los recursos de próximas edi
       <label class="reader-feedback__privacy"><input type="checkbox" name="isAnonymous"><span>Publicar de forma anónima</span></label>
       <label class="reader-feedback__honeypot" aria-hidden="true">Sitio web<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
       <div data-turnstile></div>
-      <button class="md-button md-button--primary" type="submit" disabled><span aria-hidden="true">✦</span> Enviar para revisión</button>
+      <button class="md-button md-button--primary" type="submit" disabled><span aria-hidden="true">✦</span> Enviar</button>
       <p class="reader-feedback__status" data-review-status role="status" aria-live="polite">Preparando el formulario…</p>
     </form>
     <div class="reader-feedback__comments">

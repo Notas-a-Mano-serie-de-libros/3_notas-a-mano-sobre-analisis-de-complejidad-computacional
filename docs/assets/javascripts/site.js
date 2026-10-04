@@ -104,6 +104,30 @@ function prepareAccessibleTables(root = document) {
   });
 }
 
+const reviewApiBase = "https://notas-a-mano-opiniones.carlos940807.chatgpt.site";
+let reviewDataRequest;
+
+function loadReviewData() {
+  if (!reviewDataRequest) reviewDataRequest = fetch(`${reviewApiBase}/api/reviews`).then((response) => {
+    if (!response.ok) throw new Error("reviews-unavailable");
+    return response.json();
+  });
+  return reviewDataRequest;
+}
+
+function prepareGlobalReviewSummary(root = document) {
+  const summaries = root.querySelectorAll("[data-global-review-summary]");
+  if (!summaries.length) return;
+  loadReviewData().then((data) => {
+    summaries.forEach((summary) => {
+      summary.querySelector("[data-global-review-average]").textContent = data.total ? Number(data.average).toFixed(1).replace(".", ",") : "—";
+      summary.querySelector("[data-global-review-total]").textContent = data.total === 1 ? "1 valoración" : `${data.total || 0} valoraciones`;
+    });
+  }).catch(() => {
+    summaries.forEach((summary) => { summary.querySelector("[data-global-review-total]").textContent = "Valoración"; });
+  });
+}
+
 function prepareReaderFeedback(root = document) {
   root.querySelectorAll("[data-reader-feedback]").forEach(async (panel) => {
     if (panel.dataset.initialized) return;
@@ -137,7 +161,7 @@ function prepareReaderFeedback(root = document) {
     };
 
     const loadReviews = async () => {
-      try { const response = await fetch(`${api}/api/reviews`); if (response.ok) renderReviews(await response.json()); } catch (_error) { panel.querySelector("[data-review-list]").innerHTML = '<p class="reader-feedback__empty">Los comentarios no están disponibles temporalmente.</p>'; }
+      try { renderReviews(await loadReviewData()); } catch (_error) { panel.querySelector("[data-review-list]").innerHTML = '<p class="reader-feedback__empty">Los comentarios no están disponibles temporalmente.</p>'; }
     };
 
     anonymous.addEventListener("change", () => { name.disabled = anonymous.checked; name.required = !anonymous.checked; if (anonymous.checked) name.value = ""; });
@@ -174,6 +198,7 @@ function preparePageEnhancements() {
   prepareEditorialFigures();
   prepareReadingProgress();
   prepareAccessibleTables();
+  prepareGlobalReviewSummary();
   prepareReaderFeedback();
 }
 

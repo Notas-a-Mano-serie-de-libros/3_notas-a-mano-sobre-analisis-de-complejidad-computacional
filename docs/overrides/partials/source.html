@@ -1,4 +1,8 @@
 {# Botón del repositorio en la cabecera: conserva Pages en la pestaña actual. #}
+<a class="header-rating" data-global-review-summary href="{{ config.site_url }}#tu-experiencia-con-el-libro" aria-label="Consultar la valoración general del libro">
+  <span class="header-rating__icon" aria-hidden="true">★</span>
+  <span class="header-rating__content"><strong data-global-review-average>—</strong><small data-global-review-total>Valoración</small></span>
+</a>
 <a href="{{ config.repo_url }}" title="{{ lang.t('source') }}" class="md-source" data-md-component="source" target="_blank" rel="noopener noreferrer">
   <div class="md-source__icon md-icon">
     {% set icon = config.theme.icon.repo or "fontawesome/brands/git-alt" %}
