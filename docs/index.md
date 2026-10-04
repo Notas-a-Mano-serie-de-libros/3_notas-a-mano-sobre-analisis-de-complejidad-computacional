@@ -134,7 +134,7 @@ flowchart LR
 
 Para reportar una errata o compartir una propuesta, visita la [fe de erratas](erratas.md) o [Comentarios y sugerencias](comentarios-sugerencias.md).
 
-## Tu experiencia con el libro
+## Tu experiencia con el material complementario
 
 Tu valoración ayuda a mejorar las explicaciones y los recursos de próximas ediciones. Los comentarios pasan por revisión editorial antes de aparecer públicamente.
 
