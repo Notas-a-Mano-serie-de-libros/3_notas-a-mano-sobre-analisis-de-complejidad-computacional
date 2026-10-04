@@ -147,6 +147,13 @@ input {
   width: auto;
 }
 
+.md-header__source .md-source__repository {
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
 .header-rating {
   align-items: center;
   align-self: stretch;
