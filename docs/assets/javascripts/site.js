@@ -138,7 +138,19 @@ function prepareReaderFeedback(root = document) {
     const status = panel.querySelector("[data-review-status]");
     const anonymous = form.elements.isAnonymous;
     const name = form.elements.name;
+    const reviewList = panel.querySelector("[data-review-list]");
     let turnstileWidget = null;
+
+    reviewList.tabIndex = 0;
+    reviewList.setAttribute("role", "region");
+    reviewList.setAttribute("aria-label", "Comentarios publicados");
+
+    const syncCommentsHeight = () => {
+      panel.style.setProperty("--reader-feedback-form-height", `${Math.ceil(form.getBoundingClientRect().height)}px`);
+    };
+    const formResizeObserver = new ResizeObserver(syncCommentsHeight);
+    formResizeObserver.observe(form);
+    syncCommentsHeight();
 
     const renderReviews = (data) => {
       panel.querySelector("[data-review-average]").textContent = data.total ? Number(data.average).toFixed(1).replace(".", ",") : "—";
