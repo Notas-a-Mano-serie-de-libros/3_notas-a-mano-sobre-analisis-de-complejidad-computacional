@@ -30,6 +30,9 @@ def test_jupyterlite_demo_sources_and_configuration_exist():
     assert (LITE_DIR / "jupyter-lite.json").is_file()
     config = json.loads((LITE_DIR / "jupyter-lite.json").read_text(encoding="utf-8"))
     assert config["jupyter-config-data"]["defaultKernelName"] == "python"
+    assert config["jupyter-config-data"]["settingsOverrides"][
+        "@jupyterlab/notebook-extension:tracker"
+    ]["autoStartDefaultKernel"] is True
     assert NOTEBOOKS[0] in CONTENT_FILES
     assert all(notebook in CONTENT_FILES for notebook in NOTEBOOKS)
     assert all((PROJECT_ROOT / path).is_file() for path in CONTENT_FILES)

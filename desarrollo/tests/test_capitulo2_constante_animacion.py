@@ -347,8 +347,13 @@ def test_bootstrap_no_incluye_instalacion_condicional_de_dependencias():
 
     assert 'find_spec("matplotlib")' not in source
     assert 'find_spec("numpy")' not in source
-    assert "subprocess" not in source
-    assert "pip install" not in source
+    assert 'COLAB_PACKAGES = ("ipywidgets==8.1.9",)' in source
+    assert '"pip", "install", "--quiet", *COLAB_PACKAGES' in source
+    assert "check=True" in source
+    lock = (Path(__file__).parents[2] / "requirements-lock.txt").read_text(
+        encoding="utf-8"
+    )
+    assert "ipywidgets==8.1.9" in lock
 
 
 def test_bootstrap_prioriza_simulacion_y_limpia_estado_del_kernel():

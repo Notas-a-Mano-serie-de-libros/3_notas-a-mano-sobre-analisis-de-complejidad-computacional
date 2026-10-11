@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import subprocess
 import sys
 import time
 import urllib.request
@@ -11,6 +12,7 @@ from pathlib import Path
 from IPython.display import clear_output
 
 RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main"
+COLAB_PACKAGES = ("ipywidgets==8.1.9",)
 REQUIRED_FILES = (
     "common/__init__.py",
     "common/animation_runtime.py",
@@ -70,10 +72,18 @@ def download_required_files(root):
         target.write_bytes(urllib.request.urlopen(request, timeout=30).read())
 
 
+def install_colab_packages():
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "--quiet", *COLAB_PACKAGES],
+        check=True,
+    )
+
+
 def prepare_imports():
     project_root = find_project_root() or Path.cwd()
     if running_in_colab():
         download_required_files(project_root)
+        install_colab_packages()
 
     root_string = str(project_root.resolve())
     if root_string not in sys.path:

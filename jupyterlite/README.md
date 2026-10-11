@@ -24,7 +24,9 @@ python desarrollo/scripts/sync_jupyterlite_urls.py
 
 Las dependencias de Python se configuran en las opciones de inicio del kernel
 Pyodide para que se carguen antes de abrir los notebooks, sin celdas de
-instalación auxiliares. Después de compilar, el validador del artefacto revisa
+instalación auxiliares. El kernel predeterminado se inicia automáticamente al
+abrir una simulación, sin pedir que se seleccione en cada ejecución. Después de
+compilar, el validador del artefacto revisa
 las rutas, la configuración del kernel, la presencia de paquetes, las celdas de
 solo lectura y el presupuesto total de tamaño:
 

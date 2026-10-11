@@ -37,6 +37,11 @@ def validate(site_dir: Path) -> list[str]:
         config_data = config.get("jupyter-config-data", {})
         if config_data.get("defaultKernelName") != "python":
             errors.append(f"{profile}: el kernel predeterminado no es Python")
+        auto_start = config_data.get("settingsOverrides", {}).get(
+            "@jupyterlab/notebook-extension:tracker", {}
+        ).get("autoStartDefaultKernel")
+        if auto_start is not True:
+            errors.append(f"{profile}: no está activado el inicio automático del kernel")
         kernel = config_data.get("litePluginSettings", {}).get(
             "@jupyterlite/pyodide-kernel-extension:kernel", {}
         )
