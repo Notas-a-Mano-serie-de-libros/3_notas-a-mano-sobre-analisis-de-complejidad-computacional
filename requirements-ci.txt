@@ -1,0 +1,11 @@
+pytest
+numpy
+matplotlib
+IPython
+ipywidgets
+scipy
+scikit-learn
+sympy
+ruff
+pip-audit
+pandas

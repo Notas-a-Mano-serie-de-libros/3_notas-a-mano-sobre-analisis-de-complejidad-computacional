@@ -1,0 +1,509 @@
+{
+  "source_sha256": "d7c02a0407e98c9e1c0464748ba4d24bd7509dfcfb27304cde0d94e29519aa84",
+  "listings": [
+    {
+      "folio": 136,
+      "code": "int a;\n         // Declaración\na = 5;\n         // Asignación",
+      "id": 1,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "int a;\n         // Declaración\na = 5;\n         // Asignación"
+    },
+    {
+      "folio": 136,
+      "code": "int b = a;",
+      "id": 2,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "int b = a;"
+    },
+    {
+      "folio": 137,
+      "code": "a_1 + a_2 + a_3 + ... + a_k;",
+      "id": 3,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "a_1 + a_2 + a_3 + ... + a_k;"
+    },
+    {
+      "folio": 137,
+      "code": "a > b;\n                            // Operación relacional\n(a > b) && (a == 5);\n                            // Operación lógica",
+      "id": 4,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "a > b;\n                            // Operación relacional\n(a > b) && (a == 5);\n                            // Operación lógica"
+    },
+    {
+      "folio": 137,
+      "code": "foo();",
+      "id": 5,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "foo();"
+    },
+    {
+      "folio": 138,
+      "code": "// Condicional simple\nif (condicion) {\n    // Si la condicion es VERDADERA ejecuta este bloque de código.\n}\n// Condicional compuesto\nif (condicion) {\n    // Si la condicion es VERDADERA, ejecuta este bloque de código.\n} else {\n    // Si la condicion es FALSA, ejecuta este bloque de código.\n}\n// Condicional anidado\nif (condicion1) {\n    // Si la primera condicion es VERDADERA ejecuta este bloque de código.\n} else if (condicion2) {\n    // Si la segunda condicion es VERDADERA ejecuta este bloque de código.\n} else if (condicion_k) {\n    // Si la condicion k es VERDADERA ejecuta este bloque de código.\n} else {\n    // Si no se cumple ninguna condición ejecuta este bloque de código.\n}",
+      "id": 6,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "// Condicional simple\nif (condicion) {\n    // Si la condicion es VERDADERA ejecuta este bloque de código.\n}\n// Condicional compuesto\nif (condicion) {\n    // Si la condicion es VERDADERA, ejecuta este bloque de código.\n} else {\n    // Si la condicion es FALSA, ejecuta este bloque de código.\n}\n// Condicional anidado\nif (condicion1) {\n    // Si la primera condicion es VERDADERA ejecuta este bloque de código.\n} else if (condicion2) {\n    // Si la segunda condicion es VERDADERA ejecuta este bloque de código.\n} else if (condicion_k) {\n    // Si la condicion k es VERDADERA ejecuta este bloque de código.\n} else {\n    // Si no se cumple ninguna condición ejecuta este bloque de código.\n}"
+    },
+    {
+      "folio": 138,
+      "code": "switch (valor) {\n    case valor1:\n        // Ejecuta este bloque de código.\n    case valor2:\n        // Ejecuta este bloque de código.\n    case valor_k:\n        // Ejecuta este bloque de código.\n    default:\n        // Ejecuta este bloque de código.\n}",
+      "id": 7,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto. switch no contiene break; la caída entre casos debe ser intencional o explicarse.",
+      "corrected_code": "switch (valor) {\n    case valor1:\n        // Ejecuta este bloque de código.\n    case valor2:\n        // Ejecuta este bloque de código.\n    case valor_k:\n        // Ejecuta este bloque de código.\n    default:\n        // Ejecuta este bloque de código.\n}"
+    },
+    {
+      "folio": 139,
+      "code": "if (g(n)) {\n    // Se cumple g(n)\n} else if (h(n)) {\n    // Se cumple h(n)\n} else {\n    r(n);\n}",
+      "id": 8,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "if (g(n)) {\n    // Se cumple g(n)\n} else if (h(n)) {\n    // Se cumple h(n)\n} else {\n    r(n);\n}"
+    },
+    {
+      "folio": 140,
+      "code": "for(int i = 0; i<n; i++)",
+      "id": 9,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "for(int i = 0; i<n; i++)"
+    },
+    {
+      "folio": 146,
+      "code": "for(int i_1 = 0; i_1<n_1; i_1++) {\n    // El ciclo realiza u_1 operaciones\n    for(int i_2 = 0; i_2<n_2; i_2++) {\n        // El ciclo realiza u_2 operaciones\n        for(int i_k = 0; i_k<n_k; i_k++) {\n            // El ciclo realiza u_k operaciones\n        }\n    }\n}",
+      "id": 10,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "for(int i_1 = 0; i_1<n_1; i_1++) {\n    // El ciclo realiza u_1 operaciones\n    for(int i_2 = 0; i_2<n_2; i_2++) {\n        // El ciclo realiza u_2 operaciones\n        for(int i_k = 0; i_k<n_k; i_k++) {\n            // El ciclo realiza u_k operaciones\n        }\n    }\n}"
+    },
+    {
+      "folio": 148,
+      "code": "arr[i]; //Accede al elemento i del arreglo \"arr\"\nm[i][j]; //Accede al elemento i,j del de la matriz \"m\"",
+      "id": 11,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "arr[i]; //Accede al elemento i del arreglo \"arr\"\nm[i][j]; //Accede al elemento i,j del de la matriz \"m\""
+    },
+    {
+      "folio": 149,
+      "code": "foo();",
+      "id": 12,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "foo();"
+    },
+    {
+      "folio": 150,
+      "code": "public static int sumar(int a, int b) {\n    return a + b;\n}",
+      "id": 13,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public static int sumar(int a, int b) {\n    return Math.addExact(a, b);\n}"
+    },
+    {
+      "folio": 151,
+      "code": "public static void imprimirElementos(int[] arr) {\n    for (int i = 0; i < arr.length; i++) {\n        System.out.println(arr[i]);\n    }\n}",
+      "id": 14,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public static void imprimirElementos(int[] arr) {\n    for (int i = 0; i < arr.length; i++) {\n        System.out.println(arr[i]);\n    }\n}"
+    },
+    {
+      "folio": 153,
+      "code": "public static void imprimirMatriz(int[][] matriz) {\n    int m = matriz.length;\n    int n = m > 0 ? matriz[0].length : 0;\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j++) {\n            System.out.println(matriz[i][j]);\n        }\n        System.out.println();\n    }\n}",
+      "id": 15,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public static void imprimirMatriz(int[][] matriz) {\n    int m = matriz.length;\n    int n = m > 0 ? matriz[0].length : 0;\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j++) {\n            System.out.println(matriz[i][j]);\n        }\n        System.out.println();\n    }\n}"
+    },
+    {
+      "folio": 156,
+      "code": "public static int[][] inicializarMatriz(int m, int n) {\n    int matriz = new int[m][n];\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j++) {\n            matriz[i][j] = 1;\n        }\n    }\n    return matriz;\n}",
+      "id": 16,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public static int[][] inicializarMatriz(int m, int n) {\n    int[][] matriz = new int[m][n];\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j++) {\n            matriz[i][j] = 1;\n        }\n    }\n    return matriz;\n}"
+    },
+    {
+      "folio": 158,
+      "code": "public static void recorrerMatrizVacia(int m, int n) {\n    int[][] matriz = new int[m][n];\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j+=2) {\n            // Sin operaciones internas en este ciclo\n        }\n    }\n}",
+      "id": 17,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public static void recorrerMatrizVacia(int m, int n) {\n    int[][] matriz = new int[m][n];\n    for (int i = 0; i < m; i++) {\n        for (int j = 0; j < n; j+=2) {\n            // Sin operaciones internas en este ciclo\n        }\n    }\n}"
+    },
+    {
+      "folio": 161,
+      "code": "public static void imprimirElementos(int m, int n) {\n    for (int i = 0; i < m; i++) {\n        System.out.println(i);\n        for (int j = 0; j < n; j++) {\n            System.out.println(j);\n        }\n        for (int k = n; k > 1; k = k/2) {\n            System.out.println(k);\n            foo2();\n        }\n        foo1();\n    }\n}",
+      "id": 18,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Las funciones foo no están implementadas: su costo no se valida con las funciones vacías de prueba.",
+      "corrected_code": "public static void imprimirElementos(int m, int n) {\n    for (int i = 0; i < m; i++) {\n        System.out.println(i);\n        for (int j = 0; j < n; j++) {\n            System.out.println(j);\n        }\n        for (int k = n; k > 1; k = k/2) {\n            System.out.println(k);\n            foo2();\n        }\n        foo1();\n    }\n}"
+    },
+    {
+      "folio": 164,
+      "code": "public static void iterar() {\n    for (int i = 0; i < 10000000; i++) {\n        System.out.println(i);\n    }\n}",
+      "id": 19,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public static void iterar() {\n    for (int i = 0; i < 10000000; i++) {\n        System.out.println(i);\n    }\n}"
+    },
+    {
+      "folio": 166,
+      "code": "public static void cicloFijo(int n) {\n    for (int i = 0; i < 1000; i++) {\n        foo(n);\n    }\n}",
+      "id": 20,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Las funciones foo no están implementadas: su costo no se valida con las funciones vacías de prueba.",
+      "corrected_code": "public static void cicloFijo(int n) {\n    for (int i = 0; i < 1000; i++) {\n        foo(n);\n    }\n}"
+    },
+    {
+      "folio": 167,
+      "code": "public BigInteger fibonacciBigInteger(int n) {\n    if (n <= 1)\n        return BigInteger.valueOf(n);\n    BigInteger a = BigInteger.ZERO;\n    BigInteger b = BigInteger.ONE;\n    for (int i = 2; i <= n; i++) {\n        BigInteger c = a.add(b);\n        a = b;\n        b = c;\n    }\n    return b;\n}",
+      "id": 21,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public BigInteger fibonacciBigInteger(int n) {\n    if (n < 0)\n        throw new IllegalArgumentException(\"n debe ser no negativo\");\n    if (n <= 1)\n        return BigInteger.valueOf(n);\n    BigInteger a = BigInteger.ZERO;\n    BigInteger b = BigInteger.ONE;\n    for (int i = 2; i <= n; i++) {\n        BigInteger c = a.add(b);\n        a = b;\n        b = c;\n    }\n    return b;\n}"
+    },
+    {
+      "folio": 170,
+      "code": "if (g(n)) {\n    // Se cumple g(n)\n} else if (h(n)) {\n    // Se cumple h(n)\n} else {\n    r(n);\n}",
+      "id": 22,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "if (g(n)) {\n    // Se cumple g(n)\n} else if (h(n)) {\n    // Se cumple h(n)\n} else {\n    r(n);\n}"
+    },
+    {
+      "folio": 170,
+      "code": "if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n} else {\n    r(n);\n}",
+      "id": 23,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n} else {\n    r(n);\n}"
+    },
+    {
+      "folio": 171,
+      "code": "if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n} else {\n    s(n); // O(1)\n}",
+      "id": 24,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n} else {\n    s(n); // O(1)\n}"
+    },
+    {
+      "folio": 172,
+      "code": "if (!h(n) && !g(n)) {\n    s(n);\n} else if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n}",
+      "id": 25,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "if (!h(n) && !g(n)) {\n    s(n);\n} else if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n}"
+    },
+    {
+      "folio": 173,
+      "code": "if (var) {\n    s(n);\n} else if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n}",
+      "id": 26,
+      "review": "Fragmento esquemático; interpretar dentro de su contexto.",
+      "corrected_code": "if (var) {\n    s(n);\n} else if (h(n)) {\n    // Se cumple h(n)\n} else if (g(n)) {\n    // Se cumple g(n)\n}"
+    },
+    {
+      "folio": 175,
+      "code": "public int asignacion() {\n    int x = 10, y = 20;\n    return x + y;\n}",
+      "id": 27,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public int asignacion() {\n    int x = 10, y = 20;\n    return x + y;\n}"
+    },
+    {
+      "folio": 175,
+      "code": "public boolean validacion() {\n    return (true || false && true && false || true);\n}",
+      "id": 28,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public boolean validacion() {\n    return (true || false && true && false || true);\n}"
+    },
+    {
+      "folio": 175,
+      "code": "public String evaluarNumero(int n) {\n    if (n > 0)\n        return \"Positivo\";\n    else if (n < 0)\n        return \"Negativo\";\n    else\n        return \"Cero\";\n}",
+      "id": 29,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public String evaluarNumero(int n) {\n    if (n > 0)\n        return \"Positivo\";\n    else if (n < 0)\n        return \"Negativo\";\n    else\n        return \"Cero\";\n}"
+    },
+    {
+      "folio": 175,
+      "code": "public int sumaElementos(int[] arreglo) {\n    int suma = 0;\n    for (int i = 0; i < arreglo.length; i++) {\n        suma += arreglo[i];\n    }\n    return suma;\n}",
+      "id": 30,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public int sumaElementos(int[] arreglo) {\n    int suma = 0;\n    for (int i = 0; i < arreglo.length; i++) {\n        suma = Math.addExact(suma, arreglo[i]);\n    }\n    return suma;\n}"
+    },
+    {
+      "folio": 176,
+      "code": "public void imprimirMultiplosDe(int multiplo, int n) {\n    if (n < multiplo) {\n        return;\n    }\n    int i = multiplo;\n    while (i <= n) {\n        System.out.println(i);\n        i += multiplo;\n    }\n}",
+      "id": 31,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public void imprimirMultiplosDe(int multiplo, int n) {\n    if (multiplo <= 0)\n        throw new IllegalArgumentException(\"multiplo debe ser positivo\");\n    if (n < multiplo) {\n        return;\n    }\n    long i = multiplo;\n    while (i <= n) {\n        System.out.println(i);\n        i += multiplo;\n    }\n}"
+    },
+    {
+      "folio": 176,
+      "code": "public void divisionLogaritmica(int n) {\n    int count = 0;\n    while (n > 1) {\n        n = n / 2;\n        count++;\n    }\n    System.out.println(\"Número de divisiones: \" + count);\n}",
+      "id": 32,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public void divisionLogaritmica(int n) {\n    int count = 0;\n    while (n > 1) {\n        n = n / 2;\n        count++;\n    }\n    System.out.println(\"Número de divisiones: \" + count);\n}"
+    },
+    {
+      "folio": 176,
+      "code": "public boolean esPrimo(int n) {\n    if (n <= 1) {\n        return false;\n    }\n    for (int i = 2; i * i <= n; i++) {\n        if (n % i == 0) {\n            return false;\n        }\n    }\n    return true;\n}",
+      "id": 33,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public boolean esPrimo(int n) {\n    if (n <= 1) {\n        return false;\n    }\n    for (int i = 2; (long) i * i <= n; i++) {\n        if (n % i == 0) {\n            return false;\n        }\n    }\n    return true;\n}"
+    },
+    {
+      "folio": 176,
+      "code": "public void imprimirPares(int[] arr) {\n    for (int i = 0; i < arr.length; i++) {\n        for (int j = i + 1; j < arr.length; j++) {\n            System.out.println(arr[i] + \",\" + arr[j]);\n        }\n    }\n}",
+      "id": 34,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public void imprimirPares(int[] arr) {\n    for (int i = 0; i < arr.length; i++) {\n        for (int j = i + 1; j < arr.length; j++) {\n            System.out.println(arr[i] + \",\" + arr[j]);\n        }\n    }\n}"
+    },
+    {
+      "folio": 177,
+      "code": "public void imprimirParesIguales(int[] arr) {\n    for (int i = 0; i < arr.length; i++) {\n        for (int j = i + 1; j < arr.length; j++) {\n            if (arr[i] == arr[j]) {\n                System.out.println(arr[i] + \",\" + arr[j]);\n            }\n        }\n    }\n}",
+      "id": 35,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public void imprimirParesIguales(int[] arr) {\n    for (int i = 0; i < arr.length; i++) {\n        for (int j = i + 1; j < arr.length; j++) {\n            if (arr[i] == arr[j]) {\n                System.out.println(arr[i] + \",\" + arr[j]);\n            }\n        }\n    }\n}"
+    },
+    {
+      "folio": 177,
+      "code": "public int[][] multiplicar(int[][] a, int[][] b) {\n    int n = a.length;\n    int[][] resultado = new int[n][n];\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < n; j++) {\n            for (int k = 0; k < n; k++) {\n                resultado[i][j] += a[i][k] * b[k][j];\n            }\n        }\n    }\n    return resultado;\n}",
+      "id": 36,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public int[][] multiplicar(int[][] a, int[][] b) {\n    int n = a.length;\n    int[][] resultado = new int[n][n];\n    for (int i = 0; i < n; i++) {\n        for (int j = 0; j < n; j++) {\n            for (int k = 0; k < n; k++) {\n                resultado[i][j] = Math.addExact(resultado[i][j], Math.multiplyExact(a[i][k], b[k][j]));\n            }\n        }\n    }\n    return resultado;\n}"
+    },
+    {
+      "folio": 177,
+      "code": "public int contarDivisiones(int n) {\n    int contador = 0;\n    while (true) {\n        if (n <= 1) { break; }\n        n = n / 2;\n        contador++;\n    }\n    return contador;\n}",
+      "id": 37,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public int contarDivisiones(int n) {\n    int contador = 0;\n    while (true) {\n        if (n <= 1) { break; }\n        n = n / 2;\n        contador++;\n    }\n    return contador;\n}"
+    },
+    {
+      "folio": 177,
+      "code": "public void cicloConIncrementoDoble(int n) {\n    for (int i = 0; i < n; i += 2) {\n        foo1();\n    }\n}",
+      "id": 38,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public void cicloConIncrementoDoble(int n) {\n    for (long i = 0; i < n; i += 2) {\n        foo1();\n    }\n}"
+    },
+    {
+      "folio": 178,
+      "code": "public boolean esPrimoAnidado(int n) {\n    return esPrimo(n);\n}",
+      "id": 39,
+      "review": "Depende de esPrimo y hereda el riesgo de i * i.",
+      "corrected_code": "public boolean esPrimoAnidado(int n) {\n    return esPrimo(n);\n}"
+    },
+    {
+      "folio": 178,
+      "code": "public void dosCiclos(int n) {\n    for (int i = 0; i < n; i++) {\n        foo1(i);\n    }\n    int j = 1;\n    while (j < n) {\n        foo2();\n        j *= 2;\n    }\n    foo3();\n}",
+      "id": 40,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public void dosCiclos(int n) {\n    for (int i = 0; i < n; i++) {\n        foo1(i);\n    }\n    long j = 1;\n    while (j < n) {\n        foo2();\n        j *= 2;\n    }\n    foo3();\n}"
+    },
+    {
+      "folio": 178,
+      "code": "public void foo() {\n    foo1();\n    foo2();\n}",
+      "id": 41,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Las funciones foo no están implementadas: su costo no se valida con las funciones vacías de prueba.",
+      "corrected_code": "public void foo() {\n    foo1();\n    foo2();\n}"
+    },
+    {
+      "folio": 224,
+      "code": "public static int f(int n) {\n    if (n == 0 || n == 1)\n        return 1;\n    else\n        return n * f(n - 1);\n}",
+      "id": 42,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public static int f(int n) {\n    if (n < 0)\n        throw new IllegalArgumentException(\"n debe ser no negativo\");\n    if (n > 12)\n        throw new ArithmeticException(\"El factorial no cabe en int\");\n    if (n == 0 || n == 1)\n        return 1;\n    else\n        return Math.multiplyExact(n, f(n - 1));\n}"
+    },
+    {
+      "folio": 225,
+      "code": "public static int f(int n) {\n    if (n == 0 || n == 1)\n        return 1;\n    else\n        return f(n - 1) + f(n - 2);\n}",
+      "id": 43,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public static int f(int n) {\n    if (n < 0)\n        throw new IllegalArgumentException(\"n debe ser no negativo\");\n    if (n > 45)\n        throw new ArithmeticException(\"El resultado no cabe en int\");\n    if (n == 0 || n == 1)\n        return 1;\n    else\n        return f(n - 1) + f(n - 2);\n}"
+    },
+    {
+      "folio": 229,
+      "code": "public static int factorial(int n) {\n    if (n <= 1)\n        return 1;\n    else\n        return n * factorial(n-1);\n}",
+      "id": 44,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public static int factorial(int n) {\n    if (n < 0)\n        throw new IllegalArgumentException(\"n debe ser no negativo\");\n    if (n > 12)\n        throw new ArithmeticException(\"El factorial no cabe en int\");\n    if (n <= 1)\n        return 1;\n    else\n        return Math.multiplyExact(n, factorial(n - 1));\n}"
+    },
+    {
+      "folio": 234,
+      "code": "public static int fibonacci(int n) {\n    if (n == 0)\n        return 0;\n    else if (n == 1)\n        return 1;\n    else\n        return fibonacci(n-1) + fibonacci(n-2);\n}",
+      "id": 45,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public static int fibonacci(int n) {\n    if (n < 0)\n        throw new IllegalArgumentException(\"n debe ser no negativo\");\n    if (n > 46)\n        throw new ArithmeticException(\"El resultado no cabe en int\");\n    if (n == 0)\n        return 0;\n    else if (n == 1)\n        return 1;\n    else\n        return fibonacci(n-1) + fibonacci(n-2);\n}"
+    },
+    {
+      "folio": 242,
+      "code": "public static int fibonacci(int n) {\n    if (n <= 1)\n        return n;\n    int a = 0, b = 1;\n    for (int i = 2; i <= n; i++) {\n        int c = a + b;\n        a = b;\n        b = c;\n    }\n    return b;\n}",
+      "id": 46,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public static int fibonacci(int n) {\n    if (n < 0)\n        throw new IllegalArgumentException(\"n debe ser no negativo\");\n    if (n > 46)\n        throw new ArithmeticException(\"El resultado no cabe en int\");\n    if (n <= 1)\n        return n;\n    int a = 0, b = 1;\n    for (int i = 2; i <= n; i++) {\n        int c = a + b;\n        a = b;\n        b = c;\n    }\n    return b;\n}"
+    },
+    {
+      "folio": 243,
+      "code": "public static double potencia(int a, int n) {\n    if (n == 0)\n        return 1;\n    int absExponente = Math.abs(n);\n    double mitad = potencia(a, absExponente / 2);\n    if (absExponente % 2 == 0)\n        mitad = mitad * mitad;\n    else\n        mitad = mitad * mitad * a;\n    return n < 0 ? 1.0 / mitad : mitad;\n}",
+      "id": 47,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public static double potencia(int a, int n) {\n    if (a == 0 && n < 0)\n        throw new ArithmeticException(\"Cero no admite exponente negativo\");\n    long absExponente = Math.abs((long) n);\n    double base = n < 0 ? 1.0 / a : a;\n    return potenciaAbsoluta(base, absExponente);\n}\n\nprivate static double potenciaAbsoluta(double a, long n) {\n    if (n == 0)\n        return 1;\n    double mitad = potenciaAbsoluta(a, n / 2);\n    mitad = mitad * mitad;\n    return n % 2 == 0 ? mitad : mitad * a;\n}"
+    },
+    {
+      "folio": 247,
+      "code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    int m = a + (b - a) / 2;\n    ordenar(arr, a, m);\n    ordenar(arr, m + 1, b);\n    combinar(arr, a, m, b);\n}\npublic void combinar(int[] arr, int a, int m, int b) {\n    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);\n    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);\n    int i = 0, j = 0, k = a;\n    while (i < izquierda.length && j < derecha.length) {\n        if (izquierda[i] <= derecha[j])\n            arr[k++] = izquierda[i++];\n        else\n            arr[k++] = derecha[j++];\n    }\n    while (i < izquierda.length)\n        arr[k++] = izquierda[i++];\n    while (j < derecha.length)\n        arr[k++] = derecha[j++];\n}",
+      "id": 48,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    int m = a + (b - a) / 2;\n    ordenar(arr, a, m);\n    ordenar(arr, m + 1, b);\n    combinar(arr, a, m, b);\n}\npublic void combinar(int[] arr, int a, int m, int b) {\n    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);\n    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);\n    int i = 0, j = 0, k = a;\n    while (i < izquierda.length && j < derecha.length) {\n        if (izquierda[i] <= derecha[j])\n            arr[k++] = izquierda[i++];\n        else\n            arr[k++] = derecha[j++];\n    }\n    while (i < izquierda.length)\n        arr[k++] = izquierda[i++];\n    while (j < derecha.length)\n        arr[k++] = derecha[j++];\n}"
+    },
+    {
+      "folio": 254,
+      "code": "public static boolean buscar(Nodo raiz, int valor) {\n    if (raiz == null)\n        return false;\n    if (valor == raiz.dato)\n        return true;\n    if (valor < raiz.dato)\n        return buscar(raiz.izquierdo, valor);\n    else\n        return buscar(raiz.derecho, valor);\n}",
+      "id": 49,
+      "review": "Clase Nodo y árbol binario de búsqueda acíclico requeridos.",
+      "corrected_code": "public static boolean buscar(Nodo raiz, int valor) {\n    if (raiz == null)\n        return false;\n    if (valor == raiz.dato)\n        return true;\n    if (valor < raiz.dato)\n        return buscar(raiz.izquierdo, valor);\n    else\n        return buscar(raiz.derecho, valor);\n}"
+    },
+    {
+      "folio": 257,
+      "code": "public int buscar(int[] arr, int izq,\n                  int der, int x) {\n    if (izq > der) {\n        return -1;\n    }\n    int medio = izq + (der - izq) / 2;\n    if (arr[medio] == x)\n        return medio;\n    else if (arr[medio] > x)\n        return buscar(arr, izq, medio - 1, x);\n    else\n        return buscar(arr, medio + 1, der, x);\n}",
+      "id": 50,
+      "review": "Búsqueda binaria por índice: devuelve posición o −1; no confundir con las búsquedas booleanas del capítulo 7.",
+      "corrected_code": "public int buscar(int[] arr, int izq,\n                  int der, int x) {\n    if (izq > der) {\n        return -1;\n    }\n    int medio = izq + (der - izq) / 2;\n    if (arr[medio] == x)\n        return medio;\n    else if (arr[medio] > x)\n        return buscar(arr, izq, medio - 1, x);\n    else\n        return buscar(arr, medio + 1, der, x);\n}"
+    },
+    {
+      "folio": 257,
+      "code": "public int mcd(int a, int b) {\n    if (b == 0) {\n        return a;\n    }\n    return mcd(b, a % b);\n}",
+      "id": 51,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public int mcd(int a, int b) {\n    long x = Math.abs((long) a), y = Math.abs((long) b);\n    while (y != 0) {\n        long resto = x % y;\n        x = y;\n        y = resto;\n    }\n    return Math.toIntExact(x);\n}"
+    },
+    {
+      "folio": 257,
+      "code": "public int combinar(int n, int k) {\n    if (k == 0 || k == n) {\n        return 1;\n    }\n    return combinar(n-1, k-1) + combinar(n-1, k);\n}",
+      "id": 52,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public int combinar(int n, int k) {\n    if (n < 0 || k < 0 || k > n)\n        throw new IllegalArgumentException(\"Se requiere 0 <= k <= n\");\n    if (k == 0 || k == n)\n        return 1;\n    return Math.addExact(combinar(n - 1, k - 1), combinar(n - 1, k));\n}"
+    },
+    {
+      "folio": 258,
+      "code": "public int sumaArreglo(int[] arr, int n) {\n    if (n == 0) {\n        return 0;\n    }\n    return arr[n - 1] + sumaArreglo(arr, n - 1);\n}",
+      "id": 53,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public int sumaArreglo(int[] arr, int n) {\n    if (n < 0 || n > arr.length)\n        throw new IllegalArgumentException(\"Longitud fuera del arreglo\");\n    if (n == 0) {\n        return 0;\n    }\n    return Math.addExact(arr[n - 1], sumaArreglo(arr, n - 1));\n}"
+    },
+    {
+      "folio": 258,
+      "code": "public void hanoi(int n, char origen, char destino) {\n    if (n == 1) {\n        return;\n    }\n    hanoi(n - 1, origen, destino);\n    hanoi(n - 1, origen, destino);\n}",
+      "id": 54,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public void hanoi(int n, char origen, char destino) {\n    if (n < 0 || origen == destino)\n        throw new IllegalArgumentException(\"Entrada de Hanoi inválida\");\n    char auxiliar = 'A';\n    while (auxiliar == origen || auxiliar == destino)\n        auxiliar++;\n    hanoi(n, origen, auxiliar, destino);\n}\n\nprivate void hanoi(int n, char origen, char auxiliar, char destino) {\n    if (n == 0)\n        return;\n    hanoi(n - 1, origen, destino, auxiliar);\n    System.out.println(origen + \" -> \" + destino);\n    hanoi(n - 1, auxiliar, origen, destino);\n}"
+    },
+    {
+      "folio": 258,
+      "code": "public String invertir(String str) {\n    if (str.isEmpty()) {\n        return str;\n    }\n    return invertir(str.substring(1)) + str.charAt(0);\n}",
+      "id": 55,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public String invertir(String str) {\n    int[] caracteres = str.codePoints().toArray();\n    StringBuilder resultado = new StringBuilder();\n    for (int i = caracteres.length - 1; i >= 0; i--)\n        resultado.appendCodePoint(caracteres[i]);\n    return resultado.toString();\n}"
+    },
+    {
+      "folio": 258,
+      "code": "public int sumaDigitos(int n) {\n    if (n == 0) {\n        return 0;\n    }\n    return (n % 10) + sumaDigitos(n / 10);\n}",
+      "id": 56,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public int sumaDigitos(int n) {\n    if (n < 0)\n        throw new IllegalArgumentException(\"n debe ser no negativo\");\n    if (n == 0) {\n        return 0;\n    }\n    return (n % 10) + sumaDigitos(n / 10);\n}"
+    },
+    {
+      "folio": 262,
+      "code": "public boolean buscar(int[] arr, int x) {\n    for (int i = 0; i < arr.length; i++) {\n        if (arr[i] == x)\n            return true;\n    }\n    return false;\n}",
+      "id": 57,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public boolean buscar(int[] arr, int x) {\n    for (int i = 0; i < arr.length; i++) {\n        if (arr[i] == x)\n            return true;\n    }\n    return false;\n}"
+    },
+    {
+      "folio": 268,
+      "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b) {\n        // Posición en la mitad del rango [a,b]\n        int m = a + (b - a) / 2;\n        if (arr[m] == x)\n            return true; // Elemento encontrado\n        else if (x > arr[m])\n            a = m + 1; // Buscar en la mitad derecha\n        else\n            b = m - 1; // Buscar en la mitad izquierda\n    }\n    return false; // Elemento no encontrado\n}",
+      "id": 58,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b) {\n        // Posición en la mitad del rango [a,b]\n        int m = a + (b - a) / 2;\n        if (arr[m] == x)\n            return true; // Elemento encontrado\n        else if (x > arr[m])\n            a = m + 1; // Buscar en la mitad derecha\n        else\n            b = m - 1; // Buscar en la mitad izquierda\n    }\n    return false; // Elemento no encontrado\n}"
+    },
+    {
+      "folio": 273,
+      "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    if (a > b)\n        return false; // Elemento no encontrado\n    int m = a + (b - a) / 2;\n    if (arr[m] == x)\n        return true; // Elemento encontrado\n    else if (x > arr[m])\n        return buscar(arr, m + 1, b, x); // Busca a la derecha\n    else\n        return buscar(arr, a, m - 1, x); // Busca a la izquierda\n}",
+      "id": 59,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    if (a > b)\n        return false; // Elemento no encontrado\n    int m = a + (b - a) / 2;\n    if (arr[m] == x)\n        return true; // Elemento encontrado\n    else if (x > arr[m])\n        return buscar(arr, m + 1, b, x); // Busca a la derecha\n    else\n        return buscar(arr, a, m - 1, x); // Busca a la izquierda\n}"
+    },
+    {
+      "folio": 278,
+      "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b && x >= arr[a] && x <= arr[b]) {\n        int num = (b - a) * (x - arr[a]);\n        int den = arr[b] - arr[a];\n        // Estima el elemento\n        int p = a + (num / den);\n        if (arr[p] == x)\n            return true;\n        else if (x > arr[p])\n            a = p + 1; // Buscar a la derecha del elemento\n        else\n            b = p - 1; // Buscar a la izquierda del elemento\n    }\n    // Elemento no encontrado\n    return false;\n}",
+      "id": 60,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b && x >= arr[a] && x <= arr[b]) {\n        long num = ((long) b - a) * ((long) x - arr[a]);\n        long den = (long) arr[b] - arr[a];\n        if (den == 0)\n            return arr[a] == x;\n        int p = a + (int) (num / den);\n        if (arr[p] == x)\n            return true;\n        else if (x > arr[p])\n            a = p + 1;\n        else\n            b = p - 1;\n    }\n    return false;\n}"
+    },
+    {
+      "folio": 290,
+      "code": "public boolean buscar(int[] arr, int x) {\n    int n = arr.length, anterior = 0;\n    int paso = (int) Math.floor(Math.sqrt(n)), delta = paso;\n    // Avanzar en saltos hasta encontrar el rango\n    while (arr[Math.min(delta, n) - 1] < x) {\n        anterior = delta;\n        delta += paso;\n        if (anterior >= n)\n            return false; // Elemento fuera del rango de búsqueda\n    }\n    // Realiza la búsqueda lineal en el rango identificado\n    for (int i = anterior; i < Math.min(delta, n); i++) {\n        if (arr[i] == x)\n            return true; // Elemento encontrado\n    }\n    return false; // Elemento no encontrado\n}",
+      "id": 61,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public boolean buscar(int[] arr, int x) {\n    int n = arr.length, anterior = 0;\n    if (n == 0)\n        return false;\n    int paso = (int) Math.floor(Math.sqrt(n)), delta = paso;\n    // Avanzar en saltos hasta encontrar el rango\n    while (arr[Math.min(delta, n) - 1] < x) {\n        anterior = delta;\n        delta = (int) Math.min((long) delta + paso, n);\n        if (anterior >= n)\n            return false; // Elemento fuera del rango de búsqueda\n    }\n    // Realiza la búsqueda lineal en el rango identificado\n    for (int i = anterior; i < Math.min(delta, n); i++) {\n        if (arr[i] == x)\n            return true; // Elemento encontrado\n    }\n    return false; // Elemento no encontrado\n}"
+    },
+    {
+      "folio": 298,
+      "code": "public boolean buscar(int[] arr, int x) {\n    int n = arr.length;\n    // Verificar si el primer elemento es el buscado\n    if (arr[0] == x)\n        return true;\n    // Encuentra el rango utilizando crecimiento exponencial\n    int i = 1;\n    while (i < n && arr[i] <= x)\n        i *= 2;\n    // Determina los limites y ejecuta la búsqueda binaria\n    int a = i/2;\n    int b = Math.min(i, n - 1);\n    // Invoca la función que aplica la búsqueda\n    return busquedaBinaria(arr, a, b, x);\n}",
+      "id": 62,
+      "review": "Corregido y incluido en las comprobaciones de la versión corregida.",
+      "corrected_code": "public boolean buscar(int[] arr, int x) {\n    int n = arr.length;\n    if (n == 0)\n        return false;\n    // Verificar si el primer elemento es el buscado\n    if (arr[0] == x)\n        return true;\n    // Encuentra el rango utilizando crecimiento exponencial\n    int i = 1;\n    while (i < n && arr[i] <= x)\n        i = (int) Math.min((long) i * 2, n);\n    // Determina los limites y ejecuta la búsqueda binaria\n    int a = i/2;\n    int b = Math.min(i, n - 1);\n    // Invoca la función que aplica la búsqueda\n    return busquedaBinaria(arr, a, b, x);\n}\n\npublic boolean busquedaBinaria(int[] arr, int a, int b, int x) {\n    while (a <= b) {\n        // Posición en la mitad del rango [a,b]\n        int m = a + (b - a) / 2;\n        if (arr[m] == x)\n            return true; // Elemento encontrado\n        else if (x > arr[m])\n            a = m + 1; // Buscar en la mitad derecha\n        else\n            b = m - 1; // Buscar en la mitad izquierda\n    }\n    return false; // Elemento no encontrado\n}"
+    },
+    {
+      "folio": 307,
+      "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n     // Agota el espacio de búsqueda\n    if (a > b)\n        return false;\n    int m1 = a + (b - a) / 3;\n    int m2 = b - (int) Math.ceil((b - a) / 3.0);\n    // Verificar si el valor está en los pivotes\n    if (arr[m1] == x || arr[m2] == x)\n        return true;\n    if (x < arr[m1])\n        return buscar(arr, a, m1 - 1, x);\n    else if (x > arr[m2])\n        return buscar(arr, m2 + 1, b, x);\n    else\n        return buscar(arr, m1 + 1, m2 - 1, x);\n}",
+      "id": 63,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public boolean buscar(int[] arr, int a, int b, int x) {\n     // Agota el espacio de búsqueda\n    if (a > b)\n        return false;\n    int m1 = a + (b - a) / 3;\n    int m2 = b - (int) Math.ceil((b - a) / 3.0);\n    // Verificar si el valor está en los pivotes\n    if (arr[m1] == x || arr[m2] == x)\n        return true;\n    if (x < arr[m1])\n        return buscar(arr, a, m1 - 1, x);\n    else if (x > arr[m2])\n        return buscar(arr, m2 + 1, b, x);\n    else\n        return buscar(arr, m1 + 1, m2 - 1, x);\n}"
+    },
+    {
+      "folio": 312,
+      "code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b) {\n        int m1 = a + (b - a) / 3;\n        int m2 = b - (int) Math.ceil((b - a) / 3.0);\n        if (arr[m1] == x || arr[m2] == x)\n            return true;\n        if (x < arr[m1])\n            b = m1 - 1; // Buscar en el primer tercio\n        else if (x > arr[m2])\n            a = m2 + 1; // Buscar en el último tercio\n        else {\n            a = m1 + 1; // Buscar en el tercio central\n            b = m2 - 1;\n        }\n    }\n    // Elemento no encontrado\n    return false;\n}",
+      "id": 64,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int.",
+      "corrected_code": "public boolean buscar(int[] arr, int a, int b, int x) {\n    while (a <= b) {\n        int m1 = a + (b - a) / 3;\n        int m2 = b - (int) Math.ceil((b - a) / 3.0);\n        if (arr[m1] == x || arr[m2] == x)\n            return true;\n        if (x < arr[m1])\n            b = m1 - 1; // Buscar en el primer tercio\n        else if (x > arr[m2])\n            a = m2 + 1; // Buscar en el último tercio\n        else {\n            a = m1 + 1; // Buscar en el tercio central\n            b = m2 - 1;\n        }\n    }\n    // Elemento no encontrado\n    return false;\n}"
+    },
+    {
+      "folio": 321,
+      "code": "public void ordenar(int[] arr) {\n    for (int i = 0; i < arr.length - 1; i++) {\n        for (int j = 0; j < arr.length - 1 - i; j++) {\n            if (arr[j] > arr[j + 1]) {\n                int temp = arr[j];\n                arr[j] = arr[j + 1];\n                arr[j + 1] = temp;\n            }\n        }\n    }\n}",
+      "id": 65,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public void ordenar(int[] arr) {\n    for (int i = 0; i < arr.length - 1; i++) {\n        for (int j = 0; j < arr.length - 1 - i; j++) {\n            if (arr[j] > arr[j + 1]) {\n                int temp = arr[j];\n                arr[j] = arr[j + 1];\n                arr[j + 1] = temp;\n            }\n        }\n    }\n}"
+    },
+    {
+      "folio": 323,
+      "code": "public void ordenar(int[] arr) {\n    for (int i = arr.length - 1; i > 0; i--) {\n        boolean intercambiado = false; // Bandera de control\n        for (int j = 0; j < i; j++) {\n            if (arr[j] > arr[j + 1]) {\n                int temp = arr[j];\n                arr[j] = arr[j + 1];\n                arr[j + 1] = temp;\n                intercambiado = true;\n            }\n        }\n        // El arreglo se considera ordenado\n        if (!intercambiado)\n            break;\n    }\n}",
+      "id": 66,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public void ordenar(int[] arr) {\n    for (int i = arr.length - 1; i > 0; i--) {\n        boolean intercambiado = false; // Bandera de control\n        for (int j = 0; j < i; j++) {\n            if (arr[j] > arr[j + 1]) {\n                int temp = arr[j];\n                arr[j] = arr[j + 1];\n                arr[j + 1] = temp;\n                intercambiado = true;\n            }\n        }\n        // El arreglo se considera ordenado\n        if (!intercambiado)\n            break;\n    }\n}"
+    },
+    {
+      "folio": 327,
+      "code": "public static void ordenar(int[] arr) {\n    for (int i = 0; i < arr.length - 1; i++) {\n         // Candidato inicial\n        int max = 0;\n        for (int j = 1; j < arr.length - i; j++) {\n            if (arr[j] > arr[max]) { // Aplica el criterio\n                max = j;\n            }\n        }\n        // Intercambia el candidato con el extremo derecho\n        int temp = arr[max];\n        arr[max] = arr[arr.length - 1 - i];\n        arr[arr.length - 1 - i] = temp;\n    }\n}",
+      "id": 67,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public static void ordenar(int[] arr) {\n    for (int i = 0; i < arr.length - 1; i++) {\n         // Candidato inicial\n        int max = 0;\n        for (int j = 1; j < arr.length - i; j++) {\n            if (arr[j] > arr[max]) { // Aplica el criterio\n                max = j;\n            }\n        }\n        // Intercambia el candidato con el extremo derecho\n        int temp = arr[max];\n        arr[max] = arr[arr.length - 1 - i];\n        arr[arr.length - 1 - i] = temp;\n    }\n}"
+    },
+    {
+      "folio": 329,
+      "code": "public static void ordenar(int[] arr) {\n    int a = 0, b = arr.length - 1;\n    while (a < b) {\n        int min = a, max = a;\n        for (int j = a; j <= b; j++) {\n            if (arr[j] < arr[min])\n                min = j;\n            if (arr[j] > arr[max])\n                max = j;\n        }\n        // Intercambia el mínimo con el extremo izquierdo\n        int temp = arr[a];\n        arr[a] = arr[min];\n        arr[min] = temp;\n        if (max == a)\n            max = min;\n        // Intercambia el máximo con el extremo derecho\n        temp = arr[b];\n        arr[b] = arr[max];\n        arr[max] = temp;\n        a++;\n        b--;\n    }\n}",
+      "id": 68,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public static void ordenar(int[] arr) {\n    int a = 0, b = arr.length - 1;\n    while (a < b) {\n        int min = a, max = a;\n        for (int j = a; j <= b; j++) {\n            if (arr[j] < arr[min])\n                min = j;\n            if (arr[j] > arr[max])\n                max = j;\n        }\n        // Intercambia el mínimo con el extremo izquierdo\n        int temp = arr[a];\n        arr[a] = arr[min];\n        arr[min] = temp;\n        if (max == a)\n            max = min;\n        // Intercambia el máximo con el extremo derecho\n        temp = arr[b];\n        arr[b] = arr[max];\n        arr[max] = temp;\n        a++;\n        b--;\n    }\n}"
+    },
+    {
+      "folio": 333,
+      "code": "public static void ordenar(int[] arr) {\n    for (int i = 1; i < arr.length; i++) {\n        int clave = arr[i], j = i - 1;\n         // Aplica el criterio\n        while (j >= 0 && arr[j] > clave) {\n            arr[j + 1] = arr[j];\n            j--;\n        }\n        arr[j + 1] = clave;\n    }\n}",
+      "id": 69,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public static void ordenar(int[] arr) {\n    for (int i = 1; i < arr.length; i++) {\n        int clave = arr[i], j = i - 1;\n         // Aplica el criterio\n        while (j >= 0 && arr[j] > clave) {\n            arr[j + 1] = arr[j];\n            j--;\n        }\n        arr[j + 1] = clave;\n    }\n}"
+    },
+    {
+      "folio": 341,
+      "code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    // Calcula el pivote que separa el arreglo en dos\n    int m = a + (b - a) / 2;\n    // Etapa de división\n    ordenar(arr, a, m);\n    ordenar(arr, m + 1, b);\n    // Etapa de combinación\n    combinar(arr, a, m, b);\n}\npublic void combinar(int[] arr, int a, int m, int b) {\n    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);\n    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);\n    int i = 0, j = 0, k = a;\n    while (i < izquierda.length && j < derecha.length) {\n        if (izquierda[i] <= derecha[j])\n            arr[k++] = izquierda[i++];\n        else\n            arr[k++] = derecha[j++];\n    }\n    while (i < izquierda.length)\n        arr[k++] = izquierda[i++];\n    while (j < derecha.length)\n        arr[k++] = derecha[j++];\n}",
+      "id": 70,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    // Calcula el pivote que separa el arreglo en dos\n    int m = a + (b - a) / 2;\n    // Etapa de división\n    ordenar(arr, a, m);\n    ordenar(arr, m + 1, b);\n    // Etapa de combinación\n    combinar(arr, a, m, b);\n}\npublic void combinar(int[] arr, int a, int m, int b) {\n    int[] izquierda = Arrays.copyOfRange(arr, a, m + 1);\n    int[] derecha = Arrays.copyOfRange(arr, m + 1, b + 1);\n    int i = 0, j = 0, k = a;\n    while (i < izquierda.length && j < derecha.length) {\n        if (izquierda[i] <= derecha[j])\n            arr[k++] = izquierda[i++];\n        else\n            arr[k++] = derecha[j++];\n    }\n    while (i < izquierda.length)\n        arr[k++] = izquierda[i++];\n    while (j < derecha.length)\n        arr[k++] = derecha[j++];\n}"
+    },
+    {
+      "folio": 349,
+      "code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    int p = particionar(arr, a, b);\n    ordenar(arr, a, p - 1);\n    ordenar(arr, p + 1, b);\n}\npublic int particionar(int[] arr, int a, int b) {\n    int pivote = arr[a], i = a + 1, j = b;\n    while (i <= j) {\n        while (i <= j && arr[i] < pivote)\n            i++;\n        while (i <= j && arr[j] > pivote)\n            j--;\n        if (i <= j) {\n            int temp = arr[i];\n            arr[i] = arr[j];\n            arr[j] = temp;\n            i++;\n            j--;\n        }\n    }\n    int temp = arr[a];\n    arr[a] = arr[j];\n    arr[j] = temp;\n    return j;\n}",
+      "id": 71,
+      "review": "Compila con el contexto de prueba; declarar entradas válidas y límites de int. Entrada no nula y dimensiones/intervalos válidos; revisar el costo de impresión o de la memoria nueva cuando corresponda.",
+      "corrected_code": "public void ordenar(int[] arr, int a, int b) {\n    if (a >= b)\n        return;\n    int p = particionar(arr, a, b);\n    ordenar(arr, a, p - 1);\n    ordenar(arr, p + 1, b);\n}\npublic int particionar(int[] arr, int a, int b) {\n    int pivote = arr[a], i = a + 1, j = b;\n    while (i <= j) {\n        while (i <= j && arr[i] < pivote)\n            i++;\n        while (i <= j && arr[j] > pivote)\n            j--;\n        if (i <= j) {\n            int temp = arr[i];\n            arr[i] = arr[j];\n            arr[j] = temp;\n            i++;\n            j--;\n        }\n    }\n    int temp = arr[a];\n    arr[a] = arr[j];\n    arr[j] = temp;\n    return j;\n}"
+    },
+    {
+      "folio": 363,
+      "code": "public void ordenar(int[] arr) {\n    // Obtiene el elemento más grande del arreglo\n    int max = Arrays.stream(arr).max().getAsInt();\n    // Obtiene la cantidad de dígitos (iteraciones)\n    int d = (int) Math.floor(Math.log10(max)) + 1;\n    for (int i = 1; i <= d; i++)\n        ordenarPorDigito(arr, i);\n}\npublic void ordenarPorDigito(int[] arr, int i) {\n    int n = arr.length;\n    int exp = (int) Math.pow(10, i - 1);\n    // Arreglo que representa los buckets (b=10)\n    int[] conteo = new int[10];\n    // Arreglo parcialmente ordenado\n    int[] salida = new int[n];\n    // Paso 1: Cuenta elementos por bucket\n    for (int valor : arr)\n        conteo[(valor / exp) % 10]++;\n    // Paso 2: Calcula la suma acumulada\n    for (int j = 1; j < 10; j++)\n        conteo[j] += conteo[j - 1];\n    // Paso 3: Inserta los elementos en la nueva posición\n    for (int j = n - 1; j >= 0; j--) {\n        int d = (arr[j] / exp) % 10;\n        salida[conteo[d] - 1] = arr[j];\n        conteo[d]--;\n    }\n    // Actualiza el arreglo original con el nuevo orden\n    System.arraycopy(salida, 0, arr, 0, n);\n}",
+      "id": 72,
+      "review": "Entrada vacía: NoSuchElementException. Valores negativos: posible índice de bucket negativo. El dominio requerido es un arreglo no vacío de enteros no negativos.",
+      "corrected_code": "public void ordenar(int[] arr) {\n    if (arr.length == 0)\n        return;\n    int min = Arrays.stream(arr).min().getAsInt();\n    int max = Arrays.stream(arr).max().getAsInt();\n    long rango = (long) max - min;\n    int d = 1;\n    while (rango >= 10) {\n        rango /= 10;\n        d++;\n    }\n    for (int i = 1; i <= d; i++)\n        ordenarPorDigito(arr, i);\n}\n\npublic void ordenarPorDigito(int[] arr, int i) {\n    if (i < 1 || i > 10)\n        throw new IllegalArgumentException(\"Dígito fuera del rango de int\");\n    if (arr.length == 0)\n        return;\n    int n = arr.length;\n    int min = Arrays.stream(arr).min().getAsInt();\n    long exp = 1;\n    for (int j = 1; j < i; j++)\n        exp *= 10;\n    int[] conteo = new int[10];\n    int[] salida = new int[n];\n    for (int valor : arr)\n        conteo[(int) (((long) valor - min) / exp % 10)]++;\n    for (int j = 1; j < 10; j++)\n        conteo[j] += conteo[j - 1];\n    for (int j = n - 1; j >= 0; j--) {\n        int d = (int) (((long) arr[j] - min) / exp % 10);\n        salida[--conteo[d]] = arr[j];\n    }\n    System.arraycopy(salida, 0, arr, 0, n);\n}"
+    }
+  ]
+}

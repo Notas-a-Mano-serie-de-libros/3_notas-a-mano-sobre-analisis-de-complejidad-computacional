@@ -1,0 +1,371 @@
+from __future__ import annotations
+
+import json
+
+from desarrollo.scripts.build_jupyterlite_demo import (
+    CHAPTER2_NOTEBOOKS,
+    CHAPTER2_RUNTIME_FILES,
+    CHAPTER_CONFIGS,
+    CONTENT_FILES,
+    LITE_DIR,
+    NOTEBOOKS,
+    chapter_content_files,
+    configure_pyodide_packages,
+    content_storage_name,
+    prepare_contents,
+)
+from desarrollo.tests.helpers import PROJECT_ROOT
+
+
+def test_jupyterlite_demo_sources_and_configuration_exist():
+    assert (LITE_DIR / "jupyter-lite.json").is_file()
+    config = json.loads((LITE_DIR / "jupyter-lite.json").read_text(encoding="utf-8"))
+    assert config["jupyter-config-data"]["defaultKernelName"] == "python"
+    assert NOTEBOOKS[0] in CONTENT_FILES
+    assert all(notebook in CONTENT_FILES for notebook in NOTEBOOKS)
+    assert all((PROJECT_ROOT / path).is_file() for path in CONTENT_FILES)
+    assert len(CHAPTER2_NOTEBOOKS) == 9
+    assert all((PROJECT_ROOT / path).is_file() for path in chapter_content_files(2))
+    assert all(path in chapter_content_files(2) for path in CHAPTER2_RUNTIME_FILES)
+    assert set(CHAPTER_CONFIGS) == set(range(2, 9))
+    assert all(
+        (PROJECT_ROOT / path).is_file()
+        for chapter in range(4, 9)
+        for path in chapter_content_files(chapter)
+    )
+
+
+def test_publicacion_invalida_el_contenido_persistido_cuando_cambia_el_demo():
+    storage_name = content_storage_name()
+
+    assert storage_name.startswith("Notas a mano · Capítulo 3 · ")
+    assert len(storage_name.rsplit(" · ", 1)[1]) == 12
+    assert content_storage_name(2).startswith("Notas a mano · Capítulo 2 · ")
+
+
+def test_kernel_pyodide_precarga_dependencias_del_capitulo():
+    config = {"jupyter-config-data": {"defaultKernelName": "python"}}
+    packages = CHAPTER_CONFIGS[2]["packages"]
+
+    configure_pyodide_packages(config, packages)
+
+    settings = config["jupyter-config-data"]["litePluginSettings"][
+        "@jupyterlite/pyodide-kernel-extension:kernel"
+    ]
+    assert settings["loadPyodideOptions"]["packages"] == list(packages)
+
+
+def test_chapter_three_avoids_widget_runtime_in_webassembly():
+    animation = (
+        PROJECT_ROOT / "simulaciones/capitulo3/runtime/asymptotic_animation.py"
+    ).read_text(encoding="utf-8")
+    assert 'sys.platform == "emscripten"' in animation
+    assert 'return ""' in animation
+
+
+def test_pages_copy_prepares_each_interactive_notebook_for_pyodide(tmp_path):
+    prepare_contents(tmp_path)
+    for notebook_path in NOTEBOOKS:
+        canonical = json.loads(
+            (PROJECT_ROOT / notebook_path).read_text(encoding="utf-8")
+        )
+        canonical_source = "".join(canonical["cells"][0]["source"])
+        assert "notebook-pages-button" in canonical_source
+        assert "vuelve a Pages" in canonical_source
+
+        published = json.loads((tmp_path / notebook_path).read_text(encoding="utf-8"))
+        published_source = "".join(
+            "".join(cell.get("source", [])) for cell in published["cells"]
+        )
+        assert "notebook-pages-button" not in published_source
+        assert "vuelve a Pages" not in published_source
+        assert all(
+            "piplite.install" not in "".join(cell.get("source", []))
+            for cell in published["cells"]
+        )
+        assert published["metadata"]["kernelspec"]["name"] == "python"
+        assert published["metadata"]["kernelspec"]["display_name"] == "Python (Pyodide)"
+        assert all(
+            cell["metadata"]["editable"] is False
+            and cell["metadata"]["deletable"] is False
+            for cell in published["cells"]
+        )
+
+
+def test_pages_copy_includes_chapter_two_runtime_and_notebooks(tmp_path):
+    prepare_contents(tmp_path, chapter=2)
+    for notebook_path in CHAPTER2_NOTEBOOKS:
+        canonical = json.loads(
+            (PROJECT_ROOT / notebook_path).read_text(encoding="utf-8")
+        )
+        assert "notebook-pages-button" in "".join(canonical["cells"][0]["source"])
+
+        published = json.loads((tmp_path / notebook_path).read_text(encoding="utf-8"))
+        assert all(
+            "piplite.install" not in "".join(cell.get("source", []))
+            for cell in published["cells"]
+        )
+        assert published["metadata"]["kernelspec"]["name"] == "python"
+        assert published["metadata"]["kernelspec"]["display_name"] == "Python (Pyodide)"
+        assert all(
+            cell["metadata"]["editable"] is False
+            and cell["metadata"]["deletable"] is False
+            for cell in published["cells"]
+        )
+        assert all("notebook-pages-button" not in "".join(cell.get("source", []))
+                   for cell in published["cells"])
+    assert all((tmp_path / path).is_file() for path in CHAPTER2_RUNTIME_FILES)
+
+
+def test_pages_copy_includes_every_remaining_book_simulation(tmp_path):
+    for chapter in range(4, 9):
+        chapter_dir = tmp_path / f"chapter-{chapter}"
+        prepare_contents(chapter_dir, chapter=chapter)
+        config = CHAPTER_CONFIGS[chapter]
+        for notebook_path in config["notebooks"]:
+            notebook = json.loads((chapter_dir / notebook_path).read_text(encoding="utf-8"))
+            assert notebook["metadata"]["kernelspec"]["display_name"] == "Python (Pyodide)"
+            assert all(
+                cell["metadata"]["editable"] is False
+                and cell["metadata"]["deletable"] is False
+                for cell in notebook["cells"]
+            )
+            assert all(
+                "piplite.install" not in "".join(cell.get("source", []))
+                for cell in notebook["cells"]
+            )
+        assert all(
+            (chapter_dir / path).is_file()
+            for path in config["runtime_files"]
+        )
+
+
+def test_all_canonical_simulation_notebook_cells_are_read_only():
+    notebook_paths = sorted(
+        (PROJECT_ROOT / "simulaciones").glob("capitulo[2-8]/notebooks/*.ipynb")
+    )
+
+    assert notebook_paths
+    for path in notebook_paths:
+        notebook = json.loads(path.read_text(encoding="utf-8"))
+        assert all(
+            cell.get("metadata", {}).get("editable") is False
+            and cell.get("metadata", {}).get("deletable") is False
+            for cell in notebook.get("cells", [])
+        ), path.relative_to(PROJECT_ROOT)
+
+
+def test_chapter_seven_interpolation_notebook_avoids_unavailable_sklearn():
+    notebook = json.loads(
+        (
+            PROJECT_ROOT
+            / "simulaciones/capitulo7/notebooks/3_busqueda_interpolacion.ipynb"
+        ).read_text(encoding="utf-8")
+    )
+    code = "\n".join(
+        "".join(cell.get("source", []))
+        for cell in notebook["cells"]
+        if cell.get("cell_type") == "code"
+    )
+
+    assert "from sklearn" not in code
+    assert "mse = np.mean((times - fit_values) ** 2)" in code
+
+
+def test_all_remaining_simulation_pages_embed_their_matching_notebook():
+    page_notebooks = {
+        4: {
+            "ejemplo1-sumar-numeros": "ejemplo1_(sumar_numeros).ipynb",
+            "ejemplo2-imprimir-elementos-arreglo": "ejemplo2_(imprimir_elementos_arreglo).ipynb",
+            "ejemplo3-imprimir-elementos-matriz": "ejemplo3_(imprimir_elementos_matriz).ipynb",
+            "ejemplo4-inicializar-matriz-variable": "ejemplo4_(inicializar_matriz_variable).ipynb",
+            "ejemplo5-ciclos-incremento-no-lineal": "ejemplo5_(ciclos_incremento_no_lineal).ipynb",
+            "ejemplo7-ciclo-sin-dependencia": "ejemplo7_(ciclo_sin_dependencia).ipynb",
+            "ejemplo9-complejidad-oculta": "ejemplo9_(complejidad_oculta).ipynb",
+        },
+        5: {
+            "formas-de-recurrencia": "0_arboles_recursion.ipynb",
+            "solucion-relaciones-recurrencia": "1_metodos_solucion_relaciones_recurrencia.ipynb",
+        },
+        6: {
+            "arbol-binario": "0_laboratorio_analisis_recursivo.ipynb",
+            "factorial": "0_laboratorio_analisis_recursivo.ipynb",
+            "fibonacci": (
+                "0_laboratorio_analisis_recursivo.ipynb",
+                "comparacion_fibonacci.ipynb",
+                "ejemplo_recursion.ipynb",
+            ),
+            "merge-sort": "0_laboratorio_analisis_recursivo.ipynb",
+            "potencia": "0_laboratorio_analisis_recursivo.ipynb",
+        },
+        7: {
+            "0-comparacion-busquedas": "0_comparacion_busquedas.ipynb",
+            "1-busqueda-secuencial": "1_busqueda_secuencial.ipynb",
+            "2-busqueda-binaria": "2_busqueda_binaria.ipynb",
+            "3-busqueda-interpolacion": "3_busqueda_interpolacion.ipynb",
+            "4-busqueda-saltos": "4_busqueda_saltos.ipynb",
+            "5-busqueda-exponencial": "5_busqueda_exponencial.ipynb",
+            "6-busqueda-ternaria": "6_busqueda_ternaria.ipynb",
+            "ejercicios-propuestos": "ejercicios_propuestos.ipynb",
+        },
+        8: {
+            "0-comparacion-ordenamientos": "0_comparacion_ordenamientos.ipynb",
+            "1-ordenamiento-burbuja": "1_ordenamiento_burbuja.ipynb",
+            "2-ordenamiento-seleccion": "2_ordenamiento_seleccion.ipynb",
+            "3-ordenamiento-insercion": "3_ordenamiento_insercion.ipynb",
+            "4-ordenamiento-shell": "4_ordenamiento_shell.ipynb",
+            "5-ordenamiento-mezcla": "5_ordenamiento_mezcla.ipynb",
+            "6-ordenamiento-rapido": "6_ordenamiento_rapido.ipynb",
+            "7-ordenamiento-radix": "7_ordenamiento_radix.ipynb",
+            "ejercicios-propuestos": "ejercicios_propuestos.ipynb",
+        },
+    }
+    for chapter, sections in page_notebooks.items():
+        for page_name, section_notebooks in sections.items():
+            page = (
+                PROJECT_ROOT
+                / f"docs/capitulos/capitulo-{chapter}/{page_name}.md"
+            ).read_text(encoding="utf-8")
+            notebook_names = (
+                (section_notebooks,)
+                if isinstance(section_notebooks, str)
+                else section_notebooks
+            )
+            assert "<!-- jupyterlite-demo:start -->" in page
+            for notebook_name in notebook_names:
+                notebook_path = (
+                    f"simulaciones/capitulo{chapter}/notebooks/{notebook_name}"
+                ).replace("/", "%2F")
+                assert f"jupyterlite/capitulo-{chapter}/notebooks/index.html?path={notebook_path}" in page
+            assert "Abrir en pantalla completa" in page
+            assert "Abrir en Google Colab" in page
+            before_demo = page.split("<!-- jupyterlite-demo:start -->", 1)[0]
+            assert '<div class="lab-action">' not in before_demo
+
+
+def test_chapter_three_embeds_the_jupyterlite_notebook():
+    pages = (
+        (
+            "docs/capitulos/capitulo-3/0-comparacion-notaciones-asintoticas.md",
+            NOTEBOOKS[0],
+        ),
+        *(
+            (
+                f"docs/capitulos/capitulo-3/{page_name}.md",
+                notebook,
+            )
+            for page_name, notebook in zip(
+                (
+                    "1-notacion-big-o",
+                    "2-notacion-little-o",
+                    "3-notacion-big-omega",
+                    "4-notacion-little-omega",
+                    "5-notacion-theta",
+                ),
+                NOTEBOOKS[1:],
+                strict=True,
+            )
+        ),
+    )
+    for page_path, notebook in pages:
+        page = (PROJECT_ROOT / page_path).read_text(encoding="utf-8")
+        expected_path = str(notebook).replace("/", "%2F")
+        assert "## Simulación en el navegador" in page
+        assert "<!-- jupyterlite-demo:start -->" in page
+        assert 'class="jupyterlite-demo__frame"' in page
+        assert f"jupyterlite/capitulo-3/notebooks/index.html?path={expected_path}" in page
+        assert page.index("## Simulación en el navegador") < page.index(
+            '<nav class="section-return section-step"'
+        )
+        assert page.index("<!-- local-execution:end -->") < page.index(
+            "<!-- jupyterlite-demo:start -->"
+        )
+        toolbar = page.split('<div class="jupyterlite-demo__toolbar">', 1)[1].split(
+            "</div>", 2
+        )[0]
+        assert 'class="jupyterlite-demo__actions"' in toolbar
+        assert "Simulación interactiva ·" in toolbar
+        assert ">Abrir en Google Colab</a>" in toolbar
+        assert ">Abrir en pantalla completa</a>" in toolbar
+        assert toolbar.index("Abrir en Google Colab") < toolbar.index(
+            "Abrir en pantalla completa"
+        )
+        assert '<div class="lab-action">' not in page.split(
+            "<!-- jupyterlite-demo:start -->", 1
+        )[0]
+
+
+def test_chapter_two_embeds_each_jupyterlite_simulation_without_duplicate_button():
+    pages = (
+        ("0-complejidad-sublineal", CHAPTER2_NOTEBOOKS[1]),
+        ("1-complejidad-constante", CHAPTER2_NOTEBOOKS[0]),
+        ("2-complejidad-logaritmica", CHAPTER2_NOTEBOOKS[1]),
+        ("3-complejidad-lineal", CHAPTER2_NOTEBOOKS[2]),
+        ("4-complejidad-log-lineal", CHAPTER2_NOTEBOOKS[3]),
+        ("5-complejidad-cuadratica", CHAPTER2_NOTEBOOKS[4]),
+        ("6-complejidad-cubica", CHAPTER2_NOTEBOOKS[5]),
+        ("7-complejidad-polinomial-general", CHAPTER2_NOTEBOOKS[6]),
+        ("8-complejidad-exponencial", CHAPTER2_NOTEBOOKS[7]),
+        ("9-complejidad-factorial", CHAPTER2_NOTEBOOKS[8]),
+    )
+    for page_name, notebook in pages:
+        page = (
+            PROJECT_ROOT / f"docs/capitulos/capitulo-2/{page_name}.md"
+        ).read_text(encoding="utf-8")
+        expected_path = str(notebook).replace("/", "%2F")
+        assert "## Simulación en el navegador" in page
+        assert f"jupyterlite/capitulo-2/notebooks/index.html?path={expected_path}" in page
+        assert page.index("<!-- local-execution:end -->") < page.index(
+            "<!-- jupyterlite-demo:start -->"
+        )
+        assert page.index("<!-- jupyterlite-demo:start -->") < page.index(
+            '<nav class="section-return section-step"'
+        )
+        assert '<div class="lab-action">' not in page.split(
+            "<!-- jupyterlite-demo:start -->", 1
+        )[0]
+        toolbar = page.split('<div class="jupyterlite-demo__toolbar">', 1)[1].split(
+            "</div>", 2
+        )[0]
+        assert ">Abrir en Google Colab</a>" in toolbar
+        assert ">Abrir en pantalla completa</a>" in toolbar
+
+
+def test_homepage_diagram_shows_jupyterlite_as_a_general_portal_feature():
+    homepage = (PROJECT_ROOT / "docs/index.md").read_text(encoding="utf-8")
+
+    assert "## Cómo se conectan los recursos" in homepage
+    diagram = homepage.split("```mermaid", 1)[1].split("```", 1)[0]
+    assert "JupyterLite" in diagram
+    assert "Laboratorios interactivos" in diagram
+    assert "Pyodide" in diagram
+    assert "Ejecución en el navegador" in diagram
+    assert "Google Colab" in diagram
+    assert "Jupyter local" in diagram
+    assert "Capítulos 2 y 3" not in diagram
+
+
+def test_jupyterlite_actions_share_button_style_and_have_icons():
+    styles = (
+        PROJECT_ROOT / "docs/assets/stylesheets/extra.css"
+    ).read_text(encoding="utf-8")
+    assert ".jupyterlite-demo__actions a.md-button" in styles
+    assert ".jupyterlite-button::before" in styles
+    assert 'url("../images/fullscreen-icon.svg")' in styles
+    assert (PROJECT_ROOT / "docs/assets/images/colab-icon.svg").is_file()
+    assert (PROJECT_ROOT / "docs/assets/images/fullscreen-icon.svg").is_file()
+
+
+def test_pages_workflow_builds_demo_after_content_validation():
+    workflow = (PROJECT_ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
+    build = "python desarrollo/scripts/build_jupyterlite_demo.py"
+    breadcrumbs = "python desarrollo/scripts/validate_pages_breadcrumbs.py --site-dir site"
+    upload = "uses: actions/upload-pages-artifact@v4"
+    assert workflow.index(breadcrumbs) < workflow.index(build) < workflow.index(upload)
+
+
+def test_documentation_dependencies_include_jupyter_server():
+    requirements = (PROJECT_ROOT / "requirements-docs.txt").read_text(encoding="utf-8")
+    lock = (PROJECT_ROOT / "requirements-lock.txt").read_text(encoding="utf-8")
+    assert "jupyter-server==2.21.1" in requirements
+    assert "jupyter-server==2.21.1" in lock
