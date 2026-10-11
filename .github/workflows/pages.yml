@@ -37,6 +37,7 @@ on:
       - "desarrollo/scripts/sync_page_assets.py"
       - "desarrollo/scripts/sync_local_execution.py"
       - "desarrollo/scripts/build_jupyterlite_demo.py"
+      - "desarrollo/jupyterlite_autorun_extension/**"
       - "desarrollo/scripts/jupyterlite_catalog.py"
       - "desarrollo/scripts/sync_jupyterlite_urls.py"
       - "desarrollo/scripts/validate_jupyterlite_artifact.py"

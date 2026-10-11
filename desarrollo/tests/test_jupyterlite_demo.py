@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 
 from desarrollo.scripts.build_jupyterlite_demo import (
+    AUTORUN_EXTENSION_DIR,
+    AUTORUN_EXTENSION_NAME,
     CHAPTER2_NOTEBOOKS,
     CHAPTER2_RUNTIME_FILES,
     CHAPTER_CONFIGS,
@@ -28,6 +30,8 @@ from desarrollo.tests.helpers import PROJECT_ROOT
 
 def test_jupyterlite_demo_sources_and_configuration_exist():
     assert (LITE_DIR / "jupyter-lite.json").is_file()
+    assert (AUTORUN_EXTENSION_DIR / "package.json").is_file()
+    assert (AUTORUN_EXTENSION_DIR / "src" / "index.ts").is_file()
     config = json.loads((LITE_DIR / "jupyter-lite.json").read_text(encoding="utf-8"))
     assert config["jupyter-config-data"]["defaultKernelName"] == "python"
     assert config["jupyter-config-data"]["settingsOverrides"][
@@ -45,6 +49,17 @@ def test_jupyterlite_demo_sources_and_configuration_exist():
         for chapter in range(4, 9)
         for path in chapter_content_files(chapter)
     )
+
+
+def test_autorun_extension_executes_after_the_default_kernel_is_ready():
+    extension = (
+        AUTORUN_EXTENSION_DIR / "src" / "index.ts"
+    ).read_text(encoding="utf-8")
+
+    assert AUTORUN_EXTENSION_NAME == "@notas-a-mano/jupyterlite-auto-run"
+    assert "tracker.widgetAdded.connect" in extension
+    assert "await panel.context.sessionContext.ready" in extension
+    assert "NotebookActions.runAll(panel.content, panel.context.sessionContext)" in extension
 
 
 def test_publicacion_invalida_el_contenido_persistido_cuando_cambia_el_demo():
@@ -266,14 +281,22 @@ def test_chapter_three_embeds_the_jupyterlite_notebook():
         assert page.index("<!-- local-execution:end -->") < page.index(
             "<!-- jupyterlite-demo:start -->"
         )
-        toolbar = page.split('<div class="jupyterlite-demo__toolbar">', 1)[1].split(
-            "</div>", 2
+        demo = page.split("<!-- jupyterlite-demo:start -->", 1)[1].split(
+            "<!-- jupyterlite-demo:end -->", 1
         )[0]
-        assert 'class="jupyterlite-demo__actions"' in toolbar
+        toolbar = demo.split('<div class="jupyterlite-demo__toolbar">', 1)[1].split(
+            "</div>", 1
+        )[0]
+        actions = demo.split('<div class="jupyterlite-demo__actions">', 1)[1].split(
+            "</div>", 1
+        )[0]
         assert "Simulación interactiva ·" in toolbar
-        assert ">Abrir en Google Colab</a>" in toolbar
-        assert ">Abrir en pantalla completa</a>" in toolbar
-        assert toolbar.index("Abrir en Google Colab") < toolbar.index(
+        assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
+            'class="jupyterlite-demo__actions"'
+        )
+        assert ">Abrir en Google Colab</a>" in actions
+        assert ">Abrir en pantalla completa</a>" in actions
+        assert actions.index("Abrir en Google Colab") < actions.index(
             "Abrir en pantalla completa"
         )
         assert '<div class="lab-action">' not in page.split(
@@ -309,11 +332,17 @@ def test_chapter_two_embeds_each_jupyterlite_simulation_without_duplicate_button
         assert '<div class="lab-action">' not in page.split(
             "<!-- jupyterlite-demo:start -->", 1
         )[0]
-        toolbar = page.split('<div class="jupyterlite-demo__toolbar">', 1)[1].split(
-            "</div>", 2
+        demo = page.split("<!-- jupyterlite-demo:start -->", 1)[1].split(
+            "<!-- jupyterlite-demo:end -->", 1
         )[0]
-        assert ">Abrir en Google Colab</a>" in toolbar
-        assert ">Abrir en pantalla completa</a>" in toolbar
+        actions = demo.split('<div class="jupyterlite-demo__actions">', 1)[1].split(
+            "</div>", 1
+        )[0]
+        assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
+            'class="jupyterlite-demo__actions"'
+        )
+        assert ">Abrir en Google Colab</a>" in actions
+        assert ">Abrir en pantalla completa</a>" in actions
 
 
 def test_homepage_diagram_shows_jupyterlite_as_a_general_portal_feature():

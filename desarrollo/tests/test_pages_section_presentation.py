@@ -23,7 +23,7 @@ def test_section_numbers_remain_on_one_line_and_match_title_color():
     assert all("grid-template-columns: max-content" in rule for rule in section_rules)
 
 
-def test_colab_button_precedes_code_for_searches_and_sorts():
+def test_colab_button_follows_the_embedded_simulation():
     pages_with_colab = []
     algorithm_pages = []
     for path in sorted(SECTION_PAGES.glob("capitulo-*/*.md")):
@@ -31,21 +31,45 @@ def test_colab_button_precedes_code_for_searches_and_sorts():
         if "colab-button" not in content:
             continue
         pages_with_colab.append(path)
+        if "<!-- jupyterlite-demo:start -->" in content:
+            demos = re.findall(
+                r"<!-- jupyterlite-demo:start -->(.*?)<!-- jupyterlite-demo:end -->",
+                content,
+                flags=re.DOTALL,
+            )
+            assert demos, path
+            for demo in demos:
+                assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
+                    'class="jupyterlite-demo__actions"'
+                ), path
+                assert "Run All Cells" not in demo, path
+            assert content.count("La simulación se ejecuta automáticamente") == len(
+                demos
+            ), path
         kicker = re.search(r'^<span class="chapter-kicker">.+$', content, flags=re.MULTILINE)
         assert kicker, path
         if path.name == "0-comparacion-notaciones-asintoticas.md" and path.parent.name == "capitulo-3":
-            toolbar = content.split('<div class="jupyterlite-demo__toolbar">', 1)[1]
-            actions = toolbar.split('<div class="jupyterlite-demo__actions">', 1)[1].split("</div>", 1)[0]
+            demo = content.split("<!-- jupyterlite-demo:start -->", 1)[1].split(
+                "<!-- jupyterlite-demo:end -->", 1
+            )[0]
+            actions = demo.split('<div class="jupyterlite-demo__actions">', 1)[1].split("</div>", 1)[0]
             assert "colab-button" in actions, path
             assert ">Abrir en Google Colab</a>" in actions, path
+            assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
+                'class="jupyterlite-demo__actions"'
+            ), path
             continue
         if "<!-- jupyterlite-demo:start -->" in content:
             assert '<div class="lab-action">' not in content.split(
                 "<!-- jupyterlite-demo:start -->", 1
             )[0], path
-            assert ">Abrir en Google Colab</a>" in content.split(
-                '<div class="jupyterlite-demo__toolbar">', 1
-            )[1], path
+            demo = content.split("<!-- jupyterlite-demo:start -->", 1)[1].split(
+                "<!-- jupyterlite-demo:end -->", 1
+            )[0]
+            assert ">Abrir en Google Colab</a>" in demo, path
+            assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
+                'class="jupyterlite-demo__actions"'
+            ), path
             if path.parent.name in ("capitulo-7", "capitulo-8") and re.match(
                 r"[1-9]\d*-", path.stem
             ):

@@ -37,16 +37,12 @@ La ejecución local aprovecha los recursos del equipo y evita los límites de se
 Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador: no abre Colab, no crea una sesión remota y no requiere iniciar sesión. La primera carga descarga el entorno de Python; las siguientes aperturas reutilizan los recursos almacenados por el navegador.
 
 1. Espere a que el indicador del kernel muestre **Python (Pyodide)**.
-2. Abra el menú **Run** y seleccione **Run All Cells**.
+2. La simulación se ejecuta automáticamente cuando el kernel **Python (Pyodide)** esté listo.
 3. Use los controles de la simulación log-lineal y compare los resultados teóricos y experimentales.
 
 <div class="jupyterlite-demo">
   <div class="jupyterlite-demo__toolbar">
     <span>Simulación interactiva · Complejidad log-lineal</span>
-    <div class="jupyterlite-demo__actions">
-      <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo2/notebooks/4_complejidad_log_lineal.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F4_complejidad_log_lineal.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
-    </div>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
@@ -55,6 +51,11 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador: no abre
     loading="lazy"
     allow="clipboard-read; clipboard-write"
   ></iframe>
+    <div class="jupyterlite-demo__actions">
+      <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo2/notebooks/4_complejidad_log_lineal.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
+      <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F4_complejidad_log_lineal.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    </div>
+
 </div>
 <!-- jupyterlite-demo:end -->
 

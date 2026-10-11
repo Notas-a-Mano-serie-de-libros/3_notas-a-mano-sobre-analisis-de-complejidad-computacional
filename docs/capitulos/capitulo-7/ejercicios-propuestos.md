@@ -72,16 +72,12 @@ La ejecución local aprovecha los recursos del equipo y evita los límites de se
 Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. También puedes abrir el notebook en Google Colab o en una instancia local de Jupyter.
 
 1. Espera a que el kernel indique **Python (Pyodide)**.
-2. Selecciona **Run → Run All Cells** para preparar y ejecutar el laboratorio.
+2. La simulación se ejecuta automáticamente cuando el kernel **Python (Pyodide)** esté listo.
 3. Interactúa con los controles de **Laboratorio de ejercicios propuestos**.
 
 <div class="jupyterlite-demo">
   <div class="jupyterlite-demo__toolbar">
     <span>Simulación interactiva · Laboratorio de ejercicios propuestos</span>
-    <div class="jupyterlite-demo__actions">
-      <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo7/notebooks/ejercicios_propuestos.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2Fejercicios_propuestos.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
-    </div>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
@@ -90,6 +86,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
     loading="lazy"
     allow="clipboard-read; clipboard-write"
   ></iframe>
+    <div class="jupyterlite-demo__actions">
+      <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo7/notebooks/ejercicios_propuestos.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
+      <a class="md-button jupyterlite-button" href="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2Fejercicios_propuestos.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    </div>
+
 </div>
 <!-- jupyterlite-demo:end -->
 

@@ -12,6 +12,8 @@ __pycache__/
 dist/
 build/
 site/
+desarrollo/jupyterlite_autorun_extension/node_modules/
+desarrollo/jupyterlite_autorun_extension/lib/
 
 # Generated figures produced by notebooks and simulations
 recursos/imagenes/capitulo*/generadas/*

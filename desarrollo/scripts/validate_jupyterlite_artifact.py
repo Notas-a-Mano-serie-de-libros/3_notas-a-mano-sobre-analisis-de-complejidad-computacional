@@ -7,8 +7,10 @@ import json
 from pathlib import Path
 
 try:
+    from desarrollo.scripts.build_jupyterlite_demo import AUTORUN_EXTENSION_NAME
     from desarrollo.scripts.jupyterlite_catalog import PROFILE_CONFIGS
 except ModuleNotFoundError:
+    from build_jupyterlite_demo import AUTORUN_EXTENSION_NAME
     from jupyterlite_catalog import PROFILE_CONFIGS
 
 
@@ -42,6 +44,21 @@ def validate(site_dir: Path) -> list[str]:
         ).get("autoStartDefaultKernel")
         if auto_start is not True:
             errors.append(f"{profile}: no está activado el inicio automático del kernel")
+        federated_extensions = config_data.get("federated_extensions", [])
+        autorun_extension = next(
+            (
+                extension
+                for extension in federated_extensions
+                if extension.get("name") == AUTORUN_EXTENSION_NAME
+            ),
+            None,
+        )
+        if autorun_extension is None:
+            errors.append(f"{profile}: falta la extensión de ejecución automática")
+        elif not (
+            profile_dir / "extensions" / AUTORUN_EXTENSION_NAME / autorun_extension["load"]
+        ).is_file():
+            errors.append(f"{profile}: falta el bundle de ejecución automática")
         kernel = config_data.get("litePluginSettings", {}).get(
             "@jupyterlite/pyodide-kernel-extension:kernel", {}
         )

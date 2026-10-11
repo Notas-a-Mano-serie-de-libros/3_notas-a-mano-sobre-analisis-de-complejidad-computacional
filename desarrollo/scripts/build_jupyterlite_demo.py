@@ -32,6 +32,9 @@ except ModuleNotFoundError:
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 LITE_DIR = PROJECT_ROOT / "jupyterlite"
+AUTORUN_EXTENSION_DIR = PROJECT_ROOT / "desarrollo" / "jupyterlite_autorun_extension"
+AUTORUN_EXTENSION_OUTPUT = AUTORUN_EXTENSION_DIR / "dist"
+AUTORUN_EXTENSION_NAME = "@notas-a-mano/jupyterlite-auto-run"
 DEFAULT_OUTPUT = PROJECT_ROOT / "site" / "jupyterlite"
 NOTEBOOKS = CHAPTER_CONFIGS[3]["notebooks"]
 CHAPTER2_NOTEBOOKS = CHAPTER_CONFIGS[2]["notebooks"]
@@ -55,6 +58,8 @@ def content_storage_name(chapter: int = 3) -> str:
     digest.update(json.dumps(packages).encode("utf-8"))
     digest.update(Path(__file__).read_bytes())
     digest.update(Path(__file__).with_name("jupyterlite_catalog.py").read_bytes())
+    digest.update((AUTORUN_EXTENSION_DIR / "package.json").read_bytes())
+    digest.update((AUTORUN_EXTENSION_DIR / "src" / "index.ts").read_bytes())
     return f"Notas a mano · {profile} · {digest.hexdigest()[:12]}"
 
 
@@ -104,6 +109,21 @@ def configure_pyodide_packages(
     )
     load_options = pyodide_settings.setdefault("loadPyodideOptions", {})
     load_options["packages"] = list(packages)
+
+
+def build_autorun_extension() -> None:
+    subprocess.run(["npm", "ci"], cwd=AUTORUN_EXTENSION_DIR, check=True)
+    subprocess.run(["npm", "run", "build"], cwd=AUTORUN_EXTENSION_DIR, check=True)
+
+
+def add_autorun_extension(lite_dir: Path) -> None:
+    if not AUTORUN_EXTENSION_OUTPUT.is_dir():
+        raise FileNotFoundError(
+            f"No se encontró la extensión JupyterLite compilada: {AUTORUN_EXTENSION_OUTPUT}"
+        )
+    target = lite_dir / "extensions" / AUTORUN_EXTENSION_NAME
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(AUTORUN_EXTENSION_OUTPUT, target)
 
 
 def _prepare_contents(
@@ -172,6 +192,7 @@ def build(output_dir: Path, chapter: int = 3) -> None:
         lite_dir = temporary_root / "jupyterlite"
         prepare_profile_contents(contents_dir, profile)
         shutil.copytree(LITE_DIR, lite_dir)
+        add_autorun_extension(lite_dir)
         config_path = lite_dir / "jupyter-lite.json"
         lite_config = json.loads(config_path.read_text(encoding="utf-8"))
         configure_pyodide_packages(lite_config, config["packages"])
@@ -196,6 +217,7 @@ def build(output_dir: Path, chapter: int = 3) -> None:
             "--no-sourcemaps",
             "--no-unused-shared-packages",
             "--force",
+            f"--LiteBuildConfig.federated_extensions=extensions/{AUTORUN_EXTENSION_NAME}",
         ]
         subprocess.run(command, cwd=PROJECT_ROOT, check=True)
 
@@ -234,6 +256,7 @@ def main() -> int:
     if not output_dir.is_absolute():
         output_dir = PROJECT_ROOT / output_dir
     output_dir = output_dir.resolve()
+    build_autorun_extension()
     if args.chapter:
         profile = profile_for_chapter(args.chapter)
         build(output_dir / profile, args.chapter)

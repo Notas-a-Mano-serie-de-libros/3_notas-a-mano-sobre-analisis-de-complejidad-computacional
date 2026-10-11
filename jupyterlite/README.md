@@ -25,8 +25,12 @@ python desarrollo/scripts/sync_jupyterlite_urls.py
 Las dependencias de Python se configuran en las opciones de inicio del kernel
 Pyodide para que se carguen antes de abrir los notebooks, sin celdas de
 instalación auxiliares. El kernel predeterminado se inicia automáticamente al
-abrir una simulación, sin pedir que se seleccione en cada ejecución. Después de
-compilar, el validador del artefacto revisa
+abrir una simulación, sin pedir que se seleccione en cada ejecución. Una
+extensión ligera ejecuta las celdas al quedar listo el kernel; no modifica ni
+añade celdas a los notebooks. La extensión se compila durante la generación del
+sitio con Node.js. Los accesos a Colab y pantalla completa quedan debajo del
+iframe para que la simulación aparezca primero. Después de compilar, el
+validador del artefacto revisa
 las rutas, la configuración del kernel, la presencia de paquetes, las celdas de
 solo lectura y el presupuesto total de tamaño:
 
