@@ -93,6 +93,7 @@ _BIG_O_HTML = r"""
 #bo-wrap .function-stepper .stepper-field{width:184px;white-space:nowrap}
 #bo-wrap .editable-field{outline:none;cursor:text;font-weight:400}
 #bo-wrap .editable-field:focus{border-color:#1976D2;box-shadow:0 0 0 1px #1976D2}
+#bo-wrap .theta-stepper .stepper-field{font-weight:400}
 #bo-wrap .stepper input{width:120px}
 #bo-wrap .stepper button{width:34px;height:32px;border:1px solid #ccc;border-radius:0;background:#f7f7f7;color:#333;cursor:pointer;font-size:13px;line-height:1;margin:0;padding:0}
 #bo-wrap .stepper button:hover{background:#eeeeee}
@@ -215,8 +216,20 @@ _BIG_O_HTML = r"""
     <div class="row-title">Parámetros adicionales:</div>
     <div class="ctrl vertical additional">
     <label class="single-c"><span class="label-text">\(\mathbf{c}\)</span><input type="number" id="bo-c" min="0.1" max="1000" value="1" step="0.1"></label>
-    <label class="theta-c"><span class="label-text">\(\mathbf{c_1}\)</span><input type="number" id="bo-c1" min="0.1" max="1000" value="0.1" step="0.1"></label>
-    <label class="theta-c"><span class="label-text">\(\mathbf{c_2}\)</span><input type="number" id="bo-c2" min="0.1" max="1000" value="1.1" step="0.1"></label>
+    <label class="theta-c"><span class="label-text">\(\mathbf{c_1}\)</span>
+      <span class="stepper theta-stepper">
+        <button type="button" id="bo-c1-dec">◀</button>
+        <span class="stepper-field editable-field" id="bo-c1" role="textbox" contenteditable="true" data-raw="0.1" data-value="0.1">\(0.1\)</span>
+        <button type="button" id="bo-c1-inc">▶</button>
+      </span>
+    </label>
+    <label class="theta-c"><span class="label-text">\(\mathbf{c_2}\)</span>
+      <span class="stepper theta-stepper">
+        <button type="button" id="bo-c2-dec">◀</button>
+        <span class="stepper-field editable-field" id="bo-c2" role="textbox" contenteditable="true" data-raw="1.1" data-value="1.1">\(1.1\)</span>
+        <button type="button" id="bo-c2-inc">▶</button>
+      </span>
+    </label>
     <label class="little-c"><span class="label-text">\(\mathbf{\varepsilon}\)</span><input type="number" id="bo-epsilon" min="0.000001" max="1000" value="0.01" step="0.01"></label>
     </div>
   </div>
@@ -338,8 +351,8 @@ _BIG_O_HTML = r"""
   function cKey(){return C_ORDER[STATE_C_INDEX]}
   function gKey(){return ORDER[STATE_G_INDEX]}
   function cVal(){return Math.max(0.1,parseFloat(el('bo-c').value)||1)}
-  function c1Val(){return Math.max(0.1,parseFloat(el('bo-c1').value)||1)}
-  function c2Val(){return Math.max(0.1,parseFloat(el('bo-c2').value)||1)}
+  function c1Val(){return Math.max(0.1,parseFloat(el('bo-c1').dataset.value)||1)}
+  function c2Val(){return Math.max(0.1,parseFloat(el('bo-c2').dataset.value)||1)}
   function epsilonVal(){
     var input=el('bo-epsilon');
     return Math.max(0.000001,parseFloat(input?input.value:0.01)||0.01);
@@ -408,6 +421,9 @@ _BIG_O_HTML = r"""
       return mantissa+'\\cdot 10^{'+exponent+'}';
     }
     return (Math.round(x*100)/100).toString();
+  }
+  function fmtConstant(value){
+    return String(Number(value));
   }
   function drawPowerOfTenLabel(x,y,align,baseline,exp){
     ctx.save();
@@ -600,7 +616,7 @@ _BIG_O_HTML = r"""
   }
   function dynamicTypesetTargets(){
     return [
-      'bo-a','bo-b','bo-result-main','bo-result-n0','bo-n0','bo-c-rule','bo-status',
+      'bo-a','bo-b','bo-c1','bo-c2','bo-result-main','bo-result-n0','bo-n0','bo-c-rule','bo-status',
       'bo-axis-y','bo-cfn','bo-gfn','bo-leg-c','bo-leg-cg','bo-leg-low',
       'bo-leg-threshold','bo-leg-n0','bo-limit-proof','bo-n0-proof','bo-limits'
     ].map(el).filter(Boolean);
@@ -658,6 +674,24 @@ _BIG_O_HTML = r"""
       ?'n_0=0\\;\\text{(no visible porque }\\log(0)\\text{ no está definido)}'
       :latex);
   }
+  function setThetaConstantValue(id,value,forceRender){
+    var target=el(id),numeric=Number(value),serialized=String(numeric);
+    target.dataset.value=serialized;
+    target.dataset.raw=fmtConstant(numeric);
+    if(!forceRender && document.activeElement===target){target.dataset.lastValue=serialized;return;}
+    if(!forceRender && target.dataset.lastValue===serialized)return;
+    target.dataset.lastValue=serialized;
+    target.innerHTML=tex(fmtConstant(numeric));
+  }
+  function handleThetaConstantInput(id){
+    var target=el(id),value=parseFloat(target.textContent);
+    if(isFinite(value)){
+      setThetaConstantValue(id,value,true);
+      preserveViewportForParameterChange();
+    }else{
+      setThetaConstantValue(id,target.dataset.value,true);
+    }
+  }
   function enforceC(ck,gk){
     if(isThetaMode())return enforceThetaC(ck,gk);
     var input=el('bo-c'),k=cLowerBound(ck,gk);
@@ -683,16 +717,20 @@ _BIG_O_HTML = r"""
     var cInput=el('bo-c'),c1Input=el('bo-c1'),c2Input=el('bo-c2');
     cInput.disabled=true;
     if(!isMember(ck,gk)){
-      c1Input.disabled=true;c2Input.disabled=true;
-      c1Input.value='';c2Input.value='';
+      c1Input.contentEditable='false';c2Input.contentEditable='false';
+      el('bo-c1-dec').disabled=true;el('bo-c1-inc').disabled=true;
+      el('bo-c2-dec').disabled=true;el('bo-c2-inc').disabled=true;
       return {c1:1,c2:1};
     }
-    c1Input.disabled=false;c2Input.disabled=false;
+    c1Input.contentEditable='true';c2Input.contentEditable='true';
+    el('bo-c1-dec').disabled=false;el('bo-c1-inc').disabled=false;
+    el('bo-c2-dec').disabled=false;el('bo-c2-inc').disabled=false;
     var bookAgainstCubic=ck==='book' && gk==='n3';
-    c1Input.min=0.1;c2Input.min=bookAgainstCubic?1.1:1;
-    c1Input.max=1;c2Input.max=1000;
-    if(c1Input.value==='' || (parseFloat(c1Input.value)||0)<=0 || (parseFloat(c1Input.value)||0)>1)c1Input.value=0.1;
-    if(c2Input.value==='' || (parseFloat(c2Input.value)||0)<parseFloat(c2Input.min))c2Input.value=bookAgainstCubic?1.1:1;
+    var c1Value=parseFloat(c1Input.dataset.value),c2Value=parseFloat(c2Input.dataset.value);
+    if(!isFinite(c1Value) || c1Value<=0 || c1Value>1)c1Value=0.1;
+    if(!isFinite(c2Value) || c2Value<(bookAgainstCubic?1.1:1))c2Value=bookAgainstCubic?1.1:1;
+    setThetaConstantValue('bo-c1',c1Value);
+    setThetaConstantValue('bo-c2',c2Value);
     return {c1:c1Val(),c2:c2Val()};
   }
   function updateConstantControls(){
@@ -821,11 +859,11 @@ _BIG_O_HTML = r"""
   }
   function substitutedInequalityLatex(ck,gk,c){
     var base='';
-    if(MODE==='big_o')base=cLatex()+'\\le '+fmt(c)+'\\cdot '+latexOf(gk);
-    if(MODE==='little_o')base=cLatex()+'\\lt '+fmt(c)+'\\cdot '+latexOf(gk);
-    if(MODE==='big_omega')base=cLatex()+'\\ge '+fmt(c)+'\\cdot '+latexOf(gk);
-    if(MODE==='little_omega')base=cLatex()+'\\gt '+fmt(c)+'\\cdot '+latexOf(gk);
-    if(isThetaMode())base=fmt(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk);
+    if(MODE==='big_o')base=cLatex()+'\\le '+fmtConstant(c)+'\\cdot '+latexOf(gk);
+    if(MODE==='little_o')base=cLatex()+'\\lt '+fmtConstant(c)+'\\cdot '+latexOf(gk);
+    if(MODE==='big_omega')base=cLatex()+'\\ge '+fmtConstant(c)+'\\cdot '+latexOf(gk);
+    if(MODE==='little_omega')base=cLatex()+'\\gt '+fmtConstant(c)+'\\cdot '+latexOf(gk);
+    if(isThetaMode())base=fmtConstant(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex()+'\\le '+fmtConstant(c.c2)+'\\cdot '+latexOf(gk);
     return base;
   }
   function isStrictMode(){return MODE==='little_o' || MODE==='little_omega'}
@@ -887,10 +925,10 @@ _BIG_O_HTML = r"""
       :defaultN0Html(intersection);
     return '<div class="theta-solutions">'+
       '<div class="theta-solution"><b>Desigualdad izquierda '+titleTex('c_1\\cdot g(n)\\le C(n)')+':</b>'+
-        '<div class="demo-line">'+texBlock(fmt(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex())+'</div>'+
+        '<div class="demo-line">'+texBlock(fmtConstant(c.c1)+'\\cdot '+latexOf(gk)+'\\le '+cLatex())+'</div>'+
         '<div class="demo-line">'+texBlock('S_1='+realThresholdSetLatex(lowerA,true))+'</div></div>'+
       '<div class="theta-solution"><b>Desigualdad derecha '+titleTex('C(n)\\le c_2\\cdot g(n)')+':</b>'+
-        '<div class="demo-line">'+texBlock(cLatex()+'\\le '+fmt(c.c2)+'\\cdot '+latexOf(gk))+'</div>'+
+        '<div class="demo-line">'+texBlock(cLatex()+'\\le '+fmtConstant(c.c2)+'\\cdot '+latexOf(gk))+'</div>'+
         '<div class="demo-line">'+texBlock('S_2='+realThresholdSetLatex(upperA,true))+'</div></div>'+
       '</div>'+
       '<div class="theta-intersection"><div class="solution-title">Valores que cumplen ambas desigualdades '+titleTex('S_1\\cap S_2')+':</div>'+
@@ -917,8 +955,8 @@ _BIG_O_HTML = r"""
   }
   function n0ProofHtml(ck,gk,c,n0){
     var n0Title=isThetaMode()
-      ?'Determinación de '+titleTex('n_0')+' para '+titleTex('c_1='+fmt(c.c1))+' y '+titleTex('c_2='+fmt(c.c2))+':'
-      :'Determinación de '+titleTex('n_0')+' para '+titleTex('c='+fmt(c))+':';
+      ?'Determinación de '+titleTex('n_0')+' para '+titleTex('c_1='+fmtConstant(c.c1))+' y '+titleTex('c_2='+fmtConstant(c.c2))+':'
+      :'Determinación de '+titleTex('n_0')+' para '+titleTex('c='+fmtConstant(c))+':';
     var inequalityLine=texBlock('\\displaystyle '+inequalityLatex());
     var substitutedInequalityLine=texBlock('\\displaystyle '+substitutedInequalityLatex(ck,gk,c));
     var partialSolutions=isThetaMode()?thetaPartialSolutionsHtml(ck,gk,c):'';
@@ -1308,7 +1346,7 @@ _BIG_O_HTML = r"""
     ctx.drawImage(layer,0,0,layer.width,layer.height,0,0,W,H);
   }
   function growthConfigurationSignature(a,b,n0){
-    return [MODE,scaleMode(),a,b,cKey(),gKey(),n0,el('bo-c').value,el('bo-c1').value,el('bo-c2').value].join('|');
+    return [MODE,scaleMode(),a,b,cKey(),gKey(),n0,el('bo-c').value,el('bo-c1').dataset.value,el('bo-c2').dataset.value].join('|');
   }
   function growthCurrentN(n0,b){
     if(n0===null)return null;
@@ -1426,10 +1464,10 @@ _BIG_O_HTML = r"""
     el('bo-leg-c').innerHTML=tex('C(n)='+cLatex());
     el('bo-leg-c').parentElement.style.color=cColor();
     el('bo-leg-cg').parentElement.style.color=cgColor();
-    el('bo-leg-cg').innerHTML=isThetaMode()?tex('c_2\\cdot g(n)='+fmt(c.c2)+'\\cdot '+latexOf(gk)):tex('c\\cdot g(n)='+fmt(c)+'\\cdot '+latexOf(gk));
+    el('bo-leg-cg').innerHTML=isThetaMode()?tex('c_2\\cdot g(n)='+fmtConstant(c.c2)+'\\cdot '+latexOf(gk)):tex('c\\cdot g(n)='+fmtConstant(c)+'\\cdot '+latexOf(gk));
     el('bo-leg-low-wrap').style.display=isThetaMode()?'inline':'none';
     el('bo-leg-low-wrap').style.color=c1gColor();
-    el('bo-leg-low').innerHTML=tex('c_1\\cdot g(n)='+fmt(c.c1)+'\\cdot '+latexOf(gk));
+    el('bo-leg-low').innerHTML=tex('c_1\\cdot g(n)='+fmtConstant(c.c1)+'\\cdot '+latexOf(gk));
     el('bo-leg-threshold').parentElement.style.display=threshold===null?'none':'inline';
     el('bo-leg-threshold').innerHTML=threshold===null?'':tex(
       (isStrictMode()?'\\inf(I)=':'\\min(I)=')+thresholdNumber(threshold)
@@ -1471,7 +1509,7 @@ _BIG_O_HTML = r"""
   function viewSnapshot(){
     return {
       mode:MODE,a:STATE_A,b:STATE_B,cIndex:STATE_C_INDEX,gIndex:STATE_G_INDEX,n0:STATE_N0,
-      c:el('bo-c').value,c1:el('bo-c1').value,c2:el('bo-c2').value,epsilon:el('bo-epsilon').value,
+      c:el('bo-c').value,c1:el('bo-c1').dataset.value,c2:el('bo-c2').dataset.value,epsilon:el('bo-epsilon').value,
       scale:el('bo-scale').value,yOffset:Y_OFFSET,yScale:Y_SCALE,
       yRange:Y_RANGE_OVERRIDE?{min:Y_RANGE_OVERRIDE.min,max:Y_RANGE_OVERRIDE.max}:null,
       focus:n0FocusActive,lockX:lockX,lockY:lockY
@@ -1498,8 +1536,10 @@ _BIG_O_HTML = r"""
   function restoreSnapshot(snapshot){
     MODE=snapshot.mode;STATE_A=snapshot.a;STATE_B=snapshot.b;
     STATE_C_INDEX=snapshot.cIndex;STATE_G_INDEX=snapshot.gIndex;STATE_N0=snapshot.n0;
-    el('bo-mode').value=MODE;el('bo-c').value=snapshot.c;el('bo-c1').value=snapshot.c1;
-    el('bo-c2').value=snapshot.c2;el('bo-epsilon').value=snapshot.epsilon;
+    el('bo-mode').value=MODE;el('bo-c').value=snapshot.c;
+    setThetaConstantValue('bo-c1',snapshot.c1,true);
+    setThetaConstantValue('bo-c2',snapshot.c2,true);
+    el('bo-epsilon').value=snapshot.epsilon;
     el('bo-scale').value=snapshot.scale;
     Y_OFFSET=snapshot.yOffset;Y_SCALE=snapshot.yScale;
     Y_RANGE_OVERRIDE=snapshot.yRange?{min:snapshot.yRange.min,max:snapshot.yRange.max}:null;
@@ -1541,7 +1581,10 @@ _BIG_O_HTML = r"""
     }
     var dc=defaultC(cKey(),gKey());
     el('bo-c').value=dc;
-    if(isThetaMode()){el('bo-c1').value=0.1;el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;}
+    if(isThetaMode()){
+      setThetaConstantValue('bo-c1',0.1,true);
+      setThetaConstantValue('bo-c2',(cKey()==='book'&&gKey()==='n3')?1.1:1,true);
+    }
     resetSelectedN0();
     Y_RANGE_OVERRIDE=null;
     updateConstantControls();
@@ -1557,6 +1600,15 @@ _BIG_O_HTML = r"""
       var nextB=direction>0?nextPower(STATE_B,false):previousPower(STATE_B,false);
       syncInputs(STATE_A,Math.max(nextB,STATE_A+1));
     }
+    draw();
+  }
+  function stepThetaConstant(id,direction){
+    if(el(id).contentEditable!=='true')return;
+    captureHistory();
+    deactivateN0Focus();
+    var current=parseFloat(el(id).dataset.value);
+    setThetaConstantValue(id,Math.round((current+direction*0.1)*10)/10);
+    preserveViewportForParameterChange();
     draw();
   }
   function resetInterval(){
@@ -1708,20 +1760,26 @@ _BIG_O_HTML = r"""
     if(!lastYRange)return;
     var ab=interval(),n=fx(p.x,ab[0],ab[1]),g=FNS[gKey()].fn(n);
     if(!isFinite(g) || !(g>0))return;
-    var input=el(kind==='c1g'?'bo-c1':(isThetaMode()?'bo-c2':'bo-c'));
     var value=fy(p.y,lastYRange)/g;
-    var minimum=parseFloat(input.min),maximum=parseFloat(input.max);
+    if(isThetaMode()){
+      var id=kind==='c1g'?'bo-c1':'bo-c2';
+      var minimum=id==='bo-c1'?0.1:(cKey()==='book'&&gKey()==='n3'?1.1:1);
+      var maximum=id==='bo-c1'?1:1000;
+      value=Math.max(minimum,Math.min(maximum,value));
+      setThetaConstantValue(id,String(Number(value.toPrecision(5))));
+      return;
+    }
+    var input=el('bo-c'),minimum=parseFloat(input.min),maximum=parseFloat(input.max);
     if(!isFinite(minimum))minimum=0.1;
     if(!isFinite(maximum))maximum=1000;
-    value=Math.max(minimum,Math.min(maximum,value));
-    input.value=String(Number(value.toPrecision(5)));
+    input.value=String(Number(Math.max(minimum,Math.min(maximum,value)).toPrecision(5)));
   }
   function updateBoundDragText(gk,c,threshold,n0){
     if(isThetaMode()){
-      renderDynamicMath('bo-leg-cg','c_2\\cdot g(n)='+fmt(c.c2)+'\\cdot '+latexOf(gk));
-      renderDynamicMath('bo-leg-low','c_1\\cdot g(n)='+fmt(c.c1)+'\\cdot '+latexOf(gk));
+      renderDynamicMath('bo-leg-cg','c_2\\cdot g(n)='+fmtConstant(c.c2)+'\\cdot '+latexOf(gk));
+      renderDynamicMath('bo-leg-low','c_1\\cdot g(n)='+fmtConstant(c.c1)+'\\cdot '+latexOf(gk));
     }else{
-      renderDynamicMath('bo-leg-cg','c\\cdot g(n)='+fmt(c)+'\\cdot '+latexOf(gk));
+      renderDynamicMath('bo-leg-cg','c\\cdot g(n)='+fmtConstant(c)+'\\cdot '+latexOf(gk));
     }
     renderDynamicMath('bo-leg-threshold',(isStrictMode()?'\\inf(I)=':'\\min(I)=')+thresholdNumber(threshold));
     updateDynamicN0(n0);
@@ -1850,17 +1908,35 @@ _BIG_O_HTML = r"""
       resetSelectedN0();
       Y_RANGE_OVERRIDE=null;
       el('bo-c').value=defaultC(cKey(),gKey());
-      el('bo-c1').value=0.1;
-      el('bo-c2').value=(cKey()==='book'&&gKey()==='n3')?1.1:1;
+      setThetaConstantValue('bo-c1',0.1,true);
+      setThetaConstantValue('bo-c2',(cKey()==='book'&&gKey()==='n3')?1.1:1,true);
       updateConstantControls();
       draw();
     });
   }
-  ['bo-c','bo-c1','bo-c2'].forEach(function(id){
-    el(id).addEventListener('focus',captureHistory);
-    el(id).addEventListener('input',function(){
+  el('bo-c').addEventListener('focus',captureHistory);
+  el('bo-c').addEventListener('input',function(){
       preserveViewportForParameterChange();
       draw();
+  });
+  ['bo-c1','bo-c2'].forEach(function(id){
+    el(id).addEventListener('focus',function(){
+      captureHistory();
+      beginEditableField(id);
+    });
+    el(id).addEventListener('input',function(){
+      sanitizeEditableField(id);
+      var value=parseFloat(this.textContent);
+      if(isFinite(value))this.dataset.value=String(value);
+      preserveViewportForParameterChange();
+      draw();
+    });
+    el(id).addEventListener('blur',function(){
+      handleThetaConstantInput(id);
+      draw();
+    });
+    el(id).addEventListener('keydown',function(ev){
+      if(ev.key==='Enter'){ev.preventDefault();el(id).blur();}
     });
   });
   el('bo-epsilon').addEventListener('focus',captureHistory);
@@ -1887,6 +1963,10 @@ _BIG_O_HTML = r"""
   el('bo-a-inc').addEventListener('click',function(){stepEndpoint('a',1);});
   el('bo-b-dec').addEventListener('click',function(){stepEndpoint('b',-1);});
   el('bo-b-inc').addEventListener('click',function(){stepEndpoint('b',1);});
+  el('bo-c1-dec').addEventListener('click',function(){stepThetaConstant('bo-c1',-1);});
+  el('bo-c1-inc').addEventListener('click',function(){stepThetaConstant('bo-c1',1);});
+  el('bo-c2-dec').addEventListener('click',function(){stepThetaConstant('bo-c2',-1);});
+  el('bo-c2-inc').addEventListener('click',function(){stepThetaConstant('bo-c2',1);});
   if(window.ResizeObserver){
     new ResizeObserver(function(){if(root.isConnected)draw();}).observe(cv.parentElement);
   }else{
@@ -1894,8 +1974,8 @@ _BIG_O_HTML = r"""
   }
   updateConstantControls();
   el('bo-c').value=defaultC(cKey(),gKey());
-  el('bo-c1').value=0.1;
-  el('bo-c2').value=1.1;
+  setThetaConstantValue('bo-c1',0.1,true);
+  setThetaConstantValue('bo-c2',1.1,true);
   syncInputs(STATE_A,STATE_B);
   draw();
 })();

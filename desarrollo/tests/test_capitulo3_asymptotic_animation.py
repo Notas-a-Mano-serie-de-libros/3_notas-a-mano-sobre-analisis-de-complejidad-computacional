@@ -78,17 +78,31 @@ def test_steppers_usan_el_contrato_visual_global():
     assert "border:1px solid #ccc;border-radius:0" in html
     assert ".stepper button{width:34px;height:32px;border:1px solid #ccc;border-radius:0" in html
     assert ".ctrl label{display:flex;align-items:center;gap:8px;color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1" in html
+    assert "#bo-wrap .theta-stepper .stepper-field{font-weight:400}" in html
+    for field in ("bo-c1", "bo-c2"):
+        assert f'id="{field}" role="textbox" contenteditable="true"' in html
+        assert f'id="{field}-dec"' in html
+        assert f'id="{field}-inc"' in html
+    assert "function setThetaConstantValue(id,value,forceRender)" in html
+    assert "function handleThetaConstantInput(id)" in html
+    assert "function stepThetaConstant(id,direction)" in html
+    assert "'bo-a','bo-b','bo-c1','bo-c2'" in html
     for label in (
         r"\mathbf{\mathcal{F}}",
         r"\mathbf{\text{Escala}}",
-        r"\mathbf{C(n)}",
-        r"\mathbf{g(n)}",
-        r"\mathbf{a}",
-        r"\mathbf{b}",
-        r"\mathbf{c}",
-        r"\mathbf{\varepsilon}",
     ):
         assert label in html
+    for label in (
+        r">\(\mathbf{C(n)}\)</span>",
+        r">\(\mathbf{g(n)}\)</span>",
+        r">\(\mathbf{a}\)</span>",
+        r">\(\mathbf{b}\)</span>",
+        r">\(\mathbf{c_1}\)</span>",
+        r">\(\mathbf{c_2}\)</span>",
+    ):
+        assert label in html
+    for value in (r">\(0.1\)</span>", r">\(1.1\)</span>"):
+        assert value in html
 
 
 def test_arrastrar_n0_no_reemplaza_los_extremos_mathjax_sin_cambios():
@@ -336,8 +350,8 @@ def test_parametros_adicionales_conservan_zoom_vista_y_n0_seleccionado():
     assert "Y_RANGE_OVERRIDE=null,lastYRange=null" in html
     assert "function preserveViewportForParameterChange()" in html
     assert "Y_RANGE_OVERRIDE={min:lastYRange.min,max:lastYRange.max};" in html
-    listeners = html.split("['bo-c','bo-c1','bo-c2'].forEach", 1)[1].split(
-        "el('bo-scale').addEventListener", 1
+    listeners = html.split("['bo-c1','bo-c2'].forEach", 1)[1].split(
+        "el('bo-epsilon').addEventListener", 1
     )[0]
     assert "preserveViewportForParameterChange();" in listeners
     assert "resetSelectedN0();" not in listeners
@@ -476,6 +490,11 @@ def test_bloque_informativo_permanece_estatico_al_desplazar_n0():
 def test_valores_grandes_usan_coeficiente_por_potencia_de_diez():
     assert run_math_engine("big_o", "fmt(250000)") == r"2.5\cdot 10^{5}"
     assert run_math_engine("big_o", "fmt(1.25e-5)") == r"1.25\cdot 10^{-5}"
+
+
+@pytest.mark.parametrize(("value", "expected"), [(0.1, "0.1"), (190.624, "190.624")])
+def test_constantes_se_muestran_con_la_misma_precision_que_los_controles(value, expected):
+    assert run_math_engine("theta", f"fmtConstant({value})") == expected
     assert "e+" not in run_math_engine("big_o", "thresholdNumber(2.5e20)")
 
 

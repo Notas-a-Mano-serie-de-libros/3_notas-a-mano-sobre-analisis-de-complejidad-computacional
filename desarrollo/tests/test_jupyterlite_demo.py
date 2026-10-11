@@ -59,6 +59,11 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert AUTORUN_EXTENSION_NAME == "@notas-a-mano/jupyterlite-auto-run"
     assert "tracker.widgetAdded.connect" in extension
     assert "await panel.context.sessionContext.ready" in extension
+    assert "await installWidgetPackage(panel)" in extension
+    assert "await piplite.install('ipywidgets==8.1.9')" in extension
+    assert extension.index("await installWidgetPackage(panel)") < extension.index(
+        "NotebookActions.runAll(panel.content, panel.context.sessionContext)"
+    )
     assert "NotebookActions.runAll(panel.content, panel.context.sessionContext)" in extension
 
 
