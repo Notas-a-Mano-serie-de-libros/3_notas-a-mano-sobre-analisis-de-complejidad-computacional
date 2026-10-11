@@ -93,7 +93,6 @@ _BIG_O_HTML = r"""
 #bo-wrap .function-stepper .stepper-field{width:184px;white-space:nowrap}
 #bo-wrap .editable-field{outline:none;cursor:text;font-weight:400}
 #bo-wrap .editable-field:focus{border-color:#1976D2;box-shadow:0 0 0 1px #1976D2}
-#bo-wrap .theta-stepper .stepper-field{font-weight:400}
 #bo-wrap .stepper input{width:120px}
 #bo-wrap .stepper button{width:34px;height:32px;border:1px solid #ccc;border-radius:0;background:#f7f7f7;color:#333;cursor:pointer;font-size:13px;line-height:1;margin:0;padding:0}
 #bo-wrap .stepper button:hover{background:#eeeeee}
@@ -215,7 +214,13 @@ _BIG_O_HTML = r"""
   <div class="control-section">
     <div class="row-title">Parámetros adicionales:</div>
     <div class="ctrl vertical additional">
-    <label class="single-c"><span class="label-text">\(\mathbf{c}\)</span><input type="number" id="bo-c" min="0.1" max="1000" value="1" step="0.1"></label>
+    <label class="single-c"><span class="label-text">\(\mathbf{c}\)</span>
+      <span class="stepper">
+        <button type="button" id="bo-c-dec">◀</button>
+        <span class="stepper-field editable-field" id="bo-c" role="textbox" contenteditable="true" data-raw="1" data-value="1">\(1\)</span>
+        <button type="button" id="bo-c-inc">▶</button>
+      </span>
+    </label>
     <label class="theta-c"><span class="label-text">\(\mathbf{c_1}\)</span>
       <span class="stepper theta-stepper">
         <button type="button" id="bo-c1-dec">◀</button>
@@ -350,7 +355,7 @@ _BIG_O_HTML = r"""
   function el(id){return typeof document==='undefined'?null:document.getElementById(id);}
   function cKey(){return C_ORDER[STATE_C_INDEX]}
   function gKey(){return ORDER[STATE_G_INDEX]}
-  function cVal(){return Math.max(0.1,parseFloat(el('bo-c').value)||1)}
+  function cVal(){return Math.max(0.1,parseFloat(el('bo-c').dataset.value)||1)}
   function c1Val(){return Math.max(0.1,parseFloat(el('bo-c1').dataset.value)||1)}
   function c2Val(){return Math.max(0.1,parseFloat(el('bo-c2').dataset.value)||1)}
   function epsilonVal(){
@@ -616,7 +621,7 @@ _BIG_O_HTML = r"""
   }
   function dynamicTypesetTargets(){
     return [
-      'bo-a','bo-b','bo-c1','bo-c2','bo-result-main','bo-result-n0','bo-n0','bo-c-rule','bo-status',
+      'bo-a','bo-b','bo-c','bo-c1','bo-c2','bo-result-main','bo-result-n0','bo-n0','bo-c-rule','bo-status',
       'bo-axis-y','bo-cfn','bo-gfn','bo-leg-c','bo-leg-cg','bo-leg-low',
       'bo-leg-threshold','bo-leg-n0','bo-limit-proof','bo-n0-proof','bo-limits'
     ].map(el).filter(Boolean);
@@ -660,7 +665,7 @@ _BIG_O_HTML = r"""
       var currentNode=el(id);
       if(rendered && currentNode && state.pending===null)currentNode.replaceChildren(rendered);
     }).catch(function(error){
-      console.error('No fue posible actualizar el valor dinámico de n₀.',error);
+      console.error('No fue posible actualizar una expresión matemática dinámica.',error);
     }).finally(function(){
       state.running=false;
       if(state.pending!==null)renderDynamicMath(id,state.pending);
@@ -674,43 +679,49 @@ _BIG_O_HTML = r"""
       ?'n_0=0\\;\\text{(no visible porque }\\log(0)\\text{ no está definido)}'
       :latex);
   }
-  function setThetaConstantValue(id,value,forceRender){
+  function setConstantValue(id,value,forceRender){
     var target=el(id),numeric=Number(value),serialized=String(numeric);
     target.dataset.value=serialized;
     target.dataset.raw=fmtConstant(numeric);
     if(!forceRender && document.activeElement===target){target.dataset.lastValue=serialized;return;}
     if(!forceRender && target.dataset.lastValue===serialized)return;
     target.dataset.lastValue=serialized;
-    target.innerHTML=tex(fmtConstant(numeric));
+    if(forceRender)renderDynamicMath(id,fmtConstant(numeric));
+    else target.innerHTML=tex(fmtConstant(numeric));
   }
-  function handleThetaConstantInput(id){
+  function handleConstantInput(id){
     var target=el(id),value=parseFloat(target.textContent);
     if(isFinite(value)){
-      setThetaConstantValue(id,value,true);
+      setConstantValue(id,value,true);
       preserveViewportForParameterChange();
     }else{
-      setThetaConstantValue(id,target.dataset.value,true);
+      setConstantValue(id,target.dataset.value,true);
     }
   }
   function enforceC(ck,gk){
     if(isThetaMode())return enforceThetaC(ck,gk);
     var input=el('bo-c'),k=cLowerBound(ck,gk);
     if(!isFinite(k)){
-      input.disabled=true;
-      input.value='';
+      input.contentEditable='false';
+      input.dataset.raw='';
+      input.dataset.value='1';
+      input.dataset.lastValue='';
+      input.textContent='—';
+      el('bo-c-dec').disabled=true;el('bo-c-inc').disabled=true;
       return 1;
     }
-    input.disabled=false;
-    input.min=k===0?0.1:k;
-    if(ck==='book' && gk==='n3' && MODE==='big_o')input.min=1.1;
+    input.contentEditable='true';
+    el('bo-c-dec').disabled=false;el('bo-c-inc').disabled=false;
+    var minimum=k===0?0.1:k;
+    if(ck==='book' && gk==='n3' && MODE==='big_o')minimum=1.1;
     var upper=cUpperBound(ck,gk);
-    input.max=isFinite(upper)?upper:1000;
-    if(input.value==='' || (parseFloat(input.value)||0)<parseFloat(input.min)){
-      input.value=defaultC(ck,gk);
-    }
-    if(isFinite(upper) && (parseFloat(input.value)||0)>upper){
-      input.value=upper;
-    }
+    var maximum=isFinite(upper)?upper:1000;
+    input.dataset.min=String(minimum);
+    input.dataset.max=String(maximum);
+    var current=parseFloat(input.dataset.value);
+    if(!isFinite(current))current=defaultC(ck,gk);
+    current=Math.max(minimum,Math.min(maximum,current));
+    setConstantValue('bo-c',current);
     return cVal();
   }
   function enforceThetaC(ck,gk){
@@ -729,8 +740,8 @@ _BIG_O_HTML = r"""
     var c1Value=parseFloat(c1Input.dataset.value),c2Value=parseFloat(c2Input.dataset.value);
     if(!isFinite(c1Value) || c1Value<=0 || c1Value>1)c1Value=0.1;
     if(!isFinite(c2Value) || c2Value<(bookAgainstCubic?1.1:1))c2Value=bookAgainstCubic?1.1:1;
-    setThetaConstantValue('bo-c1',c1Value);
-    setThetaConstantValue('bo-c2',c2Value);
+    setConstantValue('bo-c1',c1Value);
+    setConstantValue('bo-c2',c2Value);
     return {c1:c1Val(),c2:c2Val()};
   }
   function updateConstantControls(){
@@ -1346,7 +1357,7 @@ _BIG_O_HTML = r"""
     ctx.drawImage(layer,0,0,layer.width,layer.height,0,0,W,H);
   }
   function growthConfigurationSignature(a,b,n0){
-    return [MODE,scaleMode(),a,b,cKey(),gKey(),n0,el('bo-c').value,el('bo-c1').dataset.value,el('bo-c2').dataset.value].join('|');
+    return [MODE,scaleMode(),a,b,cKey(),gKey(),n0,el('bo-c').dataset.value,el('bo-c1').dataset.value,el('bo-c2').dataset.value].join('|');
   }
   function growthCurrentN(n0,b){
     if(n0===null)return null;
@@ -1509,7 +1520,7 @@ _BIG_O_HTML = r"""
   function viewSnapshot(){
     return {
       mode:MODE,a:STATE_A,b:STATE_B,cIndex:STATE_C_INDEX,gIndex:STATE_G_INDEX,n0:STATE_N0,
-      c:el('bo-c').value,c1:el('bo-c1').dataset.value,c2:el('bo-c2').dataset.value,epsilon:el('bo-epsilon').value,
+      c:el('bo-c').dataset.value,c1:el('bo-c1').dataset.value,c2:el('bo-c2').dataset.value,epsilon:el('bo-epsilon').value,
       scale:el('bo-scale').value,yOffset:Y_OFFSET,yScale:Y_SCALE,
       yRange:Y_RANGE_OVERRIDE?{min:Y_RANGE_OVERRIDE.min,max:Y_RANGE_OVERRIDE.max}:null,
       focus:n0FocusActive,lockX:lockX,lockY:lockY
@@ -1536,9 +1547,10 @@ _BIG_O_HTML = r"""
   function restoreSnapshot(snapshot){
     MODE=snapshot.mode;STATE_A=snapshot.a;STATE_B=snapshot.b;
     STATE_C_INDEX=snapshot.cIndex;STATE_G_INDEX=snapshot.gIndex;STATE_N0=snapshot.n0;
-    el('bo-mode').value=MODE;el('bo-c').value=snapshot.c;
-    setThetaConstantValue('bo-c1',snapshot.c1,true);
-    setThetaConstantValue('bo-c2',snapshot.c2,true);
+    el('bo-mode').value=MODE;
+    setConstantValue('bo-c',snapshot.c,true);
+    setConstantValue('bo-c1',snapshot.c1,true);
+    setConstantValue('bo-c2',snapshot.c2,true);
     el('bo-epsilon').value=snapshot.epsilon;
     el('bo-scale').value=snapshot.scale;
     Y_OFFSET=snapshot.yOffset;Y_SCALE=snapshot.yScale;
@@ -1580,10 +1592,10 @@ _BIG_O_HTML = r"""
       STATE_G_INDEX=Math.max(0,Math.min(ORDER.length-1,STATE_G_INDEX+direction));
     }
     var dc=defaultC(cKey(),gKey());
-    el('bo-c').value=dc;
+    setConstantValue('bo-c',dc,true);
     if(isThetaMode()){
-      setThetaConstantValue('bo-c1',0.1,true);
-      setThetaConstantValue('bo-c2',(cKey()==='book'&&gKey()==='n3')?1.1:1,true);
+      setConstantValue('bo-c1',0.1,true);
+      setConstantValue('bo-c2',(cKey()==='book'&&gKey()==='n3')?1.1:1,true);
     }
     resetSelectedN0();
     Y_RANGE_OVERRIDE=null;
@@ -1607,7 +1619,17 @@ _BIG_O_HTML = r"""
     captureHistory();
     deactivateN0Focus();
     var current=parseFloat(el(id).dataset.value);
-    setThetaConstantValue(id,Math.round((current+direction*0.1)*10)/10);
+    setConstantValue(id,Math.round((current+direction*0.1)*10)/10);
+    preserveViewportForParameterChange();
+    draw();
+  }
+  function stepSingleConstant(direction){
+    var target=el('bo-c');
+    if(target.contentEditable!=='true')return;
+    captureHistory();deactivateN0Focus();
+    var current=parseFloat(target.dataset.value),minimum=parseFloat(target.dataset.min),maximum=parseFloat(target.dataset.max);
+    var value=Math.max(minimum,Math.min(maximum,Math.round((current+direction*0.1)*10)/10));
+    setConstantValue('bo-c',value,true);
     preserveViewportForParameterChange();
     draw();
   }
@@ -1752,7 +1774,7 @@ _BIG_O_HTML = r"""
       if(Math.min(upperDistance,lowerDistance)>threshold)return null;
       return upperDistance<=lowerDistance?'cg':'c1g';
     }
-    if(el('bo-c').disabled)return null;
+    if(el('bo-c').contentEditable!=='true')return null;
     var y=ty(cVal()*g,lastYRange);
     return y!==null && Math.abs(p.y-y)<=threshold?'cg':null;
   }
@@ -1766,13 +1788,13 @@ _BIG_O_HTML = r"""
       var minimum=id==='bo-c1'?0.1:(cKey()==='book'&&gKey()==='n3'?1.1:1);
       var maximum=id==='bo-c1'?1:1000;
       value=Math.max(minimum,Math.min(maximum,value));
-      setThetaConstantValue(id,String(Number(value.toPrecision(5))));
+      setConstantValue(id,String(Number(value.toPrecision(5))),true);
       return;
     }
-    var input=el('bo-c'),minimum=parseFloat(input.min),maximum=parseFloat(input.max);
+    var input=el('bo-c'),minimum=parseFloat(input.dataset.min),maximum=parseFloat(input.dataset.max);
     if(!isFinite(minimum))minimum=0.1;
     if(!isFinite(maximum))maximum=1000;
-    input.value=String(Number(Math.max(minimum,Math.min(maximum,value)).toPrecision(5)));
+    setConstantValue('bo-c',String(Number(Math.max(minimum,Math.min(maximum,value)).toPrecision(5))),true);
   }
   function updateBoundDragText(gk,c,threshold,n0){
     if(isThetaMode()){
@@ -1907,19 +1929,14 @@ _BIG_O_HTML = r"""
       STATE_G_INDEX=ORDER.indexOf(defaultGKeyForMode());
       resetSelectedN0();
       Y_RANGE_OVERRIDE=null;
-      el('bo-c').value=defaultC(cKey(),gKey());
-      setThetaConstantValue('bo-c1',0.1,true);
-      setThetaConstantValue('bo-c2',(cKey()==='book'&&gKey()==='n3')?1.1:1,true);
+      setConstantValue('bo-c',defaultC(cKey(),gKey()),true);
+      setConstantValue('bo-c1',0.1,true);
+      setConstantValue('bo-c2',(cKey()==='book'&&gKey()==='n3')?1.1:1,true);
       updateConstantControls();
       draw();
     });
   }
-  el('bo-c').addEventListener('focus',captureHistory);
-  el('bo-c').addEventListener('input',function(){
-      preserveViewportForParameterChange();
-      draw();
-  });
-  ['bo-c1','bo-c2'].forEach(function(id){
+  ['bo-c','bo-c1','bo-c2'].forEach(function(id){
     el(id).addEventListener('focus',function(){
       captureHistory();
       beginEditableField(id);
@@ -1932,7 +1949,7 @@ _BIG_O_HTML = r"""
       draw();
     });
     el(id).addEventListener('blur',function(){
-      handleThetaConstantInput(id);
+      handleConstantInput(id);
       draw();
     });
     el(id).addEventListener('keydown',function(ev){
@@ -1963,6 +1980,8 @@ _BIG_O_HTML = r"""
   el('bo-a-inc').addEventListener('click',function(){stepEndpoint('a',1);});
   el('bo-b-dec').addEventListener('click',function(){stepEndpoint('b',-1);});
   el('bo-b-inc').addEventListener('click',function(){stepEndpoint('b',1);});
+  el('bo-c-dec').addEventListener('click',function(){stepSingleConstant(-1);});
+  el('bo-c-inc').addEventListener('click',function(){stepSingleConstant(1);});
   el('bo-c1-dec').addEventListener('click',function(){stepThetaConstant('bo-c1',-1);});
   el('bo-c1-inc').addEventListener('click',function(){stepThetaConstant('bo-c1',1);});
   el('bo-c2-dec').addEventListener('click',function(){stepThetaConstant('bo-c2',-1);});
@@ -1973,9 +1992,9 @@ _BIG_O_HTML = r"""
     window.addEventListener('resize',function(){if(root.isConnected)draw();});
   }
   updateConstantControls();
-  el('bo-c').value=defaultC(cKey(),gKey());
-  setThetaConstantValue('bo-c1',0.1,true);
-  setThetaConstantValue('bo-c2',1.1,true);
+  setConstantValue('bo-c',defaultC(cKey(),gKey()),true);
+  setConstantValue('bo-c1',0.1,true);
+  setConstantValue('bo-c2',1.1,true);
   syncInputs(STATE_A,STATE_B);
   draw();
 })();

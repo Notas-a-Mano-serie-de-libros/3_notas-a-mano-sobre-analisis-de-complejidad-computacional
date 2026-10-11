@@ -78,15 +78,22 @@ def test_steppers_usan_el_contrato_visual_global():
     assert "border:1px solid #ccc;border-radius:0" in html
     assert ".stepper button{width:34px;height:32px;border:1px solid #ccc;border-radius:0" in html
     assert ".ctrl label{display:flex;align-items:center;gap:8px;color:#333;font-family:sans-serif;font-size:13px;font-weight:700;line-height:1.1" in html
-    assert "#bo-wrap .theta-stepper .stepper-field{font-weight:400}" in html
-    for field in ("bo-c1", "bo-c2"):
+    assert '<span class="label-text">\\(\\mathbf{c}\\)</span>' in html
+    for field in ("bo-c", "bo-c1", "bo-c2"):
         assert f'id="{field}" role="textbox" contenteditable="true"' in html
         assert f'id="{field}-dec"' in html
         assert f'id="{field}-inc"' in html
-    assert "function setThetaConstantValue(id,value,forceRender)" in html
-    assert "function handleThetaConstantInput(id)" in html
+    assert "function setConstantValue(id,value,forceRender)" in html
+    assert "function handleConstantInput(id)" in html
     assert "function stepThetaConstant(id,direction)" in html
-    assert "'bo-a','bo-b','bo-c1','bo-c2'" in html
+    assert "function stepSingleConstant(direction)" in html
+    assert "if(forceRender)renderDynamicMath(id,fmtConstant(numeric));" in html
+    drag_start = html.index("  function setBoundConstantFromPointer(kind,p){")
+    drag_end = html.index("  function updateBoundDragText", drag_start)
+    drag_handler = html[drag_start:drag_end]
+    assert "setConstantValue(id,String(Number(value.toPrecision(5))),true);" in drag_handler
+    assert "setConstantValue('bo-c',String(Number(Math.max(minimum,Math.min(maximum,value)).toPrecision(5))),true);" in drag_handler
+    assert "'bo-a','bo-b','bo-c','bo-c1','bo-c2'" in html
     for label in (
         r"\mathbf{\mathcal{F}}",
         r"\mathbf{\text{Escala}}",
@@ -97,6 +104,7 @@ def test_steppers_usan_el_contrato_visual_global():
         r">\(\mathbf{g(n)}\)</span>",
         r">\(\mathbf{a}\)</span>",
         r">\(\mathbf{b}\)</span>",
+        r">\(\mathbf{c}\)</span>",
         r">\(\mathbf{c_1}\)</span>",
         r">\(\mathbf{c_2}\)</span>",
     ):
@@ -350,7 +358,7 @@ def test_parametros_adicionales_conservan_zoom_vista_y_n0_seleccionado():
     assert "Y_RANGE_OVERRIDE=null,lastYRange=null" in html
     assert "function preserveViewportForParameterChange()" in html
     assert "Y_RANGE_OVERRIDE={min:lastYRange.min,max:lastYRange.max};" in html
-    listeners = html.split("['bo-c1','bo-c2'].forEach", 1)[1].split(
+    listeners = html.split("['bo-c','bo-c1','bo-c2'].forEach", 1)[1].split(
         "el('bo-epsilon').addEventListener", 1
     )[0]
     assert "preserveViewportForParameterChange();" in listeners
