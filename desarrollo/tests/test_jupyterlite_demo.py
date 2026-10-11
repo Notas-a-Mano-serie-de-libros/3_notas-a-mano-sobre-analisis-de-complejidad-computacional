@@ -67,6 +67,18 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert "NotebookActions.runAll(panel.content, panel.context.sessionContext)" in extension
 
 
+def test_documentation_dependencies_include_the_jupyter_builder_cli():
+    documentation_requirements = (
+        PROJECT_ROOT / "requirements-docs.txt"
+    ).read_text(encoding="utf-8")
+    dependency_lock = (PROJECT_ROOT / "requirements-lock.txt").read_text(
+        encoding="utf-8"
+    )
+
+    assert "jupyterlab>=4.6.3,<5" in documentation_requirements
+    assert "jupyterlab==4.6.3" in dependency_lock
+
+
 def test_publicacion_invalida_el_contenido_persistido_cuando_cambia_el_demo():
     storage_name = content_storage_name()
 
