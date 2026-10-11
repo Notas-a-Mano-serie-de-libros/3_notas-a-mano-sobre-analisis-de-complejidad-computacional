@@ -61,12 +61,12 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
     <span>Simulación interactiva · Ordenamiento radix</span>
     <div class="jupyterlite-demo__actions">
       <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo8/notebooks/7_ordenamiento_radix.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/capitulo-8/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F7_ordenamiento_radix.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+      <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F7_ordenamiento_radix.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
     </div>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/capitulo-8/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F7_ordenamiento_radix.ipynb"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F7_ordenamiento_radix.ipynb"
     title="Simulación interactiva de Ordenamiento radix en JupyterLite"
     loading="lazy"
     allow="clipboard-read; clipboard-write"

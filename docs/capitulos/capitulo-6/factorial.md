@@ -72,12 +72,12 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
     <span>Simulación interactiva · Laboratorio de análisis recursivo</span>
     <div class="jupyterlite-demo__actions">
       <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/capitulo-6/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+      <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
     </div>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/capitulo-6/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb"
     title="Simulación interactiva de Laboratorio de análisis recursivo en JupyterLite"
     loading="lazy"
     allow="clipboard-read; clipboard-write"

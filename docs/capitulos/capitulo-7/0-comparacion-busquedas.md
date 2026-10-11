@@ -65,12 +65,12 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
     <span>Simulación interactiva · Comparación de algoritmos de búsqueda</span>
     <div class="jupyterlite-demo__actions">
       <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo7/notebooks/0_comparacion_busquedas.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/capitulo-7/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F0_comparacion_busquedas.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+      <a class="md-button jupyterlite-button" href="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F0_comparacion_busquedas.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
     </div>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/capitulo-7/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F0_comparacion_busquedas.ipynb"
+    src="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F0_comparacion_busquedas.ipynb"
     title="Simulación interactiva de Comparación de algoritmos de búsqueda en JupyterLite"
     loading="lazy"
     allow="clipboard-read; clipboard-write"

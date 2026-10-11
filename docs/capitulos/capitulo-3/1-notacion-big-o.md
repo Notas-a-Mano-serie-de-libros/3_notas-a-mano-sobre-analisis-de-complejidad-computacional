@@ -55,12 +55,12 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador: no abre
     <span>Simulación interactiva · Notación Big-O</span>
     <div class="jupyterlite-demo__actions">
       <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/1_notacion_big_o.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/capitulo-3/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F1_notacion_big_o.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+      <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F1_notacion_big_o.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
     </div>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/capitulo-3/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F1_notacion_big_o.ipynb"
+    src="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F1_notacion_big_o.ipynb"
     title="Simulación interactiva de notación Big-O en JupyterLite"
     loading="lazy"
     allow="clipboard-read; clipboard-write"

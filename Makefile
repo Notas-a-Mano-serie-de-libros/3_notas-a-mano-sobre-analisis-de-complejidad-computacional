@@ -25,6 +25,7 @@ validate:
 	$(PYTHON) desarrollo/scripts/validate_widget_contracts.py
 	$(PYTHON) desarrollo/scripts/validate_editorial_content.py
 	$(PYTHON) desarrollo/scripts/sync_local_execution.py --check
+	$(PYTHON) desarrollo/scripts/sync_jupyterlite_urls.py --check
 	$(PYTHON) desarrollo/scripts/sync_page_assets.py --check
 	$(PYTHON) desarrollo/scripts/audit_simulation_references.py
 

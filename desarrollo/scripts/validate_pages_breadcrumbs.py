@@ -14,7 +14,10 @@ def validate(site_dir: Path) -> list[str]:
     errors: list[str] = []
     for page in sorted(site_dir.rglob("*.html")):
         relative = page.relative_to(site_dir).as_posix()
-        if relative in EXCLUDED_PAGES or relative.startswith("overrides/"):
+        if (
+            relative in EXCLUDED_PAGES
+            or relative.startswith(("overrides/", "jupyterlite/"))
+        ):
             continue
         count = page.read_text(encoding="utf-8").count(BREADCRUMB_MARKER)
         if count != 1:

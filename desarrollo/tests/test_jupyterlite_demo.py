@@ -13,7 +13,16 @@ from desarrollo.scripts.build_jupyterlite_demo import (
     configure_pyodide_packages,
     content_storage_name,
     prepare_contents,
+    prepare_profile_contents,
 )
+from desarrollo.scripts.jupyterlite_catalog import (
+    CHAPTER_PROFILES,
+    PAGE_NOTEBOOKS,
+    PROFILE_CONFIGS,
+    profile_content_files,
+)
+from desarrollo.scripts.sync_jupyterlite_urls import notebook_url
+from desarrollo.scripts.validate_pages_breadcrumbs import validate as validate_breadcrumbs
 from desarrollo.tests.helpers import PROJECT_ROOT
 
 
@@ -38,9 +47,38 @@ def test_jupyterlite_demo_sources_and_configuration_exist():
 def test_publicacion_invalida_el_contenido_persistido_cuando_cambia_el_demo():
     storage_name = content_storage_name()
 
-    assert storage_name.startswith("Notas a mano · Capítulo 3 · ")
+    assert storage_name.startswith("Notas a mano · graficas-cientificas · ")
     assert len(storage_name.rsplit(" · ", 1)[1]) == 12
-    assert content_storage_name(2).startswith("Notas a mano · Capítulo 2 · ")
+    assert content_storage_name(2).startswith("Notas a mano · graficas · ")
+
+
+def test_catalogo_asigna_capitulos_y_recursos_a_cuatro_perfiles():
+    assert len(PROFILE_CONFIGS) == 4
+    assert set(CHAPTER_PROFILES) == set(range(2, 9))
+    assert set(PROFILE_CONFIGS["graficas"]["chapters"]) == {2, 4, 6, 8}
+    assert set(PROFILE_CONFIGS["graficas-cientificas"]["chapters"]) == {3}
+    assert set(PROFILE_CONFIGS["algebra-simbolica"]["chapters"]) == {5}
+    assert set(PROFILE_CONFIGS["analisis-completo"]["chapters"]) == {7}
+    assert all(
+        (PROJECT_ROOT / path).is_file()
+        for profile in PROFILE_CONFIGS
+        for path in profile_content_files(profile)
+    )
+    assert all(
+        notebook in PROFILE_CONFIGS[CHAPTER_PROFILES[chapter]]["notebooks"]
+        for (chapter, _page), notebooks in PAGE_NOTEBOOKS.items()
+        for notebook in notebooks
+    )
+
+
+def test_perfil_compartido_incluye_notebooks_de_todos_sus_capitulos(tmp_path):
+    prepare_profile_contents(tmp_path, "graficas")
+
+    assert all(
+        (tmp_path / notebook).is_file()
+        for chapter in (2, 4, 6, 8)
+        for notebook in CHAPTER_CONFIGS[chapter]["notebooks"]
+    )
 
 
 def test_kernel_pyodide_precarga_dependencias_del_capitulo():
@@ -173,74 +211,20 @@ def test_chapter_seven_interpolation_notebook_avoids_unavailable_sklearn():
 
 
 def test_all_remaining_simulation_pages_embed_their_matching_notebook():
-    page_notebooks = {
-        4: {
-            "ejemplo1-sumar-numeros": "ejemplo1_(sumar_numeros).ipynb",
-            "ejemplo2-imprimir-elementos-arreglo": "ejemplo2_(imprimir_elementos_arreglo).ipynb",
-            "ejemplo3-imprimir-elementos-matriz": "ejemplo3_(imprimir_elementos_matriz).ipynb",
-            "ejemplo4-inicializar-matriz-variable": "ejemplo4_(inicializar_matriz_variable).ipynb",
-            "ejemplo5-ciclos-incremento-no-lineal": "ejemplo5_(ciclos_incremento_no_lineal).ipynb",
-            "ejemplo7-ciclo-sin-dependencia": "ejemplo7_(ciclo_sin_dependencia).ipynb",
-            "ejemplo9-complejidad-oculta": "ejemplo9_(complejidad_oculta).ipynb",
-        },
-        5: {
-            "formas-de-recurrencia": "0_arboles_recursion.ipynb",
-            "solucion-relaciones-recurrencia": "1_metodos_solucion_relaciones_recurrencia.ipynb",
-        },
-        6: {
-            "arbol-binario": "0_laboratorio_analisis_recursivo.ipynb",
-            "factorial": "0_laboratorio_analisis_recursivo.ipynb",
-            "fibonacci": (
-                "0_laboratorio_analisis_recursivo.ipynb",
-                "comparacion_fibonacci.ipynb",
-                "ejemplo_recursion.ipynb",
-            ),
-            "merge-sort": "0_laboratorio_analisis_recursivo.ipynb",
-            "potencia": "0_laboratorio_analisis_recursivo.ipynb",
-        },
-        7: {
-            "0-comparacion-busquedas": "0_comparacion_busquedas.ipynb",
-            "1-busqueda-secuencial": "1_busqueda_secuencial.ipynb",
-            "2-busqueda-binaria": "2_busqueda_binaria.ipynb",
-            "3-busqueda-interpolacion": "3_busqueda_interpolacion.ipynb",
-            "4-busqueda-saltos": "4_busqueda_saltos.ipynb",
-            "5-busqueda-exponencial": "5_busqueda_exponencial.ipynb",
-            "6-busqueda-ternaria": "6_busqueda_ternaria.ipynb",
-            "ejercicios-propuestos": "ejercicios_propuestos.ipynb",
-        },
-        8: {
-            "0-comparacion-ordenamientos": "0_comparacion_ordenamientos.ipynb",
-            "1-ordenamiento-burbuja": "1_ordenamiento_burbuja.ipynb",
-            "2-ordenamiento-seleccion": "2_ordenamiento_seleccion.ipynb",
-            "3-ordenamiento-insercion": "3_ordenamiento_insercion.ipynb",
-            "4-ordenamiento-shell": "4_ordenamiento_shell.ipynb",
-            "5-ordenamiento-mezcla": "5_ordenamiento_mezcla.ipynb",
-            "6-ordenamiento-rapido": "6_ordenamiento_rapido.ipynb",
-            "7-ordenamiento-radix": "7_ordenamiento_radix.ipynb",
-            "ejercicios-propuestos": "ejercicios_propuestos.ipynb",
-        },
-    }
-    for chapter, sections in page_notebooks.items():
-        for page_name, section_notebooks in sections.items():
-            page = (
-                PROJECT_ROOT
-                / f"docs/capitulos/capitulo-{chapter}/{page_name}.md"
-            ).read_text(encoding="utf-8")
-            notebook_names = (
-                (section_notebooks,)
-                if isinstance(section_notebooks, str)
-                else section_notebooks
-            )
-            assert "<!-- jupyterlite-demo:start -->" in page
-            for notebook_name in notebook_names:
-                notebook_path = (
-                    f"simulaciones/capitulo{chapter}/notebooks/{notebook_name}"
-                ).replace("/", "%2F")
-                assert f"jupyterlite/capitulo-{chapter}/notebooks/index.html?path={notebook_path}" in page
-            assert "Abrir en pantalla completa" in page
-            assert "Abrir en Google Colab" in page
-            before_demo = page.split("<!-- jupyterlite-demo:start -->", 1)[0]
-            assert '<div class="lab-action">' not in before_demo
+    for (chapter, page_name), notebooks in PAGE_NOTEBOOKS.items():
+        if chapter not in range(4, 9):
+            continue
+        page = (
+            PROJECT_ROOT
+            / f"docs/capitulos/capitulo-{chapter}/{page_name}.md"
+        ).read_text(encoding="utf-8")
+        assert "<!-- jupyterlite-demo:start -->" in page
+        for notebook in notebooks:
+            assert notebook_url(chapter, notebook) in page
+        assert "Abrir en pantalla completa" in page
+        assert "Abrir en Google Colab" in page
+        before_demo = page.split("<!-- jupyterlite-demo:start -->", 1)[0]
+        assert '<div class="lab-action">' not in before_demo
 
 
 def test_chapter_three_embeds_the_jupyterlite_notebook():
@@ -269,11 +253,10 @@ def test_chapter_three_embeds_the_jupyterlite_notebook():
     )
     for page_path, notebook in pages:
         page = (PROJECT_ROOT / page_path).read_text(encoding="utf-8")
-        expected_path = str(notebook).replace("/", "%2F")
         assert "## Simulación en el navegador" in page
         assert "<!-- jupyterlite-demo:start -->" in page
         assert 'class="jupyterlite-demo__frame"' in page
-        assert f"jupyterlite/capitulo-3/notebooks/index.html?path={expected_path}" in page
+        assert notebook_url(3, notebook) in page
         assert page.index("## Simulación en el navegador") < page.index(
             '<nav class="section-return section-step"'
         )
@@ -312,9 +295,8 @@ def test_chapter_two_embeds_each_jupyterlite_simulation_without_duplicate_button
         page = (
             PROJECT_ROOT / f"docs/capitulos/capitulo-2/{page_name}.md"
         ).read_text(encoding="utf-8")
-        expected_path = str(notebook).replace("/", "%2F")
         assert "## Simulación en el navegador" in page
-        assert f"jupyterlite/capitulo-2/notebooks/index.html?path={expected_path}" in page
+        assert notebook_url(2, notebook) in page
         assert page.index("<!-- local-execution:end -->") < page.index(
             "<!-- jupyterlite-demo:start -->"
         )
@@ -362,6 +344,18 @@ def test_pages_workflow_builds_demo_after_content_validation():
     breadcrumbs = "python desarrollo/scripts/validate_pages_breadcrumbs.py --site-dir site"
     upload = "uses: actions/upload-pages-artifact@v4"
     assert workflow.index(breadcrumbs) < workflow.index(build) < workflow.index(upload)
+
+
+def test_breadcrumb_validation_ignores_jupyterlite_application_pages(tmp_path):
+    pages_index = tmp_path / "index.html"
+    pages_index.write_text(
+        '<nav class="editorial-breadcrumb"></nav>', encoding="utf-8"
+    )
+    lite_index = tmp_path / "jupyterlite/graficas/notebooks/index.html"
+    lite_index.parent.mkdir(parents=True)
+    lite_index.write_text("<!doctype html>", encoding="utf-8")
+
+    assert validate_breadcrumbs(tmp_path) == []
 
 
 def test_documentation_dependencies_include_jupyter_server():

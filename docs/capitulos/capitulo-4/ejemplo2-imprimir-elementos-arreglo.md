@@ -43,12 +43,12 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
     <span>Simulación interactiva · Recorrer los elementos de un arreglo</span>
     <div class="jupyterlite-demo__actions">
       <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo4/notebooks/ejemplo2_(imprimir_elementos_arreglo).ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/capitulo-4/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo2_(imprimir_elementos_arreglo).ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+      <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo2_(imprimir_elementos_arreglo).ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
     </div>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/capitulo-4/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo2_(imprimir_elementos_arreglo).ipynb"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo2_(imprimir_elementos_arreglo).ipynb"
     title="Simulación interactiva de Recorrer los elementos de un arreglo en JupyterLite"
     loading="lazy"
     allow="clipboard-read; clipboard-write"

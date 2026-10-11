@@ -43,12 +43,12 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador: no abre
     <span>Simulación interactiva · Complejidad factorial</span>
     <div class="jupyterlite-demo__actions">
       <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo2/notebooks/9_complejidad_factorial.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/capitulo-2/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F9_complejidad_factorial.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+      <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F9_complejidad_factorial.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
     </div>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/capitulo-2/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F9_complejidad_factorial.ipynb"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F9_complejidad_factorial.ipynb"
     title="Simulación interactiva de complejidad factorial en JupyterLite"
     loading="lazy"
     allow="clipboard-read; clipboard-write"
