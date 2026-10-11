@@ -901,7 +901,7 @@ def test_notebook_polinomial_general_tiene_estructura_teorica_interactiva():
     assert all(cell.get("execution_count") is None for cell in cells if cell["cell_type"] == "code")
 
 
-def test_notebooks_buscan_bootstrap_local_antes_del_remoto():
+def test_notebooks_en_colab_priorizan_bootstrap_remoto_sobre_archivo_local():
     notebooks = (
         "1_complejidad_constante.ipynb",
         "2_complejidad_logaritmica.ipynb",
@@ -909,39 +909,28 @@ def test_notebooks_buscan_bootstrap_local_antes_del_remoto():
         "4_complejidad_log_lineal.ipynb",
         "5_complejidad_cuadratica.ipynb",
         "6_complejidad_cubica.ipynb",
+        "7_complejidad_polinomial_general.ipynb",
         "8_complejidad_exponencial.ipynb",
         "9_complejidad_factorial.ipynb",
     )
 
     for notebook_name in notebooks:
         notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / notebook_name).read_text(encoding="utf-8"))
-        simulation_cells = [
+        bootstrap_cells = [
             "".join(cell.get("source", []))
             for cell in notebook["cells"]
-            if cell["cell_type"] == "code" and "SIMULATION_NAME" in "".join(cell.get("source", []))
+            if cell["cell_type"] == "code" and "_bootstrap_path = next(" in "".join(cell.get("source", []))
         ]
 
-        assert len(simulation_cells) == 1
-        for source in simulation_cells:
+        assert len(bootstrap_cells) >= 2
+        for source in bootstrap_cells:
             local_lookup_position = source.index("_bootstrap_path = next(")
+            colab_branch_position = source.index('if os.environ.get("COLAB_RELEASE_TAG"):')
             remote_position = source.index("urllib.request.urlopen")
-
-            assert local_lookup_position < remote_position
+            assert colab_branch_position < remote_position < local_lookup_position
             assert "Path.cwd().parents" in source
             assert 'base / "colab_bootstrap.py"' in source
-
-
-def test_notebook_polinomial_busca_bootstrap_local_antes_del_remoto():
-    notebook = json.loads(Path(CHAPTER_DIR / "notebooks" / "7_complejidad_polinomial_general.ipynb").read_text(encoding="utf-8"))
-    simulation_cells = [
-        "".join(cell.get("source", [])) for cell in notebook["cells"] if cell["cell_type"] == "code" and "SIMULATION_NAME" in "".join(cell.get("source", []))
-    ]
-
-    assert len(simulation_cells) == 1
-    source = simulation_cells[0]
-    assert source.index("_bootstrap_path = next(") < source.index("urllib.request.urlopen")
-    assert "Path.cwd().parents" in source
-    assert 'base / "colab_bootstrap.py"' in source
+            assert "runtime={time.time_ns()}" in source
 
 
 def test_referencias_colab_del_capitulo_2_siguen_orden_actual():
