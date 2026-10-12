@@ -42,3 +42,10 @@ def test_python_minimum_is_consistent():
     assert 'target-version = "py311"' in pyproject
     assert '"3.11"' in ci and '"3.12"' in ci
     assert '"3.10"' not in ci
+
+
+def test_requirements_lock_playwright_constraint():
+    lock = (ROOT / "requirements-lock.txt").read_text(encoding="utf-8")
+    assert "playwright==1.63.0" in lock
+    assert "playwright==1.64.0" not in lock
+

@@ -20,4 +20,4 @@ ipykernel==7.3.0
 jupyterlab_widgets==3.0.17
 tornado==6.5.8
 pre-commit==4.6.2
-playwright==1.64.0
+playwright==1.63.0
