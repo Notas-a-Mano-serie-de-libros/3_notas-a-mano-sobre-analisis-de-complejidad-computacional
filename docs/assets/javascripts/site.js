@@ -104,6 +104,36 @@ function prepareAccessibleTables(root = document) {
   });
 }
 
+const jupyterLiteHeightMessage = "notas-a-mano:jupyterlite-height";
+let jupyterLiteHeightListenerReady = false;
+
+function prepareJupyterLiteFrames(root = document) {
+  if (!jupyterLiteHeightListenerReady) {
+    window.addEventListener("message", (event) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type !== jupyterLiteHeightMessage) return;
+
+      const height = Number(event.data.height);
+      if (!Number.isFinite(height) || height < 320 || height > 30000) return;
+
+      const frame = Array.from(
+        document.querySelectorAll("iframe.jupyterlite-demo__frame"),
+      ).find((candidate) => candidate.contentWindow === event.source);
+      if (!frame) return;
+
+      frame.style.height = `${Math.ceil(height)}px`;
+      frame.dataset.contentHeight = String(Math.ceil(height));
+    });
+    jupyterLiteHeightListenerReady = true;
+  }
+
+  root.querySelectorAll("iframe.jupyterlite-demo__frame").forEach((frame) => {
+    if (frame.dataset.autoHeightInitialized) return;
+    frame.dataset.autoHeightInitialized = "true";
+    frame.setAttribute("scrolling", "no");
+  });
+}
+
 const reviewApiBase = "https://notas-a-mano-opiniones.carlos940807.chatgpt.site";
 let reviewDataRequest;
 
@@ -210,6 +240,7 @@ function preparePageEnhancements() {
   prepareEditorialFigures();
   prepareReadingProgress();
   prepareAccessibleTables();
+  prepareJupyterLiteFrames();
   prepareGlobalReviewSummary();
   prepareReaderFeedback();
 }

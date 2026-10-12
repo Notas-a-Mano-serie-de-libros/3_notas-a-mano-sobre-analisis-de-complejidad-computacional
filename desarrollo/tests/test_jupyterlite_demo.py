@@ -68,6 +68,31 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
         "NotebookActions.runAll(panel.content, panel.context.sessionContext)"
     )
     assert "NotebookActions.runAll(panel.content, panel.context.sessionContext)" in extension
+    assert '"notas-a-mano:jupyterlite-height"' in extension
+    assert '".jp-WindowedPanel-outer"' in extension
+    assert 'classList.remove("jp-mod-scrollPastEnd")' in extension
+    assert "Array.from(scrollContainer.children).reduce" in extension
+    assert "child.getBoundingClientRect().bottom - scrollBounds.top" in extension
+    assert "window.parent.postMessage" in extension
+    assert "new ResizeObserver(scheduleHeightReport)" in extension
+    assert "new MutationObserver(scheduleHeightReport)" in extension
+
+
+def test_portal_resizes_embedded_jupyterlite_frames_from_trusted_messages():
+    site_javascript = (
+        PROJECT_ROOT / "docs" / "assets" / "javascripts" / "site.js"
+    ).read_text(encoding="utf-8")
+    stylesheet = (
+        PROJECT_ROOT / "docs" / "assets" / "stylesheets" / "extra.css"
+    ).read_text(encoding="utf-8")
+
+    assert '"notas-a-mano:jupyterlite-height"' in site_javascript
+    assert "event.origin !== window.location.origin" in site_javascript
+    assert "candidate.contentWindow === event.source" in site_javascript
+    assert 'frame.setAttribute("scrolling", "no")' in site_javascript
+    assert "frame.style.height" in site_javascript
+    assert ".jupyterlite-demo__frame" in stylesheet
+    assert "overflow: hidden;" in stylesheet
 
 
 def test_documentation_dependencies_include_the_jupyter_builder_cli():
