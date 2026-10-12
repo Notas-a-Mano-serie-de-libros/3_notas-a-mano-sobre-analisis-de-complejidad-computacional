@@ -44,6 +44,13 @@ CONTENT_FILES = tuple(
         path for chapter in CHAPTER_CONFIGS for path in chapter_content_files(chapter)
     )
 )
+WIDGET_CHAPTERS = (2, 4, 5, 6, 7, 8)
+WIDGET_PROFILES = frozenset(profile_for_chapter(chapter) for chapter in WIDGET_CHAPTERS)
+WIDGET_WHEEL_REQUIREMENTS = (
+    "comm==0.2.3",
+    "ipywidgets==8.1.9",
+    "jupyterlab_widgets==3.0.17",
+)
 
 
 def content_storage_name(chapter: int = 3) -> str:
@@ -114,6 +121,30 @@ def configure_pyodide_packages(
 def build_autorun_extension() -> None:
     subprocess.run(["npm", "ci"], cwd=AUTORUN_EXTENSION_DIR, check=True)
     subprocess.run(["npm", "run", "build"], cwd=AUTORUN_EXTENSION_DIR, check=True)
+
+
+def download_widget_wheels(destination: Path) -> tuple[Path, ...]:
+    """Bundle widget wheels so remote notebooks do not depend on PyPI at runtime."""
+
+    destination.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "download",
+            "--disable-pip-version-check",
+            "--only-binary=:all:",
+            "--no-deps",
+            f"--dest={destination}",
+            *WIDGET_WHEEL_REQUIREMENTS,
+        ],
+        check=True,
+    )
+    wheels = tuple(sorted(destination.glob("*.whl")))
+    if len(wheels) != len(WIDGET_WHEEL_REQUIREMENTS):
+        raise RuntimeError("No se pudieron preparar todas las dependencias de ipywidgets.")
+    return wheels
 
 
 def add_autorun_extension(lite_dir: Path) -> None:
@@ -203,6 +234,9 @@ def build(output_dir: Path, chapter: int = 3) -> None:
             json.dumps(lite_config, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
+        widget_wheels = ()
+        if profile in WIDGET_PROFILES:
+            widget_wheels = download_widget_wheels(temporary_root / "wheels")
         output_dir.parent.mkdir(parents=True, exist_ok=True)
         command = [
             sys.executable,
@@ -218,6 +252,7 @@ def build(output_dir: Path, chapter: int = 3) -> None:
             "--no-unused-shared-packages",
             "--force",
             f"--LiteBuildConfig.federated_extensions=extensions/{AUTORUN_EXTENSION_NAME}",
+            *(f"--piplite-wheels={wheel}" for wheel in widget_wheels),
         ]
         subprocess.run(command, cwd=PROJECT_ROOT, check=True)
 

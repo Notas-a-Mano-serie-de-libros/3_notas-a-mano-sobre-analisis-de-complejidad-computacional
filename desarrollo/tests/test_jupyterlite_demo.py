@@ -11,6 +11,8 @@ from desarrollo.scripts.build_jupyterlite_demo import (
     CONTENT_FILES,
     LITE_DIR,
     NOTEBOOKS,
+    WIDGET_PROFILES,
+    WIDGET_WHEEL_REQUIREMENTS,
     chapter_content_files,
     configure_pyodide_packages,
     content_storage_name,
@@ -78,6 +80,19 @@ def test_documentation_dependencies_include_the_jupyter_builder_cli():
 
     assert "jupyterlab>=4.6.3,<5" in documentation_requirements
     assert "jupyterlab==4.6.3" in dependency_lock
+
+
+def test_widget_profiles_bundle_their_runtime_wheels():
+    assert WIDGET_PROFILES == {"graficas", "algebra-simbolica", "analisis-completo"}
+    assert WIDGET_WHEEL_REQUIREMENTS == (
+        "comm==0.2.3",
+        "ipywidgets==8.1.9",
+        "jupyterlab_widgets==3.0.17",
+    )
+    build_script = (
+        PROJECT_ROOT / "desarrollo" / "scripts" / "build_jupyterlite_demo.py"
+    ).read_text(encoding="utf-8")
+    assert 'f"--piplite-wheels={wheel}"' in build_script
 
 
 def test_publicacion_invalida_el_contenido_persistido_cuando_cambia_el_demo():
