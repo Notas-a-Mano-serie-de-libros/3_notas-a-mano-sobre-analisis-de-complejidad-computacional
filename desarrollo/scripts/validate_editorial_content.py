@@ -85,7 +85,7 @@ def main() -> int:
         )
         source = path.read_text(encoding="utf-8")
         start = source.find(f"# {chapter}.1 Comparación general")
-        table = source.find("### Algoritmos incluidos", start)
+        table = source.find("## Algoritmos incluidos", start)
         demo_start = source.find("<!-- jupyterlite-demo:start -->", start)
         demo_end = source.find("<!-- jupyterlite-demo:end -->", demo_start)
         button = source.find(COLAB_BUTTON_LABEL, demo_start, demo_end)

@@ -17,7 +17,7 @@ El cociente \(\dfrac{x - x_0}{x_1 - x_0}\) mide la posición relativa de \(x\) d
 Multiplicar esa fracción por \((y_1 - y_0)\) escala el cambio vertical total del intervalo según cuánto avanzó \(x\) desde \(x_0\). Sumar \(y_0\) al resultado desplaza el cálculo para que parta desde el primer punto de referencia.
 
 El valor obtenido es el punto sobre la recta que une \((x_0, y_0)\) con \((x_1, y_1)\), no necesariamente el valor real de la función en \(x\). La diferencia entre ambos constituye el **error de aproximación**, y depende de la curvatura de la función y de qué tan separados se encuentren los extremos del intervalo.
-### Búsqueda por interpolación
+## Búsqueda por interpolación
 
 La búsqueda por interpolación estima la posición del objetivo usando interpolación lineal: en vez de ir siempre al centro, salta a una posición proporcional al valor buscado. Requiere que el arreglo esté ordenado.
 
@@ -33,13 +33,13 @@ A continuación, se presenta la implementación iterativa estándar de la **bús
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 La búsqueda por interpolación requiere un arreglo ordenado y estima la posición usando los valores de sus extremos. Con datos aproximadamente uniformes, el tiempo promedio es doblemente logarítmico; una distribución adversa puede llevar a un recorrido lineal.
 
-#### Versión iterativa
+### Versión iterativa
 
 En la implementación iterativa, la estimación usa los valores de los extremos para saltar a una posición proporcional al objetivo. El caso promedio doblemente logarítmico depende de una distribución aproximadamente uniforme.
 
@@ -49,7 +49,7 @@ En la implementación iterativa, la estimación usa los valores de los extremos 
 | Caso promedio | \(\Theta(\log_2(\log_2(n)))\) | \(\Theta(1)\) | Los valores tienen distribución aproximadamente uniforme y las estimaciones quedan cerca de la posición del objetivo. |
 | Peor caso | \(O(n)\) | \(O(1)\) | Una distribución muy desigual hace que las estimaciones avancen pocas posiciones en cada paso. |
 
-#### Versión recursiva
+### Versión recursiva
 
 Si el recorrido se expresa mediante llamadas recursivas, cada llamada calcula una posición estimada y continúa sobre el subrango que aún puede contener el objetivo. La memoria adicional queda determinada por la cantidad de estimaciones encadenadas.
 

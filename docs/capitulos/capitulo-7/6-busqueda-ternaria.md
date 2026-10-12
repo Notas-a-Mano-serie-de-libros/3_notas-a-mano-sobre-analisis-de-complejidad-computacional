@@ -20,13 +20,13 @@ A continuación, se presenta la implementación iterativa estándar de la **bús
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 La búsqueda ternaria requiere un arreglo ordenado, compara dos posiciones y conserva uno de los tres subintervalos. Su tiempo es logarítmico; la versión iterativa conserva espacio constante y la recursiva utiliza una pila de profundidad logarítmica.
 
-#### Versión iterativa
+### Versión iterativa
 
 En la implementación iterativa, cada paso calcula \(m_1\) y \(m_2\), compara el objetivo con esos puntos y conserva solo el tercio que puede contenerlo. El espacio auxiliar se mantiene constante porque los límites se actualizan en el mismo marco de ejecución.
 
@@ -36,7 +36,7 @@ En la implementación iterativa, cada paso calcula \(m_1\) y \(m_2\), compara el
 | Caso promedio | \(\Theta(\log_3(n))\) | \(\Theta(1)\) | Con posiciones equiprobables del objetivo, se desciende por varios subintervalos. |
 | Peor caso | \(O(\log_3(n))\) | \(O(1)\) | El objetivo está en un nivel profundo o está ausente y se agotan las divisiones del intervalo. |
 
-#### Versión recursiva
+### Versión recursiva
 
 En la implementación recursiva, cada partición del arreglo genera una llamada sobre un tercio del intervalo anterior. La profundidad de esa cadena de llamadas es proporcional a \(\log_3(n)\).
 

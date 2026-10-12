@@ -6,7 +6,7 @@
 
 Resolver una relación de recurrencia consiste en obtener una expresión para su función de costo a partir de la ecuación y de sus condiciones iniciales. No todas las relaciones tienen la misma forma; por ello, el libro presenta métodos con condiciones de aplicación diferentes.
 
-### 5.5.1 Consideración previa
+## 5.5.1 Consideración previa
 
 Antes de elegir un método, identifique el tipo de reducción, la cantidad de términos recursivos, el trabajo externo y las condiciones iniciales. Esta clasificación permite escoger un procedimiento compatible y comprobar después la solución obtenida.
 

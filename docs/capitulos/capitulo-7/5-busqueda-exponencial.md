@@ -18,13 +18,13 @@ A continuación, se presenta la implementación iterativa estándar de la **bús
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 La búsqueda exponencial requiere un arreglo ordenado: duplica el límite de exploración y después aplica búsqueda binaria en el intervalo identificado. El costo depende de la posición del objetivo y queda acotado logarítmicamente por el tamaño del arreglo.
 
-#### Versión iterativa
+### Versión iterativa
 
 En la implementación iterativa, la fase exponencial necesita pocas comparaciones para ubicar un intervalo cuyo extremo superior supera o alcanza el objetivo. La fase binaria final conserva el crecimiento logarítmico.
 
@@ -34,7 +34,7 @@ En la implementación iterativa, la fase exponencial necesita pocas comparacione
 | Caso promedio | \(\Theta(\log_2(n))\) | \(\Theta(1)\) | Con posiciones equiprobables del objetivo, se combinan varios avances exponenciales con la búsqueda binaria. |
 | Peor caso | \(O(\log_2(n))\) | \(O(1)\) | El objetivo está cerca del final o está ausente y se explora un intervalo grande. |
 
-#### Versión recursiva
+### Versión recursiva
 
 Si el recorrido se expresa mediante llamadas recursivas, la fase de expansión y la fase binaria pueden apilar llamadas. La cantidad total de niveles sigue siendo logarítmica porque los índices crecen por duplicación y el rango final se divide a la mitad.
 

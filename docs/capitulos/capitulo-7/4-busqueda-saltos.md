@@ -18,13 +18,13 @@ A continuación, se presenta la implementación iterativa estándar de la **bús
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 La búsqueda por saltos combina avances de bloque con un recorrido secuencial del bloque seleccionado. Con un salto de \(\lfloor\sqrt{n}\rfloor\), ambas fases tienen costo del orden de \(\sqrt{n}\).
 
-#### Versión iterativa
+### Versión iterativa
 
 En la implementación iterativa, el tamaño del salto se elige como \(\lfloor\sqrt{n}\rfloor\). Así se equilibran las comparaciones de bloques y las comparaciones secuenciales del bloque final.
 
@@ -34,7 +34,7 @@ En la implementación iterativa, el tamaño del salto se elige como \(\lfloor\sq
 | Caso promedio | \(\Theta(\sqrt{n})\) | \(\Theta(1)\) | Con posiciones equiprobables del objetivo, se recorren varios bloques y parte del bloque final. |
 | Peor caso | \(O(\sqrt{n})\) | \(O(1)\) | Se recorren casi todos los bloques y casi todo el bloque seleccionado antes de encontrar el objetivo o confirmar su ausencia. |
 
-#### Versión recursiva
+### Versión recursiva
 
 Si el recorrido se expresa mediante llamadas recursivas, la estructura de fases se mantiene, pero cada salto o avance lineal puede quedar como una llamada pendiente. La pila crece con la cantidad de comparaciones realizadas antes de terminar.
 

@@ -2043,3 +2043,9 @@ input {
   outline: 2px solid var(--md-accent-fg-color);
   outline-offset: 2px;
 }
+
+/* Fórmulas anchas: desplazamiento propio en lugar de ensanchar la página en pantallas pequeñas. */
+.md-typeset mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+@media screen and (max-width: 44.9375em) {
+  .md-content__inner { overflow-x: clip; }
+}

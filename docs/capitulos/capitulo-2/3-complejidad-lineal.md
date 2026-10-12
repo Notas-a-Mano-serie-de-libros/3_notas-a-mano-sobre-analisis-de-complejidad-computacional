@@ -4,7 +4,7 @@
 
 <span class="chapter-kicker">Capítulo 2</span>
 
-### Código del libro asociado
+## Código del libro asociado
 
 <!-- book-code:start -->
 

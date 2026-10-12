@@ -14,13 +14,13 @@ El libro no incluye un listado de implementación para este tema.
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 Shell ordena mediante inserciones entre elementos separados por saltos decrecientes. El tiempo depende de la secuencia de saltos y del orden de los datos; el espacio auxiliar permanece constante.
 
-#### Versión iterativa
+### Versión iterativa
 
 La tabla corresponde a la secuencia original de Shell: \(\lfloor n/2\rfloor\), \(\lfloor n/4\rfloor\), hasta \(1\). Otras secuencias pueden modificar las cotas temporales.
 
@@ -30,7 +30,7 @@ La tabla corresponde a la secuencia original de Shell: \(\lfloor n/2\rfloor\), \
 | Caso promedio | Depende de la distribución de los datos | \(\Theta(1)\) | Las pasadas realizan distintos números de desplazamientos según el orden inicial; no se presupone una única cota ajustada. |
 | Peor caso | \(O(n^2)\) | \(O(1)\) | Un orden desfavorable requiere numerosos desplazamientos con la secuencia original de saltos. |
 
-### Comparación de secuencias de h
+## Comparación de secuencias de h
 
 <!-- local-execution:start -->
 <details class="local-execution" markdown="1">

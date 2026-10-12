@@ -129,8 +129,9 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("python -m pip install -r requirements-ci.txt", colab_job)
         for job in ("lint-python:", "colab-sanity:", "tests:", "benchmark:", "security:"):
             self.assertIn(job, workflow)
-        for version in ('"3.10"', '"3.11"', '"3.12"'):
+        for version in ('"3.11"', '"3.12"'):
             self.assertIn(version, workflow)
+        self.assertNotIn('"3.10"', workflow)
         self.assertNotIn("notebooks-clean:", workflow)
         self.assertNotIn("python desarrollo/scripts/clean_notebooks.py --check --diagnose", workflow)
         self.assertIn("ruff check .", workflow)
@@ -149,9 +150,9 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("python desarrollo/scripts/benchmark_animations.py --repeats 3 --max-ms 1500", workflow)
         self.assertIn("python desarrollo/scripts/validate_benchmark_report.py --report artifacts/animation-benchmark.json", workflow)
         self.assertIn("python -m pip_audit -r requirements-ci.txt --progress-spinner off --format json", workflow)
-        self.assertIn("actions/upload-artifact@v4", workflow)
-        self.assertIn("github/codeql-action/init@v3", codeql)
-        self.assertIn("github/codeql-action/analyze@v3", codeql)
+        self.assertIn("actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02", workflow)
+        self.assertIn("github/codeql-action/init@9f759ee644a3e7c15c1390abf49868036c00067b", codeql)
+        self.assertIn("github/codeql-action/analyze@9f759ee644a3e7c15c1390abf49868036c00067b", codeql)
         self.assertIn("workflow_dispatch:", release)
         self.assertIn("proyecto-notas-a-mano.zip", release)
         self.assertIn("--exclude 'artifacts'", release)

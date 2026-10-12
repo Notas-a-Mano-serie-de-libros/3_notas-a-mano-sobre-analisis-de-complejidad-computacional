@@ -161,6 +161,7 @@ Tu valoración ayuda a mejorar las explicaciones y los recursos de próximas edi
       <label data-review-name-field>Nombre<input type="text" name="name" minlength="2" maxlength="80" autocomplete="name" required></label>
       <label class="reader-feedback__privacy"><input type="checkbox" name="isAnonymous"><span>Publicar de forma anónima</span></label>
       <label class="reader-feedback__honeypot" aria-hidden="true">Sitio web<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+      <p class="reader-feedback__notice"><small><strong>Privacidad.</strong> Al enviar, tu calificación, comentario y nombre (si no eliges publicar de forma anónima) se envían a un servicio externo de opiniones y se verifican con Cloudflare Turnstile. Los comentarios pasan por revisión editorial antes de publicarse. Para solicitar su eliminación, escribe a través de <a href="comentarios-sugerencias.md">Comentarios y sugerencias</a>.</small></p>
       <div data-turnstile></div>
       <button class="md-button md-button--primary" type="submit" disabled><span aria-hidden="true">✦</span> Enviar</button>
       <p class="reader-feedback__status" data-review-status role="status" aria-live="polite">Preparando el formulario…</p>

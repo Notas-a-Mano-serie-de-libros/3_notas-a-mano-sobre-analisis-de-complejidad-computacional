@@ -219,6 +219,7 @@ CHAPTER_CONFIGS = {
                 "core/search/5_busqueda_exponencial_app.py",
                 "core/search/6_busqueda_ternaria_app.py",
                 "core/search/busquedas_chart.py",
+                "core/search/interpolation_visual.py",
                 "core/search/search_metrics.py",
                 "simulaciones/capitulo2/runtime/experimental_animation.py",
                 "simulaciones/capitulo7/runtime/__init__.py",

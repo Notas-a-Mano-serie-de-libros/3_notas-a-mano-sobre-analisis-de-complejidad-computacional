@@ -140,7 +140,7 @@ def sync(check: bool = False) -> list[str]:
         source = path.read_text(encoding="utf-8")
         detail = catalog["page_details"][relative]
         expected = render(
-            listings, 5 if relative.startswith("capitulo-6/") else 4, detail,
+            listings, 3, detail,
             include_walkthrough=not relative.startswith("capitulo-2/"),
             permutations_example=relative == "capitulo-2/9-complejidad-factorial.md",
             minimal_example=relative.startswith("capitulo-4/"),

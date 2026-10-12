@@ -14,13 +14,13 @@ A continuación, se presenta la implementación iterativa estándar de la **bús
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 La búsqueda secuencial revisa los elementos en orden. El tiempo depende de la posición del objetivo; el espacio auxiliar es constante en la versión iterativa y crece con las llamadas pendientes en la recursiva.
 
-#### Versión iterativa
+### Versión iterativa
 
 En la implementación iterativa, el algoritmo mantiene únicamente el índice de avance y algunas variables auxiliares constantes. El número de comparaciones depende de la posición del objetivo dentro del arreglo.
 
@@ -30,7 +30,7 @@ En la implementación iterativa, el algoritmo mantiene únicamente el índice de
 | Caso promedio | \(\Theta(n)\) | \(\Theta(1)\) | El objetivo está presente y sus posiciones posibles son equiprobables; se revisa aproximadamente la mitad del arreglo. |
 | Peor caso | \(O(n)\) | \(O(1)\) | El objetivo está en la última posición o está ausente; se recorre todo el arreglo. |
 
-#### Versión recursiva
+### Versión recursiva
 
 Si el recorrido se expresa mediante llamadas recursivas, cada llamada representa la comparación de una posición. La cantidad de comparaciones se conserva, pero cada llamada queda registrada temporalmente en la pila de ejecución hasta que se alcanza el caso base.
 

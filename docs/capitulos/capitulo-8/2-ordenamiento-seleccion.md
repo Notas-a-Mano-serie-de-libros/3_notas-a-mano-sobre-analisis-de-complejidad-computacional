@@ -18,13 +18,13 @@ A continuación, se presenta la implementación iterativa estándar del **ordena
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 El ordenamiento por selección examina el subarreglo pendiente para localizar sus extremos. Las variantes del libro mantienen un tiempo cuadrático independientemente del orden inicial y utilizan espacio auxiliar constante.
 
-#### Versión iterativa
+### Versión iterativa
 
 | Caso | \(T(n)\) | \(S(n)\) | Cuándo ocurre |
 | --- | --- | --- | --- |

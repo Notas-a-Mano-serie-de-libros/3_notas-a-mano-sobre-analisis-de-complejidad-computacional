@@ -1388,3 +1388,14 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTrazasConEntradaVacia(unittest.TestCase):
+    def test_every_trace_accepts_empty_input(self):
+        import sort_algorithms
+
+        for name in ("bubble", "selection", "insertion", "shell", "merge", "quick", "radix"):
+            trace = getattr(sort_algorithms, f"{name}_trace")([])
+            self.assertGreaterEqual(len(trace), 2, name)
+            self.assertFalse(trace[0]["sorting_complete"], name)
+            self.assertTrue(trace[-1]["sorting_complete"], name)

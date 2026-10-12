@@ -16,13 +16,13 @@ A continuación, se presenta la implementación iterativa estándar del **ordena
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 El ordenamiento radix procesa los dígitos de enteros no negativos. Con \(d\) dígitos y base \(k\), cada pasada recorre el arreglo y los conteos: el costo es \(\Theta(d \cdot (n+k))\), independientemente del orden inicial.
 
-#### Versión iterativa
+### Versión iterativa
 
 | Caso | \(T(n)\) | \(S(n)\) | Cuándo ocurre |
 | --- | --- | --- | --- |

@@ -12,7 +12,7 @@ Este repositorio reúne las simulaciones interactivas de la segunda edición del
   <a href="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/ci.yml"><img src="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/ci.yml/badge.svg?branch=main" alt="Estado de CI"></a>
   <a href="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/pages.yml"><img src="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/pages.yml/badge.svg?branch=main" alt="Estado de GitHub Pages"></a>
   <a href="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/codeql.yml"><img src="https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/actions/workflows/codeql.yml/badge.svg?branch=main" alt="Estado de CodeQL"></a>
-  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.10 o superior">
+  <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&amp;logoColor=white" alt="Python 3.11 o superior">
   <img src="https://img.shields.io/badge/Jupyter-Simulaciones-F37626?logo=jupyter&amp;logoColor=white" alt="Simulaciones en Jupyter">
 </p>
 
@@ -61,7 +61,7 @@ En Windows PowerShell, active el entorno con `.venv\Scripts\Activate.ps1`. La gu
 
 ## Guía de instalación
 
-Necesita Python 3.10 o superior y Git. Siga estos pasos en orden, completos, en una terminal — no son opcionales ni intercambiables entre sí.
+Necesita Python 3.11 o superior y Git. Siga estos pasos en orden, completos, en una terminal — no son opcionales ni intercambiables entre sí.
 
 ### 1. Cierre cualquier Jupyter que ya esté corriendo
 

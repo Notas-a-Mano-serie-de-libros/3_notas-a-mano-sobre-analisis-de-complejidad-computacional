@@ -6,7 +6,7 @@
 
 Expanda la recurrencia hasta reconocer un patrón. Reemplace el término recursivo por su definición, repita la operación \(k\) veces, identifique cuándo el argumento alcanza el caso base y sume el trabajo acumulado.
 
-### Procedimiento
+## Procedimiento
 
 1. Escriba la recurrencia y su condición inicial.
 2. Expanda dos o tres niveles sin simplificar prematuramente.

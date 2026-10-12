@@ -16,13 +16,13 @@ A continuación, se presenta la implementación recursiva estándar del **ordena
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 El ordenamiento por mezcla divide el arreglo y combina los subarreglos ordenados. La estructura de división y mezcla garantiza tiempo \(\Theta(n \cdot \log_2(n))\) en los tres casos; los arreglos temporales dominan el espacio auxiliar.
 
-#### Versión recursiva
+### Versión recursiva
 
 | Caso | \(T(n)\) | \(S(n)\) | Cuándo ocurre |
 | --- | --- | --- | --- |

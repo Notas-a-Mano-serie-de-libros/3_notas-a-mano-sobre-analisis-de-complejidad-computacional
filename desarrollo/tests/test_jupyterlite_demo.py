@@ -145,8 +145,8 @@ def test_documentation_dependencies_include_the_jupyter_builder_cli():
         encoding="utf-8"
     )
 
-    assert "jupyterlab>=4.6.3,<5" in documentation_requirements
-    assert "jupyterlab==4.6.3" in dependency_lock
+    assert "jupyterlab>=4.6.4,<5" in documentation_requirements
+    assert "jupyterlab==4.6.4" in dependency_lock
 
 
 def test_widget_profiles_bundle_their_runtime_wheels():
@@ -487,7 +487,7 @@ def test_pages_workflow_builds_demo_after_content_validation():
     workflow = (PROJECT_ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
     build = "python desarrollo/scripts/build_jupyterlite_demo.py"
     breadcrumbs = "python desarrollo/scripts/validate_pages_breadcrumbs.py --site-dir site"
-    upload = "uses: actions/upload-pages-artifact@v4"
+    upload = "uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b"
     assert workflow.index(breadcrumbs) < workflow.index(build) < workflow.index(upload)
 
 

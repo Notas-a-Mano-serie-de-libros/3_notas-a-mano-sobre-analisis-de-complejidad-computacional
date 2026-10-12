@@ -99,6 +99,11 @@
   <meta property="og:description" content="Explicación, análisis y recursos de {{ page.title }} para la segunda edición de la obra.">
 {% endblock %}
 
+{% block scripts %}
+  {{ super() }}
+  <script src="https://unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script>
+{% endblock %}
+
 {% block content %}
   {% set is_chapter_section = page.file and page.file.src_uri.startswith('capitulos/capitulo-') and page.file.src_uri.count('/') > 1 %}
   {% if page != nav.homepage %}{{ route_panel("top") }}{% endif %}

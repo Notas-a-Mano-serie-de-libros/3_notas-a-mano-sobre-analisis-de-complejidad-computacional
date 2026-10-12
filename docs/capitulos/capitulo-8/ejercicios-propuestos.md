@@ -4,13 +4,13 @@
 
 <span class="chapter-kicker">Capítulo 8</span>
 
-### Ejercicios opcionales
+## Ejercicios opcionales
 
 Se desarrollan los ejercicios opcionales 2, 3 y 4. El ejercicio opcional 1 no se incluye, como se solicitó.
 
 ---
 
-### Opcional 2: aplicaciones reales
+## Opcional 2: aplicaciones reales
 
 - **Burbuja:** enseñanza, listas muy pequeñas y detección simple de entradas ya ordenadas; rara vez se usa en producción.
 - **Selección:** entornos donde las escrituras son costosas, porque realiza pocas permutaciones aunque compare \(\Theta(n^2)\) veces.
@@ -20,25 +20,25 @@ Se desarrollan los ejercicios opcionales 2, 3 y 4. El ejercicio opcional 1 no se
 - **Quick Sort:** arreglos en memoria y bibliotecas de propósito general cuando interesan localidad de caché y buen tiempo promedio.
 - **Radix Sort:** claves enteras, códigos, direcciones y cadenas de longitud acotada cuando sus dígitos pueden procesarse directamente.
 
-### Opcional 3: algoritmos avanzados
+## Opcional 3: algoritmos avanzados
 
-#### Heap Sort
+### Heap Sort
 
 Construye un montículo máximo y extrae repetidamente su raíz. Garantiza \(\Theta(n \cdot \log(n))\) en los tres casos, usa \(\Theta(1)\) espacio auxiliar en su versión in situ y no es estable.
 
-#### Counting Sort
+### Counting Sort
 
 Cuenta cuántas veces aparece cada clave del intervalo \([0,k]\) y reconstruye la salida. Su tiempo es \(\Theta(n+k)\) y su espacio auxiliar \(\Theta(n+k)\) en la versión estable. Es apropiado cuando \(k\) no es mucho mayor que \(n\).
 
-#### Radix Sort
+### Radix Sort
 
 Ordena por dígitos usando un algoritmo estable en cada pasada. Con \(d\) dígitos y base \(k\), su tiempo es \(\Theta(d \cdot (n+k))\) y su espacio auxiliar usual es \(\Theta(n+k)\). No depende de comparaciones entre pares de elementos.
 
-#### Tim Sort
+### Tim Sort
 
 Detecta subsecuencias ya ordenadas y las combina, aprovechando la estructura existente en datos reales. Su peor caso es \(\Theta(n \cdot \log(n))\), su mejor caso puede ser \(\Theta(n)\) y es estable.
 
-### Opcional 4: impacto de la distribución inicial
+## Opcional 4: impacto de la distribución inicial
 
 - **Arreglo ordenado:** burbuja optimizada e inserción se aproximan a \(\Theta(n)\); selección permanece en \(\Theta(n^2)\). Merge Sort y Heap Sort conservan \(\Theta(n \cdot \log(n))\). Quick Sort puede degradarse a \(\Theta(n^2)\) si escoge siempre un extremo como pivote.
 - **Orden inverso:** inserción y burbuja realizan el máximo número de desplazamientos o intercambios, ambos \(\Theta(n^2)\). Selección mantiene el mismo número de comparaciones. Merge Sort conserva su orden log-lineal.

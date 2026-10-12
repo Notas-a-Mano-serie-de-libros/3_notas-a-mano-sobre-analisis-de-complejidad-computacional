@@ -20,13 +20,13 @@ A continuación, se presenta la implementación recursiva estándar de la **bús
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 La búsqueda binaria requiere un arreglo ordenado y reduce el intervalo a la mitad. Ambas versiones realizan un número logarítmico de comparaciones; la iterativa usa espacio constante y la recursiva acumula los marcos de la pila.
 
-#### Versión iterativa
+### Versión iterativa
 
 En la implementación iterativa, cada comparación calcula el índice medio y conserva solo los límites \(a\) y \(b\). Cada descarte reduce el intervalo activo a la mitad.
 
@@ -36,7 +36,7 @@ En la implementación iterativa, cada comparación calcula el índice medio y co
 | Caso promedio | \(\Theta(\log_2(n))\) | \(\Theta(1)\) | Con posiciones equiprobables del objetivo, se realizan varias divisiones del intervalo a la mitad. |
 | Peor caso | \(O(\log_2(n))\) | \(O(1)\) | El objetivo se encuentra en uno de los niveles más profundos o está ausente y se agota el intervalo. |
 
-#### Versión recursiva
+### Versión recursiva
 
 En la implementación recursiva, cada llamada recibe un intervalo cuya longitud es aproximadamente la mitad de la anterior. El número de comparaciones es el mismo orden que en la versión iterativa, pero la pila crece con la profundidad de divisiones.
 

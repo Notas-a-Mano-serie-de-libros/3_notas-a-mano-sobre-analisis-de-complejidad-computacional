@@ -18,7 +18,7 @@ C(n)=n^3+2 \cdot n^2+n+5
 
 El propósito es mostrar que la función de referencia cambia según la relación que se quiere demostrar. No basta con observar que ambas curvas parecen próximas: deben exhibirse constantes y un umbral, o calcular el límite correspondiente.
 
-### Ejemplo 1 · Cota superior \(O(n^3)\)
+## Ejemplo 1 · Cota superior \(O(n^3)\)
 
 Se toma \(g(n)=n^3\). Para \(n\geq 1\), se cumplen \(n^2\leq n^3\), \(n\leq n^3\) y \(1\leq n^3\). Por tanto:
 
@@ -28,7 +28,7 @@ C(n)\leq n^3+2 \cdot n^3+n^3+5 \cdot n^3=9 \cdot n^3.
 
 Al elegir \(c=9\) y \(n_0=1\), queda demostrada la desigualdad \(C(n)\leq c \cdot g(n)\) para todo \(n\geq n_0\). En consecuencia, \(C(n)\in O(n^3)\). El valor de \(c\) no tiene que ser mínimo: cualquier constante válida prueba la cota.
 
-### Ejemplo 2 · Cota superior estricta \(o(n^4)\)
+## Ejemplo 2 · Cota superior estricta \(o(n^4)\)
 
 Ahora se compara con \(g(n)=n^4\). La relación es estricta porque:
 
@@ -39,7 +39,7 @@ Ahora se compara con \(g(n)=n^4\). La relación es estricta porque:
 
 El límite cero significa que, para cualquier constante \(c>0\), existe un umbral \(n_0\) a partir del cual \(C(n)<c n^4\). Por eso \(C(n)\in o(n^4)\). Esta afirmación es más fuerte que decir solamente \(C(n)\in O(n^4)\).
 
-### Ejemplo 3 · Cota inferior \(\Omega(n^3)\)
+## Ejemplo 3 · Cota inferior \(\Omega(n^3)\)
 
 Como todos los términos adicionales son no negativos para \(n\geq1\):
 
@@ -49,7 +49,7 @@ C(n)=n^3+2 \cdot n^2+n+5\geq n^3
 
 Con \(c=1\) y \(n_0=1\) se satisface \(C(n)\geq c \cdot g(n)\). Así, \(C(n)\in\Omega(n^3)\). Esta cota garantiza que el crecimiento de \(C\) no puede quedar asintóticamente por debajo del cúbico.
 
-### Ejemplo 4 · Cota inferior estricta \(\omega(n^2)\)
+## Ejemplo 4 · Cota inferior estricta \(\omega(n^2)\)
 
 Al usar \(g(n)=n^2\), el cociente es:
 
@@ -59,7 +59,7 @@ Al usar \(g(n)=n^2\), el cociente es:
 
 Como este cociente tiende a infinito, para cualquier \(c>0\) se puede encontrar un \(n_0\) tal que \(C(n)>c n^2\) cuando \(n\geq n_0\). En consecuencia, \(C(n)\in\omega(n^2)\).
 
-### Ejemplo 5 · Cota ajustada \(\Theta(n^3)\)
+## Ejemplo 5 · Cota ajustada \(\Theta(n^3)\)
 
 Las pruebas de los ejemplos 1 y 3 pueden combinarse:
 

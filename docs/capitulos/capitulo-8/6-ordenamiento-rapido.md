@@ -18,13 +18,13 @@ A continuación, se presenta la implementación recursiva estándar del **ordena
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 El ordenamiento rápido particiona alrededor de un pivote. El equilibrio de las particiones determina tanto el tiempo como la profundidad de la pila: particiones equilibradas producen crecimiento logarítmico en profundidad y particiones muy desiguales pueden generar profundidad lineal.
 
-#### Versión recursiva
+### Versión recursiva
 
 | Caso | \(T(n)\) | \(S(n)\) | Cuándo ocurre |
 | --- | --- | --- | --- |
@@ -32,13 +32,13 @@ El ordenamiento rápido particiona alrededor de un pivote. El equilibrio de las 
 | Caso promedio | \(\Theta(n \cdot \log_2(n))\) | \(\Theta(\log_2(n))\) | Con valores aleatorios y pivotes representativos, las particiones son equilibradas en promedio. |
 | Peor caso | \(O(n^2)\) | \(O(n)\) | El pivote produce repetidamente una partición vacía o muy pequeña y otra con casi todos los elementos. |
 
-### Comparación entre Hoare y Lomuto
+## Comparación entre Hoare y Lomuto
 
 Ambos esquemas producen particiones válidas para quicksort, aunque recorren y modifican el arreglo de manera diferente. Hoare inicia con dos índices fuera del intervalo activo: \(i\) avanza desde la izquierda hasta encontrar un valor que pertenece al lado derecho y \(j\) retrocede desde la derecha hasta encontrar uno que pertenece al lado izquierdo. Mientras \(i<j\), ambos elementos se intercambian. Cuando los índices se cruzan, \(j\) define el límite entre las dos particiones.
 
 Lomuto mueve primero el pivote al extremo final. El índice \(j\) examina cada elemento y el índice \(i\) conserva el límite de la región cuyos valores deben quedar antes del pivote. Cada valor que satisface la relación con el pivote se intercambia con el elemento situado en \(i\); al terminar el recorrido, el pivote se coloca en esa frontera.
 
-### Comparación entre estrategias de pivote
+## Comparación entre estrategias de pivote
 
 La selección del pivote modifica la forma en que se dividen los subarreglos. Cuando el pivote queda cerca del centro de los valores, las particiones tienden a ser más equilibradas y el recorrido recursivo reduce su profundidad. Cuando el pivote queda cerca de un extremo, una partición puede concentrar casi todos los elementos y el número de pasos aumenta.
 

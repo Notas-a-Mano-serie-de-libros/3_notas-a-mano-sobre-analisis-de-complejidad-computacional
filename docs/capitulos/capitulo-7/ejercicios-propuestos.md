@@ -4,7 +4,7 @@
 
 <span class="chapter-kicker">Capítulo 7</span>
 
-### Ejercicios opcionales
+## Ejercicios opcionales
 
 Se desarrollan los ejercicios opcionales 2, 3 y 4. El ejercicio opcional 1 no se incluye, como se solicitó.
 
@@ -14,7 +14,7 @@ La búsqueda ternaria recursiva conserva la siguiente referencia para el selecto
 
 ---
 
-### Opcional 2: aplicaciones comunes
+## Opcional 2: aplicaciones comunes
 
 - **Búsqueda secuencial:** colecciones pequeñas o sin ordenar, flujos de datos y comprobaciones donde preparar un índice costaría más que recorrer la entrada.
 - **Búsqueda binaria:** catálogos ordenados, tablas de símbolos, búsqueda de límites y consultas sobre datos estáticos.
@@ -23,25 +23,25 @@ La búsqueda ternaria recursiva conserva la siguiente referencia para el selecto
 - **Búsqueda exponencial:** colecciones ordenadas de tamaño desconocido o potencialmente no acotado; primero localiza un intervalo y luego aplica búsqueda binaria.
 - **Búsqueda ternaria:** búsqueda sobre dominios ordenados y, en su variante de optimización, funciones unimodales. Para arreglos suele preferirse la binaria porque hace menos comparaciones por nivel.
 
-### Opcional 3: otros algoritmos de búsqueda
+## Opcional 3: otros algoritmos de búsqueda
 
-#### Búsqueda en tablas hash
+### Búsqueda en tablas hash
 
 Calcula una posición a partir de una función hash. Su tiempo esperado es \(\Theta(1)\) para insertar, consultar o eliminar, aunque las colisiones pueden llevar el peor caso a \(\Theta(n)\). Requiere \(\Theta(n)\) espacio adicional.
 
-#### Búsqueda en árboles balanceados
+### Búsqueda en árboles balanceados
 
 Árboles AVL y rojo-negro conservan altura \(\Theta(\log(n))\), por lo que búsqueda, inserción y eliminación cuestan \(\Theta(\log(n))\). El almacenamiento de nodos ocupa \(\Theta(n)\).
 
-#### Búsqueda en tries
+### Búsqueda en tries
 
 Un trie procesa una clave carácter por carácter. Para una clave de longitud \(m\), la búsqueda cuesta \(\Theta(m)\), independiente del número total de claves, a cambio de un consumo de memoria que puede ser elevado.
 
-#### Búsqueda primero en anchura y profundidad
+### Búsqueda primero en anchura y profundidad
 
 En grafos, BFS y DFS recorren vértices y aristas en \(\Theta(V+E)\). BFS necesita una cola y encuentra caminos mínimos en grafos no ponderados; DFS usa una pila o recursión y es útil para conectividad, ciclos y ordenamiento topológico.
 
-### Opcional 4: búsquedas sobre matrices
+## Opcional 4: búsquedas sobre matrices
 
 Para una matriz de \(f\) filas y \(c\) columnas, una búsqueda secuencial revisa hasta \(fc\) elementos: tiempo \(\Theta(fc)\) y espacio auxiliar \(\Theta(1)\). Si se define \(n=f=c\), el costo es \(\Theta(n^2)\).
 

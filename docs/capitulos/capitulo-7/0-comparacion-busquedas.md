@@ -4,7 +4,7 @@
 
 <span class="chapter-kicker">Capítulo 7</span>
 
-### Algoritmos incluidos
+## Algoritmos incluidos
 
 <div style="text-align: center;">
 <table style="margin: 0 auto; text-align: center;">

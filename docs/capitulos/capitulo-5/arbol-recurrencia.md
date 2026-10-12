@@ -6,7 +6,7 @@
 
 Represente cada llamada como un nodo y cada subproblema como una rama. Obtenga la complejidad sumando el costo de todos los niveles del árbol.
 
-### Procedimiento
+## Procedimiento
 
 1. Determine el número y el tamaño de los hijos de cada llamada.
 2. Calcule el costo individual de un nodo en el nivel \(i\).

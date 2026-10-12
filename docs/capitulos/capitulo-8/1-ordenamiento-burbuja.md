@@ -20,13 +20,13 @@ A continuación, se presenta la implementación iterativa estándar del **ordena
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 El ordenamiento burbuja compara pares adyacentes. La versión básica siempre completa sus pasadas; la versión con bandera termina cuando una pasada no produce intercambios. Ambas trabajan sobre el arreglo con espacio auxiliar constante.
 
-#### Versión iterativa
+### Versión iterativa
 
 La tabla corresponde a la versión con bandera. En la versión básica, los tres casos requieren \(\Theta(n^2)\) tiempo y \(\Theta(1)\) espacio: se hacen \(n \cdot (n-1)/2\) comparaciones sin parada anticipada.
 

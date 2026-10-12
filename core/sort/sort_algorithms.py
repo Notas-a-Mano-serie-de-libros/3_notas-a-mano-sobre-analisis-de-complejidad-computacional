@@ -593,9 +593,18 @@ def shell_trace(values, descending=False, gap_sequence="shell"):
     return trace
 
 
+def _empty_trace(name):
+    return [
+        make_event([], start_message(name), ""),
+        make_event([], final_message(name), r"\text{arreglo ordenado}", [], [], True),
+    ]
+
+
 def merge_trace(values, descending=False):
     initial = list(values)
     n = len(initial)
+    if n == 0:
+        return _empty_trace("mezcla")
 
     def node(start, values, depth=0, parent=None):
         item = {
@@ -1378,6 +1387,8 @@ def _hoare_quick_trace(values, descending=False, pivot_strategy="middle"):
 
 
 def quick_trace(values, descending=False, pivot_strategy="middle", partition_scheme="hoare"):
+    if len(values) == 0:
+        return _empty_trace("rapido")
     if partition_scheme == "lomuto":
         return _lomuto_quick_trace(values, descending=descending, pivot_strategy=pivot_strategy)
     return _hoare_quick_trace(values, descending=descending, pivot_strategy=pivot_strategy)

@@ -14,7 +14,7 @@ Donde:
 - **\(m\):** Cantidad de términos distintos que conforman la relación.
 - **\(f(n)\):** Costo de las operaciones realizadas en cada llamada, fuera de las llamadas recursivas.
 
-### Relaciones de reducción
+## Relaciones de reducción
 
 El tamaño del problema disminuye en una cantidad fija en cada llamada recursiva:
 
@@ -26,7 +26,7 @@ a_i\in\mathbb{R}^{+},\quad b_i\in\mathbb{N}^{+}
 \end{cases}
 \]
 
-### Relaciones de división
+## Relaciones de división
 
 El problema se descompone en subproblemas cuyos tamaños son fracciones del tamaño original:
 
@@ -38,7 +38,7 @@ a_i,b_i\in\mathbb{R}^{+},\quad 0<b_i<1
 \end{cases}
 \]
 
-### Caso particular: un solo término recursivo
+## Caso particular: un solo término recursivo
 
 Muchos problemas recursivos clásicos contienen un único término recursivo distinto, es decir, \(m=1\). En ese caso, la sumatoria contiene únicamente el término \(i=1\). Al escribir \(a=a_1\) y \(b=b_1\), se obtienen los dos casos particulares:
 
@@ -66,7 +66,7 @@ n_k&=n\cdot b^k &&\text{(división)}
 \end{aligned}
 \]
 
-### Multiplicidad y árbol asociado
+## Multiplicidad y árbol asociado
 
 Para interpretar \(a\) como número de hijos, se consideran multiplicidades enteras positivas. Las figuras siguientes ilustran la división por dos; la cantidad de hijos depende de \(a\), mientras que el tamaño de cada hijo depende del factor de reducción.
 
@@ -96,7 +96,7 @@ Para interpretar \(a\) como número de hijos, se consideran multiplicidades ente
 
     <figure class="recurrence-tree-figure"><img src="../../../assets/images/capitulo-5/arbol_recurrencia_a4.png" alt="Árbol de cuatro hijos como ejemplo de árbol k-nario"><figcaption>Árbol de recurrencia (\(a=k\)).</figcaption></figure>
 
-### Más de un término recursivo
+## Más de un término recursivo
 
 Las relaciones con \(m=1\) permiten representar un patrón uniforme. Con \(m>1\), distintos factores de reducción pueden producir ramas que alcanzan el caso base en profundidades diferentes. Por ejemplo:
 

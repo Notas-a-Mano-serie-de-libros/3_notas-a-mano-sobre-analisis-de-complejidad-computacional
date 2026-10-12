@@ -16,13 +16,13 @@ A continuación, se presenta la implementación iterativa estándar del **ordena
 
 <!-- book-code:end -->
 
-### Análisis de complejidad
+## Análisis de complejidad
 
-#### Resumen general
+### Resumen general
 
 El ordenamiento por inserción desplaza cada elemento hasta su posición en el prefijo ordenado. El tiempo depende de cuántos desplazamientos exige el orden inicial y el espacio auxiliar es constante.
 
-#### Versión iterativa
+### Versión iterativa
 
 | Caso | \(T(n)\) | \(S(n)\) | Cuándo ocurre |
 | --- | --- | --- | --- |
@@ -30,7 +30,7 @@ El ordenamiento por inserción desplaza cada elemento hasta su posición en el p
 | Caso promedio | \(\Theta(n^2)\) | \(\Theta(1)\) | Con valores en orden aleatorio, cada inserción desplaza parte del prefijo ordenado. |
 | Peor caso | \(O(n^2)\) | \(O(1)\) | El arreglo está en orden inverso y cada nuevo elemento desplaza todo el prefijo. |
 
-### Variante: inserción binaria
+## Variante: inserción binaria
 
 El ordenamiento por inserción localiza, para cada elemento, la posición que debe ocupar dentro del prefijo ya ordenado. En la versión clásica esa búsqueda se hace de derecha a izquierda mediante comparaciones consecutivas. La variante de **inserción binaria** aprovecha que el prefijo `arr[0:i]` ya está ordenado y usa búsqueda binaria para encontrar la posición de inserción.
 
@@ -38,7 +38,7 @@ La mejora principal está en la cantidad de comparaciones usadas para decidir la
 
 El desplazamiento de elementos sigue siendo necesario, porque insertar dentro de un arreglo exige mover una sección hacia la derecha para abrir espacio. Por eso la complejidad temporal total permanece cuadrática en el peor caso, aunque el número de comparaciones puede disminuir de forma importante.
 
-### Comparación entre inserción clásica e inserción binaria
+## Comparación entre inserción clásica e inserción binaria
 
 <!-- local-execution:start -->
 <details class="local-execution" markdown="1">
