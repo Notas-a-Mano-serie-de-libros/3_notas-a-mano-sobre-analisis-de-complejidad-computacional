@@ -1483,6 +1483,24 @@ def run_app(builder_only=False):
           .continuation-label{font-size:22px}.level-label{text-anchor:end;font-size:15px}
           .recursion-tree-note{box-sizing:border-box;width:100%;min-height:30px;padding:6px 10px;
             color:#555;background:#fff;text-align:center;font-size:13px}
+          @media (max-width:480px){
+            .recursion-tree-controls{column-gap:12px!important}
+            .recursion-control-section{
+              box-sizing:border-box!important;flex-direction:column!important;
+              align-items:flex-start!important;width:100%!important;overflow:visible!important}
+            .recursion-control-section>.widget-box{
+              box-sizing:border-box!important;width:100%!important;max-width:100%!important}
+            .recursion-labeled-control{
+              box-sizing:border-box!important;flex-direction:column!important;
+              align-items:flex-start!important;gap:4px!important;
+              width:100%!important;min-width:0!important;max-width:100%!important}
+            .recursion-parameter-controls{
+              width:100%!important;max-width:100%!important;overflow:visible!important}
+            .recursion-parameter-controls>.widget-box{
+              box-sizing:border-box!important;width:100%!important;max-width:100%!important}
+            .recursion-term-validation{width:100%!important;padding-left:0!important}
+            .recursion-master-variant-note{margin-left:0!important}
+          }
         </style>
         """ + standard_view_styles(".recursion-tree-root")
     )

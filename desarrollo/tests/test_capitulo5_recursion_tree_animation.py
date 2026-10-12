@@ -119,6 +119,18 @@ def test_controls_wrap_without_horizontal_scroll():
     assert "grid_template_columns=" not in SOURCE
 
 
+def test_builder_controls_remain_visible_on_narrow_screens():
+    responsive_styles = SOURCE.split("@media (max-width:480px){", 1)[1].split(
+        "</style>", 1
+    )[0]
+    assert ".recursion-control-section" in responsive_styles
+    assert "flex-direction:column!important" in responsive_styles
+    assert ".recursion-labeled-control" in responsive_styles
+    assert "width:100%!important;min-width:0!important;max-width:100%!important" in responsive_styles
+    assert ".recursion-parameter-controls" in responsive_styles
+    assert "overflow:visible!important" in responsive_styles
+
+
 def test_playback_buttons_wrap_without_horizontal_scroll():
     playback_rule = SOURCE.split(".recursion-playback{", 1)[1].split("}", 1)[0]
     assert "flex-flow:row wrap!important" in playback_rule

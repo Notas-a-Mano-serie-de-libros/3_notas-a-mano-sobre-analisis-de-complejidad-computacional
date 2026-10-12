@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -11,7 +12,20 @@ from urllib.parse import unquote, urlparse
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPOSITORY_NAME = "3_notas-a-mano-sobre-analisis-de-complejidad-computacional"
 TEXT_SUFFIXES = {".md", ".ipynb", ".py"}
-IGNORED_PARTS = {".git", ".mypy_cache", ".pytest_cache", ".ruff_cache", ".venv", "__pycache__", ".ipynb_checkpoints", ".virtual_documents"}
+IGNORED_PARTS = {
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "__pycache__",
+    ".ipynb_checkpoints",
+    ".virtual_documents",
+    "build",
+    "dist",
+    "node_modules",
+    "site",
+}
 OBSOLETE_PATTERNS = {
     r"capitulo[2-8]/graficas/": "carpeta antigua de gráficas del capítulo",
     r"(?:^|[\"'/])graficas/(?:recursos|generadas)/": "carpeta central de gráficas eliminada",
@@ -34,13 +48,13 @@ def generated_page_asset_sources() -> dict[Path, Path]:
 
 
 def repository_files() -> list[Path]:
-    return sorted(
-        path
-        for path in PROJECT_ROOT.rglob("*")
-        if path.is_file()
-        and path.suffix in TEXT_SUFFIXES
-        and not IGNORED_PARTS.intersection(path.parts)
-    )
+    files = []
+    for current, directories, names in os.walk(PROJECT_ROOT):
+        directories[:] = [name for name in directories if name not in IGNORED_PARTS]
+        files.extend(
+            Path(current) / name for name in names if Path(name).suffix in TEXT_SUFFIXES
+        )
+    return sorted(files)
 
 
 def notebook_markdown(path: Path) -> str:
