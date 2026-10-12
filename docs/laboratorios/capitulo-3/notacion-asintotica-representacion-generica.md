@@ -2,7 +2,7 @@
 
 <span class="chapter-kicker">Capítulo 3</span>
 
-[Abrir en Google Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/notacion_asintotica_representacion_generica.ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
+[Abrir en Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/notacion_asintotica_representacion_generica.ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
 
 La obra parte de una función compuesta por términos ordenados de menor a mayor crecimiento:
 

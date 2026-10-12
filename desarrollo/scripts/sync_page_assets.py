@@ -1,4 +1,4 @@
-"""Reconstruye los recursos publicados de Pages desde sus fuentes del libro."""
+"""Reconstruye los recursos publicados desde copias versionadas del repositorio."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def main() -> int:
     if errors:
         print("\n".join(errors))
         return 1
-    print("Recursos de Pages sincronizados desde las fuentes del libro.")
+    print("Recursos de Pages sincronizados desde copias versionadas del repositorio.")
     return 0
 
 

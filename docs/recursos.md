@@ -34,7 +34,23 @@ En las secciones que muestran un laboratorio integrado, espera a que aparezca el
 
 ## 3. Ejecutar en Google Colab
 
-Los botones **Abrir en Google Colab** cargan cada cuaderno en el navegador. Es una alternativa para experimentar y conservar cambios: guarda una copia del cuaderno en tu propia cuenta.
+Los botones **Abrir en Colab** cargan cada cuaderno en el navegador. Es una alternativa para experimentar y conservar cambios: guarda una copia del cuaderno en tu propia cuenta.
+
+## Conexión y recursos externos
+
+El contenido narrativo, las figuras y los ejemplos C compilados se publican con el portal. Estas funciones sí necesitan conexión:
+
+- **Colab** abre un servicio externo de Google.
+- **Ejemplos Python** descargan Pyodide `v314.0.6` desde jsDelivr la primera vez.
+- **Ejemplos Java** cargan CheerpJ desde su distribución externa.
+- **Fórmulas dentro de simulaciones** cargan MathJax `3.2.2` desde jsDelivr; tanto esas cargas como la plantilla principal verifican la integridad del archivo.
+- **JupyterLite** se sirve desde el artefacto de Pages, pero el navegador puede necesitar descargar paquetes declarados por cada perfil durante el primer inicio del kernel.
+- **Valoraciones y comentarios** consultan la API del portal y cargan Turnstile al enviar; la lectura principal funciona si esos servicios no están disponibles.
+- **Algunas simulaciones de búsqueda y ordenamiento** solicitan la tipografía Scheherazade New a Google Fonts y usan una fuente local de reserva si falla.
+
+MathJax puede empaquetarse localmente sin cambiar las simulaciones, a costa de aumentar el artefacto y mantener sus fuentes. Pyodide ya queda incluido en la distribución generada por JupyterLite; duplicarlo para el ejecutor de ejemplos aumentaría sensiblemente el portal. Por ahora ambos puntos de red están fijados a versiones exactas y se controlan mediante `validate_web_dependencies.py`.
+
+Las páginas fuente de `docs/laboratorios/` no se publican: `mkdocs.yml` las excluye y el contenido integrado se genera en las páginas de capítulo. Así se evita mantener dos URL públicas para una misma simulación.
 
 ## 4. Trabajar localmente
 

@@ -12,7 +12,7 @@ Es especialmente eficaz cuando el objetivo está cerca del inicio del arreglo, y
 
 La página reúne la explicación y el análisis. El notebook conserva la implementación, los controles y las salidas experimentales.
 
-[Abrir en Google Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo7/notebooks/5_busqueda_exponencial.ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
+[Abrir en Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo7/notebooks/5_busqueda_exponencial.ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
 
 ---
 

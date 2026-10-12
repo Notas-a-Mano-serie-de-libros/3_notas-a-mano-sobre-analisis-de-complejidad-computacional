@@ -37,7 +37,7 @@ def main() -> int:
     if errors:
         print("\n".join(errors))
         return 1
-    print("Recursos gráficos de Pages sin archivos huérfanos.")
+    print("Existencia del manifiesto y ausencia de recursos gráficos huérfanos validadas.")
     return 0
 
 

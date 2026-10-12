@@ -1,4 +1,5 @@
-# Versiones verificadas en Python 3.12 para CI y la documentación
+# Restricciones directas compartidas por Python 3.11 y 3.12.
+# Este archivo no sustituye los locks transitivos con hashes pendientes de generar.
 pytest==9.1.1
 numpy==2.4.6
 matplotlib==3.11.2
@@ -15,3 +16,8 @@ mkdocs-material==9.7.7
 Pillow==12.3.0
 jupyter-server==2.21.1
 jupyterlab==4.6.4
+ipykernel==7.3.0
+jupyterlab_widgets==3.0.17
+tornado==6.5.8
+pre-commit==4.6.2
+playwright==1.64.0

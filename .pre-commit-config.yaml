@@ -49,3 +49,13 @@ repos:
         entry: python desarrollo/scripts/validate_html_snapshots.py
         language: system
         pass_filenames: false
+      - id: validate-web-dependencies
+        name: Validate exact web dependency versions
+        entry: python desarrollo/scripts/validate_web_dependencies.py
+        language: system
+        pass_filenames: false
+      - id: check-secrets
+        name: Check tracked files for secrets
+        entry: python desarrollo/scripts/check_secrets.py
+        language: system
+        pass_filenames: false

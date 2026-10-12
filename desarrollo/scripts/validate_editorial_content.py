@@ -34,6 +34,10 @@ def main() -> int:
 
     for path in DOCS.rglob("*.md"):
         source = path.read_text(encoding="utf-8")
+        if "Abrir en Google Colab" in source:
+            errors.append(
+                f"{path.relative_to(ROOT)}: usa la etiqueta obsoleta de Colab"
+            )
         for expression in implicit_product_issues(source):
             compact = " ".join(expression.split())
             errors.append(

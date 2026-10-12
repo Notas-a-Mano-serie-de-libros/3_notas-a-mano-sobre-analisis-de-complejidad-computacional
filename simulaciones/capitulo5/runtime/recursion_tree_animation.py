@@ -1905,7 +1905,9 @@ def run_app(builder_only=False):
                 svg: {fontCache: 'none'}
               };
               const script = document.createElement('script');
-              script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+              script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js';
+              script.integrity = 'sha256-1CldwzdEg2k1wTmf7s5RWVd7NMXI/7nxxjJM2C4DqII=';
+              script.crossOrigin = 'anonymous';
               script.async = true;
               script.onload = () => {
                 const startup = window.MathJax?.startup?.promise;
@@ -2148,6 +2150,9 @@ def run_app(builder_only=False):
               clearTimeout(typesetTimer);
             }
           };
+          window.addEventListener('pagehide', () => {
+            window.__recursionTreeController?.abort();
+          }, {once:true});
         })();
         """
     ))

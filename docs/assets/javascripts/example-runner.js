@@ -50,6 +50,21 @@
     activeLanguage = null;
     if (terminate) { worker?.terminate(); worker = null; cWorker?.terminate(); cWorker = null; javaFrame?.remove(); javaFrame = null; javaJob++; }
   };
+  const disposeRuntimes = () => {
+    clearTimeout(timeout);
+    worker?.terminate();
+    cWorker?.terminate();
+    javaFrame?.remove();
+    worker = null;
+    cWorker = null;
+    javaFrame = null;
+    active = null;
+    activeLanguage = null;
+    javaJob++;
+    cJob++;
+    pythonJob++;
+  };
+  window.addEventListener("pagehide", disposeRuntimes);
   window.addEventListener("message", ({ source, origin, data }) => {
     if (origin !== location.origin || source !== javaFrame?.contentWindow || !data || data.job !== javaJob || !active || activeLanguage !== "java") return;
     if (data.type === "java-loading") {
@@ -70,7 +85,7 @@
       const simulationAction = panel.closest("article")?.querySelector(".lab-action");
       const simulationLink = simulationAction?.querySelector(".colab-button");
       if (simulationLink) {
-        simulationLink.textContent = "Abrir en Google Colab";
+        simulationLink.textContent = "Abrir en Colab";
         simulationLink.classList.add("simulation-open-button");
         panel.querySelector("details").before(simulationLink);
         simulationAction.remove();

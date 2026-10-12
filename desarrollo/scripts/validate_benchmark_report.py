@@ -11,6 +11,7 @@ BASELINE_PATH = PROJECT_ROOT / "desarrollo" / "benchmarks" / "animation_baseline
 
 def benchmark_regressions(report: dict, baseline: dict) -> list[str]:
     budgets = baseline["max_avg_ms"]
+    max_peak_kib = float(baseline["max_peak_kib"])
     errors = []
     seen = set()
     for item in report["benchmarks"]:
@@ -23,6 +24,12 @@ def benchmark_regressions(report: dict, baseline: dict) -> list[str]:
         max_ms = float(budgets[label])
         if avg_ms > max_ms:
             errors.append(f"{label}: avg={avg_ms:.3f} ms supera presupuesto {max_ms:.3f} ms")
+        peak_kib = float(item["peak_kib"])
+        if peak_kib > max_peak_kib:
+            errors.append(
+                f"{label}: memoria pico={peak_kib:.1f} KiB supera "
+                f"{max_peak_kib:.1f} KiB"
+            )
 
     missing = sorted(set(budgets) - seen)
     for label in missing:

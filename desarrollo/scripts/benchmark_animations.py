@@ -5,6 +5,7 @@ import importlib.util
 import json
 import sys
 import time
+import tracemalloc
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -30,14 +31,19 @@ def load_module(name, path, extra_paths=()):
 def measure(label, fn, repeats):
     durations = []
     last_result = None
+    tracemalloc.start()
+    tracemalloc.reset_peak()
     for _ in range(repeats):
         start = time.perf_counter()
         last_result = fn()
         durations.append(time.perf_counter() - start)
+    _, peak_bytes = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
     return {
         "label": label,
         "min_ms": min(durations) * 1000,
         "avg_ms": (sum(durations) / len(durations)) * 1000,
+        "peak_kib": peak_bytes / 1024,
         "last_result": last_result,
     }
 

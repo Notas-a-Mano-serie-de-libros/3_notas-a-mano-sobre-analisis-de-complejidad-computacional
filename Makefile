@@ -1,4 +1,4 @@
-.PHONY: book-review install test lint validate clean-notebooks clean-graphics clean-project check docs-install docs-serve docs-build docs-validate check-links
+.PHONY: book-review install test lint validate clean-notebooks clean-graphics clean-project check docs-install docs-serve docs-build docs-validate check-links benchmark-web
 
 PYTHON ?= python3
 
@@ -16,6 +16,8 @@ validate:
 	$(PYTHON) desarrollo/scripts/validate_book_structure.py
 	$(PYTHON) desarrollo/scripts/validate_page_assets.py
 	$(PYTHON) desarrollo/scripts/validate_external_references.py
+	$(PYTHON) desarrollo/scripts/validate_web_dependencies.py
+	$(PYTHON) desarrollo/scripts/check_secrets.py
 	$(PYTHON) desarrollo/scripts/validate_repository_paths.py
 	$(PYTHON) desarrollo/scripts/validate_colab_bootstrap.py
 	$(PYTHON) desarrollo/scripts/validate_colab_links.py
@@ -63,6 +65,9 @@ docs-build:
 docs-validate: docs-build
 	$(PYTHON) desarrollo/scripts/validate_editorial_content.py
 	$(PYTHON) desarrollo/scripts/validate_pages_breadcrumbs.py --site-dir site
+
+benchmark-web:
+	$(PYTHON) desarrollo/scripts/benchmark_jupyterlite_runtime.py
 
 book-review:
 	$(PYTHON) desarrollo/scripts/review_book_code.py

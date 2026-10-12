@@ -92,7 +92,7 @@ Para interpretar \(a\) como número de hijos, se consideran multiplicidades ente
 
     Si \(k>1\), el número de nodos por nivel crece exponencialmente con la profundidad. La figura ilustra el caso particular de cuatro hijos por nodo.
 
-    <figure class="recurrence-tree-figure"><img src="../../../assets/images/capitulo-5/arbol_recurrencia_a4.png" alt="Árbol de cuatro hijos como ejemplo de árbol k-nario"><figcaption>Árbol de recurrencia (\(a=k\)).</figcaption></figure>
+    <figure class="recurrence-tree-figure"><img src="../../../assets/images/capitulo-5/arbol_recurrencia_ak.png" alt="Árbol k-nario con k hijos por nodo"><figcaption>Árbol de recurrencia (\(a=k\)).</figcaption></figure>
 
 ## Más de un término recursivo
 
@@ -114,7 +114,7 @@ El árbol puede ser desbalanceado y no uniforme. Su representación ayuda a visu
 
 ## Ejecutar el laboratorio
 
-[Abrir en Google Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo5/notebooks/0_arboles_recursion.ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
+[Abrir en Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo5/notebooks/0_arboles_recursion.ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
 
 ---
 

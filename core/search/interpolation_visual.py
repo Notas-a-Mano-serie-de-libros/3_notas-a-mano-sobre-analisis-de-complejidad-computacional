@@ -350,7 +350,9 @@ def run_interpolation_visual():
         startup:{typeset:false}
       };
       var script=document.createElement('script');
-      script.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+      script.src='https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js';
+      script.integrity='sha256-1CldwzdEg2k1wTmf7s5RWVd7NMXI/7nxxjJM2C4DqII=';
+      script.crossOrigin='anonymous';
       script.async=true;
       script.onload=function(){
         var startup=window.MathJax && MathJax.startup && MathJax.startup.promise;
@@ -716,6 +718,7 @@ def run_interpolation_visual():
     draw();
   });
   window.addEventListener('resize',function(){resize();draw();});
+  window.addEventListener('pagehide',stopPlayback,{once:true});
   resize();draw();
 })();
 </script>

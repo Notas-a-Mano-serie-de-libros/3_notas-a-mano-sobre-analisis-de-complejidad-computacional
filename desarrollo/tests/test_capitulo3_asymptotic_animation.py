@@ -227,7 +227,7 @@ def test_pareja_sin_relacion_asintotica_no_inventa_n0():
 def test_mathjax_se_carga_una_vez_y_espera_startup():
     html = load_animation_module()._BIG_O_HTML
     assert "window.__asymptoticMathJaxReady" in html
-    assert "paths:{mathjax:'https://cdn.jsdelivr.net/npm/mathjax@3/es5'}" in html
+    assert "paths:{mathjax:'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5'}" in html
     assert "script.id='MathJax-script';" in html
     assert "'[tex]/cancel'" in html
     assert "MathJax.startup && MathJax.startup.promise" in html

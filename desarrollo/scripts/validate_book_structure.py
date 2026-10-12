@@ -1,4 +1,4 @@
-"""Valida la correspondencia estable entre la estructura del libro y Pages."""
+"""Valida las páginas declaradas en el manifiesto editorial del portal."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ def validate() -> list[str]:
         actual = match.group(1).strip() if match else ""
         if actual != heading:
             errors.append(
-                f"{relative}: título '{actual}' distinto del libro ('{heading}')"
+                f"{relative}: título '{actual}' distinto del manifiesto ('{heading}')"
             )
         nav_path = relative.removeprefix("docs/")
         if nav_path not in nav:
@@ -51,7 +51,7 @@ def main() -> int:
     if errors:
         print("\n".join(errors))
         return 1
-    print("Correspondencia estructural entre el libro y Pages validada.")
+    print("Existencia, títulos y navegación del manifiesto editorial validados.")
     return 0
 
 

@@ -77,7 +77,7 @@ Por eso no se utiliza una notación little-theta como contraparte de \(\Theta\).
 
 ## Ejecutar el laboratorio
 
-[Abrir en Google Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/5_notacion_theta.ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
+[Abrir en Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/5_notacion_theta.ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
 
 ---
 

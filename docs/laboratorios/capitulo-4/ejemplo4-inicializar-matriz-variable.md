@@ -10,7 +10,7 @@ Este algoritmo recibe \(n\) y construye internamente una matriz de \(n\times n\)
 
 La página reúne la explicación y el análisis. El notebook conserva la implementación, los controles y las salidas experimentales.
 
-[Abrir en Google Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo4/notebooks/ejemplo4_(inicializar_matriz_variable).ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
+[Abrir en Colab](https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo4/notebooks/ejemplo4_(inicializar_matriz_variable).ipynb){ .md-button .md-button--primary target="_blank" rel="noopener noreferrer" .colab-button }
 
 ---
 

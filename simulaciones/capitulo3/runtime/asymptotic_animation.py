@@ -303,7 +303,7 @@ _BIG_O_HTML = r"""
       window.MathJax={
         loader:{
           load:['[tex]/cancel'],
-          paths:{mathjax:'https://cdn.jsdelivr.net/npm/mathjax@3/es5'}
+          paths:{mathjax:'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5'}
         },
         tex:{
           packages:{'[+]':['cancel']},
@@ -314,7 +314,9 @@ _BIG_O_HTML = r"""
       };
       var script=document.createElement('script');
       script.id='MathJax-script';
-      script.src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+      script.src='https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js';
+      script.integrity='sha256-1CldwzdEg2k1wTmf7s5RWVd7NMXI/7nxxjJM2C4DqII=';
+      script.crossOrigin='anonymous';
       script.async=true;
       script.onload=function(){
         var startup=window.MathJax && MathJax.startup && MathJax.startup.promise;
@@ -1986,8 +1988,10 @@ _BIG_O_HTML = r"""
   el('bo-c1-inc').addEventListener('click',function(){stepThetaConstant('bo-c1',1);});
   el('bo-c2-dec').addEventListener('click',function(){stepThetaConstant('bo-c2',-1);});
   el('bo-c2-inc').addEventListener('click',function(){stepThetaConstant('bo-c2',1);});
+  var resizeObserver=null;
   if(window.ResizeObserver){
-    new ResizeObserver(function(){if(root.isConnected)draw();}).observe(cv.parentElement);
+    resizeObserver=new ResizeObserver(function(){if(root.isConnected)draw();});
+    resizeObserver.observe(cv.parentElement);
   }else{
     window.addEventListener('resize',function(){if(root.isConnected)draw();});
   }
@@ -1996,6 +2000,10 @@ _BIG_O_HTML = r"""
   setConstantValue('bo-c1',0.1,true);
   setConstantValue('bo-c2',1.1,true);
   syncInputs(STATE_A,STATE_B);
+  window.addEventListener('pagehide',function(){
+    if(resizeObserver)resizeObserver.disconnect();
+    if(growthFrame!==null)cancelAnimationFrame(growthFrame);
+  },{once:true});
   draw();
 })();
 </script>

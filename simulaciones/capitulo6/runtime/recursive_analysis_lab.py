@@ -578,7 +578,7 @@ mjx-container{{color:#333!important;}}
 <script>
 window.MathJax={{tex:{{inlineMath:[['\\\\(','\\\\)']],processEscapes:true}},svg:{{fontCache:'none'}},startup:{{typeset:false}}}};
 </script>
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" integrity="sha256-1CldwzdEg2k1wTmf7s5RWVd7NMXI/7nxxjJM2C4DqII=" crossorigin="anonymous"></script>
 </head>
 <body><div id="content">{content}</div>
 <script>

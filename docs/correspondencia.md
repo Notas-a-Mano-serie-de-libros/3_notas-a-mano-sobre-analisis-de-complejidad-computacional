@@ -2,6 +2,8 @@
 
 Utiliza esta tabla para localizar en Pages la sección que estás leyendo en el libro. Cada enlace conduce directamente a la explicación, simulación o conjunto de ejercicios correspondiente.
 
+Esta tabla es un mapa editorial mantenido dentro del portal. Su validador comprueba que las rutas, los títulos declarados y la navegación existan; no compara automáticamente el contenido con el manuscrito. El proyecto LaTeX es la fuente canónica y no se modifica durante la construcción de Pages.
+
 | Sección del libro | Entrada en Pages |
 | --- | --- |
 | 1.1–1.3 · Introducción | [Capítulo 1: Introducción](capitulos/capitulo-1.md) |

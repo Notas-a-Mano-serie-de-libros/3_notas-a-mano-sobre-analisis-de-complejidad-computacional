@@ -13,7 +13,10 @@ on:
       - "mkdocs.yml"
       - "requirements-ci.txt"
       - "requirements-docs.txt"
+      - "requirements-publish.txt"
       - "requirements-lock.txt"
+      - "SECURITY.md"
+      - "THIRD_PARTY_LICENSES.md"
       - ".github/workflows/pages.yml"
       - "desarrollo/scripts/integrate_laboratories_into_chapters.py"
       - "desarrollo/scripts/editorial_math.py"
@@ -23,6 +26,9 @@ on:
       - "desarrollo/scripts/validate_page_assets.py"
       - "desarrollo/scripts/validate_pages_breadcrumbs.py"
       - "desarrollo/scripts/validate_external_references.py"
+      - "desarrollo/scripts/validate_web_dependencies.py"
+      - "desarrollo/scripts/check_secrets.py"
+      - "desarrollo/scripts/benchmark_jupyterlite_runtime.py"
       - "desarrollo/scripts/data/book_structure.json"
       - "desarrollo/scripts/sync_book_code.py"
       - "desarrollo/scripts/data/book_code.json"
@@ -51,14 +57,25 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
+  codeql:
+    name: CodeQL for deploy commit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: github/codeql-action/init@9f759ee644a3e7c15c1390abf49868036c00067b # v3
+        with:
+          languages: python
+      - uses: github/codeql-action/analyze@9f759ee644a3e7c15c1390abf49868036c00067b # v3
+
   build:
     name: Build site
     runs-on: ubuntu-latest
@@ -71,11 +88,16 @@ jobs:
           cache-dependency-path: |
             requirements-ci.txt
             requirements-docs.txt
+            requirements-publish.txt
             requirements-lock.txt
       - name: Install documentation and simulation dependencies
         run: |
           python -m pip install -r requirements-ci.txt -c requirements-lock.txt
-          python -m pip install -r requirements-docs.txt -c requirements-lock.txt
+          python -m pip install -r requirements-publish.txt -c requirements-lock.txt
+      - name: Audit dependencies used by the deployable artifact
+        run: |
+          python -m pip_audit -r requirements-ci.txt --progress-spinner off
+          python -m pip_audit -r requirements-publish.txt --progress-spinner off
       - name: Configure GitHub Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
@@ -110,11 +132,17 @@ jobs:
 
   deploy:
     name: Deploy site
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs:
+      - build
+      - codeql
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

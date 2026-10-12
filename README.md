@@ -44,7 +44,7 @@ git clone https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-a
 cd 3_notas-a-mano-sobre-analisis-de-complejidad-computacional
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements-dev.txt -c requirements-lock.txt jupyterlab jupyterlab_widgets ipykernel "tornado<6.5.9"
+python -m pip install -r requirements-dev.txt -c requirements-lock.txt
 python -m jupyter lab simulaciones/capitulo2/notebooks/
 ```
 
@@ -54,7 +54,7 @@ En Windows PowerShell, active el entorno con `.venv\Scripts\Activate.ps1`. La gu
 
 | Componente | Versión o entorno |
 | --- | --- |
-| Python | 3.10 o superior |
+| Python | 3.11 o superior; CI comprueba 3.11 y 3.12 |
 | JupyterLab | Versión resuelta con `requirements-lock.txt` |
 | Navegadores | Chrome, Edge, Firefox y Safari actuales |
 | Sistemas | Linux, macOS y Windows |
@@ -103,12 +103,12 @@ Este único comando instala, en el entorno recién creado (sin nada más que pue
 
 ```bash
 python -m pip install --upgrade pip
-python -m pip install -r requirements-dev.txt -c requirements-lock.txt jupyterlab jupyterlab_widgets ipykernel "tornado<6.5.9"
+python -m pip install -r requirements-dev.txt -c requirements-lock.txt
 ```
 
 Con los cuatro pasos anteriores el entorno queda listo de una vez — no hace falta repetir ni ajustar comandos después, ni ejecutar verificaciones manuales antes de abrir las animaciones.
 
-Las versiones de las dependencias usadas por CI están registradas en `requirements-lock.txt`. Las carpetas `.ipynb_checkpoints` y `.virtual_documents` son archivos temporales de Jupyter; no forman parte de las simulaciones y se pueden borrar si aparecen. El comando `make clean-notebooks` limpia salidas y metadatos generados sin tocar el código fuente.
+Las restricciones directas verificadas están registradas en `requirements-lock.txt`; los grupos de pruebas, documentación y publicación están separados. Las carpetas `.ipynb_checkpoints` y `.virtual_documents` son archivos temporales de Jupyter; no forman parte de las simulaciones y se pueden borrar si aparecen. El comando `make clean-notebooks` limpia salidas y metadatos generados sin tocar el código fuente.
 
 ## Guía de ejecución de animaciones por capítulo
 

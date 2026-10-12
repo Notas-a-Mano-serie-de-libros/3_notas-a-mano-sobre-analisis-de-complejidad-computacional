@@ -1403,7 +1403,7 @@ def clean_published_simulation_prose() -> None:
 def extract_lab(chapter: int, slug: str) -> tuple[str, str]:
     source = (DOCS / "laboratorios" / f"capitulo-{chapter}" / f"{slug}.md").read_text(encoding="utf-8")
     match = re.search(
-        r"^\[Abrir en Google Colab\]\((https://colab\.research\.google\.com/.+)\)\{",
+        r"^\[Abrir en (?:Google )?Colab\]\((https://colab\.research\.google\.com/.+)\)\{",
         source,
         flags=re.MULTILINE,
     )
@@ -1413,7 +1413,7 @@ def extract_lab(chapter: int, slug: str) -> tuple[str, str]:
     lines = source.splitlines()
     body = "\n".join(lines[3:]).strip()
     body = re.sub(
-        r"\n*---\n+## Ejecutar el laboratorio\n+.*?\n+\[Abrir en Google Colab\].*?\n+---\n*",
+        r"\n*---\n+## Ejecutar el laboratorio\n+.*?\n+\[Abrir en (?:Google )?Colab\].*?\n+---\n*",
         "\n\n",
         body,
         flags=re.DOTALL,
@@ -1432,7 +1432,7 @@ def extract_lab(chapter: int, slug: str) -> tuple[str, str]:
             "5-notacion-theta",
         }
     ):
-        body = re.sub(r"^\[Abrir en Google Colab\].*\n?", "", body, flags=re.MULTILINE)
+        body = re.sub(r"^\[Abrir en (?:Google )?Colab\].*\n?", "", body, flags=re.MULTILINE)
     body = body.replace(
         "Este resumen presenta los resultados generales para las dos formas de implementación. "
         "El detalle de los procesos, criterios y cálculos que llevan a estas complejidades se puede "

@@ -17,6 +17,7 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SITE = ROOT / "site" / "jupyterlite"
 MAX_ARTIFACT_BYTES = 100 * 1024 * 1024
+MAX_ARTIFACT_FILES = 12_000
 
 
 def validate(site_dir: Path) -> list[str]:
@@ -93,6 +94,12 @@ def validate(site_dir: Path) -> list[str]:
         errors.append(
             f"JupyterLite ocupa {artifact_bytes} bytes; el límite es {MAX_ARTIFACT_BYTES}"
         )
+    artifact_files = sum(1 for path in site_dir.rglob("*") if path.is_file())
+    if artifact_files > MAX_ARTIFACT_FILES:
+        errors.append(
+            f"JupyterLite contiene {artifact_files} archivos; el límite es "
+            f"{MAX_ARTIFACT_FILES}"
+        )
     return errors
 
 
@@ -108,7 +115,11 @@ def main() -> int:
     total_bytes = sum(
         path.stat().st_size for path in site_dir.rglob("*") if path.is_file()
     )
-    print(f"Artefactos JupyterLite válidos ({total_bytes} bytes en cuatro perfiles).")
+    total_files = sum(1 for path in site_dir.rglob("*") if path.is_file())
+    print(
+        f"Artefactos JupyterLite válidos ({total_bytes} bytes y "
+        f"{total_files} archivos en cuatro perfiles)."
+    )
     return 0
 
 

@@ -136,6 +136,7 @@ function prepareJupyterLiteFrames(root = document) {
 
 const reviewApiBase = "https://notas-a-mano-opiniones.carlos940807.chatgpt.site";
 let reviewDataRequest;
+let pageCleanup = [];
 
 function loadReviewData() {
   if (!reviewDataRequest) reviewDataRequest = fetch(`${reviewApiBase}/api/reviews`).then((response) => {
@@ -180,6 +181,10 @@ function prepareReaderFeedback(root = document) {
     };
     const formResizeObserver = new ResizeObserver(syncCommentsHeight);
     formResizeObserver.observe(form);
+    pageCleanup.push(() => {
+      formResizeObserver.disconnect();
+      if (turnstileWidget !== null && window.turnstile) window.turnstile.remove(turnstileWidget);
+    });
     syncCommentsHeight();
 
     const renderReviews = (data) => {
@@ -237,6 +242,7 @@ function prepareReaderFeedback(root = document) {
 }
 
 function preparePageEnhancements() {
+  pageCleanup.splice(0).forEach((cleanup) => cleanup());
   prepareEditorialFigures();
   prepareReadingProgress();
   prepareAccessibleTables();

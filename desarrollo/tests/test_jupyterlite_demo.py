@@ -139,7 +139,7 @@ def test_portal_resizes_embedded_jupyterlite_frames_from_trusted_messages():
 
 def test_documentation_dependencies_include_the_jupyter_builder_cli():
     documentation_requirements = (
-        PROJECT_ROOT / "requirements-docs.txt"
+        PROJECT_ROOT / "requirements-publish.txt"
     ).read_text(encoding="utf-8")
     dependency_lock = (PROJECT_ROOT / "requirements-lock.txt").read_text(
         encoding="utf-8"
@@ -504,7 +504,7 @@ def test_breadcrumb_validation_ignores_jupyterlite_application_pages(tmp_path):
 
 
 def test_documentation_dependencies_include_jupyter_server():
-    requirements = (PROJECT_ROOT / "requirements-docs.txt").read_text(encoding="utf-8")
+    requirements = (PROJECT_ROOT / "requirements-publish.txt").read_text(encoding="utf-8")
     lock = (PROJECT_ROOT / "requirements-lock.txt").read_text(encoding="utf-8")
     assert "jupyter-server==2.21.1" in requirements
     assert "jupyter-server==2.21.1" in lock

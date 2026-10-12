@@ -133,15 +133,26 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements-docs.txt -c requirements-lock.txt playwright
+          python -m pip install -r requirements-publish.txt -r requirements-ci.txt -c requirements-lock.txt
           python -m playwright install --with-deps chromium
       - name: Build portal and run smoke test
         run: |
           mkdocs build --strict
           python desarrollo/scripts/smoke_portal_e2e.py --site-dir site
+          python desarrollo/scripts/build_jupyterlite_demo.py
+          python desarrollo/scripts/validate_jupyterlite_artifact.py
+          mkdir -p artifacts
+          python desarrollo/scripts/benchmark_jupyterlite_runtime.py --output artifacts/jupyterlite-runtime.json
+      - name: Upload browser performance report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: jupyterlite-runtime
+          path: artifacts/jupyterlite-runtime.json
+          if-no-files-found: warn
 
   security:
-    name: Audit Python dependencies
+    name: Audit dependencies and secrets
     runs-on: ubuntu-latest
     needs:
       - lint-python
@@ -161,6 +172,8 @@ jobs:
         run: |
           mkdir -p artifacts
           python -m pip_audit -r requirements-ci.txt --progress-spinner off --format json --output artifacts/pip-audit.json
+      - name: Scan tracked files for secret formats
+        run: python desarrollo/scripts/check_secrets.py
       - name: Upload dependency audit
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

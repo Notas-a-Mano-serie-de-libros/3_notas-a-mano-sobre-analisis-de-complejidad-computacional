@@ -53,15 +53,19 @@ class TestPerformanceContracts(unittest.TestCase):
         )
         report = {
             "benchmarks": [
-                {"label": "a", "avg_ms": 2.0},
-                {"label": "b", "avg_ms": 9.0},
+                {"label": "a", "avg_ms": 2.0, "peak_kib": 10.0},
+                {"label": "b", "avg_ms": 9.0, "peak_kib": 200.0},
             ]
         }
-        baseline = {"max_avg_ms": {"a": 3.0, "b": 5.0, "c": 1.0}}
+        baseline = {
+            "max_avg_ms": {"a": 3.0, "b": 5.0, "c": 1.0},
+            "max_peak_kib": 100.0,
+        }
 
         errors = module.benchmark_regressions(report, baseline)
 
         self.assertIn("b: avg=9.000 ms supera presupuesto 5.000 ms", errors)
+        self.assertIn("b: memoria pico=200.0 KiB supera 100.0 KiB", errors)
         self.assertIn("c: existe en línea base, pero no aparece en el reporte", errors)
 
     def test_clean_notebooks_check_mode_passes_on_clean_tree(self):

@@ -1,5 +1,6 @@
 {
-  "description": "Presupuesto m\u00e1ximo por benchmark en milisegundos.",
+  "description": "Presupuestos máximos de CPU y memoria para cada benchmark.",
+  "max_peak_kib": 65536,
   "max_avg_ms": {
     "capitulo7.binaria.lazy_render_steps": 10.0,
     "capitulo7.binaria.render": 10.0,

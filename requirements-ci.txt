@@ -9,3 +9,4 @@ sympy
 ruff
 pip-audit
 pandas
+playwright

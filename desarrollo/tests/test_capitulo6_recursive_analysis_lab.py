@@ -409,7 +409,7 @@ def test_experiment_ui_fallback_defines_complete_sampling_contract():
 
 
 def test_recursive_lab_uses_self_contained_mathjax_in_remote_frontends():
-    assert "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" in SOURCE
+    assert "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" in SOURCE
     assert "MathJax.typesetPromise" in SOURCE
     assert "widgets.HTMLMath" not in SOURCE
 

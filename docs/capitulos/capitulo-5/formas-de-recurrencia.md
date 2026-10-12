@@ -94,7 +94,7 @@ Para interpretar \(a\) como número de hijos, se consideran multiplicidades ente
 
     Si \(k>1\), el número de nodos por nivel crece exponencialmente con la profundidad. La figura ilustra el caso particular de cuatro hijos por nodo.
 
-    <figure class="recurrence-tree-figure"><img src="../../../assets/images/capitulo-5/arbol_recurrencia_a4.png" alt="Árbol de cuatro hijos como ejemplo de árbol k-nario"><figcaption>Árbol de recurrencia (\(a=k\)).</figcaption></figure>
+    <figure class="recurrence-tree-figure"><img src="../../../assets/images/capitulo-5/arbol_recurrencia_ak.png" alt="Árbol k-nario con k hijos por nodo"><figcaption>Árbol de recurrencia (\(a=k\)).</figcaption></figure>
 
 ## Más de un término recursivo
 
