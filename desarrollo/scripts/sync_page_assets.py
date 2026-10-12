@@ -7,9 +7,9 @@ import json
 from pathlib import Path
 
 try:
-    from desarrollo.scripts.image_assets import published_bytes
+    from desarrollo.scripts.image_assets import published_bytes, rendered_png_pixels
 except ModuleNotFoundError:
-    from image_assets import published_bytes
+    from image_assets import published_bytes, rendered_png_pixels
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "desarrollo/scripts/data/page_asset_sources.json"
@@ -26,7 +26,12 @@ def sync(check: bool = False) -> list[str]:
             continue
         expected = published_bytes(source)
         if check:
-            if not destination.is_file() or destination.read_bytes() != expected:
+            if not destination.is_file():
+                errors.append(f"Recurso desactualizado: {destination_name}")
+            elif source.suffix.lower() == ".png":
+                if rendered_png_pixels(source) != rendered_png_pixels(destination):
+                    errors.append(f"Recurso desactualizado: {destination_name}")
+            elif destination.read_bytes() != expected:
                 errors.append(f"Recurso desactualizado: {destination_name}")
             continue
         destination.parent.mkdir(parents=True, exist_ok=True)

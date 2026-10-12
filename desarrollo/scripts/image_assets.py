@@ -17,3 +17,13 @@ def published_bytes(source: Path) -> bytes:
         output = BytesIO()
         image.save(output, format="PNG", optimize=True, compress_level=9)
         return output.getvalue()
+
+
+def rendered_png_pixels(source: Path) -> tuple[tuple[int, int], bytes]:
+    """Normalizes PNG pixels so sync checks ignore encoder-version differences."""
+
+    from PIL import Image, ImageOps
+
+    with Image.open(source) as image:
+        image = ImageOps.exif_transpose(image).convert("RGBA")
+        return image.size, image.tobytes()
