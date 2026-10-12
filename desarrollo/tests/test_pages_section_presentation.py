@@ -23,7 +23,7 @@ def test_section_numbers_remain_on_one_line_and_match_title_color():
     assert all("grid-template-columns: max-content" in rule for rule in section_rules)
 
 
-def test_colab_button_follows_the_embedded_simulation():
+def test_colab_button_precedes_the_embedded_simulation():
     pages_with_colab = []
     algorithm_pages = []
     for path in sorted(SECTION_PAGES.glob("capitulo-*/*.md")):
@@ -39,8 +39,8 @@ def test_colab_button_follows_the_embedded_simulation():
             )
             assert demos, path
             for demo in demos:
-                assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
-                    'class="jupyterlite-demo__actions"'
+                assert demo.index('class="jupyterlite-demo__actions"') < demo.index(
+                    'class="jupyterlite-demo__frame"'
                 ), path
                 assert "Run All Cells" not in demo, path
             assert content.count("La simulación se ejecuta automáticamente") == len(
@@ -54,9 +54,9 @@ def test_colab_button_follows_the_embedded_simulation():
             )[0]
             actions = demo.split('<div class="jupyterlite-demo__actions">', 1)[1].split("</div>", 1)[0]
             assert "colab-button" in actions, path
-            assert ">Abrir en Google Colab</a>" in actions, path
-            assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
-                'class="jupyterlite-demo__actions"'
+            assert ">Abrir en Colab</a>" in actions, path
+            assert demo.index('class="jupyterlite-demo__actions"') < demo.index(
+                'class="jupyterlite-demo__frame"'
             ), path
             continue
         if "<!-- jupyterlite-demo:start -->" in content:
@@ -66,9 +66,9 @@ def test_colab_button_follows_the_embedded_simulation():
             demo = content.split("<!-- jupyterlite-demo:start -->", 1)[1].split(
                 "<!-- jupyterlite-demo:end -->", 1
             )[0]
-            assert ">Abrir en Google Colab</a>" in demo, path
-            assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
-                'class="jupyterlite-demo__actions"'
+            assert ">Abrir en Colab</a>" in demo, path
+            assert demo.index('class="jupyterlite-demo__actions"') < demo.index(
+                'class="jupyterlite-demo__frame"'
             ), path
             if path.parent.name in ("capitulo-7", "capitulo-8") and re.match(
                 r"[1-9]\d*-", path.stem
@@ -97,7 +97,7 @@ def test_colab_button_follows_the_embedded_simulation():
         assert remainder.startswith('<div class="lab-action">'), path
         first_action = remainder.split("</div>", 1)[0]
         assert "colab-button" in first_action, path
-        assert ">Abrir en Google Colab</a>" in first_action, path
+        assert ">Abrir en Colab</a>" in first_action, path
 
     assert len(pages_with_colab) == 48
     assert len(algorithm_pages) == 13

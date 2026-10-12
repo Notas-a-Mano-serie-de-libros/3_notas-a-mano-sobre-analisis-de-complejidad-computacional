@@ -5,7 +5,7 @@
 <span class="chapter-kicker">Capítulo 3</span>
 
 <div class="lab-action">
-<a class="md-button md-button--primary colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/ejemplos_concretos_notaciones.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
+<a class="md-button md-button--primary colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/ejemplos_concretos_notaciones.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
 </div>
 
 La notación asintótica simplificada conserva el término que determina el crecimiento de una función cuando \(n\) aumenta y omite constantes multiplicativas y términos de menor orden. Los ejemplos siguientes muestran cómo esa simplificación se relaciona con las cotas formales.

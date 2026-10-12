@@ -353,7 +353,7 @@ def test_all_remaining_simulation_pages_embed_their_matching_notebook():
         for notebook in notebooks:
             assert notebook_url(chapter, notebook) in page
         assert "Abrir en pantalla completa" in page
-        assert "Abrir en Google Colab" in page
+        assert "Abrir en Colab" in page
         before_demo = page.split("<!-- jupyterlite-demo:start -->", 1)[0]
         assert '<div class="lab-action">' not in before_demo
 
@@ -403,13 +403,13 @@ def test_chapter_three_embeds_the_jupyterlite_notebook():
         actions = demo.split('<div class="jupyterlite-demo__actions">', 1)[1].split(
             "</div>", 1
         )[0]
-        assert "Simulación interactiva ·" in toolbar
-        assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
-            'class="jupyterlite-demo__actions"'
+        assert toolbar.strip() == "<span>Simulación interactiva</span>"
+        assert demo.index('class="jupyterlite-demo__actions"') < demo.index(
+            'class="jupyterlite-demo__frame"'
         )
-        assert ">Abrir en Google Colab</a>" in actions
+        assert ">Abrir en Colab</a>" in actions
         assert ">Abrir en pantalla completa</a>" in actions
-        assert actions.index("Abrir en Google Colab") < actions.index(
+        assert actions.index("Abrir en Colab") < actions.index(
             "Abrir en pantalla completa"
         )
         assert '<div class="lab-action">' not in page.split(
@@ -451,10 +451,10 @@ def test_chapter_two_embeds_each_jupyterlite_simulation_without_duplicate_button
         actions = demo.split('<div class="jupyterlite-demo__actions">', 1)[1].split(
             "</div>", 1
         )[0]
-        assert demo.index('class="jupyterlite-demo__frame"') < demo.index(
-            'class="jupyterlite-demo__actions"'
+        assert demo.index('class="jupyterlite-demo__actions"') < demo.index(
+            'class="jupyterlite-demo__frame"'
         )
-        assert ">Abrir en Google Colab</a>" in actions
+        assert ">Abrir en Colab</a>" in actions
         assert ">Abrir en pantalla completa</a>" in actions
 
 

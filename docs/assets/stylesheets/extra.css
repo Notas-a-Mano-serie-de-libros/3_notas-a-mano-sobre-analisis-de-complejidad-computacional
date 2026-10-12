@@ -1941,7 +1941,7 @@ input {
 .md-typeset .jupyterlite-demo__actions {
   align-items: center;
   background: color-mix(in srgb, var(--md-default-fg-color) 5%, var(--md-default-bg-color));
-  border-top: 1px solid var(--notas-rule);
+  border-bottom: 1px solid var(--notas-rule);
   display: flex;
   flex-wrap: nowrap;
   gap: .55rem;

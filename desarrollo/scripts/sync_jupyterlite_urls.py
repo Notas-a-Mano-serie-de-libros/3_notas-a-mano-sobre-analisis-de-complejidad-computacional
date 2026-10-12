@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 
 try:
@@ -16,12 +17,74 @@ except ModuleNotFoundError:
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "docs"
+DEMO_START = "<!-- jupyterlite-demo:start -->"
+DEMO_END = "<!-- jupyterlite-demo:end -->"
 
 
 def notebook_url(chapter: int, notebook: Path) -> str:
     profile = profile_for_chapter(chapter)
     encoded_path = str(notebook).replace("/", "%2F")
     return f"jupyterlite/{profile}/notebooks/index.html?path={encoded_path}"
+
+
+def normalize_demo_presentation(content: str) -> str:
+    """Mantiene título y acciones encima de cada iframe JupyterLite."""
+
+    def normalize(match: re.Match[str]) -> str:
+        demo = match.group("demo")
+        demo = re.sub(
+            r'(<div class="jupyterlite-demo__toolbar">\s*<span>).*?(</span>)',
+            r"\1Simulación interactiva\2",
+            demo,
+            count=1,
+            flags=re.DOTALL,
+        )
+        demo = re.sub(
+            r'(<a\b[^>]*class="[^"]*\bcolab-button\b[^"]*"[^>]*>).*?(</a>)',
+            r"\1Abrir en Colab\2",
+            demo,
+            flags=re.DOTALL,
+        )
+        actions_match = re.search(
+            r'(?P<actions>[ \t]*<div class="jupyterlite-demo__actions">.*?</div>)[ \t]*\n?',
+            demo,
+            flags=re.DOTALL,
+        )
+        if not actions_match:
+            return match.group(0)
+
+        action_lines = actions_match.group("actions").splitlines()
+        base_indent = len(action_lines[0]) - len(action_lines[0].lstrip())
+        actions = "\n".join(
+            "  " + line[base_indent:] if line.strip() else ""
+            for line in action_lines
+        )
+        demo_without_actions = (
+            demo[: actions_match.start()] + demo[actions_match.end() :]
+        )
+        toolbar_match = re.search(
+            r'<div class="jupyterlite-demo__toolbar">.*?</div>',
+            demo_without_actions,
+            flags=re.DOTALL,
+        )
+        if not toolbar_match:
+            return match.group(0)
+
+        insertion = toolbar_match.end()
+        normalized = (
+            demo_without_actions[:insertion].rstrip()
+            + "\n"
+            + actions
+            + "\n"
+            + demo_without_actions[insertion:].lstrip("\n")
+        )
+        return f"{DEMO_START}{normalized}{DEMO_END}"
+
+    pattern = re.compile(
+        rf"{re.escape(DEMO_START)}(?P<demo>.*?){re.escape(DEMO_END)}",
+        flags=re.DOTALL,
+    )
+    return pattern.sub(normalize, content)
 
 
 def synchronize(check: bool = False) -> list[Path]:
@@ -33,7 +96,7 @@ def synchronize(check: bool = False) -> list[Path]:
             errors.append(f"Falta la página catalogada: {path.relative_to(ROOT)}")
             continue
         content = path.read_text(encoding="utf-8")
-        updated = content
+        updated = normalize_demo_presentation(content)
         for notebook in notebooks:
             target = notebook_url(chapter, notebook)
             previous = f"jupyterlite/capitulo-{chapter}/notebooks/index.html?path={str(notebook).replace('/', '%2F')}"

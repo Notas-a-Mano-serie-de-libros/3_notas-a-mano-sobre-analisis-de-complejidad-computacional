@@ -66,7 +66,11 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador: no abre
 
 <div class="jupyterlite-demo">
   <div class="jupyterlite-demo__toolbar">
-    <span>Simulación interactiva · Capítulo 3</span>
+    <span>Simulación interactiva</span>
+  </div>
+  <div class="jupyterlite-demo__actions">
+    <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/0_comparacion_notaciones_asintoticas.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F0_comparacion_notaciones_asintoticas.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
@@ -75,10 +79,6 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador: no abre
     loading="lazy"
     allow="clipboard-read; clipboard-write"
   ></iframe>
-    <div class="jupyterlite-demo__actions">
-      <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/0_comparacion_notaciones_asintoticas.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F0_comparacion_notaciones_asintoticas.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
-    </div>
 
 </div>
 <!-- jupyterlite-demo:end -->

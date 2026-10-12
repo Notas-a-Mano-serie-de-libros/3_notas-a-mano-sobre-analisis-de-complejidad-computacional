@@ -15,7 +15,7 @@ except ModuleNotFoundError:  # Ejecución directa desde desarrollo/scripts/
 ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "docs"
 FORMULA = re.compile(r"(?:[OΩΘωo]\s*\(|log(?:_\d+)?\s*\(|√|[nkd][²³])")
-COLAB_BUTTON_LABEL = "Abrir en Google Colab"
+COLAB_BUTTON_LABEL = "Abrir en Colab"
 
 
 def main() -> int:

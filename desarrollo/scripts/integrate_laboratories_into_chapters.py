@@ -1137,7 +1137,7 @@ def lab_button(url: str) -> str:
     return (
         '<div class="lab-action">\n'
         f'<a class="md-button md-button--primary colab-button" href="{url}" '
-        'target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>\n'
+        'target="_blank" rel="noopener noreferrer">Abrir en Colab</a>\n'
         "</div>"
     )
 
@@ -1239,7 +1239,7 @@ def normalize_colab_button_label(content: str) -> str:
     """Unifica el llamado a la acción de todos los botones de simulación."""
     return re.sub(
         r'(<a\b[^>]*class="[^"]*\bcolab-button\b[^"]*"[^>]*>).*?(</a>)',
-        r"\1Abrir en Google Colab\2",
+        r"\1Abrir en Colab\2",
         content,
         flags=re.DOTALL,
     )

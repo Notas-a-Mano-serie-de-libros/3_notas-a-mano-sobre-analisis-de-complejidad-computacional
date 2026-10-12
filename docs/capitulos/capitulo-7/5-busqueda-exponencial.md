@@ -72,7 +72,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
 
 <div class="jupyterlite-demo">
   <div class="jupyterlite-demo__toolbar">
-    <span>Simulación interactiva · Búsqueda exponencial</span>
+    <span>Simulación interactiva</span>
+  </div>
+  <div class="jupyterlite-demo__actions">
+    <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo7/notebooks/5_busqueda_exponencial.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F5_busqueda_exponencial.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
@@ -81,10 +85,6 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
     loading="lazy"
     allow="clipboard-read; clipboard-write"
   ></iframe>
-    <div class="jupyterlite-demo__actions">
-      <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo7/notebooks/5_busqueda_exponencial.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Google Colab</a>
-      <a class="md-button jupyterlite-button" href="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F5_busqueda_exponencial.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
-    </div>
 
 </div>
 <!-- jupyterlite-demo:end -->
