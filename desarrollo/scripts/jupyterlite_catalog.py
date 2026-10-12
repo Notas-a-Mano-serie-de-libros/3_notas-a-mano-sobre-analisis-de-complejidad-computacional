@@ -190,6 +190,22 @@ CHAPTER_CONFIGS = {
             "notebooks/ejercicios_propuestos.ipynb",
         ),
         "runtime_files": tuple(
+            Path(f"common/{name}")
+            for name in (
+                "__init__.py",
+                "animation_runtime.py",
+                "chart_runtime.py",
+                "exercise_laboratory.py",
+                "experimental_simulation.py",
+                "graphics.py",
+                "plot_style.py",
+                "remote_fetch.py",
+                "simulation_views.py",
+                "visual_roles.py",
+                "widget_controls.py",
+            )
+        )
+        + tuple(
             Path(path)
             for path in (
                 "core/__init__.py",
@@ -204,6 +220,7 @@ CHAPTER_CONFIGS = {
                 "core/search/6_busqueda_ternaria_app.py",
                 "core/search/busquedas_chart.py",
                 "core/search/search_metrics.py",
+                "simulaciones/capitulo2/runtime/experimental_animation.py",
                 "simulaciones/capitulo7/runtime/__init__.py",
                 "simulaciones/capitulo7/runtime/abrir_busqueda.py",
                 "simulaciones/capitulo7/runtime/colab_bootstrap.py",

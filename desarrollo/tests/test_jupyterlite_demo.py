@@ -110,6 +110,19 @@ def test_catalogo_asigna_capitulos_y_recursos_a_cuatro_perfiles():
     assert set(PROFILE_CONFIGS["graficas-cientificas"]["chapters"]) == {3}
     assert set(PROFILE_CONFIGS["algebra-simbolica"]["chapters"]) == {5}
     assert set(PROFILE_CONFIGS["analisis-completo"]["chapters"]) == {7}
+    assert {
+        PROJECT_ROOT / "common" / "animation_runtime.py",
+        PROJECT_ROOT / "common" / "exercise_laboratory.py",
+        PROJECT_ROOT / "common" / "simulation_views.py",
+        PROJECT_ROOT / "common" / "widget_controls.py",
+    }.issubset({PROJECT_ROOT / path for path in chapter_content_files(7)})
+    assert (
+        PROJECT_ROOT
+        / "simulaciones"
+        / "capitulo2"
+        / "runtime"
+        / "experimental_animation.py"
+    ) in {PROJECT_ROOT / path for path in chapter_content_files(7)}
     assert all(
         (PROJECT_ROOT / path).is_file()
         for profile in PROFILE_CONFIGS
