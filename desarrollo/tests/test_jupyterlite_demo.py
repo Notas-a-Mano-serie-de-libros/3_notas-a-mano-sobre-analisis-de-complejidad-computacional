@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import ast
 import json
+from types import SimpleNamespace
 
 from desarrollo.scripts.build_jupyterlite_demo import (
     AUTORUN_EXTENSION_DIR,
@@ -76,6 +78,46 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert "window.parent.postMessage" in extension
     assert "new ResizeObserver(scheduleHeightReport)" in extension
     assert "new MutationObserver(scheduleHeightReport)" in extension
+
+
+def test_chapter2_bootstrap_repairs_only_missing_runtime_files(tmp_path):
+    bootstrap_path = (
+        PROJECT_ROOT
+        / "simulaciones"
+        / "capitulo2"
+        / "runtime"
+        / "colab_bootstrap.py"
+    )
+    parsed = ast.parse(bootstrap_path.read_text(encoding="utf-8"))
+    definitions = ast.Module(
+        body=[
+            node
+            for node in parsed.body
+            if isinstance(
+                node,
+                (ast.Import, ast.ImportFrom, ast.Assign, ast.AnnAssign, ast.FunctionDef),
+            )
+        ],
+        type_ignores=[],
+    )
+    namespace = {"__name__": "chapter2_bootstrap_test"}
+    exec(compile(definitions, str(bootstrap_path), "exec"), namespace)
+
+    present_file = tmp_path / "runtime" / "present.py"
+    present_file.parent.mkdir(parents=True)
+    present_file.write_text("# disponible\n", encoding="utf-8")
+    downloaded = []
+    namespace["REQUIRED_FILES"] = ("runtime/present.py", "runtime/missing.py")
+    namespace["find_project_root"] = lambda: tmp_path
+    namespace["running_in_colab"] = lambda: False
+    namespace["download_required_files"] = (
+        lambda root, paths: downloaded.extend((root, tuple(paths)))
+    )
+    namespace["sys"] = SimpleNamespace(path=[], modules={})
+
+    namespace["prepare_imports"]()
+
+    assert downloaded == [tmp_path, ("runtime/missing.py",)]
 
 
 def test_portal_resizes_embedded_jupyterlite_frames_from_trusted_messages():

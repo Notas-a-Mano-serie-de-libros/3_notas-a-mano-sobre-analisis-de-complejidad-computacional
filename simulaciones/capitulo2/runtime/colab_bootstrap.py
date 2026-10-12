@@ -61,8 +61,8 @@ def find_project_root():
     return None
 
 
-def download_required_files(root):
-    for relative_path in REQUIRED_FILES:
+def download_required_files(root, relative_paths=REQUIRED_FILES):
+    for relative_path in relative_paths:
         target = root / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
         request = urllib.request.Request(
@@ -84,6 +84,18 @@ def prepare_imports():
     if running_in_colab():
         download_required_files(project_root)
         install_colab_packages()
+    else:
+        # JupyterLite conserva /drive entre visitas. Una versión antigua puede
+        # contener el bootstrap, pero no todos los módulos añadidos después.
+        # Reparar solo los archivos ausentes mantiene la ejecución sin borrar
+        # el trabajo del lector ni depender de limpiar el almacenamiento.
+        missing_files = tuple(
+            relative_path
+            for relative_path in REQUIRED_FILES
+            if not (project_root / relative_path).is_file()
+        )
+        if missing_files:
+            download_required_files(project_root, missing_files)
 
     root_string = str(project_root.resolve())
     if root_string not in sys.path:
