@@ -45,6 +45,29 @@ def test_check_url_reports_antirobot_response_without_marking_link_as_broken():
     assert "HTTP 403" in detail
 
 
+def test_check_url_retries_transient_server_responses_with_get():
+    url = f"{EXAMPLE_ROOT}/temporarily-unavailable"
+    with patch(
+        "desarrollo.scripts.check_published_links.request_status",
+        side_effect=[503, 200],
+    ) as request:
+        assert check_url(url) == ("ok", url)
+
+    assert [call.args[1] for call in request.call_args_list] == ["HEAD", "GET"]
+
+
+def test_check_url_reports_persistent_transient_response_as_unverifiable():
+    url = f"{EXAMPLE_ROOT}/temporarily-unavailable"
+    with patch(
+        "desarrollo.scripts.check_published_links.request_status",
+        side_effect=[503, 503],
+    ):
+        outcome, detail = check_url(url)
+
+    assert outcome == "blocked"
+    assert "HTTP 503" in detail
+
+
 def test_check_url_rejects_missing_pages():
     url = f"{EXAMPLE_ROOT}/missing"
     with patch("desarrollo.scripts.check_published_links.request_status", return_value=404):

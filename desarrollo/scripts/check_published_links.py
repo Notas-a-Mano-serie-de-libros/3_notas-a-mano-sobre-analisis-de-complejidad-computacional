@@ -16,8 +16,9 @@ HTML_URL_RE = re.compile(
     r'''(?:href|src)\s*=\s*["'](?P<url>https:''' + r'''//[^"']+)["']'''
 )
 BARE_URL_RE = re.compile(r"https:" + r"//[^\s'\"<>\x60)}]+")
-FALLBACK_TO_GET = {403, 405}
-ROBOT_BLOCKS = {401, 403, 429}
+TRANSIENT_STATUSES = {408, 425, 429, 500, 502, 503, 504}
+FALLBACK_TO_GET = {403, 405, *TRANSIENT_STATUSES}
+UNVERIFIABLE_STATUSES = {401, 403, *TRANSIENT_STATUSES}
 USER_AGENT = "Mozilla/5.0 (compatible; notas-a-mano-link-check/1.0)"
 
 
@@ -79,7 +80,7 @@ def check_url(url: str) -> tuple[str, str]:
             status = request_status(url, "GET")
         if status < 400:
             return "ok", url
-        if status in ROBOT_BLOCKS:
+        if status in UNVERIFIABLE_STATUSES:
             return "blocked", f"HTTP {status}: {url}"
         return "failure", f"HTTP {status}: {url}"
     except Exception as error:
@@ -101,12 +102,18 @@ def main() -> None:
     failures = [detail for outcome, detail in results if outcome == "failure"]
     blocked = [detail for outcome, detail in results if outcome == "blocked"]
     if blocked:
-        print("Enlaces no verificables por políticas antirobot:", file=sys.stderr)
+        print(
+            "Enlaces no verificables por bloqueo antirobot o respuesta transitoria:",
+            file=sys.stderr,
+        )
         print("\n".join(blocked), file=sys.stderr)
     if failures:
         print("\n".join(failures), file=sys.stderr)
         raise SystemExit(1)
-    print(f"Enlaces publicados comprobados: {len(urls) - len(blocked)}; bloqueados por robots: {len(blocked)}")
+    print(
+        f"Enlaces publicados comprobados: {len(urls) - len(blocked)}; "
+        f"no verificables: {len(blocked)}"
+    )
 
 
 if __name__ == "__main__":
