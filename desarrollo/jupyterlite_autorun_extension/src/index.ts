@@ -21,7 +21,12 @@ async function installWidgetPackage(panel: NotebookPanel): Promise<void> {
   let installationError: string | null = null;
   const future = kernel.requestExecute(
     {
-      code: "import piplite\nawait piplite.install('ipywidgets==8.1.9')",
+      code: [
+        "import piplite",
+        "await piplite.install('ipywidgets==8.1.9')",
+        // Confirm the module is visible in this kernel before the notebook runs.
+        "import ipywidgets",
+      ].join("\n"),
       stop_on_error: true,
     },
     true,
