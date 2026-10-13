@@ -18,13 +18,73 @@
 
 El mejor caso encuentra el valor en la raíz: \(\Omega(1)\). En un árbol balanceado, una búsqueda guiada por orden alcanza una profundidad \(\Theta(\log_2(n))\); en un árbol degenerado puede recorrer \(O(n)\) nodos. La memoria de la versión recursiva depende de la altura \(h\): \(S(n)\in\Theta(h)\).
 
-### Aplicación del procedimiento
+### Aplicación de los procedimientos del libro
 
-1. **Casos base:** encontrar el valor en la raíz cuesta \(\Theta(1)\); alcanzar una referencia nula también cuesta \(\Theta(1)\).
-2. **Llamadas y tamaño:** la comparación con la clave selecciona exactamente uno de los dos subárboles. El tamaño disminuye según la altura restante, de \(h\) a \(h-1\).
-3. **Trabajo local:** las comparaciones y la selección del hijo cuestan \(\Theta(1)\), por lo que \(T(h)=T(h-1)+\Theta(1)\).
-4. **Método de resolución:** la sustitución iterativa produce \(T(h)\in\Theta(h)\). En un árbol balanceado, \(h\in\Theta(\log_2(n))\); en uno degenerado, \(h\in\Theta(n)\). Esto da \(\Theta(\log_2(n))\) y \(\Theta(n)\), respectivamente.
-5. **Espacio:** permanece activa una sola ruta con un marco constante por nivel; en consecuencia, \(S(n)\in\Theta(h)\), con los mismos órdenes balanceado y degenerado.
+Este ejemplo se separa por casos porque el costo depende de la profundidad del elemento y, por tanto, de la forma del árbol.
+
+#### Mejor caso
+
+El valor buscado está en la raíz. Solo se ejecutan la comprobación y el retorno:
+
+\[
+C(n)\in\Omega(1).
+\]
+
+#### Caso promedio: árbol balanceado
+
+Cada comparación descarta uno de los subárboles y conserva un problema de la mitad del tamaño:
+
+\[
+C(n)=
+\begin{cases}
+1 & \text{si } n=0,\\
+C(n/2)+1 & \text{si } n>0.
+\end{cases}
+\]
+
+Por sustitución iterativa:
+
+\[
+C(n)=C(n/2^k)+k.
+\]
+
+La condición \(n/2^k=1\) implica \(k=\log_2(n)\). En consecuencia:
+
+\[
+C(n)=C(1)+\log_2(n)
+\in\Theta(\log_2(n)).
+\]
+
+#### Peor caso: árbol degenerado
+
+Cuando el árbol se comporta como una lista, cada comparación elimina un solo nodo:
+
+\[
+C(n)=
+\begin{cases}
+1 & \text{si } n=0,\\
+C(n-1)+1 & \text{si } n>0.
+\end{cases}
+\]
+
+La expansión produce \(C(n)=C(n-k)+k\). Al llegar al caso base, \(k=n\), por lo que:
+
+\[
+C(n)=C(0)+n\in O(n).
+\]
+
+#### Tiempo y espacio
+
+La función sigue una sola rama del árbol. Por ello, el número de operaciones y la cantidad máxima de marcos activos dependen de la misma profundidad. Tal como resume el libro:
+
+\[
+T(n),S(n)\in
+\begin{cases}
+\Omega(1) & \text{mejor caso},\\
+\Theta(\log_2(n)) & \text{caso promedio},\\
+O(n) & \text{peor caso}.
+\end{cases}
+\]
 
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">

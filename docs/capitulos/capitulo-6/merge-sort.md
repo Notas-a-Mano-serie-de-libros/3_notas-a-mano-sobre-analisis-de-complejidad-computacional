@@ -18,18 +18,143 @@ A continuación, se presenta la implementación recursiva estándar del **ordena
 
 La división genera dos subproblemas de tamaño \(n/2\) y la combinación recorre los \(n\) elementos. Por tanto, \(T(n)=2 \cdot T(n/2)+\Theta(n)\in\Theta(n \cdot \log_2(n))\). Los arreglos auxiliares de combinación requieren \(\Theta(n)\) memoria; la pila añade \(\Theta(\log_2(n))\), que queda dominada por el almacenamiento lineal.
 
-### Aplicación del procedimiento
+### Aplicación de los procedimientos del libro
 
-1. **Caso base:** un segmento con cero o un elemento ya está ordenado y cuesta \(\Theta(1)\).
-2. **Llamadas y tamaños:** se generan dos llamadas sobre mitades de tamaño aproximado \(n/2\).
-3. **Trabajo local:** dividir los límites cuesta \(\Theta(1)\), mientras que combinar las mitades cuesta \(\Theta(n)\). De ahí surge
+El caso base es constante, se generan dos llamadas de tamaño \(n/2\) y la función de combinación realiza trabajo lineal. Así se construye la recurrencia temporal:
 
-    \[
-    T(n)=2\cdot T(n/2)+\Theta(n).
-    \]
+\[
+T(n)=
+\begin{cases}
+1 & \text{si } n\leq1,\\
+2\cdot T(n/2)+n & \text{si } n>1.
+\end{cases}
+\]
 
-4. **Método de resolución:** en el teorema maestro, \(a=2\), \(b=2\) y \(f(n)=\Theta(n)\). Como \(n^{\log_b(a)}=n\), corresponde el caso 2 y \(T(n)\in\Theta(n\cdot\log_2(n))\).
-5. **Espacio:** la pila tiene \(\Theta(\log_2(n))\) marcos. Las estructuras auxiliares activas suman la serie \(n+n/2+n/4+\cdots\in\Theta(n)\), que domina la pila; por tanto, \(S(n)\in\Theta(n)\).
+#### Complejidad temporal por sustitución iterativa
+
+\[
+\begin{aligned}
+T(n)&=2\cdot T(n/2)+n\\
+&=4\cdot T(n/4)+2\cdot n\\
+&=8\cdot T(n/8)+3\cdot n\\
+&=16\cdot T(n/16)+4\cdot n\\
+&=\cdots\\
+&=2^k\cdot T(n/2^k)+k\cdot n.
+\end{aligned}
+\]
+
+El caso base exige \(n/2^k=1\), por lo que \(k=\log_2(n)\). Entonces:
+
+\[
+\begin{aligned}
+T(n)&=2^{\log_2(n)}\cdot T(1)+n\cdot\log_2(n)\\
+&=n+n\cdot\log_2(n)\\
+&=n\cdot(1+\log_2(n))
+\in\Theta(n\cdot\log_2(n)).
+\end{aligned}
+\]
+
+#### Complejidad temporal mediante el árbol de recurrencia
+
+En el nivel \(k\) hay \(2^k\) nodos, cada uno con un subproblema de tamaño \(n/2^k\). Por tanto, el costo total del nivel es
+
+\[
+T_k(n)=2^k\left(\frac{n}{2^k}\right)=n.
+\]
+
+La altura satisface \(n/2^h=1\), luego \(h=\log_2(n)\). Al sumar los niveles:
+
+\[
+T(n)=\sum_{k=0}^{\log_2(n)}n
+=n\cdot(1+\log_2(n))
+\in\Theta(n\cdot\log_2(n)).
+\]
+
+#### Complejidad temporal mediante el teorema maestro
+
+Aquí \(a=2\), \(b=2\), \(f(n)=n\) y
+
+\[
+n^{\log_b(a)}=n^{\log_2(2)}=n.
+\]
+
+Como \(f(n)=n^{\log_b(a)}\), corresponde el caso 2:
+
+\[
+T(n)\in\Theta\!\left(n^{\log_b(a)}\cdot\log_2(n)\right)
+=\Theta(n\cdot\log_2(n)).
+\]
+
+#### Construcción de la recurrencia espacial
+
+Solo una rama recursiva permanece activa a la vez. En cada nivel, los arreglos auxiliares ocupan espacio lineal respecto del subproblema activo:
+
+\[
+S(n)=
+\begin{cases}
+1 & \text{si } n=1,\\
+S(n/2)+n & \text{si } n>1.
+\end{cases}
+\]
+
+#### Complejidad espacial por sustitución iterativa
+
+\[
+\begin{aligned}
+S(n)&=S(n/2)+n\\
+&=S(n/4)+n/2+n\\
+&=S(n/8)+n/4+n/2+n\\
+&=\cdots\\
+&=S(n/2^k)+\sum_{i=0}^{k}\frac{n}{2^i}.
+\end{aligned}
+\]
+
+Con \(k=\log_2(n)\) y \(S(1)=1\):
+
+\[
+S(n)=1+\sum_{i=0}^{\log_2(n)}\frac{n}{2^i}.
+\]
+
+La suma es una serie geométrica de razón \(1/2\):
+
+\[
+\sum_{i=0}^{\log_2(n)}\frac{n}{2^i}=2\cdot n-1.
+\]
+
+Por consiguiente,
+
+\[
+S(n)=1+(2\cdot n-1)=2\cdot n\in\Theta(n).
+\]
+
+#### Complejidad espacial mediante el árbol de recurrencia
+
+En el nivel \(k\) solo cuenta el subproblema activo, cuyo tamaño es \(n/2^k\):
+
+\[
+S_k(n)=\frac{n}{2^k}.
+\]
+
+Como la altura es \(\log_2(n)\):
+
+\[
+S(n)=\sum_{k=0}^{\log_2(n)}\frac{n}{2^k}=2\cdot n-1\in\Theta(n).
+\]
+
+#### Complejidad espacial mediante el teorema maestro extendido
+
+Para \(S(n)=S(n/2)+n\), se tiene \(a=1\), \(b=2\) y
+
+\[
+f(n)=n=n^1\cdot\log_{\ell}^{0}(n),\qquad k=1,\quad p=0.
+\]
+
+Como \(a<b^k\), pues \(1<2^1\), se cumple el caso 3 del teorema extendido:
+
+\[
+S(n)\in\Theta\!\left(n^k\cdot\log_{\ell}^{p}(n)\right)
+=\Theta(n).
+\]
 
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">

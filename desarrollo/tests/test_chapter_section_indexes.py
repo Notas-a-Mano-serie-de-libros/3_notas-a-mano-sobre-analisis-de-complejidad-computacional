@@ -62,17 +62,38 @@ def test_chapter6_places_the_shared_lab_before_examples():
 
 def test_chapter6_examples_apply_the_analysis_methods_without_shared_lab():
     expectations = {
-        "factorial": "sustitución iterativa",
-        "fibonacci": "ecuación característica",
-        "potencia": "sustitución iterativa",
-        "merge-sort": "teorema maestro",
-        "arbol-binario": "sustitución",
+        "factorial": (
+            "sustitución iterativa",
+            "árbol de recurrencia",
+            "ecuación característica",
+        ),
+        "fibonacci": (
+            "ecuación característica",
+            "sustitución iterativa mediante aproximación",
+            "árbol de recurrencia aproximado",
+        ),
+        "potencia": (
+            "sustitución iterativa",
+            "árbol de recurrencia",
+            "teorema maestro básico",
+        ),
+        "merge-sort": (
+            "complejidad temporal por sustitución iterativa",
+            "complejidad temporal mediante el árbol de recurrencia",
+            "complejidad espacial mediante el teorema maestro extendido",
+        ),
+        "arbol-binario": (
+            "mejor caso",
+            "caso promedio: árbol balanceado",
+            "peor caso: árbol degenerado",
+        ),
     }
 
-    for slug, method in expectations.items():
+    for slug, methods in expectations.items():
         content = (CHAPTERS / "capitulo-6" / f"{slug}.md").read_text(
             encoding="utf-8"
         )
-        assert "### Aplicación del procedimiento" in content
-        assert method in content.lower()
+        assert "### Aplicación de los procedimientos del libro" in content
+        for method in methods:
+            assert method in content.lower()
         assert "0_laboratorio_analisis_recursivo.ipynb" not in content

@@ -419,18 +419,40 @@ T(n)=T(n-1)+\Theta(1),\qquad T(1)=\Theta(1).
 
 Después de \(n-1\) expansiones se alcanza el caso base, de modo que \(T(n)\in\Theta(n)\). Las llamadas pendientes forman una cadena de profundidad \(n\), por lo que \(S(n)\in\Theta(n)\).
 
-#### Aplicación del procedimiento
+#### Aplicación de los procedimientos del libro
 
-1. **Caso base:** para \(n\leq1\), la función retorna sin generar otra llamada; su costo es \(T(1)=\Theta(1)\).
-2. **Llamadas y tamaño:** cada caso no base produce una sola llamada con tamaño \(n-1\).
-3. **Trabajo local:** la comparación, la resta y la multiplicación requieren \(\Theta(1)\).
-4. **Recurrencia y método:** mediante sustitución iterativa,
+El caso base, la llamada recursiva y el trabajo local producen
 
-    \[
-    T(n)=T(n-1)+\Theta(1)=T(1)+(n-1)\Theta(1)\in\Theta(n).
-    \]
+\[
+T(n)=\begin{cases}1&\text{si }n\leq1,\\T(n-1)+1&\text{si }n>1.\end{cases}
+\]
 
-5. **Espacio:** cada marco ocupa \(\Theta(1)\) y la cadena alcanza \(n\) marcos activos; por ello, \(S(n)\in\Theta(n)\).
+##### Sustitución iterativa
+
+\[
+T(n)=T(n-1)+1=T(n-2)+2=\cdots=T(n-k)+k.
+\]
+
+Como \(n-k=1\), entonces \(k=n-1\) y \(T(n)=T(1)+(n-1)=n\in\Theta(n)\).
+
+##### Árbol de recurrencia
+
+En el nivel \(k\) hay un nodo de costo constante: \(T_k(n)=1\). La altura satisface \(n-h=1\), así que
+
+\[
+T(n)=\sum_{k=0}^{n-1}1=n\in\Theta(n).
+\]
+
+##### Ecuación característica
+
+La ecuación \(r-1=0\) tiene raíz \(r_1=1\), por lo que \(T_h(n)=A_1\). Para la parte particular se propone \(T_p(n)=An\); al sustituir, \(An=A(n-1)+1\), luego \(A=1\). La condición \(T(1)=1\) da \(A_1=0\), y por tanto \(T(n)=n\in\Theta(n)\).
+
+##### Complejidad espacial
+
+\[
+S(n)=\begin{cases}1&\text{si }n\leq1,\\S(n-1)+1&\text{si }n>1,\end{cases}
+\qquad S(n)\in\Theta(n).
+\]
 
 #### Simulación
 
@@ -457,18 +479,46 @@ T(n)=T(n-1)+T(n-2)+\Theta(1)\in\Theta(\varphi^n).
 
 El árbol contiene una cantidad exponencial de llamadas por la repetición de resultados. Sin embargo, sus dos ramas no permanecen completas a la vez: la profundidad máxima es lineal, así que \(S(n)\in\Theta(n)\).
 
-#### Aplicación del procedimiento
+#### Aplicación de los procedimientos del libro
 
-1. **Casos base:** \(T(0)=T(1)=\Theta(1)\).
-2. **Llamadas y tamaños:** cada caso no base genera dos llamadas, con tamaños \(n-1\) y \(n-2\).
-3. **Trabajo local:** la comparación y la suma cuestan \(\Theta(1)\), por lo que
+\[
+T(n)=\begin{cases}1&\text{si }n\in\{0,1\},\\T(n-1)+T(n-2)+1&\text{si }n>1.\end{cases}
+\]
 
-    \[
-    T(n)=T(n-1)+T(n-2)+\Theta(1).
-    \]
+##### Ecuación característica y cota exponencial
 
-4. **Método de resolución:** el árbol de recurrencia evidencia la duplicación de subproblemas. La ecuación característica de la parte homogénea es \(r^2=r+1\); su raíz dominante es \(\varphi=(1+\sqrt5)/2\). En consecuencia, \(T(n)\in\Theta(\varphi^n)\).
-5. **Espacio:** solo permanece activa una ruta del árbol a la vez. La ruta más larga reduce \(n\) de uno en uno, tiene profundidad \(\Theta(n)\) y determina \(S(n)\in\Theta(n)\).
+La solución analítica da \(T(n)\in\Theta(\varphi^n)\), con \(\varphi=(1+\sqrt5)/2\). Como \(\varphi<2\), también se cumple \(T(n)\in O(2^n)\), aunque esta última no es la cota ajustada.
+
+##### Sustitución iterativa mediante aproximación
+
+El libro usa \(T(n-1)\approx T(n-2)\). Para la cota superior:
+
+\[
+T(n)\approx2T(n-1)+1=\cdots=2^kT(n-k)+(2^k-1).
+\]
+
+Con \(k=n\), \(T(n)\in O(2^n)\). Para la cota inferior se obtiene \(T(n)\in\Omega(2^{n/2})=\Omega((\sqrt2)^n)\), de modo que
+
+\[
+(\sqrt2)^n\prec\varphi^n\prec2^n.
+\]
+
+##### Árbol de recurrencia aproximado
+
+Al balancear el árbol con la misma aproximación, el nivel \(k\) contiene \(2^k\) nodos de costo constante y \(h\approx n\):
+
+\[
+T(n)\approx\sum_{k=0}^{n}2^k=2^{n+1}-1\in O(2^n).
+\]
+
+##### Complejidad espacial
+
+La pila conserva una sola rama y la más larga reduce \(n\) de uno en uno:
+
+\[
+S(n)=\begin{cases}1&\text{si }n\in\{0,1\},\\S(n-1)+1&\text{si }n>1,\end{cases}
+\qquad S(n)\in\Theta(n).
+\]
 
 #### Simulación
 
@@ -517,18 +567,42 @@ T(n)=T(\lfloor n/2\rfloor)+\Theta(1)\in\Theta(\log_2(n)).
 
 La profundidad de llamadas sigue la misma cantidad de divisiones, de modo que \(S(n)\in\Theta(\log_2(n))\). Llamar dos veces a `potencia(a, absExponente / 2)` cambiaría radicalmente el árbol y desperdiciaría el resultado compartido.
 
-#### Aplicación del procedimiento
+#### Aplicación de los procedimientos del libro
 
-1. **Caso base:** cuando \(n=0\), el retorno tiene costo \(\Theta(1)\).
-2. **Llamadas y tamaño:** cada caso no base realiza una sola llamada con tamaño \(\lfloor n/2\rfloor\); el resultado se almacena y se reutiliza.
-3. **Trabajo local:** comprobar la paridad y efectuar una o dos multiplicaciones cuesta \(\Theta(1)\).
-4. **Recurrencia y método:** por sustitución iterativa, después de \(k\) expansiones el tamaño es \(\lfloor n/2^k\rfloor\). El caso base se alcanza cuando \(2^k\geq n\), es decir, \(k\in\Theta(\log_2(n))\). Por tanto,
+\[
+T(n)=\begin{cases}1&\text{si }n=0,\\T(n/2)+1&\text{si }n>0.\end{cases}
+\]
 
-    \[
-    T(n)=T(\lfloor n/2\rfloor)+\Theta(1)\in\Theta(\log_2(n)).
-    \]
+##### Sustitución iterativa
 
-5. **Espacio:** hay un marco de costo constante por nivel y \(\Theta(\log_2(n))\) niveles activos; así, \(S(n)\in\Theta(\log_2(n))\).
+\[
+T(n)=T(n/2)+1=T(n/4)+2=\cdots=T(n/2^k)+k.
+\]
+
+Como \(n/2^k=1\), se tiene \(k=\log_2(n)\), y entonces \(T(n)=1+\log_2(n)\in\Theta(\log_2(n))\).
+
+##### Árbol de recurrencia
+
+Cada nivel tiene un nodo de costo constante y la altura es \(h=\log_2(n)\):
+
+\[
+T(n)=\sum_{k=0}^{\log_2(n)}1=1+\log_2(n)\in\Theta(\log_2(n)).
+\]
+
+##### Teorema maestro básico
+
+Con \(a=1\), \(b=2\) y \(f(n)=1\), se cumple \(n^{\log_b(a)}=n^0=1=f(n)\). El caso 2 da
+
+\[
+T(n)\in\Theta(n^0\log_2(n))=\Theta(\log_2(n)).
+\]
+
+##### Complejidad espacial
+
+\[
+S(n)=\begin{cases}1&\text{si }n=0,\\S(n/2)+1&\text{si }n>0,\end{cases}
+\qquad S(n)\in\Theta(\log_2(n)).
+\]
 
 #### Simulación
 
@@ -552,18 +626,49 @@ def merge_sort(a):
 
 La división genera dos subproblemas de tamaño \(n/2\) y la combinación recorre los \(n\) elementos. Por tanto, \(T(n)=2T(n/2)+\Theta(n)\in\Theta(n\log_2(n))\). Los arreglos auxiliares de combinación requieren \(\Theta(n)\) memoria; la pila añade \(\Theta(\log_2(n))\), que queda dominada por el almacenamiento lineal.
 
-#### Aplicación del procedimiento
+#### Aplicación de los procedimientos del libro
 
-1. **Caso base:** un segmento con cero o un elemento ya está ordenado y cuesta \(\Theta(1)\).
-2. **Llamadas y tamaños:** se generan dos llamadas sobre mitades de tamaño aproximado \(n/2\).
-3. **Trabajo local:** dividir los límites cuesta \(\Theta(1)\), mientras que combinar las mitades cuesta \(\Theta(n)\). De ahí surge
+\[
+T(n)=\begin{cases}1&\text{si }n\leq1,\\2T(n/2)+n&\text{si }n>1.\end{cases}
+\]
 
-    \[
-    T(n)=2T(n/2)+\Theta(n).
-    \]
+##### Tiempo por sustitución iterativa
 
-4. **Método de resolución:** en el teorema maestro, \(a=2\), \(b=2\) y \(f(n)=\Theta(n)\). Como \(n^{\log_b(a)}=n\), corresponde el caso 2 y \(T(n)\in\Theta(n\log_2(n))\).
-5. **Espacio:** la pila tiene \(\Theta(\log_2(n))\) marcos. Las estructuras auxiliares activas suman la serie \(n+n/2+n/4+\cdots\in\Theta(n)\), que domina la pila; por tanto, \(S(n)\in\Theta(n)\).
+\[
+T(n)=2T(n/2)+n=4T(n/4)+2n=\cdots=2^kT(n/2^k)+kn.
+\]
+
+Con \(n/2^k=1\), \(k=\log_2(n)\), de modo que
+
+\[
+T(n)=n+n\log_2(n)\in\Theta(n\log_2(n)).
+\]
+
+##### Tiempo mediante el árbol de recurrencia
+
+El nivel \(k\) contiene \(2^k\) nodos de tamaño \(n/2^k\), luego \(T_k(n)=n\). Como \(h=\log_2(n)\):
+
+\[
+T(n)=\sum_{k=0}^{\log_2(n)}n=n(1+\log_2(n))\in\Theta(n\log_2(n)).
+\]
+
+##### Tiempo mediante el teorema maestro
+
+Con \(a=2\), \(b=2\) y \(f(n)=n=n^{\log_2(2)}\), el caso 2 produce \(T(n)\in\Theta(n\log_2(n))\).
+
+##### Recurrencia espacial
+
+\[
+S(n)=\begin{cases}1&\text{si }n=1,\\S(n/2)+n&\text{si }n>1.\end{cases}
+\]
+
+Por sustitución:
+
+\[
+S(n)=S(n/2^k)+\sum_{i=0}^{k}\frac{n}{2^i}.
+\]
+
+Con \(k=\log_2(n)\), la serie geométrica vale \(2n-1\), por lo que \(S(n)\in\Theta(n)\). El árbol espacial suma la misma serie. En el teorema maestro extendido, \(a=1\), \(b=2\), \(f(n)=n^1\log_\ell^0(n)\) y \(a<b^1\); el caso 3 confirma \(S(n)\in\Theta(n)\).
 
 #### Simulación
 
@@ -586,13 +691,33 @@ def buscar(raiz, valor):
 
 El mejor caso encuentra el valor en la raíz: \(\Omega(1)\). En un árbol balanceado, una búsqueda guiada por orden alcanza una profundidad \(\Theta(\log_2(n))\); en un árbol degenerado puede recorrer \(O(n)\) nodos. La memoria de la versión recursiva depende de la altura \(h\): \(S(n)\in\Theta(h)\).
 
-#### Aplicación del procedimiento
+#### Aplicación de los procedimientos del libro
 
-1. **Casos base:** encontrar el valor en la raíz cuesta \(\Theta(1)\); alcanzar una referencia nula también cuesta \(\Theta(1)\).
-2. **Llamadas y tamaño:** la comparación con la clave selecciona exactamente uno de los dos subárboles. El tamaño disminuye según la altura restante, de \(h\) a \(h-1\).
-3. **Trabajo local:** las comparaciones y la selección del hijo cuestan \(\Theta(1)\), por lo que \(T(h)=T(h-1)+\Theta(1)\).
-4. **Método de resolución:** la sustitución iterativa produce \(T(h)\in\Theta(h)\). En un árbol balanceado, \(h\in\Theta(\log_2(n))\); en uno degenerado, \(h\in\Theta(n)\). Esto da \(\Theta(\log_2(n))\) y \(\Theta(n)\), respectivamente.
-5. **Espacio:** permanece activa una sola ruta con un marco constante por nivel; en consecuencia, \(S(n)\in\Theta(h)\), con los mismos órdenes balanceado y degenerado.
+El análisis se separa según la forma del árbol.
+
+##### Mejor caso
+
+El valor está en la raíz y \(C(n)\in\Omega(1)\).
+
+##### Caso promedio
+
+\[
+C(n)=\begin{cases}1&\text{si }n=0,\\C(n/2)+1&\text{si }n>0.\end{cases}
+\]
+
+Por sustitución, \(C(n)=C(n/2^k)+k\). La condición \(n/2^k=1\) da \(k=\log_2(n)\), luego \(C(n)\in\Theta(\log_2(n))\).
+
+##### Peor caso
+
+\[
+C(n)=\begin{cases}1&\text{si }n=0,\\C(n-1)+1&\text{si }n>0.\end{cases}
+\]
+
+La expansión \(C(n)=C(n-k)+k\), con \(k=n\), produce \(C(n)\in O(n)\). Como solo permanece activa una rama, tiempo y espacio comparten los resultados:
+
+\[
+T(n),S(n)\in\begin{cases}\Omega(1)&\text{mejor caso},\\\Theta(\log_2(n))&\text{caso promedio},\\O(n)&\text{peor caso}.\end{cases}
+\]
 
 #### Simulación
 

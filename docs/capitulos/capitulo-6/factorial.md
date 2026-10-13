@@ -34,18 +34,93 @@ T(n)=T(n-1)+\Theta(1),\qquad T(1)=\Theta(1).
 
 Después de \(n-1\) expansiones se alcanza el caso base, de modo que \(T(n)\in\Theta(n)\). Las llamadas pendientes forman una cadena de profundidad \(n\), por lo que \(S(n)\in\Theta(n)\).
 
-### Aplicación del procedimiento
+### Aplicación de los procedimientos del libro
 
-1. **Caso base:** para \(n\leq1\), la función retorna sin generar otra llamada; su costo es \(T(1)=\Theta(1)\).
-2. **Llamadas y tamaño:** cada caso no base produce una sola llamada con tamaño \(n-1\).
-3. **Trabajo local:** la comparación, la resta y la multiplicación requieren \(\Theta(1)\).
-4. **Recurrencia y método:** mediante sustitución iterativa,
+El costo depende únicamente de \(n\), de modo que los tres casos de análisis coinciden. Primero se separan los componentes de la recurrencia temporal:
 
-    \[
-    T(n)=T(n-1)+\Theta(1)=T(1)+(n-1)\Theta(1)\in\Theta(n).
-    \]
+\[
+T_{base}(n)=\Theta(1),\qquad
+T_{recursivo}(n)=T(n-1),\qquad
+f(n)=\Theta(1).
+\]
 
-5. **Espacio:** cada marco ocupa \(\Theta(1)\) y la cadena alcanza \(n\) marcos activos; por ello, \(S(n)\in\Theta(n)\).
+Al expresar el costo exacto de cada término se obtiene:
+
+\[
+T(n)=
+\begin{cases}
+1 & \text{si } n\leq1,\\
+T(n-1)+1 & \text{si } n>1.
+\end{cases}
+\]
+
+#### Sustitución iterativa
+
+La recurrencia se expande hasta hacer visible el patrón:
+
+\[
+\begin{aligned}
+T(n)&=T(n-1)+1\\
+&=T(n-2)+2\\
+&=T(n-3)+3\\
+&=\cdots\\
+&=T(n-k)+k.
+\end{aligned}
+\]
+
+La recursión termina cuando \(n-k=1\), por lo que \(k=n-1\). Al sustituir:
+
+\[
+T(n)=T(1)+(n-1)=1+n-1=n\in\Theta(n).
+\]
+
+#### Árbol de recurrencia
+
+En el nivel \(k\) hay un solo nodo y su trabajo local es constante:
+
+\[
+\#_{nodos}=1,\qquad f_k(n)=1,\qquad T_k(n)=1.
+\]
+
+La altura se obtiene de \(n-h=1\), es decir, \(h=n-1\). La suma de todos los niveles confirma el resultado:
+
+\[
+T(n)=\sum_{k=0}^{h}T_k(n)=\sum_{k=0}^{n-1}1=n\in\Theta(n).
+\]
+
+#### Ecuación característica
+
+La recurrencia es lineal, no homogénea y de orden uno. Su ecuación característica es
+
+\[
+r-1=0,
+\]
+
+con raíz \(r_1=1\), por lo que \(T_h(n)=A_1\). Como el término independiente es constante y \(1\) ya es raíz, se propone \(T_p(n)=An\). Al sustituir en la recurrencia:
+
+\[
+An=A(n-1)+1\quad\Longrightarrow\quad A=1.
+\]
+
+Así, \(T(n)=A_1+n\). La condición inicial \(T(1)=1\) produce \(A_1=0\), y finalmente:
+
+\[
+T(n)=n\in\Theta(n).
+\]
+
+#### Complejidad espacial
+
+Cada llamada añade un marco de tamaño constante y reduce \(n\) en una unidad:
+
+\[
+S(n)=
+\begin{cases}
+1 & \text{si } n\leq1,\\
+S(n-1)+1 & \text{si } n>1.
+\end{cases}
+\]
+
+Esta recurrencia tiene la misma forma que la temporal; por cualquiera de los procedimientos anteriores, \(S(n)\in\Theta(n)\).
 
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">

@@ -35,18 +35,91 @@ T(e)=T(\lfloor e/2\rfloor)+\Theta(1)\in\Theta(\log_2(2+e)).
 
 La profundidad de llamadas sigue la misma cantidad de divisiones, de modo que \(S(e)\in\Theta(\log_2(2+e))\). Llamar dos veces a `potencia(a, absExponente / 2)` cambiaría radicalmente el árbol y desperdiciaría el resultado compartido.
 
-### Aplicación del procedimiento
+### Aplicación de los procedimientos del libro
 
-1. **Caso base:** cuando \(e=0\), el retorno tiene costo \(\Theta(1)\).
-2. **Llamadas y tamaño:** cada caso no base realiza una sola llamada con tamaño \(\lfloor e/2\rfloor\); el resultado se almacena y se reutiliza.
-3. **Trabajo local:** comprobar la paridad y efectuar una o dos multiplicaciones cuesta \(\Theta(1)\).
-4. **Recurrencia y método:** por sustitución iterativa, después de \(k\) expansiones el tamaño es \(\lfloor e/2^k\rfloor\). El caso base se alcanza cuando \(2^k\geq e\), es decir, \(k\in\Theta(\log_2(2+e))\). Por tanto,
+Sea \(e=|n|\). El caso base cuesta una unidad, hay una sola llamada con la mitad del exponente y el resto de las operaciones es constante:
 
-    \[
-    T(e)=T(\lfloor e/2\rfloor)+\Theta(1)\in\Theta(\log_2(2+e)).
-    \]
+\[
+T(e)=
+\begin{cases}
+1 & \text{si } e=0,\\
+T(\lfloor e/2\rfloor)+1 & \text{si } e>0.
+\end{cases}
+\]
 
-5. **Espacio:** hay un marco de costo constante por nivel y \(\Theta(\log_2(2+e))\) niveles activos; así, \(S(e)\in\Theta(\log_2(2+e))\).
+Para mostrar el desarrollo del libro se omiten temporalmente los pisos; estos no cambian el orden asintótico.
+
+#### Sustitución iterativa
+
+\[
+\begin{aligned}
+T(e)&=T(e/2)+1\\
+&=T(e/4)+2\\
+&=T(e/8)+3\\
+&=\cdots\\
+&=T(e/2^k)+k.
+\end{aligned}
+\]
+
+El caso base se alcanza cuando \(e/2^k=1\), de donde \(k=\log_2(e)\). Al sustituir:
+
+\[
+T(e)=T(1)+\log_2(e)=1+\log_2(e)\in\Theta(\log_2(e)).
+\]
+
+Para incluir también \(e=0\), la página expresa el mismo orden como \(\Theta(\log_2(2+e))\).
+
+#### Árbol de recurrencia
+
+El árbol tiene un nodo por nivel y cada nodo realiza trabajo constante:
+
+\[
+\#_{nodos}=1,qquad f_k(e)=1,qquad T_k(e)=1.
+\]
+
+La profundidad máxima satisface \(e/2^h=1\), por lo que \(h=\log_2(e)\). Sumando todos los niveles:
+
+\[
+T(e)=\sum_{k=0}^{h}T_k(e)
+=\sum_{k=0}^{\log_2(e)}1
+=1+\log_2(e)
+\in\Theta(\log_2(e)).
+\]
+
+#### Teorema maestro básico
+
+La recurrencia tiene la forma \(T(e)=a\cdot T(e/b)+f(e)\), con
+
+\[
+a=1,qquad b=2,qquad f(e)=1,qquad \log_b(a)=\log_2(1)=0.
+\]
+
+Como
+
+\[
+f(e)=1=e^0=e^{\log_b(a)},
+\]
+
+se cumple el caso 2 del teorema maestro:
+
+\[
+T(e)\in\Theta\!\left(e^{\log_b(a)}\cdot\log_2(e)\right)
+=\Theta(\log_2(e)).
+\]
+
+#### Complejidad espacial
+
+La pila sigue una sola rama y cada marco almacena una cantidad constante de datos:
+
+\[
+S(e)=
+\begin{cases}
+1 & \text{si } e=0,\\
+S(\lfloor e/2\rfloor)+1 & \text{si } e>0.
+\end{cases}
+\]
+
+Su forma coincide con la recurrencia temporal; por ello, \(S(e)\in\Theta(\log_2(2+e))\).
 
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">

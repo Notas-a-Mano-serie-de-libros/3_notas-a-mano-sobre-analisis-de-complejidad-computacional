@@ -53,18 +53,117 @@ T(n)=T(n-1)+T(n-2)+\Theta(1)\in\Theta(\varphi^n).
 
 El árbol contiene una cantidad exponencial de llamadas por la repetición de resultados. Sin embargo, sus dos ramas no permanecen completas a la vez: la profundidad máxima es lineal, así que \(S(n)\in\Theta(n)\).
 
-### Aplicación del procedimiento
+### Aplicación de los procedimientos del libro
 
-1. **Casos base:** \(T(0)=T(1)=\Theta(1)\).
-2. **Llamadas y tamaños:** cada caso no base genera dos llamadas, con tamaños \(n-1\) y \(n-2\).
-3. **Trabajo local:** la comparación y la suma cuestan \(\Theta(1)\), por lo que
+El caso base, las dos llamadas recursivas y el trabajo local constante producen:
 
-    \[
-    T(n)=T(n-1)+T(n-2)+\Theta(1).
-    \]
+\[
+T(n)=
+\begin{cases}
+1 & \text{si } n\in\{0,1\},\\
+T(n-1)+T(n-2)+1 & \text{si } n>1.
+\end{cases}
+\]
 
-4. **Método de resolución:** el árbol de recurrencia evidencia la duplicación de subproblemas. La ecuación característica de la parte homogénea es \(r^2=r+1\); su raíz dominante es \(\varphi=(1+\sqrt5)/2\). En consecuencia, \(T(n)\in\Theta(\varphi^n)\).
-5. **Espacio:** solo permanece activa una ruta del árbol a la vez. La ruta más larga reduce \(n\) de uno en uno, tiene profundidad \(\Theta(n)\) y determina \(S(n)\in\Theta(n)\).
+El teorema maestro no aplica porque los subproblemas tienen tamaños diferentes.
+
+#### Ecuación característica y cota exponencial
+
+La solución analítica desarrollada en el libro conduce al número áureo:
+
+\[
+\varphi=\frac{1+\sqrt5}{2}\approx1.618,qquad
+T(n)\in\Theta(\varphi^n).
+\]
+
+Como \(\varphi<2\), entonces \(\varphi^n<2^n\). Por transitividad:
+
+\[
+T(n)\in O(\varphi^n)\subseteq O(2^n).
+\]
+
+La expresión \(O(2^n)\) es una cota superior conveniente, pero la cota ajustada sigue siendo \(\Theta(\varphi^n)\).
+
+#### Sustitución iterativa mediante aproximación
+
+La expansión directa no presenta un patrón uniforme:
+
+\[
+\begin{aligned}
+T(n)&=T(n-1)+T(n-2)+1\\
+&=[T(n-2)+T(n-3)+1]+T(n-2)+1\\
+&=\cdots
+\end{aligned}
+\]
+
+El libro aproxima \(T(n-1)\approx T(n-2)\). Elegir el término mayor genera la cota superior
+
+\[
+T(n-1)+T(n-2)\leq2T(n-1),
+\]
+
+mientras que elegir el menor genera la cota inferior
+
+\[
+T(n-1)+T(n-2)\geq2T(n-2).
+\]
+
+Para la cota superior, la sustitución queda:
+
+\[
+\begin{aligned}
+T(n)&\approx2\cdot T(n-1)+1\\
+&\approx2^2\cdot T(n-2)+(2^2-1)\\
+&\approx\cdots\\
+&\approx2^k\cdot T(n-k)+(2^k-1).
+\end{aligned}
+\]
+
+Con \(n-k=0\), se tiene \(k=n\), y por tanto:
+
+\[
+T(n)\approx2^n\cdot T(0)+(2^n-1)=2\cdot2^n-1\in O(2^n).
+\]
+
+Al repetir el procedimiento con la cota inferior:
+
+\[
+T(n)\in\Omega(2^{n/2})=\Omega((\sqrt2)^n).
+\]
+
+Así se obtiene el intervalo señalado en el libro:
+
+\[
+(\sqrt2)^n\prec\varphi^n\prec2^n.
+\]
+
+#### Árbol de recurrencia aproximado
+
+Al reemplazar ambas ramas por subproblemas de tamaño \(n-1\), el árbol aproximado queda balanceado. En el nivel \(k\) aparecen \(2^k\) nodos de costo constante:
+
+\[
+T_k(n)=2^k.
+\]
+
+La condición \(n-h=0\) da \(h\approx n\). La suma por niveles es una serie geométrica:
+
+\[
+T(n)\approx\sum_{k=0}^{n}2^k=2^{n+1}-1\in O(2^n).
+\]
+
+#### Complejidad espacial
+
+Aunque cada llamada genera dos ramas, la pila solo mantiene una activa a la vez. La rama más profunda es la que reduce el argumento de uno en uno:
+
+\[
+S(n)=
+\begin{cases}
+1 & \text{si } n\in\{0,1\},\\
+S(n-1)+1 & \text{si } n>1.
+\end{cases}
+\]
+
+Esta es la misma recurrencia lineal del factorial, luego \(S(n)\in\Theta(n)\).
 
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">
