@@ -91,7 +91,11 @@ def synchronize(check: bool = False) -> list[Path]:
     changed = []
     errors = []
     for (chapter, page), notebooks in PAGE_NOTEBOOKS.items():
-        path = DOCS / "capitulos" / f"capitulo-{chapter}" / f"{page}.md"
+        path = (
+            DOCS / "capitulos" / f"capitulo-{chapter}.md"
+            if page == "__chapter__"
+            else DOCS / "capitulos" / f"capitulo-{chapter}" / f"{page}.md"
+        )
         if not path.is_file():
             errors.append(f"Falta la página catalogada: {path.relative_to(ROOT)}")
             continue

@@ -47,3 +47,32 @@ def test_chapter6_example_links_preserve_complete_book_titles():
     content = (PROJECT_ROOT / "docs" / "capitulos" / "capitulo-6.md").read_text(encoding="utf-8")
     for _number, title, slug, _description in SECTION_INDEX[6]:
         assert f'<a href="{slug}/"><strong>{title}</strong></a>' in content
+
+
+def test_chapter6_places_the_shared_lab_before_examples():
+    content = (CHAPTERS / "capitulo-6.md").read_text(encoding="utf-8")
+
+    lab_heading = "### Simulación interactiva del procedimiento"
+    examples_heading = '<h2 id="chapter-sections-title">Ejemplos</h2>'
+    notebook = "0_laboratorio_analisis_recursivo.ipynb"
+
+    assert content.index(lab_heading) < content.index(examples_heading)
+    assert notebook in content
+
+
+def test_chapter6_examples_apply_the_analysis_methods_without_shared_lab():
+    expectations = {
+        "factorial": "sustitución iterativa",
+        "fibonacci": "ecuación característica",
+        "potencia": "sustitución iterativa",
+        "merge-sort": "teorema maestro",
+        "arbol-binario": "sustitución",
+    }
+
+    for slug, method in expectations.items():
+        content = (CHAPTERS / "capitulo-6" / f"{slug}.md").read_text(
+            encoding="utf-8"
+        )
+        assert "### Aplicación del procedimiento" in content
+        assert method in content.lower()
+        assert "0_laboratorio_analisis_recursivo.ipynb" not in content

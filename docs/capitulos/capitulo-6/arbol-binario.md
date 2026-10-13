@@ -18,6 +18,14 @@
 
 El mejor caso encuentra el valor en la raíz: \(\Omega(1)\). En un árbol balanceado, una búsqueda guiada por orden alcanza una profundidad \(\Theta(\log_2(n))\); en un árbol degenerado puede recorrer \(O(n)\) nodos. La memoria de la versión recursiva depende de la altura \(h\): \(S(n)\in\Theta(h)\).
 
+### Aplicación del procedimiento
+
+1. **Casos base:** encontrar el valor en la raíz cuesta \(\Theta(1)\); alcanzar una referencia nula también cuesta \(\Theta(1)\).
+2. **Llamadas y tamaño:** la comparación con la clave selecciona exactamente uno de los dos subárboles. El tamaño disminuye según la altura restante, de \(h\) a \(h-1\).
+3. **Trabajo local:** las comparaciones y la selección del hijo cuestan \(\Theta(1)\), por lo que \(T(h)=T(h-1)+\Theta(1)\).
+4. **Método de resolución:** la sustitución iterativa produce \(T(h)\in\Theta(h)\). En un árbol balanceado, \(h\in\Theta(\log_2(n))\); en uno degenerado, \(h\in\Theta(n)\). Esto da \(\Theta(\log_2(n))\) y \(\Theta(n)\), respectivamente.
+5. **Espacio:** permanece activa una sola ruta con un marco constante por nivel; en consecuencia, \(S(n)\in\Theta(h)\), con los mismos órdenes balanceado y degenerado.
+
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">
 <figure><img src="../../../assets/images/capitulo-6/ejemplos/complejidad_binario.png" alt="Secuencia visual de ejemplo 5 · búsqueda en árbol binario · paso representativo 1 de 3"><figcaption>Secuencia visual de ejemplo 5 · búsqueda en árbol binario · paso representativo 1 de 3.</figcaption></figure>
@@ -25,51 +33,6 @@ El mejor caso encuentra el valor en la raíz: \(\Omega(1)\). En un árbol balanc
 <figure><img src="../../../assets/images/capitulo-6/ejemplos/comparacion_complejidad_binario_2.png" alt="Comparación de crecimiento para ejemplo 5 · búsqueda en árbol binario"><figcaption>Comparación de crecimiento para ejemplo 5 · búsqueda en árbol binario.</figcaption></figure>
 </div>
 <!-- figures-from-explanation:end -->
-
-<!-- local-execution:start -->
-<details class="local-execution" markdown="1">
-<summary>Recomendación de ejecución local</summary>
-
-Con el proyecto clonado, abra una terminal, sitúese en la ruta principal y active el entorno según la [guía de instalación](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional#guía-de-instalación) y ejecute el notebook con Jupyter:
-
-| Paso | Comando |
-| --- | --- |
-| Ir a la ruta principal del proyecto | `cd 3_notas-a-mano-sobre-analisis-de-complejidad-computacional` |
-| Abrir Laboratorio de análisis recursivo | `jupyter lab simulaciones/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb` |
-
-Jupyter abrirá la simulación; ejecute todas sus celdas para iniciarla.
-
-La ejecución local aprovecha los recursos del equipo y evita los límites de sesión de los entornos remotos.
-</details>
-<!-- local-execution:end -->
-
-<!-- jupyterlite-demo:start -->
-## Simulación en el navegador
-
-Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. También puedes abrir el notebook en Google Colab o en una instancia local de Jupyter.
-
-1. Espera a que el kernel indique **Python (Pyodide)**.
-2. La simulación se ejecuta automáticamente cuando el kernel **Python (Pyodide)** esté listo.
-3. Interactúa con los controles de **Laboratorio de análisis recursivo**.
-
-<div class="jupyterlite-demo">
-  <div class="jupyterlite-demo__toolbar">
-    <span>Simulación interactiva</span>
-  </div>
-  <div class="jupyterlite-demo__actions">
-    <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
-  </div>
-  <iframe
-    class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb"
-    title="Simulación interactiva de Laboratorio de análisis recursivo en JupyterLite"
-    loading="lazy"
-    allow="clipboard-read; clipboard-write"
-  ></iframe>
-
-</div>
-<!-- jupyterlite-demo:end -->
 
 <nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../merge-sort/">← Ejemplo 4 · Ordenamiento por mezcla</a><a class="section-step__index" href="../">Capítulo 6</a><a class="section-step__next" href="../ejercicios-propuestos/">6.4.1 Ejercicios propuestos →</a></nav>
 

@@ -257,7 +257,7 @@ El análisis comienza definiendo qué representa \(n\), qué escenario se estudi
 
 Una recurrencia define un término mediante valores anteriores. Puede ser lineal o no lineal, homogénea o no homogénea, y usar coeficientes constantes o variables. En análisis de algoritmos, la relación debe reflejar cuántas llamadas se generan, cómo cambia el tamaño del subproblema y cuánto trabajo se hace fuera de ellas. Clasificarla antes de resolverla evita aplicar un teorema fuera de sus condiciones.
 """,
-    6: r"""## 6.1 Estructura de una solución recursiva
+    6: r"""## 6.1 Procedimiento de análisis de algoritmos recursivos
 
 Toda función recursiva necesita un caso base y una transformación que acerque cada llamada a ese caso. El seguimiento distingue tres momentos: apilamiento de llamadas, resolución del caso base y retorno de resultados. El tiempo cuenta todo el trabajo ejecutado; el espacio cuenta la máxima cantidad de marcos activos simultáneamente, no el total histórico de llamadas.
 
@@ -275,7 +275,7 @@ Toda función recursiva necesita un caso base y una transformación que acerque 
 3. Añada estructuras auxiliares que sobrevivan mientras se resuelven los subproblemas.
 4. Exprese la altura en función de \(n\) y simplifique \(S(n)\).
 
-Las secciones siguientes aplican el procedimiento a factorial, Fibonacci, potencia, Merge Sort y búsqueda en árbol binario, siempre en el orden código, análisis y simulación.
+Las secciones siguientes aplican el procedimiento a factorial, Fibonacci, potencia, Merge Sort y búsqueda en árbol binario, siempre en el orden de código y análisis.
 """,
     7: """## Cómo leer este capítulo
 
@@ -286,6 +286,52 @@ Los algoritmos de búsqueda se comparan a partir de sus precondiciones, la forma
 Un ordenamiento no se elige únicamente por su tiempo asintótico. También importan estabilidad, memoria auxiliar, comportamiento ante datos casi ordenados, número de movimientos y restricciones sobre las claves. Cada sección presenta el mecanismo, sus invariantes, sus costos por escenario y el experimento ejecutable.
 """,
 }
+
+CHAPTER6_LAB = r"""### Simulación interactiva del procedimiento
+
+Utiliza este laboratorio para aplicar el procedimiento anterior antes de estudiar los ejemplos resueltos. Permite seleccionar factorial, Fibonacci, potencia rápida, Merge Sort o búsqueda en árbol binario y observar el caso base, las llamadas, el trabajo local, la recurrencia temporal y la profundidad de la pila.
+
+<!-- local-execution:start -->
+<details class="local-execution" markdown="1">
+<summary>Recomendación de ejecución local</summary>
+
+Con el proyecto clonado, abra una terminal, sitúese en la ruta principal y active el entorno según la [guía de instalación](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional#guía-de-instalación) y ejecute el notebook con Jupyter:
+
+| Paso | Comando |
+| --- | --- |
+| Ir a la ruta principal del proyecto | `cd 3_notas-a-mano-sobre-analisis-de-complejidad-computacional` |
+| Abrir Laboratorio de análisis recursivo | `jupyter lab simulaciones/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb` |
+
+Jupyter abrirá la simulación; ejecute todas sus celdas para iniciarla.
+
+La ejecución local aprovecha los recursos del equipo y evita los límites de sesión de los entornos remotos.
+</details>
+<!-- local-execution:end -->
+
+<!-- jupyterlite-demo:start -->
+Ejecuta el laboratorio integrado con **JupyterLite y Pyodide**. También puedes abrirlo en Google Colab o en una instancia local de Jupyter.
+
+1. Espera a que el kernel indique **Python (Pyodide)**.
+2. La simulación se ejecuta automáticamente cuando el kernel esté listo.
+3. Selecciona un algoritmo y contrasta la animación con los pasos del procedimiento.
+
+<div class="jupyterlite-demo">
+  <div class="jupyterlite-demo__toolbar">
+    <span>Simulación interactiva</span>
+  </div>
+  <div class="jupyterlite-demo__actions">
+    <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
+    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+  </div>
+  <iframe
+    class="jupyterlite-demo__frame"
+    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb"
+    title="Simulación interactiva del procedimiento de análisis recursivo en JupyterLite"
+    loading="lazy"
+    allow="clipboard-read; clipboard-write"
+  ></iframe>
+</div>
+<!-- jupyterlite-demo:end -->"""
 
 ASYMPTOTIC_EXAMPLES = r"""En todos los ejemplos se analiza la misma función:
 
@@ -373,6 +419,19 @@ T(n)=T(n-1)+\Theta(1),\qquad T(1)=\Theta(1).
 
 Después de \(n-1\) expansiones se alcanza el caso base, de modo que \(T(n)\in\Theta(n)\). Las llamadas pendientes forman una cadena de profundidad \(n\), por lo que \(S(n)\in\Theta(n)\).
 
+#### Aplicación del procedimiento
+
+1. **Caso base:** para \(n\leq1\), la función retorna sin generar otra llamada; su costo es \(T(1)=\Theta(1)\).
+2. **Llamadas y tamaño:** cada caso no base produce una sola llamada con tamaño \(n-1\).
+3. **Trabajo local:** la comparación, la resta y la multiplicación requieren \(\Theta(1)\).
+4. **Recurrencia y método:** mediante sustitución iterativa,
+
+    \[
+    T(n)=T(n-1)+\Theta(1)=T(1)+(n-1)\Theta(1)\in\Theta(n).
+    \]
+
+5. **Espacio:** cada marco ocupa \(\Theta(1)\) y la cadena alcanza \(n\) marcos activos; por ello, \(S(n)\in\Theta(n)\).
+
 #### Simulación
 
 El recorrido muestra cómo se apilan los valores \(n,n-1,\ldots,1\) y cómo los productos se resuelven durante el retorno.
@@ -397,6 +456,19 @@ T(n)=T(n-1)+T(n-2)+\Theta(1)\in\Theta(\varphi^n).
 \]
 
 El árbol contiene una cantidad exponencial de llamadas por la repetición de resultados. Sin embargo, sus dos ramas no permanecen completas a la vez: la profundidad máxima es lineal, así que \(S(n)\in\Theta(n)\).
+
+#### Aplicación del procedimiento
+
+1. **Casos base:** \(T(0)=T(1)=\Theta(1)\).
+2. **Llamadas y tamaños:** cada caso no base genera dos llamadas, con tamaños \(n-1\) y \(n-2\).
+3. **Trabajo local:** la comparación y la suma cuestan \(\Theta(1)\), por lo que
+
+    \[
+    T(n)=T(n-1)+T(n-2)+\Theta(1).
+    \]
+
+4. **Método de resolución:** el árbol de recurrencia evidencia la duplicación de subproblemas. La ecuación característica de la parte homogénea es \(r^2=r+1\); su raíz dominante es \(\varphi=(1+\sqrt5)/2\). En consecuencia, \(T(n)\in\Theta(\varphi^n)\).
+5. **Espacio:** solo permanece activa una ruta del árbol a la vez. La ruta más larga reduce \(n\) de uno en uno, tiene profundidad \(\Theta(n)\) y determina \(S(n)\in\Theta(n)\).
 
 #### Simulación
 
@@ -445,6 +517,19 @@ T(n)=T(\lfloor n/2\rfloor)+\Theta(1)\in\Theta(\log_2(n)).
 
 La profundidad de llamadas sigue la misma cantidad de divisiones, de modo que \(S(n)\in\Theta(\log_2(n))\). Llamar dos veces a `potencia(a, absExponente / 2)` cambiaría radicalmente el árbol y desperdiciaría el resultado compartido.
 
+#### Aplicación del procedimiento
+
+1. **Caso base:** cuando \(n=0\), el retorno tiene costo \(\Theta(1)\).
+2. **Llamadas y tamaño:** cada caso no base realiza una sola llamada con tamaño \(\lfloor n/2\rfloor\); el resultado se almacena y se reutiliza.
+3. **Trabajo local:** comprobar la paridad y efectuar una o dos multiplicaciones cuesta \(\Theta(1)\).
+4. **Recurrencia y método:** por sustitución iterativa, después de \(k\) expansiones el tamaño es \(\lfloor n/2^k\rfloor\). El caso base se alcanza cuando \(2^k\geq n\), es decir, \(k\in\Theta(\log_2(n))\). Por tanto,
+
+    \[
+    T(n)=T(\lfloor n/2\rfloor)+\Theta(1)\in\Theta(\log_2(n)).
+    \]
+
+5. **Espacio:** hay un marco de costo constante por nivel y \(\Theta(\log_2(n))\) niveles activos; así, \(S(n)\in\Theta(\log_2(n))\).
+
 #### Simulación
 
 La animación contrasta la reducción lineal de la potencia simple con la reducción por mitades. El panel experimental amplía la comparación a factorial, Fibonacci, Merge Sort y búsqueda en árbol binario, mostrando tiempo, memoria y función teórica ajustada."""
@@ -467,6 +552,19 @@ def merge_sort(a):
 
 La división genera dos subproblemas de tamaño \(n/2\) y la combinación recorre los \(n\) elementos. Por tanto, \(T(n)=2T(n/2)+\Theta(n)\in\Theta(n\log_2(n))\). Los arreglos auxiliares de combinación requieren \(\Theta(n)\) memoria; la pila añade \(\Theta(\log_2(n))\), que queda dominada por el almacenamiento lineal.
 
+#### Aplicación del procedimiento
+
+1. **Caso base:** un segmento con cero o un elemento ya está ordenado y cuesta \(\Theta(1)\).
+2. **Llamadas y tamaños:** se generan dos llamadas sobre mitades de tamaño aproximado \(n/2\).
+3. **Trabajo local:** dividir los límites cuesta \(\Theta(1)\), mientras que combinar las mitades cuesta \(\Theta(n)\). De ahí surge
+
+    \[
+    T(n)=2T(n/2)+\Theta(n).
+    \]
+
+4. **Método de resolución:** en el teorema maestro, \(a=2\), \(b=2\) y \(f(n)=\Theta(n)\). Como \(n^{\log_b(a)}=n\), corresponde el caso 2 y \(T(n)\in\Theta(n\log_2(n))\).
+5. **Espacio:** la pila tiene \(\Theta(\log_2(n))\) marcos. Las estructuras auxiliares activas suman la serie \(n+n/2+n/4+\cdots\in\Theta(n)\), que domina la pila; por tanto, \(S(n)\in\Theta(n)\).
+
 #### Simulación
 
 La vista experimental muestra las divisiones, el retorno de cada mitad y la combinación ordenada por niveles.
@@ -487,6 +585,14 @@ def buscar(raiz, valor):
 #### Análisis
 
 El mejor caso encuentra el valor en la raíz: \(\Omega(1)\). En un árbol balanceado, una búsqueda guiada por orden alcanza una profundidad \(\Theta(\log_2(n))\); en un árbol degenerado puede recorrer \(O(n)\) nodos. La memoria de la versión recursiva depende de la altura \(h\): \(S(n)\in\Theta(h)\).
+
+#### Aplicación del procedimiento
+
+1. **Casos base:** encontrar el valor en la raíz cuesta \(\Theta(1)\); alcanzar una referencia nula también cuesta \(\Theta(1)\).
+2. **Llamadas y tamaño:** la comparación con la clave selecciona exactamente uno de los dos subárboles. El tamaño disminuye según la altura restante, de \(h\) a \(h-1\).
+3. **Trabajo local:** las comparaciones y la selección del hijo cuestan \(\Theta(1)\), por lo que \(T(h)=T(h-1)+\Theta(1)\).
+4. **Método de resolución:** la sustitución iterativa produce \(T(h)\in\Theta(h)\). En un árbol balanceado, \(h\in\Theta(\log_2(n))\); en uno degenerado, \(h\in\Theta(n)\). Esto da \(\Theta(\log_2(n))\) y \(\Theta(n)\), respectivamente.
+5. **Espacio:** permanece activa una sola ruta con un marco constante por nivel; en consecuencia, \(S(n)\in\Theta(h)\), con los mismos órdenes balanceado y degenerado.
 
 #### Simulación
 
@@ -656,10 +762,10 @@ CHAPTER6_CODE = {
         "C": "void mergeSort(int a[], int inicio, int fin) {\n    if (inicio >= fin) return;\n    int medio = inicio + (fin - inicio) / 2;\n    mergeSort(a, inicio, medio);\n    mergeSort(a, medio + 1, fin);\n    combinar(a, inicio, medio, fin);\n}",
     },
     "arbol": {
-        "Pseudocódigo": "función buscar(raíz, valor)\n    si raíz = nulo entonces retornar falso\n    si raíz.valor = valor entonces retornar verdadero\n    retornar buscar(raíz.izquierdo, valor) o buscar(raíz.derecho, valor)",
-        "Python": "def buscar(raiz, valor):\n    if raiz is None:\n        return False\n    if raiz.valor == valor:\n        return True\n    return buscar(raiz.izquierdo, valor) or buscar(raiz.derecho, valor)",
-        "Java": "static boolean buscar(Nodo raiz, int valor) {\n    if (raiz == null) return false;\n    if (raiz.valor == valor) return true;\n    return buscar(raiz.izquierdo, valor) || buscar(raiz.derecho, valor);\n}",
-        "C": "bool buscar(const Nodo *raiz, int valor) {\n    if (raiz == NULL) return false;\n    if (raiz->valor == valor) return true;\n    return buscar(raiz->izquierdo, valor) ||\n           buscar(raiz->derecho, valor);\n}",
+        "Pseudocódigo": "función buscar(raíz, valor)\n    si raíz = nulo entonces retornar falso\n    si raíz.valor = valor entonces retornar verdadero\n    si valor < raíz.valor entonces retornar buscar(raíz.izquierdo, valor)\n    retornar buscar(raíz.derecho, valor)",
+        "Python": "def buscar(raiz, valor):\n    if raiz is None:\n        return False\n    if raiz.valor == valor:\n        return True\n    if valor < raiz.valor:\n        return buscar(raiz.izquierdo, valor)\n    return buscar(raiz.derecho, valor)",
+        "Java": "static boolean buscar(Nodo raiz, int valor) {\n    if (raiz == null) return false;\n    if (raiz.valor == valor) return true;\n    if (valor < raiz.valor) return buscar(raiz.izquierdo, valor);\n    return buscar(raiz.derecho, valor);\n}",
+        "C": "bool buscar(const Nodo *raiz, int valor) {\n    if (raiz == NULL) return false;\n    if (raiz->valor == valor) return true;\n    if (valor < raiz->valor) return buscar(raiz->izquierdo, valor);\n    return buscar(raiz->derecho, valor);\n}",
     },
 }
 
@@ -1696,13 +1802,13 @@ def section_specs(chapter: int) -> list[tuple[str, str, str, str | None]]:
         specs.append((EXERCISE_TITLES[chapter], "ejercicios-propuestos", exercise_pdf(chapter), None))
         return specs
     if chapter == 6:
-        body, url = extract_lab(6, "0-laboratorio-analisis-recursivo")
+        body, _url = extract_lab(6, "0-laboratorio-analisis-recursivo")
         matches = list(re.finditer(r"^### (Ejemplo \d+ · .+)$", body, flags=re.MULTILINE))
         for index, match in enumerate(matches):
             end = matches[index + 1].start() if index + 1 < len(matches) else len(body)
             title = match.group(1)
             slug = ("factorial", "fibonacci", "potencia", "merge-sort", "arbol-binario")[index]
-            specs.append((title, slug, body[match.end():end].strip(), url))
+            specs.append((title, slug, body[match.end():end].strip(), None))
         specs.append((EXERCISE_TITLES[chapter], "ejercicios-propuestos", exercise_pdf(chapter), None))
         return specs
     for heading, slug in LABS[chapter]:
@@ -1772,9 +1878,11 @@ def build_sectioned_chapter(chapter: int) -> None:
     directory.mkdir(exist_ok=True)
 
     top, bottom = navigation(chapter)
-    chapter_content = "\n\n".join(
-        (top, title, kicker, INTRO[chapter].strip(), chapter_section_cards(chapter), "---", bottom)
-    ) + "\n"
+    chapter_parts = [top, title, kicker, INTRO[chapter].strip()]
+    if chapter == 6:
+        chapter_parts.append(CHAPTER6_LAB.strip())
+    chapter_parts.extend((chapter_section_cards(chapter), "---", bottom))
+    chapter_content = "\n\n".join(chapter_parts) + "\n"
     current_path.write_text(normalize_math_products(chapter_content), encoding="utf-8")
 
     section_pairs = [(label, slug) for label, slug, _body, _url in specs]

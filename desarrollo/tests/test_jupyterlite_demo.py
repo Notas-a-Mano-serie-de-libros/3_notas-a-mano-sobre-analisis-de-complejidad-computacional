@@ -345,10 +345,13 @@ def test_all_remaining_simulation_pages_embed_their_matching_notebook():
     for (chapter, page_name), notebooks in PAGE_NOTEBOOKS.items():
         if chapter not in range(4, 9):
             continue
-        page = (
-            PROJECT_ROOT
+        page_path = (
+            PROJECT_ROOT / f"docs/capitulos/capitulo-{chapter}.md"
+            if page_name == "__chapter__"
+            else PROJECT_ROOT
             / f"docs/capitulos/capitulo-{chapter}/{page_name}.md"
-        ).read_text(encoding="utf-8")
+        )
+        page = page_path.read_text(encoding="utf-8")
         assert "<!-- jupyterlite-demo:start -->" in page
         for notebook in notebooks:
             assert notebook_url(chapter, notebook) in page

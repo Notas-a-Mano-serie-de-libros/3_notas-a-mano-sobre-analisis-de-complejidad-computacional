@@ -53,6 +53,19 @@ T(n)=T(n-1)+T(n-2)+\Theta(1)\in\Theta(\varphi^n).
 
 El árbol contiene una cantidad exponencial de llamadas por la repetición de resultados. Sin embargo, sus dos ramas no permanecen completas a la vez: la profundidad máxima es lineal, así que \(S(n)\in\Theta(n)\).
 
+### Aplicación del procedimiento
+
+1. **Casos base:** \(T(0)=T(1)=\Theta(1)\).
+2. **Llamadas y tamaños:** cada caso no base genera dos llamadas, con tamaños \(n-1\) y \(n-2\).
+3. **Trabajo local:** la comparación y la suma cuestan \(\Theta(1)\), por lo que
+
+    \[
+    T(n)=T(n-1)+T(n-2)+\Theta(1).
+    \]
+
+4. **Método de resolución:** el árbol de recurrencia evidencia la duplicación de subproblemas. La ecuación característica de la parte homogénea es \(r^2=r+1\); su raíz dominante es \(\varphi=(1+\sqrt5)/2\). En consecuencia, \(T(n)\in\Theta(\varphi^n)\).
+5. **Espacio:** solo permanece activa una ruta del árbol a la vez. La ruta más larga reduce \(n\) de uno en uno, tiene profundidad \(\Theta(n)\) y determina \(S(n)\in\Theta(n)\).
+
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">
 <figure><img src="../../../assets/images/capitulo-6/ejemplos/arbol_recurrencia_fibonacci_general.png" alt="Árbol de llamadas de ejemplo 2 · fibonacci recursivo ingenuo"><figcaption>Árbol de llamadas de ejemplo 2 · fibonacci recursivo ingenuo.</figcaption></figure>
@@ -69,7 +82,6 @@ Con el proyecto clonado, abra una terminal, sitúese en la ruta principal y acti
 | Paso | Comando |
 | --- | --- |
 | Ir a la ruta principal del proyecto | `cd 3_notas-a-mano-sobre-analisis-de-complejidad-computacional` |
-| Abrir Laboratorio de análisis recursivo | `jupyter lab simulaciones/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb` |
 | Abrir Comparacion Fibonacci | `jupyter lab simulaciones/capitulo6/notebooks/comparacion_fibonacci.ipynb` |
 | Abrir Ejemplo Recursion | `jupyter lab simulaciones/capitulo6/notebooks/ejemplo_recursion.ipynb` |
 
@@ -78,34 +90,6 @@ Jupyter abrirá la simulación; ejecute todas sus celdas para iniciarla.
 La ejecución local aprovecha los recursos del equipo y evita los límites de sesión de los entornos remotos.
 </details>
 <!-- local-execution:end -->
-
-<!-- jupyterlite-demo:start -->
-## Simulación en el navegador
-
-Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. También puedes abrir el notebook en Google Colab o en una instancia local de Jupyter.
-
-1. Espera a que el kernel indique **Python (Pyodide)**.
-2. La simulación se ejecuta automáticamente cuando el kernel **Python (Pyodide)** esté listo.
-3. Interactúa con los controles de **Laboratorio de análisis recursivo**.
-
-<div class="jupyterlite-demo">
-  <div class="jupyterlite-demo__toolbar">
-    <span>Simulación interactiva</span>
-  </div>
-  <div class="jupyterlite-demo__actions">
-    <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
-  </div>
-  <iframe
-    class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb"
-    title="Simulación interactiva de Laboratorio de análisis recursivo en JupyterLite"
-    loading="lazy"
-    allow="clipboard-read; clipboard-write"
-  ></iframe>
-
-</div>
-<!-- jupyterlite-demo:end -->
 
 <!-- jupyterlite-demo:start -->
 ## Simulación en el navegador

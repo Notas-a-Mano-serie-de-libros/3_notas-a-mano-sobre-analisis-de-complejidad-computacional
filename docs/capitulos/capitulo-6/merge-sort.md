@@ -18,57 +18,25 @@ A continuación, se presenta la implementación recursiva estándar del **ordena
 
 La división genera dos subproblemas de tamaño \(n/2\) y la combinación recorre los \(n\) elementos. Por tanto, \(T(n)=2 \cdot T(n/2)+\Theta(n)\in\Theta(n \cdot \log_2(n))\). Los arreglos auxiliares de combinación requieren \(\Theta(n)\) memoria; la pila añade \(\Theta(\log_2(n))\), que queda dominada por el almacenamiento lineal.
 
+### Aplicación del procedimiento
+
+1. **Caso base:** un segmento con cero o un elemento ya está ordenado y cuesta \(\Theta(1)\).
+2. **Llamadas y tamaños:** se generan dos llamadas sobre mitades de tamaño aproximado \(n/2\).
+3. **Trabajo local:** dividir los límites cuesta \(\Theta(1)\), mientras que combinar las mitades cuesta \(\Theta(n)\). De ahí surge
+
+    \[
+    T(n)=2\cdot T(n/2)+\Theta(n).
+    \]
+
+4. **Método de resolución:** en el teorema maestro, \(a=2\), \(b=2\) y \(f(n)=\Theta(n)\). Como \(n^{\log_b(a)}=n\), corresponde el caso 2 y \(T(n)\in\Theta(n\cdot\log_2(n))\).
+5. **Espacio:** la pila tiene \(\Theta(\log_2(n))\) marcos. Las estructuras auxiliares activas suman la serie \(n+n/2+n/4+\cdots\in\Theta(n)\), que domina la pila; por tanto, \(S(n)\in\Theta(n)\).
+
 <!-- figures-from-explanation:start -->
 <div class="chapter-figures">
 <figure><img src="../../../assets/images/capitulo-6/ejemplos/arbol_recursion_mezcla.png" alt="Árbol de llamadas de ejemplo 4 · ordenamiento por mezcla"><figcaption>Árbol de llamadas de ejemplo 4 · ordenamiento por mezcla.</figcaption></figure>
 <figure><img src="../../../assets/images/capitulo-6/ejemplos/arbol_recursion_mecla_2.png" alt="Árbol de llamadas de ejemplo 4 · ordenamiento por mezcla"><figcaption>Árbol de llamadas de ejemplo 4 · ordenamiento por mezcla.</figcaption></figure>
 </div>
 <!-- figures-from-explanation:end -->
-
-<!-- local-execution:start -->
-<details class="local-execution" markdown="1">
-<summary>Recomendación de ejecución local</summary>
-
-Con el proyecto clonado, abra una terminal, sitúese en la ruta principal y active el entorno según la [guía de instalación](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional#guía-de-instalación) y ejecute el notebook con Jupyter:
-
-| Paso | Comando |
-| --- | --- |
-| Ir a la ruta principal del proyecto | `cd 3_notas-a-mano-sobre-analisis-de-complejidad-computacional` |
-| Abrir Laboratorio de análisis recursivo | `jupyter lab simulaciones/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb` |
-
-Jupyter abrirá la simulación; ejecute todas sus celdas para iniciarla.
-
-La ejecución local aprovecha los recursos del equipo y evita los límites de sesión de los entornos remotos.
-</details>
-<!-- local-execution:end -->
-
-<!-- jupyterlite-demo:start -->
-## Simulación en el navegador
-
-Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. También puedes abrir el notebook en Google Colab o en una instancia local de Jupyter.
-
-1. Espera a que el kernel indique **Python (Pyodide)**.
-2. La simulación se ejecuta automáticamente cuando el kernel **Python (Pyodide)** esté listo.
-3. Interactúa con los controles de **Laboratorio de análisis recursivo**.
-
-<div class="jupyterlite-demo">
-  <div class="jupyterlite-demo__toolbar">
-    <span>Simulación interactiva</span>
-  </div>
-  <div class="jupyterlite-demo__actions">
-    <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo6/notebooks/0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
-  </div>
-  <iframe
-    class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb"
-    title="Simulación interactiva de Laboratorio de análisis recursivo en JupyterLite"
-    loading="lazy"
-    allow="clipboard-read; clipboard-write"
-  ></iframe>
-
-</div>
-<!-- jupyterlite-demo:end -->
 
 <nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../potencia/">← Ejemplo 3 · Potencia de un número entero positivo</a><a class="section-step__index" href="../">Capítulo 6</a><a class="section-step__next" href="../arbol-binario/">Ejemplo 5 · Búsqueda en árbol binario →</a></nav>
 
