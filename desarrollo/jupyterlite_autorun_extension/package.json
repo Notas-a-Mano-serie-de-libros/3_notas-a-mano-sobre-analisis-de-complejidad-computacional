@@ -1,0 +1,26 @@
+{
+  "name": "@notas-a-mano/jupyterlite-auto-run",
+  "version": "1.0.0",
+  "description": "Run simulation notebooks when their JupyterLite kernel is ready",
+  "license": "UNLICENSED",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc && jupyter builder build ."
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^4.6.3",
+    "@jupyterlab/notebook": "^4.6.3"
+  },
+  "devDependencies": {
+    "@jupyter/builder": "^1.2.2",
+    "typescript": "~5.9.3"
+  },
+  "jupyterlab": {
+    "extension": true,
+    "outputDir": "dist"
+  }
+}

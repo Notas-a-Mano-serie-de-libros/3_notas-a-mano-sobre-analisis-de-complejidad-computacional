@@ -1,0 +1,7 @@
+-c requirements-lock.txt
+-r requirements-ci.txt
+-r requirements-publish.txt
+pre-commit
+ipykernel
+jupyterlab_widgets
+tornado
