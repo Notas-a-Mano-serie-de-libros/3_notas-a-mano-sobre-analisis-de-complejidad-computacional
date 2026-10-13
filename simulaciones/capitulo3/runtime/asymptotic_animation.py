@@ -101,10 +101,16 @@ _BIG_O_HTML = r"""
 #bo-wrap .card .lbl{font-size:11px;color:#78909C;margin-bottom:3px}
 #bo-wrap .card .val{font-size:15px;font-weight:600}
 #bo-wrap .fml{margin-top:10px;background:#f7f7f7;border:1px solid #e8e8e8;border-radius:4px;padding:10px 20px;font-size:15px;color:#333;min-height:44px;text-align:center}
-#bo-wrap .info-sections{margin-top:12px}
-#bo-wrap .info-section{border:1px solid #dedede;border-radius:5px;background:#fff;margin-top:8px;overflow:hidden}
-#bo-wrap .info-section>summary{cursor:pointer;padding:10px 14px;font-weight:700;background:#f7f7f7;list-style-position:inside}
-#bo-wrap .info-section[open]>summary{border-bottom:1px solid #e2e2e2}
+#bo-wrap .analysis-panel{width:100%;box-sizing:border-box;margin-top:12px;border:1px solid #dedede;border-radius:5px;background:#fff;overflow:hidden}
+#bo-wrap .analysis-title{margin:0;padding:12px 16px;font-size:16px;font-weight:700;color:#333;background:#f7f7f7;border-bottom:1px solid #dedede}
+#bo-wrap .analysis-tabs{display:flex;width:100%;box-sizing:border-box;overflow-x:auto;background:#fafafa;border-bottom:1px solid #dedede}
+#bo-wrap .analysis-tab{flex:1 1 auto;min-width:max-content;padding:10px 14px;border:0;border-right:1px solid #e2e2e2;border-bottom:3px solid transparent;background:transparent;color:#555;font:600 13px sans-serif;cursor:pointer;text-align:center}
+#bo-wrap .analysis-tab:last-child{border-right:0}
+#bo-wrap .analysis-tab:hover{background:#f1f1f1;color:#222}
+#bo-wrap .analysis-tab:focus-visible{outline:2px solid #1976D2;outline-offset:-2px}
+#bo-wrap .analysis-tab[aria-selected=true]{background:#fff;color:#1565C0;border-bottom-color:#1565C0}
+#bo-wrap .analysis-content{width:100%;box-sizing:border-box}
+#bo-wrap .analysis-section[hidden]{display:none}
 #bo-wrap .section-content{padding:12px 18px}
 #bo-wrap .result-body{min-height:172px;box-sizing:border-box;text-align:center}
 #bo-wrap .result-equations{min-height:70px;display:flex;flex-direction:column;justify-content:center;text-align:center}
@@ -265,9 +271,16 @@ _BIG_O_HTML = r"""
       <span style="color:#2E7D32"><span class="sw" style="border-top-style:dotted"></span><span id="bo-leg-n0">—</span></span>
     </div>
   </div>
-  <div class="info-sections">
-    <details class="info-section" id="bo-result-section" open>
-      <summary>Resultado</summary>
+  <section class="analysis-panel" aria-labelledby="bo-analysis-title">
+    <h3 class="analysis-title" id="bo-analysis-title">Análisis de los resultados</h3>
+    <div class="analysis-tabs" role="tablist" aria-label="Secciones del análisis">
+      <button type="button" class="analysis-tab" id="bo-result-tab" role="tab" aria-selected="true" aria-controls="bo-result-section">Resultado</button>
+      <button type="button" class="analysis-tab" id="bo-limit-tab" role="tab" aria-selected="false" aria-controls="bo-limit-section" tabindex="-1">Verificación por límite</button>
+      <button type="button" class="analysis-tab" id="bo-n0-tab" role="tab" aria-selected="false" aria-controls="bo-n0-section" tabindex="-1">Conjunto solución y \(\mathbf{n_0}\)</button>
+      <button type="button" class="analysis-tab" id="bo-comparison-tab" role="tab" aria-selected="false" aria-controls="bo-comparison-section" tabindex="-1">Comparación con otras funciones</button>
+    </div>
+    <div class="analysis-content">
+      <div class="analysis-section" id="bo-result-section" role="tabpanel" aria-labelledby="bo-result-tab">
       <div class="section-content result-body">
         <div class="result-equations">
           <div id="bo-result-main">—</div>
@@ -280,20 +293,18 @@ _BIG_O_HTML = r"""
         </div>
         <div class="note" id="bo-reading">—</div>
       </div>
-    </details>
-    <details class="info-section" id="bo-limit-section">
-      <summary>Verificación por límite</summary>
+      </div>
+      <div class="analysis-section" id="bo-limit-section" role="tabpanel" aria-labelledby="bo-limit-tab" hidden>
       <div class="section-content fml" id="bo-limit-proof">—</div>
-    </details>
-    <details class="info-section" id="bo-n0-section">
-      <summary>Conjunto solución y \(\mathbf{n_0}\)</summary>
+      </div>
+      <div class="analysis-section" id="bo-n0-section" role="tabpanel" aria-labelledby="bo-n0-tab" hidden>
       <div class="section-content fml" id="bo-n0-proof">—</div>
-    </details>
-    <details class="info-section" id="bo-comparison-section">
-      <summary>Comparación con otras funciones</summary>
+      </div>
+      <div class="analysis-section" id="bo-comparison-section" role="tabpanel" aria-labelledby="bo-comparison-tab" hidden>
       <div class="section-content"><div id="bo-limits"></div></div>
-    </details>
-  </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -1988,6 +1999,31 @@ _BIG_O_HTML = r"""
   el('bo-c1-inc').addEventListener('click',function(){stepThetaConstant('bo-c1',1);});
   el('bo-c2-dec').addEventListener('click',function(){stepThetaConstant('bo-c2',-1);});
   el('bo-c2-inc').addEventListener('click',function(){stepThetaConstant('bo-c2',1);});
+  var analysisTabs=Array.prototype.slice.call(root.querySelectorAll('.analysis-tab'));
+  function selectAnalysisTab(tab,moveFocus){
+    analysisTabs.forEach(function(candidate){
+      var selected=candidate===tab;
+      candidate.setAttribute('aria-selected',selected?'true':'false');
+      candidate.tabIndex=selected?0:-1;
+      var panel=el(candidate.getAttribute('aria-controls'));
+      if(panel)panel.hidden=!selected;
+    });
+    if(moveFocus)tab.focus();
+    typeset();
+  }
+  analysisTabs.forEach(function(tab,index){
+    tab.addEventListener('click',function(){selectAnalysisTab(tab,false);});
+    tab.addEventListener('keydown',function(ev){
+      var next=index;
+      if(ev.key==='ArrowRight')next=(index+1)%analysisTabs.length;
+      else if(ev.key==='ArrowLeft')next=(index-1+analysisTabs.length)%analysisTabs.length;
+      else if(ev.key==='Home')next=0;
+      else if(ev.key==='End')next=analysisTabs.length-1;
+      else return;
+      ev.preventDefault();
+      selectAnalysisTab(analysisTabs[next],true);
+    });
+  });
   var resizeObserver=null;
   if(window.ResizeObserver){
     resizeObserver=new ResizeObserver(function(){if(root.isConnected)draw();});

@@ -629,16 +629,19 @@ def test_tabla_final_resalta_pertenencia_y_sustituye_directamente_las_funciones(
     assert "var rowClass=(isMember(ck,gk)?'member':'nonmember')" in html
 
 
-def test_informacion_inferior_se_organiza_en_secciones_plegables():
+def test_informacion_inferior_se_organiza_en_un_panel_con_pestanas():
     html = load_animation_module()._BIG_O_HTML
-    assert '<details class="info-section" id="bo-result-section" open>' in html
-    assert '<details class="info-section" id="bo-limit-section">' in html
-    assert '<details class="info-section" id="bo-n0-section">' in html
-    assert '<details class="info-section" id="bo-comparison-section">' in html
-    assert html.count('<details class="info-section"') == 4
-    assert html.count(" open>") == 1
+    assert '<h3 class="analysis-title" id="bo-analysis-title">Análisis de los resultados</h3>' in html
+    assert html.count('class="analysis-tab"') == 4
+    assert '<div class="analysis-section" id="bo-result-section" role="tabpanel" aria-labelledby="bo-result-tab">' in html
+    assert '<div class="analysis-section" id="bo-limit-section" role="tabpanel" aria-labelledby="bo-limit-tab" hidden>' in html
+    assert '<div class="analysis-section" id="bo-n0-section" role="tabpanel" aria-labelledby="bo-n0-tab" hidden>' in html
+    assert '<div class="analysis-section" id="bo-comparison-section" role="tabpanel" aria-labelledby="bo-comparison-tab" hidden>' in html
+    assert '.analysis-panel{width:100%;box-sizing:border-box' in html
     assert ".result-body{min-height:172px" in html
-    assert r"<summary>Conjunto solución y \(\mathbf{n_0}\)</summary>" in html
+    assert r">Conjunto solución y \(\mathbf{n_0}\)</button>" in html
+    assert "function selectAnalysisTab(tab,moveFocus)" in html
+    assert "if(ev.key==='ArrowRight')" in html
 
 
 def test_resultado_resume_respuesta_antes_del_procedimiento():
@@ -657,7 +660,7 @@ def test_resultado_resume_respuesta_antes_del_procedimiento():
 def test_tarjetas_inferiores_conservan_solo_tres_datos_principales():
     html = load_animation_module()._BIG_O_HTML
     result_section = html.split('id="bo-result-section"', 1)[1].split(
-        "</details>", 1
+        '<div class="analysis-section" id="bo-limit-section"', 1
     )[0]
     assert result_section.count('class="card"') == 3
     assert "n₀ seleccionado" in result_section
