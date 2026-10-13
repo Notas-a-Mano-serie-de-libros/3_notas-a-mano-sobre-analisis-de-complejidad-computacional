@@ -59,9 +59,9 @@ run_app = run_big_o_app
 
 _BIG_O_HTML = r"""
 <style>
-#bo-wrap{background:#ffffff;font-family:sans-serif;padding:14px 4px;color:#333}
-#bo-wrap .plot-wrap{position:relative;width:100%;height:480px}
-#bo-wrap canvas{display:block;width:100%;height:480px;background:#ffffff;border:1px solid #e0e0e0;touch-action:none;cursor:grab}
+#bo-wrap{width:100%;max-width:100%;box-sizing:border-box;background:#ffffff;font-family:sans-serif;padding:14px 4px;color:#333}
+#bo-wrap .plot-wrap{position:relative;width:100%;max-width:100%;height:480px;box-sizing:border-box}
+#bo-wrap canvas{display:block;width:100%;max-width:100%;height:480px;box-sizing:border-box;background:#ffffff;border:1px solid #e0e0e0;touch-action:none;cursor:grab}
 #bo-wrap .zoom-controls{position:absolute;top:10px;right:10px;z-index:3;display:flex;gap:0}
 #bo-wrap .zoom-btn{width:34px;height:32px;border:1px solid #ccc;border-radius:0;background:#f7f7f7;color:#333;cursor:pointer;font-size:20px;line-height:1}
 #bo-wrap .zoom-btn:hover{background:#eee}
@@ -101,7 +101,7 @@ _BIG_O_HTML = r"""
 #bo-wrap .card .lbl{font-size:11px;color:#78909C;margin-bottom:3px}
 #bo-wrap .card .val{font-size:15px;font-weight:600}
 #bo-wrap .fml{margin-top:10px;background:#f7f7f7;border:1px solid #e8e8e8;border-radius:4px;padding:10px 20px;font-size:15px;color:#333;min-height:44px;text-align:center}
-#bo-wrap .analysis-panel{width:100%;box-sizing:border-box;margin-top:12px;border:1px solid #dedede;border-radius:5px;background:#fff;overflow:hidden}
+#bo-wrap .analysis-panel{display:block;width:100%;min-width:100%;max-width:100%;box-sizing:border-box;margin-top:12px;border:1px solid #dedede;border-radius:5px;background:#fff;overflow:hidden}
 #bo-wrap .analysis-title{margin:0;padding:12px 16px;font-size:16px;font-weight:700;color:#333;background:#f7f7f7;border-bottom:1px solid #dedede}
 #bo-wrap .analysis-tabs{display:flex;width:100%;box-sizing:border-box;overflow-x:auto;background:#fafafa;border-bottom:1px solid #dedede}
 #bo-wrap .analysis-tab{flex:1 1 auto;min-width:max-content;padding:10px 14px;border:0;border-right:1px solid #e2e2e2;border-bottom:3px solid transparent;background:transparent;color:#555;font:600 13px sans-serif;cursor:pointer;text-align:center}
@@ -364,7 +364,7 @@ _BIG_O_HTML = r"""
     if(MODE==='little_omega')return 'n2';
     return 'n3';
   }
-  var STATE_A=0,STATE_B=MAX_B,STATE_C_INDEX=0,STATE_G_INDEX=ORDER.indexOf(defaultGKeyForMode()),STATE_N0=null;
+  var STATE_A=0,STATE_B=MAX_B,STATE_C_INDEX=0,STATE_G_INDEX=ORDER.indexOf(defaultGKeyForMode()),STATE_N0=null,STATE_N0_MINIMUM=null;
   function el(id){return typeof document==='undefined'?null:document.getElementById(id);}
   function cKey(){return C_ORDER[STATE_C_INDEX]}
   function gKey(){return ORDER[STATE_G_INDEX]}
@@ -906,12 +906,20 @@ _BIG_O_HTML = r"""
   }
   function selectedN0(threshold){
     var minimum=minimumSelectedN0(threshold);
-    if(minimum===null){STATE_N0=null;return null;}
-    if(STATE_N0===null || STATE_N0<minimum)STATE_N0=minimum;
+    if(minimum===null){STATE_N0=null;STATE_N0_MINIMUM=null;return null;}
+    var minimumChanged=STATE_N0_MINIMUM===null ||
+      Math.abs(STATE_N0_MINIMUM-minimum)>1e-10*Math.max(1,Math.abs(minimum));
+    if(minimumChanged){
+      STATE_N0=minimum;
+      STATE_N0_MINIMUM=minimum;
+    }else if(STATE_N0===null || STATE_N0<minimum){
+      STATE_N0=minimum;
+    }
     return STATE_N0;
   }
   function resetSelectedN0(){
     STATE_N0=null;
+    STATE_N0_MINIMUM=null;
   }
   function defaultN0Latex(threshold){
     if(isStrictMode()){
@@ -1532,7 +1540,7 @@ _BIG_O_HTML = r"""
   }
   function viewSnapshot(){
     return {
-      mode:MODE,a:STATE_A,b:STATE_B,cIndex:STATE_C_INDEX,gIndex:STATE_G_INDEX,n0:STATE_N0,
+      mode:MODE,a:STATE_A,b:STATE_B,cIndex:STATE_C_INDEX,gIndex:STATE_G_INDEX,n0:STATE_N0,n0Minimum:STATE_N0_MINIMUM,
       c:el('bo-c').dataset.value,c1:el('bo-c1').dataset.value,c2:el('bo-c2').dataset.value,epsilon:el('bo-epsilon').value,
       scale:el('bo-scale').value,yOffset:Y_OFFSET,yScale:Y_SCALE,
       yRange:Y_RANGE_OVERRIDE?{min:Y_RANGE_OVERRIDE.min,max:Y_RANGE_OVERRIDE.max}:null,
@@ -1560,6 +1568,7 @@ _BIG_O_HTML = r"""
   function restoreSnapshot(snapshot){
     MODE=snapshot.mode;STATE_A=snapshot.a;STATE_B=snapshot.b;
     STATE_C_INDEX=snapshot.cIndex;STATE_G_INDEX=snapshot.gIndex;STATE_N0=snapshot.n0;
+    STATE_N0_MINIMUM=snapshot.n0Minimum===undefined?null:snapshot.n0Minimum;
     el('bo-mode').value=MODE;
     setConstantValue('bo-c',snapshot.c,true);
     setConstantValue('bo-c1',snapshot.c1,true);

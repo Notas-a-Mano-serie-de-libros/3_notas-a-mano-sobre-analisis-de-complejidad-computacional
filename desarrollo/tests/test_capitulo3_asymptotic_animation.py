@@ -353,11 +353,14 @@ def test_mas_acerca_y_menos_aleja_la_vista():
     assert "el('bo-zoom-out').addEventListener('click',zoomOut);" in html
 
 
-def test_parametros_adicionales_conservan_zoom_vista_y_n0_seleccionado():
+def test_parametros_adicionales_conservan_el_zoom_y_recalculan_n0():
     html = load_animation_module()._BIG_O_HTML
     assert "Y_RANGE_OVERRIDE=null,lastYRange=null" in html
     assert "function preserveViewportForParameterChange()" in html
     assert "Y_RANGE_OVERRIDE={min:lastYRange.min,max:lastYRange.max};" in html
+    assert "STATE_N0_MINIMUM=null" in html
+    assert "var minimumChanged=STATE_N0_MINIMUM===null" in html
+    assert "STATE_N0_MINIMUM=minimum;" in html
     listeners = html.split("['bo-c','bo-c1','bo-c2'].forEach", 1)[1].split(
         "el('bo-epsilon').addEventListener", 1
     )[0]
@@ -366,6 +369,22 @@ def test_parametros_adicionales_conservan_zoom_vista_y_n0_seleccionado():
     assert "Y_OFFSET=0" not in listeners
     assert "Y_SCALE=1" not in listeners
     assert "Y_RANGE_OVERRIDE=null" not in listeners
+
+
+def test_n0_se_actualiza_si_cambia_el_extremo_del_conjunto_solucion():
+    result = run_math_engine(
+        "big_o",
+        "(function(){"
+        "var first=selectedN0(estimateN0('book','n3',9));"
+        "STATE_N0=5;"
+        "var second=selectedN0(estimateN0('book','n3',2));"
+        "return {first:first,second:second,stored:STATE_N0};"
+        "})()",
+    )
+
+    assert result["first"] == pytest.approx(1)
+    assert result["second"] == pytest.approx(2.9258515514770953)
+    assert result["stored"] == pytest.approx(result["second"])
 
 
 def test_solo_reset_y_cambios_estructurales_liberan_el_rango_vertical():
@@ -550,8 +569,8 @@ def test_etiquetas_de_controles_estan_centradas_en_su_columna():
 
 def test_grafica_usa_altura_ampliada():
     html = load_animation_module()._BIG_O_HTML
-    assert ".plot-wrap{position:relative;width:100%;height:480px}" in html
-    assert "canvas{display:block;width:100%;height:480px" in html
+    assert ".plot-wrap{position:relative;width:100%;max-width:100%;height:480px;box-sizing:border-box}" in html
+    assert "canvas{display:block;width:100%;max-width:100%;height:480px;box-sizing:border-box" in html
 
 
 def test_controles_permanecen_dentro_de_la_grafica_sin_tapar_el_area_de_dibujo():
@@ -637,7 +656,7 @@ def test_informacion_inferior_se_organiza_en_un_panel_con_pestanas():
     assert '<div class="analysis-section" id="bo-limit-section" role="tabpanel" aria-labelledby="bo-limit-tab" hidden>' in html
     assert '<div class="analysis-section" id="bo-n0-section" role="tabpanel" aria-labelledby="bo-n0-tab" hidden>' in html
     assert '<div class="analysis-section" id="bo-comparison-section" role="tabpanel" aria-labelledby="bo-comparison-tab" hidden>' in html
-    assert '.analysis-panel{width:100%;box-sizing:border-box' in html
+    assert '.analysis-panel{display:block;width:100%;min-width:100%;max-width:100%;box-sizing:border-box' in html
     assert ".result-body{min-height:172px" in html
     assert r">Conjunto solución y \(\mathbf{n_0}\)</button>" in html
     assert "function selectAnalysisTab(tab,moveFocus)" in html
