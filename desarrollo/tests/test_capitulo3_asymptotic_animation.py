@@ -417,7 +417,7 @@ def test_historial_restaura_vista_parametros_y_n0():
     assert "historyUndo.length>50" in html
 
 
-def test_n0_dinamico_no_recompone_la_demostracion_ni_la_tabla():
+def test_arrastre_actualiza_n0_e_intervalo_del_resultado_sin_recomponer_la_tabla():
     html = load_animation_module()._BIG_O_HTML
     assert "function renderDynamicMath(id,latex)" in html
     assert "mathJax.tex2svgPromise(requested,{display:false})" in html
@@ -425,6 +425,8 @@ def test_n0_dinamico_no_recompone_la_demostracion_ni_la_tabla():
     assert "if(state.running)return;" in html
     assert "function updateDynamicN0(n0)" in html
     assert "if(drag==='n0')updateDynamicN0(n0);" in html
+    assert "updateBoundDragText(ck,gk,c,threshold,n0);" in html
+    assert "renderDynamicMath('bo-result-main',resultSummaryLatex(ck,gk,c,threshold));" in html
 
 
 def test_muestreo_se_adapta_al_ancho_curvatura_y_cruce():
@@ -548,7 +550,7 @@ def test_curvas_de_referencia_se_pueden_arrastrar_verticalmente():
     assert "value=Math.max(minimum,Math.min(maximum,value));" in html
     assert "drag==='cg' || drag==='c1g'" in html
     assert "?'ns-resize':'ew-resize'" in html
-    assert "updateBoundDragText(gk,c,threshold,n0)" in html
+    assert "updateBoundDragText(ck,gk,c,threshold,n0)" in html
     assert "Arrastra verticalmente las curvas" in html
 
 
@@ -667,6 +669,7 @@ def test_resultado_resume_respuesta_antes_del_procedimiento():
     html = load_animation_module()._BIG_O_HTML
     assert 'id="bo-result-main"' in html
     assert 'id="bo-result-n0"' in html
+    assert "function resultSummaryLatex(ck,gk,c,threshold)" in html
     assert "function resultSummaryHtml(ck,gk,c,threshold)" in html
     assert "realThresholdSetLatex(" in html
     assert r"\\begin{gathered}" in html

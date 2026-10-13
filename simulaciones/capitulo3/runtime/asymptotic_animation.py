@@ -1007,12 +1007,15 @@ _BIG_O_HTML = r"""
       partialSolutions+
       singleSolution;
   }
-  function resultSummaryHtml(ck,gk,c,threshold){
+  function resultSummaryLatex(ck,gk,c,threshold){
     var relation=cLatex()+(isMember(ck,gk)?'\\in ':'\\notin ')+modeLatex()+'('+latexOf(gk)+')';
     var solution='n\\in '+realThresholdSetLatex(
       threshold,solutionIncludesBoundary(ck,gk,c,threshold)
     );
-    return texBlock('\\displaystyle \\begin{gathered}'+relation+'\\\\[4pt]'+solution+'\\end{gathered}');
+    return '\\displaystyle \\begin{gathered}'+relation+'\\\\[4pt]'+solution+'\\end{gathered}';
+  }
+  function resultSummaryHtml(ck,gk,c,threshold){
+    return texBlock(resultSummaryLatex(ck,gk,c,threshold));
   }
   function readingText(ck,gk){
     if(!isMember(ck,gk))return 'La función seleccionada no satisface la relación asintótica de esta notación con la referencia actual.';
@@ -1463,7 +1466,7 @@ _BIG_O_HTML = r"""
     drawEndpointMarker(a,a,b,'a');
     drawEndpointMarker(b,a,b,'b');
     if(drag==='n0')updateDynamicN0(n0);
-    else if(drag==='cg' || drag==='c1g')updateBoundDragText(gk,c,threshold,n0);
+    else if(drag==='cg' || drag==='c1g')updateBoundDragText(ck,gk,c,threshold,n0);
     else updateText(a,b,ck,gk,c,threshold,lim);
   }
   function requestDraw(){
@@ -1818,7 +1821,7 @@ _BIG_O_HTML = r"""
     if(!isFinite(maximum))maximum=1000;
     setConstantValue('bo-c',String(Number(Math.max(minimum,Math.min(maximum,value)).toPrecision(5))),true);
   }
-  function updateBoundDragText(gk,c,threshold,n0){
+  function updateBoundDragText(ck,gk,c,threshold,n0){
     if(isThetaMode()){
       renderDynamicMath('bo-leg-cg','c_2\\cdot g(n)='+fmtConstant(c.c2)+'\\cdot '+latexOf(gk));
       renderDynamicMath('bo-leg-low','c_1\\cdot g(n)='+fmtConstant(c.c1)+'\\cdot '+latexOf(gk));
@@ -1826,6 +1829,7 @@ _BIG_O_HTML = r"""
       renderDynamicMath('bo-leg-cg','c\\cdot g(n)='+fmtConstant(c)+'\\cdot '+latexOf(gk));
     }
     renderDynamicMath('bo-leg-threshold',(isStrictMode()?'\\inf(I)=':'\\min(I)=')+thresholdNumber(threshold));
+    renderDynamicMath('bo-result-main',resultSummaryLatex(ck,gk,c,threshold));
     updateDynamicN0(n0);
   }
   function beginDrag(p,pointerType){
