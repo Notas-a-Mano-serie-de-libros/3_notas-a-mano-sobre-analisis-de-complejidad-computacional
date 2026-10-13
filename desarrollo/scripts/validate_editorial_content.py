@@ -83,13 +83,10 @@ def main() -> int:
     errors.extend(sync(check=True))
 
     for chapter in (7, 8):
-        path = (
-            DOCS / "capitulos" / f"capitulo-{chapter}" /
-            f"0-comparacion-{'busquedas' if chapter == 7 else 'ordenamientos'}.md"
-        )
+        path = DOCS / "capitulos" / f"capitulo-{chapter}.md"
         source = path.read_text(encoding="utf-8")
-        start = source.find(f"# {chapter}.1 Comparación general")
-        table = source.find("## Algoritmos incluidos", start)
+        start = source.find(f"## {chapter}.1 Comparación general")
+        table = source.find("### Algoritmos incluidos", start)
         demo_start = source.find("<!-- jupyterlite-demo:start -->", start)
         demo_end = source.find("<!-- jupyterlite-demo:end -->", demo_start)
         button = source.find(COLAB_BUTTON_LABEL, demo_start, demo_end)

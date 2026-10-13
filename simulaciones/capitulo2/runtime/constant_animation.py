@@ -54,6 +54,9 @@ WARNING_BYTES = 512 * 1024**2
 EXPERIMENT_POINTS = 200
 GRAPHICS_DIR = graphics_dir("capitulo2", "experimental")
 
+DISPLAY_DPI = 300
+EXPORT_DPI = 600
+
 GRAPHICS_DIR.mkdir(parents=True, exist_ok=True)
 plt.style.use("default")
 plt.rcParams.update(
@@ -223,9 +226,9 @@ def render_result(sizes, experimental, checkpoint_sizes, checkpoint_times, mode,
 
     GRAPHICS_DIR.mkdir(parents=True, exist_ok=True)
     filename = "complejidad_constante.png" if mode == "time" else "complejidad_constante_espacial.png"
-    fig_main.savefig(GRAPHICS_DIR / filename, bbox_inches="tight", pad_inches=0.05)
+    fig_main.savefig(GRAPHICS_DIR / filename, dpi=EXPORT_DPI, bbox_inches="tight", pad_inches=0.05)
     image_buffer = BytesIO()
-    fig_main.savefig(image_buffer, format="png")
+    fig_main.savefig(image_buffer, format="png", dpi=DISPLAY_DPI)
     plt.close(fig_main)
     encoded_image = base64.b64encode(image_buffer.getvalue()).decode("ascii")
     table_html = _results_table_widget(
@@ -256,7 +259,7 @@ def render_template(maximum_n, mode):
     fig_main.subplots_adjust(left=0.12, right=0.97, bottom=0.16, top=0.86)
 
     image_buffer = BytesIO()
-    fig_main.savefig(image_buffer, format="png")
+    fig_main.savefig(image_buffer, format="png", dpi=DISPLAY_DPI)
     plt.close(fig_main)
     encoded_image = base64.b64encode(image_buffer.getvalue()).decode("ascii")
     return (
