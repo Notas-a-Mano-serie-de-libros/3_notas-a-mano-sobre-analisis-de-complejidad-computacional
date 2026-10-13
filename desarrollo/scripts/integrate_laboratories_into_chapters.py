@@ -57,7 +57,6 @@ LABS: dict[int, list[tuple[str, str]]] = {
     ],
     6: [("6.2–6.3 Análisis de algoritmos recursivos", "0-laboratorio-analisis-recursivo")],
     7: [
-        ("7.1 Comparación general", "0-comparacion-busquedas"),
         ("7.2 Búsqueda secuencial", "1-busqueda-secuencial"),
         ("7.3 Búsqueda binaria", "2-busqueda-binaria"),
         ("7.4 Búsqueda por interpolación", "3-busqueda-interpolacion"),
@@ -67,7 +66,6 @@ LABS: dict[int, list[tuple[str, str]]] = {
         ("7.9 Ejercicios propuestos", "ejercicios-propuestos"),
     ],
     8: [
-        ("8.1 Comparación general", "0-comparacion-ordenamientos"),
         ("8.2 Ordenamiento burbuja", "1-ordenamiento-burbuja"),
         ("8.3 Ordenamiento por selección", "2-ordenamiento-seleccion"),
         ("8.4 Ordenamiento por inserción", "3-ordenamiento-insercion"),
@@ -1633,7 +1631,6 @@ SECTION_INDEX: dict[int, tuple[tuple[str, str, str, str], ...]] = {
         ("6.3.5", "Búsqueda en un árbol binario balanceado", "arbol-binario", "Vincula el costo de búsqueda con la altura y el balance del árbol."),
     ),
     7: (
-        ("7.1", "Comparación general", "0-comparacion-busquedas", "Compara requisitos, pasos y costos de todos los algoritmos de búsqueda."),
         ("7.2", "Búsqueda secuencial", "1-busqueda-secuencial", "Recorre los elementos en orden y no exige que los datos estén ordenados."),
         ("7.3", "Búsqueda binaria", "2-busqueda-binaria", "Descarta la mitad del rango activo en cada comparación."),
         ("7.4", "Búsqueda por interpolación", "3-busqueda-interpolacion", "Estima la posición del objetivo a partir de la distribución de los valores."),
@@ -1643,7 +1640,6 @@ SECTION_INDEX: dict[int, tuple[tuple[str, str, str, str], ...]] = {
         ("7.9", "Ejercicios propuestos", "ejercicios-propuestos", "Plantea problemas para elegir y analizar búsquedas según los datos."),
     ),
     8: (
-        ("8.1", "Comparación general", "0-comparacion-ordenamientos", "Contrasta estabilidad, memoria y costos de los algoritmos de ordenamiento."),
         ("8.2", "Ordenamiento burbuja", "1-ordenamiento-burbuja", "Ordena mediante comparaciones e intercambios de elementos adyacentes."),
         ("8.3", "Ordenamiento por selección", "2-ordenamiento-seleccion", "Busca el mínimo restante y lo ubica al final de la zona ordenada."),
         ("8.4", "Ordenamiento por inserción", "3-ordenamiento-insercion", "Inserta cada elemento en su posición dentro del prefijo ya ordenado."),

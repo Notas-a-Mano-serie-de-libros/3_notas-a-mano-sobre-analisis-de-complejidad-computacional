@@ -91,7 +91,6 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
 <section class="chapter-sections" aria-labelledby="chapter-sections-title">
 <h2 id="chapter-sections-title">Secciones del capítulo</h2>
 <ul class="chapter-section-list">
-<li><a href="0-comparacion-ordenamientos/"><strong>Comparación general</strong></a></li>
 <li><a href="1-ordenamiento-burbuja/"><strong>Ordenamiento burbuja</strong></a></li>
 <li><a href="2-ordenamiento-seleccion/"><strong>Ordenamiento por selección</strong></a></li>
 <li><a href="3-ordenamiento-insercion/"><strong>Ordenamiento por inserción</strong></a></li>

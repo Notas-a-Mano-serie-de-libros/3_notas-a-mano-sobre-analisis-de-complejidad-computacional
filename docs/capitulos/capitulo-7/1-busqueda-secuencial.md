@@ -85,7 +85,7 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
 </div>
 <!-- jupyterlite-demo:end -->
 
-<nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../0-comparacion-busquedas/">← 7.1 Comparación general</a><a class="section-step__index" href="../">Capítulo 7</a><a class="section-step__next" href="../2-busqueda-binaria/">7.3 Búsqueda binaria →</a></nav>
+<nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../">← Capítulo 7</a><a class="section-step__index" href="../">Capítulo 7</a><a class="section-step__next" href="../2-busqueda-binaria/">7.3 Búsqueda binaria →</a></nav>
 
 ---
 

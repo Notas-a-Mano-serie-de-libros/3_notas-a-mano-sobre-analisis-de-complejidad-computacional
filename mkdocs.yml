@@ -137,8 +137,7 @@ nav:
           - Árbol binario: capitulos/capitulo-6/arbol-binario.md
           - Ejercicios propuestos: capitulos/capitulo-6/ejercicios-propuestos.md
       - Capítulo 7 · Análisis de algoritmos de búsqueda clásicos:
-          - Introducción: capitulos/capitulo-7.md
-          - Comparación general: capitulos/capitulo-7/0-comparacion-busquedas.md
+          - Introducción y comparación: capitulos/capitulo-7.md
           - Secuencial: capitulos/capitulo-7/1-busqueda-secuencial.md
           - Binaria: capitulos/capitulo-7/2-busqueda-binaria.md
           - Interpolación: capitulos/capitulo-7/3-busqueda-interpolacion.md
@@ -147,8 +146,7 @@ nav:
           - Ternaria: capitulos/capitulo-7/6-busqueda-ternaria.md
           - Ejercicios propuestos: capitulos/capitulo-7/ejercicios-propuestos.md
       - Capítulo 8 · Análisis de algoritmos de ordenamiento clásicos:
-          - Introducción: capitulos/capitulo-8.md
-          - Comparación general: capitulos/capitulo-8/0-comparacion-ordenamientos.md
+          - Introducción y comparación: capitulos/capitulo-8.md
           - Burbuja: capitulos/capitulo-8/1-ordenamiento-burbuja.md
           - Selección: capitulos/capitulo-8/2-ordenamiento-seleccion.md
           - Inserción: capitulos/capitulo-8/3-ordenamiento-insercion.md

@@ -24,10 +24,10 @@ Esta tabla es un mapa editorial mantenido dentro del portal. Su validador compru
 | 5.6.1 · Ejercicios propuestos | [Ejercicios del capítulo 5](capitulos/capitulo-5/ejercicios-propuestos.md) |
 | 6.1–6.3 · Análisis de algoritmos recursivos | [Capítulo 6: Procedimiento para analizar algoritmos recursivos](capitulos/capitulo-6.md) |
 | 6.4.1 · Ejercicios propuestos | [Ejercicios del capítulo 6](capitulos/capitulo-6/ejercicios-propuestos.md) |
-| 7.1 · Comparación general | [Comparación de algoritmos de búsqueda](capitulos/capitulo-7/0-comparacion-busquedas.md) |
+| 7.1 · Comparación general | [Comparación de algoritmos de búsqueda](capitulos/capitulo-7.md) |
 | 7.2–7.7 · Algoritmos de búsqueda | [Capítulo 7: Análisis de algoritmos de búsqueda clásicos](capitulos/capitulo-7.md) |
 | 7.9 · Ejercicios propuestos | [Ejercicios del capítulo 7](capitulos/capitulo-7/ejercicios-propuestos.md) |
-| 8.1 · Comparación general | [Comparación de algoritmos de ordenamiento](capitulos/capitulo-8/0-comparacion-ordenamientos.md) |
+| 8.1 · Comparación general | [Comparación de algoritmos de ordenamiento](capitulos/capitulo-8.md) |
 | 8.2–8.7 · Algoritmos de ordenamiento | [Capítulo 8: Análisis de algoritmos de ordenamiento clásicos](capitulos/capitulo-8.md) |
 | 8.9 · Ejercicios propuestos | [Ejercicios del capítulo 8](capitulos/capitulo-8/ejercicios-propuestos.md) |
 | 9.1–9.2 · Reflexiones finales | [Capítulo 9: Mejorar sin perder el camino](capitulos/capitulo-9.md) |

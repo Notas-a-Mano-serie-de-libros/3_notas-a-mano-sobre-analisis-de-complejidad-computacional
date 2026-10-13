@@ -90,7 +90,6 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
 <section class="chapter-sections" aria-labelledby="chapter-sections-title">
 <h2 id="chapter-sections-title">Secciones del capítulo</h2>
 <ul class="chapter-section-list">
-<li><a href="0-comparacion-busquedas/"><strong>Comparación general</strong></a></li>
 <li><a href="1-busqueda-secuencial/"><strong>Búsqueda secuencial</strong></a></li>
 <li><a href="2-busqueda-binaria/"><strong>Búsqueda binaria</strong></a></li>
 <li><a href="3-busqueda-interpolacion/"><strong>Búsqueda por interpolación</strong></a></li>

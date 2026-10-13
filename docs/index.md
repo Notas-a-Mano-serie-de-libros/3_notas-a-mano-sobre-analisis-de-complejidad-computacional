@@ -127,7 +127,7 @@ flowchart LR
 
 1. Si necesitas reforzar la notación matemática o los conceptos previos, consulta las [consideraciones teóricas](consideraciones-teoricas.md).
 2. Revisa [Cómo usar los contenidos](recursos.md) para conocer la relación entre Pages, los notebooks y las simulaciones.
-3. Elige la ruta que responda a tu objetivo: sigue el [recorrido por capítulos](capitulos/index.md), localiza una sección impresa mediante la [correspondencia libro–sitio](correspondencia.md), consulta el [glosario](glosario.md) o compara directamente las [búsquedas](capitulos/capitulo-7/0-comparacion-busquedas.md) y los [ordenamientos](capitulos/capitulo-8/0-comparacion-ordenamientos.md).
+3. Elige la ruta que responda a tu objetivo: sigue el [recorrido por capítulos](capitulos/index.md), localiza una sección impresa mediante la [correspondencia libro–sitio](correspondencia.md), consulta el [glosario](glosario.md) o compara directamente las [búsquedas](capitulos/capitulo-7.md) y los [ordenamientos](capitulos/capitulo-8.md).
 4. Cuando una sección incluya una simulación integrada, ejecútala con JupyterLite; también puedes abrir los notebooks en Google Colab o ejecutarlos localmente con Jupyter.
 
 !!! note "Alcance"
