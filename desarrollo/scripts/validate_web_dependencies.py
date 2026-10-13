@@ -66,6 +66,16 @@ def validate() -> list[str]:
         errors.append(
             f"Se esperaba una carga explícita del ejecutor Pyodide; hay {pyodide_references}"
         )
+    mathjax_site_config = (ROOT / "docs/assets/javascripts/mathjax.js").read_text(
+        encoding="utf-8"
+    )
+    if "mtextInheritFont: true" not in mathjax_site_config:
+        errors.append("docs/assets/javascripts/mathjax.js debe tener mtextInheritFont: true para renderizar tildes uniformes")
+    tree_anim_source = (ROOT / "simulaciones/capitulo5/runtime/recursion_tree_animation.py").read_text(
+        encoding="utf-8"
+    )
+    if "mtextInheritFont: true" not in tree_anim_source:
+        errors.append("recursion_tree_animation.py debe configurar mtextInheritFont: true en MathJax SVG")
     return errors
 
 

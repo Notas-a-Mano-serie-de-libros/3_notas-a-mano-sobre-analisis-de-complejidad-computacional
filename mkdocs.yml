@@ -42,6 +42,7 @@ plugins:
 exclude_docs: |
   laboratorios/
   algoritmos/
+  overrides/
 
 markdown_extensions:
   - admonition

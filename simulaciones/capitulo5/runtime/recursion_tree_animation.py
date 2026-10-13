@@ -1393,7 +1393,7 @@ def run_app(builder_only=False):
             padding:12px;background:#fff;overflow:hidden}
           .recursion-tree-panel-content.is-collapsed{display:none!important}
           .recursion-equation{width:100%;box-sizing:border-box;padding:16px 20px;
-            text-align:center;font-size:15px}
+            text-align:center;font-size:15px;overflow-x:auto;max-width:100%}
           .recursion-level-table{display:flex;flex-direction:column;
             box-sizing:border-box;align-items:center;justify-content:center;overflow:clip;
             padding-bottom:12px;text-align:center;font-size:16px}

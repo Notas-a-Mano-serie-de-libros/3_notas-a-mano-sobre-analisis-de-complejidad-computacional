@@ -142,7 +142,8 @@ def main():
         return notebook, remote, issues
 
     cases = [(notebook, remote) for notebook in notebooks for remote in (False, True)]
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1 if args.live else 4) as pool:
+    max_workers = 1 if args.live else min(8, os.cpu_count() or 4)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
         for notebook, remote, issues in pool.map(audit, cases):
             mode = "Colab" if remote else "local"
             for issue in issues:
