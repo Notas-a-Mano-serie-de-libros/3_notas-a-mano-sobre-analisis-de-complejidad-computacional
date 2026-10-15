@@ -191,7 +191,8 @@
 
   function renderDominant(container, question) {
     clearMath(container);
-    container.innerHTML = `<p class="self-check-practice__prompt">Clasifique <strong>\\(C(n)=${question.expression}\\)</strong> por su crecimiento ajustado.</p>
+    container.innerHTML = `<p class="self-check-practice__prompt">Clasifique la cota asociada con la función presentada a continuación:</p>
+      <div class="self-check-practice__formula">\\[C(n)=${question.expression}\\]</div>
       <fieldset class="self-check-practice__choices"><legend>Seleccione una respuesta</legend>${question.options.map((option) => `<label><input type="radio" name="dominant-answer" value="${option}"><span>\\(${familyTex(option)}\\)</span></label>`).join("")}</fieldset>`;
     typesetMath(container);
   }
