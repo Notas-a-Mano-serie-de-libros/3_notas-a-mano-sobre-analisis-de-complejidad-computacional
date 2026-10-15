@@ -74,7 +74,7 @@ def test_action_buttons_have_icons_while_mode_tabs_use_descriptive_titles():
     action_buttons = [button for button in buttons if "data-practice-mode" not in button]
     assert all('self-check-practice__button-icon' not in button for button in mode_buttons)
     assert all('self-check-practice__button-icon' in button for button in action_buttons)
-    for title in ("Simplificar expresión", "Relación de crecimiento", "Demostración mediante límite", "Construcción de cota"):
+    for title in ("Simplificar expresión", "Relación de crecimiento", "Demostración por límite", "Construcción de cota"):
         assert title in page
     assert 'class="md-button md-button--primary"' in page
     assert 'class="md-button self-check-practice__secondary" type="button" data-practice-hint' in page

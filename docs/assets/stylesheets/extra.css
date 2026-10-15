@@ -2094,8 +2094,9 @@ input {
 }
 
 .self-check-practice__stats div { display: grid; justify-items: center; text-align: center; }
-.self-check-practice__stats dt { color: var(--md-default-fg-color--light); font-size: .64rem; order: 2; text-transform: uppercase; }
-.self-check-practice__stats dd { font-family: Georgia, "Times New Roman", serif; font-size: 1.65rem; line-height: 1; margin: 0 0 .2rem; text-align: center; width: 100%; }
+.self-check-practice__stats dt { color: var(--md-default-fg-color--light); font-size: .64rem; margin: 0; order: 2; text-transform: uppercase; }
+.self-check-practice__stats dd,
+.md-typeset .self-check-practice__stats dd { font-family: Georgia, "Times New Roman", serif; font-size: 1.65rem; line-height: 1; margin: 0 0 .2rem; margin-inline-start: 0; text-align: center; width: 100%; }
 
 .self-check-practice__mastery {
   display: grid;
@@ -2185,9 +2186,11 @@ input {
 
 .self-check-practice__number-fields { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 1rem 0 .35rem; }
 .self-check-practice__number-fields label,
-.self-check-practice__interval-fields label { display: grid; font-size: .68rem; font-weight: 700; gap: .3rem; min-width: 0; text-transform: uppercase; }
+.self-check-practice__interval-fields label { display: grid; font-size: .68rem; font-weight: 700; gap: .3rem; min-width: 0; }
+.self-check-practice__number-fields label > span,
+.self-check-practice__interval-fields label > span { display: inline-flex; align-items: baseline; gap: .25rem; text-transform: uppercase; }
 .self-check-practice__number-fields mjx-container,
-.self-check-practice__interval-fields mjx-container { font-size: 1em; text-transform: none; }
+.self-check-practice__interval-fields mjx-container { font-size: 1.15em; text-transform: none; }
 .self-check-practice__number-fields input,
 .self-check-practice__interval-fields input {
   background: var(--md-default-bg-color);
@@ -2201,7 +2204,8 @@ input {
   padding: .65rem;
   width: 100%;
 }
-.self-check-practice__interval-fields { display: grid; gap: .65rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: .8rem 0 .35rem; max-width: 20rem; width: 100%; }
+.self-check-practice__graph-intro { font-size: .8rem; margin: .9rem 0 .4rem; }
+.self-check-practice__interval-fields { display: grid; gap: .65rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: .4rem 0 .35rem; max-width: 20rem; width: 100%; }
 
 .self-check-practice__graph {
   border: 1px solid #e0e0e0;
@@ -2220,21 +2224,23 @@ input {
 .self-check-practice__graph canvas[data-dragging] { cursor: grabbing; }
 .self-check-practice__graph-legend {
   align-items: flex-start;
-  background: rgba(255, 255, 255, .9);
+  background: rgba(255, 255, 255, .92);
   border: 1px solid rgba(80, 80, 80, .28);
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
   color: #333;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   font: 12px sans-serif;
   gap: 5px;
   left: 96px;
   max-width: calc(100% - 122px);
-  padding: 6px 8px;
+  padding: 6px 10px;
   pointer-events: none;
   position: absolute;
   top: 10px;
+  width: max-content;
+  z-index: 2;
 }
 .self-check-practice__legend-row { align-items: center; display: flex; gap: 6px; white-space: nowrap; }
 .self-check-practice__legend-row i { border-top: 3px solid currentColor; display: inline-block; flex: 0 0 22px; height: 0; }
@@ -2245,6 +2251,7 @@ input {
 .self-check-practice__legend-row--n0 i { border-top-style: dotted; }
 .self-check-practice__graph-legend sub,
 .self-check-practice__graph-legend sup { line-height: 0; }
+.self-check-practice__graph-legend mjx-container { line-height: 0; margin: 0 !important; }
 .self-check-practice__sr-status { clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
 
 .self-check-practice__actions { align-items: stretch; display: flex; gap: .7rem; margin-top: 1.25rem; }
