@@ -104,7 +104,7 @@ nav:
               - Notación little-ω: capitulos/capitulo-3/4-notacion-little-omega.md
               - Notación Θ: capitulos/capitulo-3/5-notacion-theta.md
           - Ejercicios propuestos: capitulos/capitulo-3/ejercicios-propuestos.md
-          - Práctica autocorregible: capitulos/capitulo-3/practica-autocorregible.md
+          - Ejercicios complementarios: capitulos/capitulo-3/practica-autocorregible.md
       - Capítulo 4 · Algoritmos estructurados:
           - Procedimiento de análisis: capitulos/capitulo-4.md
           - Ejemplo 1 · Suma: capitulos/capitulo-4/ejemplo1-sumar-numeros.md

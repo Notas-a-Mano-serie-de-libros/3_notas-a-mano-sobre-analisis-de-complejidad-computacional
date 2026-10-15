@@ -1,10 +1,10 @@
 <nav class="chapter-nav" aria-label="Navegación superior entre capítulos"><a href="../../capitulo-2/">← Capítulo 2</a><a class="chapter-nav__index" href="../">Capítulo 3</a><a class="chapter-nav__next" href="../../capitulo-4/">Capítulo 4 →</a></nav>
 
-# Práctica autocorregible
+# Ejercicios complementarios
 
 <span class="chapter-kicker">Extensión digital · Capítulo 3</span>
 
-Esta práctica complementa los ejercicios propuestos del libro. Genera cada problema con parámetros aleatorios y conserva su firma en este navegador para no volver a mostrarlo mientras se mantenga el progreso. Comprueba la respuesta y señala el primer paso que conviene revisar. No basta con acertar una opción: en la construcción de cotas puede proporcionar cualquier par de testigos válido.
+Estos ejercicios amplían la práctica del libro con problemas sobre términos dominantes, relaciones asintóticas, límites y construcción de cotas. Cada intento presenta una combinación distinta y el avance queda guardado en este navegador. Si una respuesta no es correcta, la retroalimentación indica qué paso conviene revisar; en la construcción de cotas se acepta cualquier par de testigos que satisfaga la definición.
 
 <div class="self-check-practice" data-chapter3-practice data-storage-key="notas-a-mano:practica:capitulo-3:v2">
   <section class="self-check-practice__summary" aria-labelledby="practice-progress-title">

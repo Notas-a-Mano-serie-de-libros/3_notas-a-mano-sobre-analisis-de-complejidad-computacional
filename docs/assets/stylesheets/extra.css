@@ -2093,9 +2093,9 @@ input {
   text-align: center;
 }
 
-.self-check-practice__stats div { display: grid; }
+.self-check-practice__stats div { display: grid; justify-items: center; text-align: center; }
 .self-check-practice__stats dt { color: var(--md-default-fg-color--light); font-size: .64rem; order: 2; text-transform: uppercase; }
-.self-check-practice__stats dd { font-family: Georgia, "Times New Roman", serif; font-size: 1.65rem; line-height: 1; margin: 0 0 .2rem; }
+.self-check-practice__stats dd { font-family: Georgia, "Times New Roman", serif; font-size: 1.65rem; line-height: 1; margin: 0 0 .2rem; text-align: center; width: 100%; }
 
 .self-check-practice__mastery {
   display: grid;

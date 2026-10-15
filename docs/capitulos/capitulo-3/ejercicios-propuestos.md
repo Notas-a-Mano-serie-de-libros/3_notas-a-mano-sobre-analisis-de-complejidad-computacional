@@ -11,7 +11,7 @@ Esta sección reúne los problemas destinados a comprobar relaciones asintótica
 <small class="lab-action__note">El documento se abrirá en una pestaña nueva.</small>
 </div>
 
-<nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../5-notacion-theta/">← 3.5.3 Notación Θ</a><a class="section-step__index" href="../">Capítulo 3</a><a class="section-step__next" href="../practica-autocorregible/">Práctica autocorregible →</a></nav>
+<nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../5-notacion-theta/">← 3.5.3 Notación Θ</a><a class="section-step__index" href="../">Capítulo 3</a><a class="section-step__next" href="../practica-autocorregible/">Ejercicios complementarios →</a></nav>
 
 ---
 

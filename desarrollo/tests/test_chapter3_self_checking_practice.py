@@ -18,6 +18,19 @@ def test_practice_is_published_after_the_book_exercises():
     assert PAGE.is_file()
 
 
+def test_complementary_exercises_use_editorial_copy_and_centered_stats():
+    page = PAGE.read_text(encoding="utf-8")
+    nav = (PROJECT_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+    stylesheet = STYLESHEET.read_text(encoding="utf-8")
+
+    assert "# Ejercicios complementarios" in page
+    assert "Ejercicios complementarios: capitulos/capitulo-3/practica-autocorregible.md" in nav
+    assert "Estos ejercicios amplían la práctica del libro" in page
+    assert "conserva su firma" not in page
+    assert ".self-check-practice__stats div { display: grid; justify-items: center; text-align: center; }" in stylesheet
+    assert "text-align: center; width: 100%;" in stylesheet
+
+
 def test_practice_covers_four_skills_and_keeps_progress_locally():
     page = PAGE.read_text(encoding="utf-8")
     script = SCRIPT.read_text(encoding="utf-8")
