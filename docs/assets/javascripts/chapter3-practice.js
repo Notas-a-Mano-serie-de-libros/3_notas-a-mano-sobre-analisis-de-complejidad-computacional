@@ -6,7 +6,7 @@
     dominant: { level: "Fundamentos", title: "Identifique el término dominante", hint: "Busque el sumando que crece más rápido cuando \\(n\\) aumenta; su coeficiente no cambia la familia." },
     relations: { level: "Comprensión", title: "Seleccione todas las relaciones válidas", hint: "Compare las familias de \\(C(n)\\) y \\(g(n)\\). Después determine si su cociente tiende a cero, a una constante positiva o a infinito." },
     limits: { level: "Definición por límite", title: "Calcule el límite y concluya la relación", hint: "Simplifique el cociente conservando los factores dominantes. Relacione \\(0\\), \\(L>0\\) y \\(+\\infty\\) con \\(o\\), \\(\\Theta\\) y \\(\\omega\\)." },
-    witnesses: { level: "Aplicación", title: "Construya testigos para la cota", hint: "Divida entre \\(g(n)\\) y observe la razón resultante. Ajuste primero \\(c\\) y después encuentre desde qué \\(n_0\\) se cumple la desigualdad." },
+    witnesses: { level: "Aplicación", title: "Selección de valores para c y n₀", hint: "Divida entre \\(g(n)\\) y observe la razón resultante. Ajuste primero \\(c\\) y después encuentre desde qué \\(n_0\\) se cumple la desigualdad." },
   };
 
   const relationLabels = {

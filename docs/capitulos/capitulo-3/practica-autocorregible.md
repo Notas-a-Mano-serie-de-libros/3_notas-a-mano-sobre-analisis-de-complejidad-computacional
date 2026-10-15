@@ -4,7 +4,7 @@
 
 <span class="chapter-kicker">Extensión digital · Capítulo 3</span>
 
-Estos ejercicios amplían la práctica del libro con problemas sobre términos dominantes, relaciones asintóticas, límites y construcción de cotas. Cada intento presenta una combinación distinta y el avance queda guardado en este navegador. Si una respuesta no es correcta, la retroalimentación indica qué paso conviene revisar; en la construcción de cotas se acepta cualquier par de testigos que satisfaga la definición.
+Estos ejercicios amplían la práctica del libro con problemas sobre términos dominantes, relaciones asintóticas, límites y construcción de cotas. Cada intento presenta una combinación distinta y el avance queda guardado en este navegador. Si una respuesta no es correcta, la retroalimentación indica qué paso conviene revisar; en la construcción de cotas se acepta cualquier par de valores para <var>c</var> y <var>n</var><sub>0</sub> que satisfaga la definición.
 
 <div class="self-check-practice" data-chapter3-practice data-storage-key="notas-a-mano:practica:capitulo-3:v2">
   <section class="self-check-practice__summary" aria-labelledby="practice-progress-title">
@@ -23,7 +23,7 @@ Estos ejercicios amplían la práctica del libro con problemas sobre términos d
     <div><span>Término dominante</span><meter min="0" max="3" value="0" data-mastery="dominant">0 de 3</meter><small data-mastery-label="dominant">0/3</small></div>
     <div><span>Relaciones asintóticas</span><meter min="0" max="3" value="0" data-mastery="relations">0 de 3</meter><small data-mastery-label="relations">0/3</small></div>
     <div><span>Definición por límite</span><meter min="0" max="3" value="0" data-mastery="limits">0 de 3</meter><small data-mastery-label="limits">0/3</small></div>
-    <div><span>Testigos (<var>c</var>, <var>n</var><sub>0</sub>)</span><meter min="0" max="3" value="0" data-mastery="witnesses">0 de 3</meter><small data-mastery-label="witnesses">0/3</small></div>
+    <div><span>Selección de valores para <var>c</var> y <var>n</var><sub>0</sub></span><meter min="0" max="3" value="0" data-mastery="witnesses">0 de 3</meter><small data-mastery-label="witnesses">0/3</small></div>
   </div>
 
   <nav class="self-check-practice__modes" aria-label="Tipo de ejercicio">
@@ -57,7 +57,7 @@ Estos ejercicios amplían la práctica del libro con problemas sobre términos d
 
 ## Cómo aprovechar la retroalimentación
 
-Si una respuesta no es correcta, conserve el mismo ejercicio y ajuste únicamente el paso indicado. En las relaciones asintóticas, recuerde que pueden cumplirse varias notaciones al mismo tiempo. En las cotas, los valores de <var>c</var> y <var>n</var><sub>0</sub> no son únicos: el verificador evalúa la desigualdad para los testigos elegidos.
+Si una respuesta no es correcta, conserve el mismo ejercicio y ajuste únicamente el paso indicado. En las relaciones asintóticas, recuerde que pueden cumplirse varias notaciones al mismo tiempo. En las cotas, los valores de <var>c</var> y <var>n</var><sub>0</sub> no son únicos: el verificador evalúa la desigualdad para los valores elegidos.
 
 <nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../ejercicios-propuestos/">← 3.6 Ejercicios propuestos</a><a class="section-step__index" href="../">Capítulo 3</a></nav>
 

@@ -83,7 +83,7 @@ def test_action_buttons_have_icons_while_mode_tabs_use_descriptive_titles():
 def test_static_witness_symbols_use_mathematical_html():
     page = PAGE.read_text(encoding="utf-8")
 
-    assert "Testigos (<var>c</var>, <var>n</var><sub>0</sub>)" in page
+    assert "Selección de valores para <var>c</var> y <var>n</var><sub>0</sub>" in page
     assert "valores de <var>c</var> y <var>n</var><sub>0</sub>" in page
     assert "(c,n_0)" not in page
 
