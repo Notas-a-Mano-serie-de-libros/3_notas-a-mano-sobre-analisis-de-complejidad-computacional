@@ -69,6 +69,7 @@ extra_javascript:
   - assets/javascripts/mathjax.js
   - assets/javascripts/site.js
   - assets/javascripts/chapter3-practice.js
+  - assets/javascripts/chapter4-practice.js
   - assets/javascripts/example-runner.js
 
 nav:
@@ -118,6 +119,7 @@ nav:
           - Ejemplo 9 · Complejidad oculta: capitulos/capitulo-4/ejemplo9-complejidad-oculta.md
           - Ejemplo 10 · Casos: capitulos/capitulo-4/ejemplo10.md
           - Ejercicios propuestos: capitulos/capitulo-4/ejercicios-propuestos.md
+          - Ejercicios complementarios: capitulos/capitulo-4/practica-autocorregible.md
       - Capítulo 5 · Relaciones de recurrencia y análisis de complejidad:
           - Teoría y clasificación: capitulos/capitulo-5.md
           - Sucesión numérica: capitulos/capitulo-5/sucesion-numerica.md

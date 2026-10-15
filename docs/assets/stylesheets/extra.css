@@ -2361,3 +2361,82 @@ input {
   .self-check-practice__actions { flex-direction: column; }
   .self-check-practice__actions .md-button { width: 100%; }
 }
+.self-check-practice__code-box {
+  background: #fbfbfb;
+  border: 1px solid var(--notas-rule);
+  border-radius: 4px;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: .84rem;
+  line-height: 1.5;
+  margin: 1rem 0 1.2rem;
+  overflow-x: auto;
+  padding: .85rem 1.1rem;
+}
+.self-check-practice__code-box pre {
+  background: transparent !important;
+  border: 0 !important;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.self-check-practice__code-box .kw { color: #004d40; font-weight: 700; }
+.self-check-practice__code-box .op { color: #8a3f2c; font-weight: 700; }
+.self-check-practice__code-box .num { color: #1565c0; }
+.self-check-practice__code-box .target-line {
+  background: color-mix(in srgb, var(--md-accent-fg-color) 12%, transparent);
+  border-left: 3px solid var(--md-accent-fg-color);
+  display: block;
+  font-weight: 600;
+  margin: .15rem -.6rem;
+  padding: .15rem .6rem;
+}
+.self-check-practice__choices--code {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.self-check-practice__sim-row {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.self-check-practice__sim-row label {
+  align-items: center;
+  color: #333;
+  display: flex;
+  font-family: sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 8px;
+}
+.self-check-practice__sim-results {
+  background: #f7f7f7;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 1rem 0;
+  padding: 1rem;
+}
+.self-check-practice__sim-card {
+  text-align: center;
+}
+.self-check-practice__sim-card .lbl {
+  color: #78909c;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.self-check-practice__sim-card .val {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+@media screen and (max-width: 44.984375em) {
+  .self-check-practice__choices--code { grid-template-columns: 1fr; }
+  .self-check-practice__sim-results { grid-template-columns: 1fr; }
+}

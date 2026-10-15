@@ -11,7 +11,7 @@ Los enunciados de esta sección se conservan en el documento PDF del capítulo. 
 <small class="lab-action__note">El documento se abrirá en una pestaña nueva.</small>
 </div>
 
-<nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../ejemplo10/">← 4.4.4.10 Algoritmo costoso por diseño</a><a class="section-step__index" href="../">Capítulo 4</a></nav>
+<nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../ejemplo10/">← 4.4.4.10 Algoritmo costoso por diseño</a><a class="section-step__index" href="../">Capítulo 4</a><a class="section-step__next" href="../practica-autocorregible/">Ejercicios complementarios →</a></nav>
 
 ---
 

@@ -37,6 +37,8 @@ El análisis comienza definiendo qué representa \(n\), qué escenario se estudi
 - [**Ciclo con límite fijo y costo lineal**](capitulo-4/ejemplo8.md)
 - [**Complejidad oculta**](capitulo-4/ejemplo9-complejidad-oculta.md)
 - [**Algoritmo costoso por diseño**](capitulo-4/ejemplo10.md)
+- [**Ejercicios propuestos**](capitulo-4/ejercicios-propuestos.md)
+- [**Ejercicios complementarios**](capitulo-4/practica-autocorregible.md)
 
 </section>
 
