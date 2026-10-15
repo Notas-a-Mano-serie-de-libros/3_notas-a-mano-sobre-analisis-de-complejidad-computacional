@@ -2168,8 +2168,21 @@ input {
 .md-typeset .self-check-practice__formula--pair { margin-bottom: 1rem; }
 .md-typeset .self-check-practice__formula--plain { background: transparent; padding: .35rem 0; }
 
-.self-check-practice__choices { border: 0; display: grid; gap: .55rem; margin: 0; padding: 0; }
-.self-check-practice__choices legend { font-size: .66rem; font-weight: 700; margin-bottom: .5rem; text-transform: uppercase; }
+.self-check-practice__choices { border: 0; display: grid; gap: .55rem; margin: 0; padding: 0; width: 100%; }
+.self-check-practice__choices legend {
+  box-sizing: border-box;
+  display: block;
+  float: none;
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 .5rem;
+  max-width: 100%;
+  padding: 0;
+  text-transform: uppercase;
+  white-space: normal;
+  width: 100%;
+}
 .self-check-practice__choices label {
   align-items: center;
   border: 1px solid var(--notas-rule);
@@ -2236,25 +2249,26 @@ input {
 .self-check-practice__graph canvas[data-dragging] { cursor: grabbing; }
 .self-check-practice__graph-legend {
   align-items: flex-start;
-  background: rgba(255, 255, 255, .92);
+  background: rgba(255, 255, 255, .95);
   border: 1px solid rgba(80, 80, 80, .28);
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+  box-sizing: border-box;
   color: #333;
   display: inline-flex;
   flex-direction: column;
   font: 12px sans-serif;
   gap: 5px;
-  left: 96px;
-  max-width: calc(100% - 122px);
-  padding: 6px 10px;
+  left: 92px;
+  max-width: calc(100% - 110px);
+  padding: 6px 12px;
   pointer-events: none;
   position: absolute;
   top: 10px;
   width: max-content;
   z-index: 2;
 }
-.self-check-practice__legend-row { align-items: center; display: flex; gap: 6px; white-space: nowrap; }
+.self-check-practice__legend-row { align-items: center; display: flex; gap: 8px; max-width: 100%; white-space: nowrap; }
 .self-check-practice__legend-row i { border-top: 3px solid currentColor; display: inline-block; flex: 0 0 22px; height: 0; }
 .self-check-practice__legend-row--curve { color: #1565C0; }
 .self-check-practice__legend-row--bound { color: #B71C1C; }
