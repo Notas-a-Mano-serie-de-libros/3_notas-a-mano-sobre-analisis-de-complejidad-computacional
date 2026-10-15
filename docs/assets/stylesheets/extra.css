@@ -2165,6 +2165,7 @@ input {
 .md-typeset .self-check-practice__prompt { font-size: .9rem; margin: 1.5rem 0 1rem; text-align: left; }
 .md-typeset .self-check-practice__formula { background: var(--md-code-bg-color); font-family: Georgia, "Times New Roman", serif; font-size: 1.08rem; padding: .85rem 1rem; text-align: center; }
 .md-typeset .self-check-practice__formula--pair { margin-bottom: 1rem; }
+.md-typeset .self-check-practice__formula--plain { background: transparent; padding: .35rem 0; }
 
 .self-check-practice__choices { border: 0; display: grid; gap: .55rem; margin: 0; padding: 0; }
 .self-check-practice__choices legend { font-size: .66rem; font-weight: 700; margin-bottom: .5rem; text-transform: uppercase; }
@@ -2184,21 +2185,23 @@ input {
 
 .self-check-practice__number-fields { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 1rem 0 .35rem; }
 .self-check-practice__number-fields label,
-.self-check-practice__interval-fields label { display: grid; font-size: .68rem; font-weight: 700; gap: .3rem; text-transform: uppercase; }
-.self-check-practice__number-fields var,
-.self-check-practice__interval-fields var { font-family: Georgia, "Times New Roman", serif; font-weight: 400; text-transform: none; }
-.self-check-practice__number-fields sub { font-family: Georgia, "Times New Roman", serif; font-size: .72em; font-weight: 400; text-transform: none; }
+.self-check-practice__interval-fields label { display: grid; font-size: .68rem; font-weight: 700; gap: .3rem; min-width: 0; text-transform: uppercase; }
+.self-check-practice__number-fields mjx-container,
+.self-check-practice__interval-fields mjx-container { font-size: 1em; text-transform: none; }
 .self-check-practice__number-fields input,
 .self-check-practice__interval-fields input {
   background: var(--md-default-bg-color);
   border: 1px solid var(--notas-rule);
   border-radius: 0;
+  box-sizing: border-box;
   color: inherit;
   font: inherit;
   font-size: .85rem;
+  min-width: 0;
   padding: .65rem;
+  width: 100%;
 }
-.self-check-practice__interval-fields { display: grid; gap: .65rem; grid-template-columns: repeat(2, minmax(0, 8rem)); margin: .8rem 0 .35rem; }
+.self-check-practice__interval-fields { display: grid; gap: .65rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: .8rem 0 .35rem; max-width: 20rem; width: 100%; }
 
 .self-check-practice__graph {
   border: 1px solid #e0e0e0;
@@ -2264,7 +2267,8 @@ input {
   .self-check-practice__modes,
   .self-check-practice__choices--relations,
   .self-check-practice__choices--limits,
-  .self-check-practice__number-fields { grid-template-columns: 1fr; }
+  .self-check-practice__number-fields,
+  .self-check-practice__interval-fields { grid-template-columns: 1fr; }
   .self-check-practice__modes button { border-bottom: 1px solid var(--notas-rule); border-right: 0; }
   .self-check-practice__modes button:last-child { border-bottom: 0; }
   .self-check-practice__exercise-heading,

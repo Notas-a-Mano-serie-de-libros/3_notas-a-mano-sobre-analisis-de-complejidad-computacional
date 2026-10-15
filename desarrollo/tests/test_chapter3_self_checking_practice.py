@@ -4,6 +4,7 @@ from desarrollo.tests.helpers import PROJECT_ROOT
 
 PAGE = PROJECT_ROOT / "docs/capitulos/capitulo-3/practica-autocorregible.md"
 SCRIPT = PROJECT_ROOT / "docs/assets/javascripts/chapter3-practice.js"
+STYLESHEET = PROJECT_ROOT / "docs/assets/stylesheets/extra.css"
 
 
 def test_practice_is_published_after_the_book_exercises():
@@ -97,6 +98,7 @@ def test_generators_cover_non_polynomial_function_families_and_show_g():
 
 def test_witness_exercise_has_a_synchronized_draggable_graph():
     script = SCRIPT.read_text(encoding="utf-8")
+    stylesheet = STYLESHEET.read_text(encoding="utf-8")
 
     assert "data-witness-graph" in script
     assert "drawWitnessGraph" in script
@@ -118,6 +120,15 @@ def test_witness_exercise_has_a_synchronized_draggable_graph():
     assert "data-witness-legend-n0" in script
     assert "\\\\(n_0=${n0}\\\\)" in script
     assert "padding = { left: 86" in script
+    assert "context.arc(handleX" not in script
+    assert "context.arc(n0X" not in script
+    assert "handleX, handleY, n0X" in script
+    assert "Constante \\\\(\\\\mathbf{c}\\\\)" in script
+    assert "Umbral \\\\(\\\\mathbf{n}_0\\\\)" in script
+    assert "self-check-practice__formula--plain" in script
+    assert ".self-check-practice__formula--plain { background: transparent" in stylesheet
+    assert "box-sizing: border-box" in stylesheet
+    assert "min-width: 0" in stylesheet
 
 
 def test_dynamic_equations_are_typeset_with_mathjax():
