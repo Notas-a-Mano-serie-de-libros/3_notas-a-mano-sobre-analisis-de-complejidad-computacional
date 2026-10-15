@@ -21,6 +21,7 @@ La notación asintótica compara tasas de crecimiento cuando \(n\) tiende a infi
 <li><a href="4-notacion-little-omega/"><strong>Notación little-ω</strong></a></li>
 <li><a href="5-notacion-theta/"><strong>Notación Θ</strong></a></li>
 <li><a href="ejercicios-propuestos/"><strong>Ejercicios propuestos</strong></a></li>
+<li><a href="practica-autocorregible/"><strong>Práctica autocorregible</strong></a></li>
 </ul>
 </section>
 

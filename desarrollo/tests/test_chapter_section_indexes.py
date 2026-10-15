@@ -6,7 +6,7 @@ from desarrollo.tests.helpers import PROJECT_ROOT
 
 CHAPTERS = PROJECT_ROOT / "docs" / "capitulos"
 ENTRY_PATTERN = re.compile(r'<li><a href="[^"]+"><strong>([^<]+)</strong></a></li>')
-EXPECTED_ENTRIES = {1: 3, 2: 11, 3: 10, 4: 11, 5: 5, 6: 6, 7: 7, 8: 8, 9: 3}
+EXPECTED_ENTRIES = {1: 3, 2: 11, 3: 11, 4: 11, 5: 5, 6: 6, 7: 7, 8: 8, 9: 3}
 
 
 def test_all_chapters_use_number_name_and_description_indexes():

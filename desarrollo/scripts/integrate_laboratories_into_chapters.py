@@ -1833,6 +1833,7 @@ SECTION_INDEX: dict[int, tuple[tuple[str, str, str, str], ...]] = {
         ("3.5.2.2", "Notación little-ω", "4-notacion-little-omega", "Expresa que una función crece estrictamente más rápido que otra."),
         ("3.5.3", "Notación Θ", "5-notacion-theta", "Establece una cota ajustada combinando límites superior e inferior."),
         ("3.6", "Ejercicios propuestos", "ejercicios-propuestos", "Propone problemas para practicar cotas, límites y relaciones asintóticas."),
+        ("Extensión digital", "Práctica autocorregible", "practica-autocorregible", "Ofrece ejercicios paramétricos con corrección inmediata y progreso local."),
     ),
     4: (
         ("4.4.4.1", "Sumar dos números", "ejemplo1-sumar-numeros", "Separa el tamaño de entrada del costo fijo de una operación aritmética."),

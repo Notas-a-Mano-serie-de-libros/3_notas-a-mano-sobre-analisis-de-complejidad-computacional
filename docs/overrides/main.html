@@ -19,7 +19,12 @@
 
 {% macro reading_card() %}
   {% set source = page.file.src_uri %}
-  {% if "/capitulo-2/" in source %}
+  {% if source == "capitulos/capitulo-3/practica-autocorregible.md" %}
+    {% set purpose = "Comprobar el dominio del término dominante, las relaciones asintóticas, su definición por límite y la construcción de cotas." %}
+    {% set prerequisite = "Repasa las cinco notaciones y el papel de las constantes y del umbral en sus definiciones." %}
+    {% set route = "Resuelve las cuatro habilidades, usa la retroalimentación para corregir el primer error y alcanza tres aciertos en cada una." %}
+    {% set duration = "Entre 15 y 25 minutos; puede retomarse porque el progreso queda guardado localmente." %}
+  {% elif "/capitulo-2/" in source %}
     {% set purpose = "Reconocer el patrón de crecimiento presentado en «" ~ page.title ~ "» y relacionarlo con el costo del algoritmo." %}
     {% set prerequisite = "Identifica el tamaño de entrada y distingue el valor de los datos de la cantidad de operaciones." %}
     {% set route = "Examina la función de crecimiento, interpreta sus propiedades y contrasta el comportamiento en la simulación." %}
