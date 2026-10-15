@@ -125,8 +125,8 @@ def test_witness_exercise_has_a_synchronized_draggable_graph():
     assert '"#B71C1C" : "#EF6C00"' in script
     assert 'n0: "#2E7D32"' in script
     assert "figcaption" not in script
-    assert 'name="witness-view-start"' in script
-    assert 'name="witness-view-end"' in script
+    assert "data-view-start" in script
+    assert "data-view-end" in script
     assert "niceTicks(minimumN, xMax, 5)" in script
     assert "data-witness-legend-c" in script
     assert "data-witness-legend-bound" in script
@@ -136,8 +136,8 @@ def test_witness_exercise_has_a_synchronized_draggable_graph():
     assert "context.arc(handleX" not in script
     assert "context.arc(n0X" not in script
     assert "handleX, handleY, n0X" in script
-    assert "Constante \\\\(\\\\mathbf{c}\\\\)" in script
-    assert "Umbral \\\\(\\\\mathbf{n}_0\\\\)" in script
+    assert "<span>\\\\(\\\\mathbf{c}\\\\)</span>" in script
+    assert "<span>\\\\(\\\\mathbf{n}_0\\\\)</span>" in script
     assert "self-check-practice__formula--plain" in script
     assert ".self-check-practice__formula--plain { background: transparent" in stylesheet
     assert "box-sizing: border-box" in stylesheet

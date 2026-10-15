@@ -208,8 +208,10 @@
   function renderLimits(container, question) {
     const limitOptions = shuffled([{ value: "zero", tex: "0" }, { value: "positive", tex: question.ratio }, { value: "infinity", tex: "+\\infty" }]);
     clearMath(container);
-    container.innerHTML = `<p class="self-check-practice__prompt">Use la definición mediante el cociente para comparar <strong>\\(C(n)=${question.left}\\)</strong> y <strong>\\(g(n)=${question.right}\\)</strong>.</p>
-      <div class="self-check-practice__formula">\\[\\lim_{n\\to\\infty}\\frac{C(n)}{g(n)}=\\lim_{n\\to\\infty}\\frac{${question.left}}{${question.right}}\\]</div>
+    container.innerHTML = `<p class="self-check-practice__prompt">Considerar las funciones presentadas a continuación:</p>
+      <div class="self-check-practice__formula self-check-practice__formula--pair">\\[C(n)=${question.left}\\]\\[g(n)=${question.right}\\]</div>
+      <p>Aplicar el criterio del límite para determinar su valor y la relación:</p>
+      <div class="self-check-practice__formula">\\[\\lim_{n\\to\\infty}\\frac{C(n)}{g(n)}\\]</div>
       <fieldset class="self-check-practice__choices self-check-practice__choices--limits"><legend>1. Valor del límite</legend>${limitOptions.map((option) => `<label><input type="radio" name="limit-answer" value="${option.value}"><span>\\(${option.tex}\\)</span></label>`).join("")}</fieldset>
       <fieldset class="self-check-practice__choices self-check-practice__choices--limits"><legend>2. Relación más precisa que se deduce</legend>${Object.entries(strongestRelationLabels).map(([value, label]) => `<label><input type="radio" name="limit-relation" value="${value}"><span>\\(${label}\\)</span></label>`).join("")}</fieldset>`;
     typesetMath(container);
@@ -285,11 +287,12 @@
 
   function setupWitnessGraph(container, question) {
     const canvas = container.querySelector("[data-witness-graph]"); const cInput = container.querySelector("input[name='witness-c']"); const n0Input = container.querySelector("input[name='witness-n0']");
-    const startInput = container.querySelector("input[name='witness-view-start']"); const endInput = container.querySelector("input[name='witness-view-end']"); const live = container.querySelector("[data-witness-graph-status]");
+    const live = container.querySelector("[data-witness-graph-status]");
     const legendC = container.querySelector("[data-witness-legend-c]"); const legendBound = container.querySelector("[data-witness-legend-bound]"); const legendN0 = container.querySelector("[data-witness-legend-n0]");
     let drag = null;
     const redraw = () => {
-      const c = parseDecimal(cInput.value); const n0 = Number(n0Input.value); const start = Number(startInput.value); const end = Number(endInput.value);
+      const c = parseDecimal(cInput.value); const n0 = Number(n0Input.value);
+      const start = Number(canvas.dataset.viewStart); const end = Number(canvas.dataset.viewEnd);
       if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) { live.textContent = "El extremo final del intervalo debe ser mayor que el inicial."; return; }
       drawWitnessGraph(canvas, question, c, n0, start, end, drag);
       const operator = question.sign > 0 ? "+" : "-"; const terms = witnessTerms(question); const lower = terms.lowerTex === "1" ? "" : terms.lowerTex;
@@ -302,7 +305,7 @@
       }
       live.textContent = `Gráfica actualizada: intervalo de ${start} a ${end}, c = ${Number.isFinite(c) ? c.toFixed(2) : "—"} y n₀ = ${Number.isFinite(n0) ? n0 : "—"}.`;
     };
-    [cInput, n0Input, startInput, endInput].forEach((input) => input.addEventListener("input", redraw));
+    [cInput, n0Input].forEach((input) => input.addEventListener("input", redraw));
     const position = (event) => { const rect = canvas.getBoundingClientRect(); return { x: event.clientX - rect.left, y: event.clientY - rect.top }; };
     canvas.addEventListener("pointerdown", (event) => {
       if (cInput.disabled || n0Input.disabled) return; const point = position(event); const geometry = canvas._witnessGeometry; if (!geometry) return;
@@ -335,10 +338,9 @@
     container.innerHTML = `<p class="self-check-practice__prompt">Proponga <strong>\\(c&gt;0\\)</strong> y un <strong>\\(n_0\\) natural positivo</strong> que demuestren que</p>
       <div class="self-check-practice__formula self-check-practice__formula--plain">\\[C(n)=${question.a}${terms.gTex}${operator}${question.b}${terms.lowerTex === "1" ? "" : terms.lowerTex}\\in ${notation}(${terms.gTex})\\]</div>
       <p>Sus valores deben hacer verdadera <strong>\\(C(n)${symbol} c\\cdot g(n)\\)</strong>, con <strong>\\(g(n)=${terms.gTex}\\)</strong>, para todo <strong>\\(n\\geq n_0\\)</strong>.</p>
-      <div class="self-check-practice__number-fields"><label><span>Constante \\(\\mathbf{c}\\)</span><input type="text" inputmode="decimal" autocomplete="off" name="witness-c" aria-describedby="witness-format" value="${initialC.toFixed(2)}"></label><label><span>Umbral \\(\\mathbf{n}_0\\)</span><input type="number" inputmode="numeric" min="${terms.minimumN}" step="1" name="witness-n0" value="${initialN0}"></label></div><small id="witness-format">Puede escribir los valores o arrastrar la curva de la cota y la línea vertical de la gráfica.</small>
-      <p class="self-check-practice__graph-intro">Puede usar la gráfica presentada a continuación para verificar los valores que va a seleccionar de forma visual:</p>
-      <div class="self-check-practice__interval-fields" aria-label="Intervalo visible de la gráfica"><label><span>Desde \\(n\\)</span><input type="number" inputmode="numeric" step="1" name="witness-view-start" value="${graphStart}"></label><label><span>Hasta \\(n\\)</span><input type="number" inputmode="numeric" step="1" name="witness-view-end" value="${graphEnd}"></label></div>
-      <div class="self-check-practice__graph${question.relation === "Omega" ? " self-check-practice__graph--lower" : ""}"><canvas data-witness-graph role="img" aria-label="Comparación interactiva entre C de n y c por g de n. Arrastre la curva de la cota para cambiar c o la línea vertical para cambiar n cero."></canvas><div class="self-check-practice__graph-legend" aria-label="Leyenda de la gráfica"><span class="self-check-practice__legend-row self-check-practice__legend-row--curve"><i aria-hidden="true"></i><span data-witness-legend-c></span></span><span class="self-check-practice__legend-row self-check-practice__legend-row--bound"><i aria-hidden="true"></i><span data-witness-legend-bound></span></span><span class="self-check-practice__legend-row self-check-practice__legend-row--n0"><i aria-hidden="true"></i><span data-witness-legend-n0></span></span></div></div><span class="self-check-practice__sr-status" data-witness-graph-status aria-live="polite"></span>`;
+      <div class="self-check-practice__number-fields"><label><span>\\(\\mathbf{c}\\)</span><input type="text" inputmode="decimal" autocomplete="off" name="witness-c" aria-describedby="witness-format" value="${initialC.toFixed(2)}"></label><label><span>\\(\\mathbf{n}_0\\)</span><input type="number" inputmode="numeric" min="${terms.minimumN}" step="1" name="witness-n0" value="${initialN0}"></label></div><small id="witness-format">Puede escribir los valores o arrastrar la curva de la cota y la línea vertical de la gráfica.</small>
+      <p class="self-check-practice__graph-intro">La siguiente gráfica constituye un apoyo visual complementario para que pueda inspeccionar el comportamiento de las curvas y determinar con mayor claridad los valores de \\(c\\) y \\(n_0\\) antes de introducirlos:</p>
+      <div class="self-check-practice__graph${question.relation === "Omega" ? " self-check-practice__graph--lower" : ""}"><canvas data-witness-graph data-view-start="${graphStart}" data-view-end="${graphEnd}" role="img" aria-label="Comparación interactiva entre C de n y c por g de n. Arrastre la curva de la cota para cambiar c o la línea vertical para cambiar n cero."></canvas><div class="self-check-practice__graph-legend" aria-label="Leyenda de la gráfica"><span class="self-check-practice__legend-row self-check-practice__legend-row--curve"><i aria-hidden="true"></i><span data-witness-legend-c></span></span><span class="self-check-practice__legend-row self-check-practice__legend-row--bound"><i aria-hidden="true"></i><span data-witness-legend-bound></span></span><span class="self-check-practice__legend-row self-check-practice__legend-row--n0"><i aria-hidden="true"></i><span data-witness-legend-n0></span></span></div></div><span class="self-check-practice__sr-status" data-witness-graph-status aria-live="polite"></span>`;
     typesetMath(container); setupWitnessGraph(container, question);
   }
 

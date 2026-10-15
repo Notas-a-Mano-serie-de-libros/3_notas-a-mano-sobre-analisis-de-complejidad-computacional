@@ -2184,15 +2184,28 @@ input {
 .self-check-practice__choices--limits { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .self-check-practice__choices + .self-check-practice__choices { margin-top: 1.2rem; }
 
-.self-check-practice__number-fields { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 1rem 0 .35rem; }
-.self-check-practice__number-fields label,
-.self-check-practice__interval-fields label { display: grid; font-size: .68rem; font-weight: 700; gap: .3rem; min-width: 0; }
-.self-check-practice__number-fields label > span,
-.self-check-practice__interval-fields label > span { display: inline-flex; align-items: baseline; gap: .25rem; text-transform: uppercase; }
-.self-check-practice__number-fields mjx-container,
-.self-check-practice__interval-fields mjx-container { font-size: 1.15em; text-transform: none; }
-.self-check-practice__number-fields input,
-.self-check-practice__interval-fields input {
+.self-check-practice__number-fields {
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+  margin: 1rem 0 .35rem;
+  max-width: 14rem;
+}
+.self-check-practice__number-fields label {
+  align-items: center;
+  display: flex;
+  font-size: .8rem;
+  font-weight: 700;
+  gap: .75rem;
+}
+.self-check-practice__number-fields label > span {
+  align-items: baseline;
+  display: inline-flex;
+  gap: .25rem;
+  min-width: 1.8rem;
+}
+.self-check-practice__number-fields mjx-container { font-size: 1.25em; text-transform: none; }
+.self-check-practice__number-fields input {
   background: var(--md-default-bg-color);
   border: 1px solid var(--notas-rule);
   border-radius: 0;
@@ -2200,12 +2213,11 @@ input {
   color: inherit;
   font: inherit;
   font-size: .85rem;
-  min-width: 0;
-  padding: .65rem;
+  max-width: 8.5rem;
+  padding: .45rem .65rem;
   width: 100%;
 }
-.self-check-practice__graph-intro { font-size: .8rem; margin: .9rem 0 .4rem; }
-.self-check-practice__interval-fields { display: grid; gap: .65rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: .4rem 0 .35rem; max-width: 20rem; width: 100%; }
+.self-check-practice__graph-intro { font-size: .8rem; line-height: 1.5; margin: .9rem 0 .4rem; }
 
 .self-check-practice__graph {
   border: 1px solid #e0e0e0;
