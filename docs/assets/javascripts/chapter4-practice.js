@@ -1266,7 +1266,7 @@
       <div class="self-check-practice__sim-results">
         <div class="self-check-practice__sim-card">
           <div class="lbl">Iteraciones reales ejecutadas</div>
-          <div class="val" data-sim-real>${question.formulaFn(question.initialN)}</div>
+          <div class="val" data-sim-real>\\(${question.formulaFn(question.initialN)}\\)</div>
         </div>
         <div class="self-check-practice__sim-card">
           <div class="lbl">Crecimiento estimado</div>
@@ -1274,7 +1274,7 @@
         </div>
       </div>
       <fieldset class="self-check-practice__choices self-check-practice__choices--code">
-        <legend>Fórmula de costo C(n) que predice exactamente estas iteraciones</legend>
+        <legend>Fórmula de costo \\(C(n)\\) que predice exactamente estas iteraciones</legend>
         ${question.options.map((opt) => `<label><input type="radio" name="chapter4-answer" value="${opt.value}"><span>\\(${opt.tex}\\)</span></label>`).join("")}
       </fieldset>`;
 
@@ -1288,8 +1288,9 @@
     range.addEventListener("input", () => {
       const val = Number(range.value);
       nDisplay.textContent = val;
-      realDisplay.textContent = question.formulaFn(val);
+      realDisplay.innerHTML = `\\(${question.formulaFn(val)}\\)`;
       growthDisplay.innerHTML = `\\(n = ${val}\\)`;
+      typesetMath(realDisplay);
       typesetMath(growthDisplay);
     });
 
