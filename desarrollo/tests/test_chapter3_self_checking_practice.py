@@ -136,8 +136,8 @@ def test_witness_exercise_has_a_synchronized_draggable_graph():
     assert "context.arc(handleX" not in script
     assert "context.arc(n0X" not in script
     assert "handleX, handleY, n0X" in script
-    assert "<span>\\\\(\\\\mathbf{c}\\\\)</span>" in script
-    assert "<span>\\\\(\\\\mathbf{n}_0\\\\)</span>" in script
+    assert '<span class="label-text">\\\\(\\\\mathbf{c}\\\\)</span>' in script
+    assert '<span class="label-text">\\\\(\\\\mathbf{n}_0\\\\)</span>' in script
     assert "self-check-practice__formula--plain" in script
     assert ".self-check-practice__formula--plain { background: transparent" in stylesheet
     assert "box-sizing: border-box" in stylesheet

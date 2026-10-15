@@ -2200,34 +2200,41 @@ input {
 .self-check-practice__number-fields {
   display: flex;
   flex-direction: column;
-  gap: .65rem;
+  gap: 8px;
   margin: 1rem 0 .35rem;
   max-width: 14rem;
 }
 .self-check-practice__number-fields label {
   align-items: center;
+  color: #333;
   display: flex;
-  font-size: .8rem;
+  font-family: sans-serif;
+  font-size: 13px;
   font-weight: 700;
-  gap: .75rem;
+  gap: 8px;
+  line-height: 1.1;
+  min-height: 32px;
 }
-.self-check-practice__number-fields label > span {
-  align-items: baseline;
+.self-check-practice__number-fields label > .label-text {
+  align-items: center;
   display: inline-flex;
-  gap: .25rem;
-  min-width: 1.8rem;
+  justify-content: center;
+  min-width: 48px;
+  text-align: center;
+  width: 48px;
 }
-.self-check-practice__number-fields mjx-container { font-size: 1.25em; text-transform: none; }
+.self-check-practice__number-fields mjx-container { text-transform: none; }
 .self-check-practice__number-fields input {
   background: var(--md-default-bg-color);
-  border: 1px solid var(--notas-rule);
-  border-radius: 0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
   box-sizing: border-box;
-  color: inherit;
-  font: inherit;
-  font-size: .85rem;
+  color: #333;
+  font-size: 13px;
+  height: 32px;
   max-width: 8.5rem;
-  padding: .45rem .65rem;
+  padding: 2px 4px;
+  text-align: center;
   width: 100%;
 }
 .self-check-practice__graph-intro { font-size: .8rem; line-height: 1.5; margin: .9rem 0 .4rem; }
