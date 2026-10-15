@@ -51,12 +51,17 @@ def test_limit_exercises_connect_the_limit_with_the_strongest_relation():
     assert 'infinity: "omega"' in script
 
 
-def test_every_practice_button_has_an_icon_and_actions_share_button_style():
+def test_action_buttons_have_icons_while_mode_tabs_use_descriptive_titles():
     page = PAGE.read_text(encoding="utf-8")
 
     buttons = [line for line in page.splitlines() if "<button" in line]
     assert len(buttons) == 8
-    assert all('self-check-practice__button-icon' in button for button in buttons)
+    mode_buttons = [button for button in buttons if "data-practice-mode" in button]
+    action_buttons = [button for button in buttons if "data-practice-mode" not in button]
+    assert all('self-check-practice__button-icon' not in button for button in mode_buttons)
+    assert all('self-check-practice__button-icon' in button for button in action_buttons)
+    for title in ("Simplificar expresión", "Relación de crecimiento", "Demostración mediante límite", "Construcción de cota"):
+        assert title in page
     assert 'class="md-button md-button--primary"' in page
     assert 'class="md-button self-check-practice__secondary" type="button" data-practice-hint' in page
 
@@ -75,9 +80,44 @@ def test_practice_requires_all_relations_and_accepts_non_unique_witnesses():
     assert "sameSet(selected, question.answer)" in script
     assert "c <= question.a" in script
     assert "c >= question.a" in script
-    assert "Math.ceil((question.b / (c - question.a))" in script
-    assert "Math.ceil((question.b / (question.a - c))" in script
+    assert "witnessMinimum(question, c)" in script
     assert "El primer requisito que falla" in script
+
+
+def test_generators_cover_non_polynomial_function_families_and_show_g():
+    script = SCRIPT.read_text(encoding="utf-8")
+
+    for family in ('key: "log"', 'key: "nlogn"', 'key: "exponential"', 'key: "factorial"'):
+        assert family in script
+    assert 'answer: "factorial"' in script
+    assert 'answer: "linear"' in script
+    assert "C(n)=${question.left}\\\\qquad g(n)=${question.right}" in script
+    assert '["linear", "log", "nlogn", "poly"]' in script
+
+
+def test_witness_exercise_has_a_synchronized_draggable_graph():
+    script = SCRIPT.read_text(encoding="utf-8")
+
+    assert "data-witness-graph" in script
+    assert "drawWitnessGraph" in script
+    assert "setupWitnessGraph" in script
+    assert 'addEventListener("input", redraw)' in script
+    assert 'addEventListener("pointerdown"' in script
+    assert 'addEventListener("pointermove"' in script
+    assert "setPointerCapture" in script
+    assert "C(n)" in script and "c\\\\cdot g(n)" in script
+    assert 'curve: "#1565C0"' in script
+    assert '"#B71C1C" : "#EF6C00"' in script
+    assert 'n0: "#2E7D32"' in script
+    assert "figcaption" not in script
+    assert 'name="witness-view-start"' in script
+    assert 'name="witness-view-end"' in script
+    assert "niceTicks(minimumN, xMax, 5)" in script
+    assert "data-witness-legend-c" in script
+    assert "data-witness-legend-bound" in script
+    assert "data-witness-legend-n0" in script
+    assert "\\\\(n_0=${n0}\\\\)" in script
+    assert "padding = { left: 86" in script
 
 
 def test_dynamic_equations_are_typeset_with_mathjax():

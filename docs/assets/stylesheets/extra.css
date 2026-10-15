@@ -2164,6 +2164,7 @@ input {
 .self-check-practice__button-icon { align-items: center; display: inline-flex; font-family: Georgia, "Times New Roman", serif; font-size: 1.05em; font-weight: 700; justify-content: center; line-height: 1; min-width: 1em; text-transform: none; }
 .md-typeset .self-check-practice__prompt { font-size: .9rem; margin: 1.5rem 0 1rem; text-align: left; }
 .md-typeset .self-check-practice__formula { background: var(--md-code-bg-color); font-family: Georgia, "Times New Roman", serif; font-size: 1.08rem; padding: .85rem 1rem; text-align: center; }
+.md-typeset .self-check-practice__formula--pair { margin-bottom: 1rem; }
 
 .self-check-practice__choices { border: 0; display: grid; gap: .55rem; margin: 0; padding: 0; }
 .self-check-practice__choices legend { font-size: .66rem; font-weight: 700; margin-bottom: .5rem; text-transform: uppercase; }
@@ -2182,8 +2183,13 @@ input {
 .self-check-practice__choices + .self-check-practice__choices { margin-top: 1.2rem; }
 
 .self-check-practice__number-fields { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 1rem 0 .35rem; }
-.self-check-practice__number-fields label { display: grid; font-size: .68rem; font-weight: 700; gap: .3rem; text-transform: uppercase; }
-.self-check-practice__number-fields input {
+.self-check-practice__number-fields label,
+.self-check-practice__interval-fields label { display: grid; font-size: .68rem; font-weight: 700; gap: .3rem; text-transform: uppercase; }
+.self-check-practice__number-fields var,
+.self-check-practice__interval-fields var { font-family: Georgia, "Times New Roman", serif; font-weight: 400; text-transform: none; }
+.self-check-practice__number-fields sub { font-family: Georgia, "Times New Roman", serif; font-size: .72em; font-weight: 400; text-transform: none; }
+.self-check-practice__number-fields input,
+.self-check-practice__interval-fields input {
   background: var(--md-default-bg-color);
   border: 1px solid var(--notas-rule);
   border-radius: 0;
@@ -2192,6 +2198,51 @@ input {
   font-size: .85rem;
   padding: .65rem;
 }
+.self-check-practice__interval-fields { display: grid; gap: .65rem; grid-template-columns: repeat(2, minmax(0, 8rem)); margin: .8rem 0 .35rem; }
+
+.self-check-practice__graph {
+  border: 1px solid #e0e0e0;
+  margin: 1rem 0 0;
+  padding: 0;
+  position: relative;
+}
+.self-check-practice__graph canvas {
+  background: #fff;
+  cursor: grab;
+  display: block;
+  height: 250px;
+  touch-action: none;
+  width: 100%;
+}
+.self-check-practice__graph canvas[data-dragging] { cursor: grabbing; }
+.self-check-practice__graph-legend {
+  align-items: flex-start;
+  background: rgba(255, 255, 255, .9);
+  border: 1px solid rgba(80, 80, 80, .28);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  font: 12px sans-serif;
+  gap: 5px;
+  left: 96px;
+  max-width: calc(100% - 122px);
+  padding: 6px 8px;
+  pointer-events: none;
+  position: absolute;
+  top: 10px;
+}
+.self-check-practice__legend-row { align-items: center; display: flex; gap: 6px; white-space: nowrap; }
+.self-check-practice__legend-row i { border-top: 3px solid currentColor; display: inline-block; flex: 0 0 22px; height: 0; }
+.self-check-practice__legend-row--curve { color: #1565C0; }
+.self-check-practice__legend-row--bound { color: #B71C1C; }
+.self-check-practice__graph--lower .self-check-practice__legend-row--bound { color: #EF6C00; }
+.self-check-practice__legend-row--n0 { color: #2E7D32; }
+.self-check-practice__legend-row--n0 i { border-top-style: dotted; }
+.self-check-practice__graph-legend sub,
+.self-check-practice__graph-legend sup { line-height: 0; }
+.self-check-practice__sr-status { clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
 
 .self-check-practice__actions { align-items: stretch; display: flex; gap: .7rem; margin-top: 1.25rem; }
 .self-check-practice__actions .md-button { align-items: center; display: inline-flex; gap: .45rem; justify-content: center; margin: 0; min-height: 2.65rem; }

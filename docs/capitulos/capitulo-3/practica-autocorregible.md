@@ -27,10 +27,10 @@ Esta práctica complementa los ejercicios propuestos del libro. Genera cada prob
   </div>
 
   <nav class="self-check-practice__modes" aria-label="Tipo de ejercicio">
-    <button type="button" data-practice-mode="dominant" aria-pressed="true"><span class="self-check-practice__button-icon" aria-hidden="true">ƒ</span><span>1. Simplificar</span></button>
-    <button type="button" data-practice-mode="relations" aria-pressed="false"><span class="self-check-practice__button-icon" aria-hidden="true">≼</span><span>2. Relacionar</span></button>
-    <button type="button" data-practice-mode="limits" aria-pressed="false"><span class="self-check-practice__button-icon" aria-hidden="true">lim</span><span>3. Usar límites</span></button>
-    <button type="button" data-practice-mode="witnesses" aria-pressed="false"><span class="self-check-practice__button-icon" aria-hidden="true">c</span><span>4. Construir la cota</span></button>
+    <button type="button" data-practice-mode="dominant" aria-pressed="true"><span>1. Simplificar expresión</span></button>
+    <button type="button" data-practice-mode="relations" aria-pressed="false"><span>2. Relación de crecimiento</span></button>
+    <button type="button" data-practice-mode="limits" aria-pressed="false"><span>3. Demostración mediante límite</span></button>
+    <button type="button" data-practice-mode="witnesses" aria-pressed="false"><span>4. Construcción de cota</span></button>
   </nav>
 
   <section class="self-check-practice__exercise" aria-labelledby="practice-exercise-title">
