@@ -21,9 +21,16 @@
     simulation: {
       level: "Nivel 4 · Verificación experimental",
       title: "Compruebe empíricamente el conteo de operaciones",
-      hint: "Ingrese una fórmula candidata para \\(C(n)\\) y evalúe con el deslizador si coincide exactamente con el conteo de ejecuciones para todo \\(n\\).",
+      hint: "Ingrese o seleccione la fórmula candidata para \\(C(n)\\) y evalúe con el deslizador si coincide exactamente con el conteo de ejecuciones para todo \\(n\\).",
     },
   };
+
+  const LANGUAGES = [
+    { id: "pseudo", label: "Pseudocódigo" },
+    { id: "java", label: "Java" },
+    { id: "c", label: "C" },
+    { id: "python", label: "Python" },
+  ];
 
   function emptyState() {
     return {
@@ -72,6 +79,10 @@
     return min + Math.floor(Math.random() * range);
   }
 
+  function pickRandom(list) {
+    return list[randomInt(0, list.length - 1)];
+  }
+
   function shuffled(items) {
     const result = [...items];
     for (let i = result.length - 1; i > 0; i -= 1) {
@@ -90,35 +101,256 @@
     window.MathJax.typesetPromise([element]).catch(() => {});
   }
 
+  // --- Renderizado con pestañas multilingüe y números de línea ---
+
+  function renderCodeBlock(codeSnippets) {
+    const tabsHtml = LANGUAGES.map((lang, idx) => `
+      <button type="button" class="self-check-practice__code-tab" data-lang="${lang.id}" role="tab" aria-selected="${idx === 0 ? "true" : "false"}" tabindex="${idx === 0 ? "0" : "-1"}">
+        ${lang.label}
+      </button>
+    `).join("");
+
+    const panelsHtml = LANGUAGES.map((lang, idx) => {
+      const lines = codeSnippets[lang.id] || [];
+      const linesHtml = lines.map((item, lineIdx) => {
+        const isTarget = item.highlight ? " target-line" : "";
+        return `<div class="self-check-practice__code-line${isTarget}"><span class="self-check-practice__line-num">${lineIdx + 1}</span><span class="self-check-practice__line-code">${item.text}</span></div>`;
+      }).join("");
+
+      return `
+        <div class="self-check-practice__code-panel" data-panel-lang="${lang.id}" role="tabpanel" ${idx === 0 ? "" : "hidden"}>
+          <div class="self-check-practice__code-box">
+            <pre><code>${linesHtml}</code></pre>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <div class="self-check-practice__code-container">
+        <div class="self-check-practice__code-tabs" role="tablist" aria-label="Lenguajes de programación">
+          ${tabsHtml}
+        </div>
+        ${panelsHtml}
+      </div>
+    `;
+  }
+
+  function attachCodeTabEvents(container) {
+    const tabs = container.querySelectorAll(".self-check-practice__code-tab");
+    const panels = container.querySelectorAll(".self-check-practice__code-panel");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const lang = tab.dataset.lang;
+        tabs.forEach((t) => {
+          const isSelected = t === tab;
+          t.setAttribute("aria-selected", String(isSelected));
+          t.setAttribute("tabindex", isSelected ? "0" : "-1");
+        });
+        panels.forEach((p) => {
+          if (p.dataset.panelLang === lang) {
+            p.removeAttribute("hidden");
+          } else {
+            p.setAttribute("hidden", "true");
+          }
+        });
+      });
+    });
+  }
+
   // --- Generadores de ejercicios para Capítulo 4 ---
 
   function generateFrequency() {
-    const kind = randomInt(0, 3);
+    const kind = randomInt(0, 5);
+
+    // Tipo 0: Salto aditivo constante con paso k (k entre 2 y 7)
     if (kind === 0) {
-      const k = randomInt(2, 5);
-      const code = `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">step</span> <span class="num">${k}</span> <span class="kw">do</span>\n<span class="target-line">    operacion_basica();</span>\n<span class="kw">end for</span>`;
+      const k = randomInt(2, 7);
+      const start = pickRandom([0, 1]);
+      const salt = randomInt(10, 999);
+      const signature = `freq:step:${k}:start:${start}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">${start}</span> <span class="kw">to</span> n <span class="kw">step</span> <span class="num">${k}</span> <span class="kw">do</span>` },
+          { text: `    <span class="com">// Cuerpo del ciclo</span>` },
+          { text: `    operacion_basica();`, highlight: true },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">${start}</span>; i <span class="op">&lt;=</span> n; i <span class="op">+=</span> <span class="num">${k}</span>) {` },
+          { text: `    <span class="com">// Operación elemental</span>` },
+          { text: `    operacionBasica();`, highlight: true },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">${start}</span>; i <span class="op">&lt;=</span> n; i <span class="op">+=</span> <span class="num">${k}</span>) {` },
+          { text: `    <span class="com">/* Operación elemental */</span>` },
+          { text: `    operacion_basica();`, highlight: true },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">${start}</span>, n <span class="op">+</span> <span class="num">1</span>, <span class="num">${k}</span>):` },
+          { text: `    <span class="com"># Operación elemental</span>` },
+          { text: `    operacion_basica()`, highlight: true },
+        ],
+      };
+
+      const correctTex = start === 1 ? `\\lceil n/${k} \\rceil` : `\\lfloor n/${k} \\rfloor + 1`;
       return {
-        signature: `freq:step:${k}`,
-        code,
-        prompt: `Considere el siguiente ciclo con tamaño de entrada \\(n\\) e incremento de \\(${k}\\) en \\(${k}\\):`,
-        targetDescription: "la cantidad exacta de ejecuciones de <code>operacion_basica()</code>",
+        signature,
+        codeSnippets,
+        prompt: `Considere el siguiente ciclo con tamaño de entrada \\(n\\), inicio en \\(${start}\\) y salto de avance \\(i \\leftarrow i + ${k}\\):`,
         options: shuffled([
-          { value: "correct", tex: `\\lceil n/${k} \\rceil` },
+          { value: "correct", tex: correctTex },
           { value: "w1", tex: `n - ${k}` },
           { value: "w2", tex: `${k}n` },
           { value: "w3", tex: `\\lfloor n/2 \\rfloor` },
         ]),
         answer: "correct",
-        reason: `Al avanzar de \\(${k}\\) en \\(${k}\\) comenzando en 1 hasta \\(n\\), la cantidad de pasos es \\(\\lceil n/${k} \\rceil\\).`,
+        reason: start === 1
+          ? `Al comenzar en 1 y dar saltos de \\(${k}\\) en \\(${k}\\) hasta \\(n\\), el total de pasos es \\(\\lceil n/${k} \\rceil\\).`
+          : `Al comenzar en 0 y dar saltos de \\(${k}\\) en \\(${k}\\) hasta \\(n\\), el total de pasos es \\(\\lfloor n/${k} \\rfloor + 1\\).`,
       };
     }
+
+    // Tipo 1: Salto multiplicativo creciente (i = i * factor, factor = 2, 3 o 4)
     if (kind === 1) {
-      const code = `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> i <span class="kw">do</span>\n<span class="target-line">        operacion_basica();</span>\n    <span class="kw">end for</span>\n<span class="kw">end for</span>`;
+      const factor = pickRandom([2, 3, 4]);
+      const salt = randomInt(10, 999);
+      const signature = `freq:mult:${factor}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `i <span class="op">=</span> <span class="num">1</span>` },
+          { text: `<span class="kw">while</span> i <span class="op">&lt;=</span> n <span class="kw">do</span>` },
+          { text: `    operacion_basica();`, highlight: true },
+          { text: `    i <span class="op">=</span> i <span class="op">*</span> <span class="num">${factor}</span>` },
+          { text: `<span class="kw">end while</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>;` },
+          { text: `<span class="kw">while</span> (i <span class="op">&lt;=</span> n) {` },
+          { text: `    operacionBasica();`, highlight: true },
+          { text: `    i <span class="op">*=</span> <span class="num">${factor}</span>;` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>;` },
+          { text: `<span class="kw">while</span> (i <span class="op">&lt;=</span> n) {` },
+          { text: `    operacion_basica();`, highlight: true },
+          { text: `    i <span class="op">*=</span> <span class="num">${factor}</span>;` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `i <span class="op">=</span> <span class="num">1</span>` },
+          { text: `<span class="kw">while</span> i <span class="op">&lt;=</span> n:` },
+          { text: `    operacion_basica()`, highlight: true },
+          { text: `    i <span class="op">*=</span> <span class="num">${factor}</span>` },
+        ],
+      };
+
       return {
-        signature: "freq:triangular",
-        code,
+        signature,
+        codeSnippets,
+        prompt: `Considere el siguiente ciclo con salto multiplicativo \\(i \\leftarrow i \\times ${factor}\\):`,
+        options: shuffled([
+          { value: "correct", tex: `\\lfloor \\log_{${factor}}(n) \\rfloor + 1` },
+          { value: "w1", tex: `\\frac{n}{${factor}}` },
+          { value: "w2", tex: `${factor}^n` },
+          { value: "w3", tex: `\\log_{${factor}}(n) - 1` },
+        ]),
+        answer: "correct",
+        reason: `La variable \\(i\\) toma valores \\(1, ${factor}, ${factor}^2, \\dots, ${factor}^k\\) hasta que \\(${factor}^k > n\\). La cantidad exacta de iteraciones es \\(\\lfloor \\log_{${factor}}(n) \\rfloor + 1\\).`,
+      };
+    }
+
+    // Tipo 2: Salto multiplicativo decreciente / división (i = n; i > 0; i = i / div)
+    if (kind === 2) {
+      const div = pickRandom([2, 3]);
+      const salt = randomInt(10, 999);
+      const signature = `freq:div:${div}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `i <span class="op">=</span> n` },
+          { text: `<span class="kw">while</span> i <span class="op">&gt;</span> <span class="num">0</span> <span class="kw">do</span>` },
+          { text: `    operacion_basica();`, highlight: true },
+          { text: `    i <span class="op">=</span> <span class="kw">floor</span>(i <span class="op">/</span> <span class="num">${div}</span>)` },
+          { text: `<span class="kw">end while</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">int</span> i <span class="op">=</span> n;` },
+          { text: `<span class="kw">while</span> (i <span class="op">&gt;</span> <span class="num">0</span>) {` },
+          { text: `    operacionBasica();`, highlight: true },
+          { text: `    i <span class="op">/=</span> <span class="num">${div}</span>;` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">int</span> i <span class="op">=</span> n;` },
+          { text: `<span class="kw">while</span> (i <span class="op">&gt;</span> <span class="num">0</span>) {` },
+          { text: `    operacion_basica();`, highlight: true },
+          { text: `    i <span class="op">/=</span> <span class="num">${div}</span>;` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `i <span class="op">=</span> n` },
+          { text: `<span class="kw">while</span> i <span class="op">&gt;</span> <span class="num">0</span>:` },
+          { text: `    operacion_basica()`, highlight: true },
+          { text: `    i <span class="op">//=</span> <span class="num">${div}</span>` },
+        ],
+      };
+
+      return {
+        signature,
+        codeSnippets,
+        prompt: `Considere el siguiente ciclo con reducción sucesiva por división entera entre \\(${div}\\):`,
+        options: shuffled([
+          { value: "correct", tex: `\\lfloor \\log_{${div}}(n) \\rfloor + 1` },
+          { value: "w1", tex: `\\frac{n}{${div}}` },
+          { value: "w2", tex: `n - ${div}` },
+          { value: "w3", tex: `\\log_{${div}}(n) - 1` },
+        ]),
+        answer: "correct",
+        reason: `Al dividir iterativamente entre \\(${div}\\) hasta llegar a 0, la cantidad de pasos coincide exactamente con la representación en base \\(${div}\\), es decir, \\(\\lfloor \\log_{${div}}(n) \\rfloor + 1\\).`,
+      };
+    }
+
+    // Tipo 3: Bucle triangular clásico (j = 1 to i)
+    if (kind === 3) {
+      const salt = randomInt(10, 999);
+      const signature = `freq:triangular:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> i <span class="kw">do</span>` },
+          { text: `        operacion_basica();`, highlight: true },
+          { text: `    <span class="kw">end for</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> i; j<span class="op">++</span>) {` },
+          { text: `        operacionBasica();`, highlight: true },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> i; j<span class="op">++</span>) {` },
+          { text: `        operacion_basica();`, highlight: true },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">1</span>, i <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `        operacion_basica()`, highlight: true },
+        ],
+      };
+
+      return {
+        signature,
+        codeSnippets,
         prompt: "Considere el siguiente ciclo anidado donde el límite del ciclo interior depende de la variable del ciclo exterior:",
-        targetDescription: "la cantidad de veces que se ejecuta <code>operacion_basica()</code>",
         options: shuffled([
           { value: "correct", tex: "\\frac{n(n+1)}{2}" },
           { value: "w1", tex: "n^2" },
@@ -129,101 +361,349 @@
         reason: "El ciclo exterior toma valores de \\(1\\) a \\(n\\) y en cada iteración \\(i\\) el ciclo interior ejecuta \\(i\\) veces. La suma es \\(\\sum_{i=1}^n i = \\frac{n(n+1)}{2}\\).",
       };
     }
-    if (kind === 2) {
-      const code = `i <span class="op">=</span> <span class="num">1</span>\n<span class="kw">while</span> i <span class="op">&lt;=</span> n <span class="kw">do</span>\n<span class="target-line">    operacion_basica();</span>\n    i <span class="op">=</span> i <span class="op">*</span> <span class="num">2</span>\n<span class="kw">end while</span>`;
+
+    // Tipo 4: Bucle triangular estricto (j = i + 1 to n)
+    if (kind === 4) {
+      const salt = randomInt(10, 999);
+      const signature = `freq:strictly-triangular:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    <span class="kw">for</span> j <span class="op">=</span> i <span class="op">+</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `        operacion_basica();`, highlight: true },
+          { text: `    <span class="kw">end for</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> i <span class="op">+</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j<span class="op">++</span>) {` },
+          { text: `        operacionBasica();`, highlight: true },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> i <span class="op">+</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j<span class="op">++</span>) {` },
+          { text: `        operacion_basica();`, highlight: true },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(i <span class="op">+</span> <span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `        operacion_basica()`, highlight: true },
+        ],
+      };
+
       return {
-        signature: "freq:doubling",
-        code,
-        prompt: "Considere el siguiente ciclo con incremento multiplicativo en la variable de control:",
-        targetDescription: "la cantidad exacta de iteraciones de <code>operacion_basica()</code>",
+        signature,
+        codeSnippets,
+        prompt: "Considere el siguiente patrón de comparación por pares en un arreglo de tamaño \\(n\\):",
         options: shuffled([
-          { value: "correct", tex: "\\lfloor \\log_2(n) \\rfloor + 1" },
-          { value: "w1", tex: "n / 2" },
-          { value: "w2", tex: "2^n" },
-          { value: "w3", tex: "\\log_2(n) - 1" },
+          { value: "correct", tex: "\\frac{n(n-1)}{2}" },
+          { value: "w1", tex: "\\frac{n(n+1)}{2}" },
+          { value: "w2", tex: "n(n-1)" },
+          { value: "w3", tex: "\\frac{n^2}{2}" },
         ]),
         answer: "correct",
-        reason: "La variable \\(i\\) toma valores \\(1, 2, 4, 8, \\dots, 2^k\\) hasta que \\(2^k > n\\). La cantidad de iteraciones es \\(\\lfloor \\log_2(n) \\rfloor + 1\\).",
+        reason: "Para cada \\(i\\) de \\(1\\) a \\(n-1\\), \\(j\\) realiza \\(n-i\\) iteraciones. La suma es \\(\\sum_{i=1}^{n-1} (n-i) = \\frac{n(n-1)}{2}\\).",
       };
     }
-    const code = `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    <span class="kw">for</span> j <span class="op">=</span> i <span class="op">+</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n<span class="target-line">        operacion_basica();</span>\n    <span class="kw">end for</span>\n<span class="kw">end for</span>`;
+
+    // Tipo 5: Salto variable dependiente del índice exterior (paso i)
+    const salt = randomInt(10, 999);
+    const signature = `freq:harmonic:${salt}`;
+    const codeSnippets = {
+      pseudo: [
+        { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+        { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">step</span> i <span class="kw">do</span>` },
+        { text: `        operacion_basica();`, highlight: true },
+        { text: `    <span class="kw">end for</span>` },
+        { text: `<span class="kw">end for</span>` },
+      ],
+      java: [
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+        { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j <span class="op">+=</span> i) {` },
+        { text: `        operacionBasica();`, highlight: true },
+        { text: `    }` },
+        { text: `}` },
+      ],
+      c: [
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+        { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j <span class="op">+=</span> i) {` },
+        { text: `        operacion_basica();`, highlight: true },
+        { text: `    }` },
+        { text: `}` },
+      ],
+      python: [
+        { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+        { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>, i):` },
+        { text: `        operacion_basica()`, highlight: true },
+      ],
+    };
+
     return {
-      signature: "freq:strictly-triangular",
-      code,
-      prompt: "Considere el siguiente patrón de comparación por parejas en un arreglo de tamaño \\(n\\):",
-      targetDescription: "la cantidad de comparaciones ejecutadas por <code>operacion_basica()</code>",
+      signature,
+      codeSnippets,
+      prompt: "Considere el siguiente ciclo anidado con salto variable \\(j \\leftarrow j + i\\) dependiente del ciclo exterior:",
       options: shuffled([
-        { value: "correct", tex: "\\frac{n(n-1)}{2}" },
-        { value: "w1", tex: "\\frac{n(n+1)}{2}" },
-        { value: "w2", tex: "n(n-1)" },
-        { value: "w3", tex: "n^2 / 2" },
+        { value: "correct", tex: "\\approx n \\ln(n)" },
+        { value: "w1", tex: "n^2" },
+        { value: "w2", tex: "\\frac{n(n+1)}{2}" },
+        { value: "w3", tex: "n" },
       ]),
       answer: "correct",
-      reason: "Para cada \\(i\\) de \\(1\\) a \\(n-1\\), \\(j\\) realiza \\(n-i\\) iteraciones. La suma es \\(\\sum_{i=1}^{n-1} (n-i) = \\frac{n(n-1)}{2}\\).",
+      reason: "Para cada \\(i\\), el ciclo interior ejecuta \\(\\approx n/i\\) veces. La suma total es \\(\\sum_{i=1}^n \\frac{n}{i} = n \\sum_{i=1}^n \\frac{1}{i} \\approx n \\ln(n)\\) (serie armónica).",
     };
   }
 
   function generateCost() {
-    const kind = randomInt(0, 2);
+    const kind = randomInt(0, 3);
+
+    // Tipo 0: Ciclo simple con costos c1 y c2 aleatorios
     if (kind === 0) {
-      const c1 = randomInt(2, 4);
-      const c2 = randomInt(1, 3);
-      const code = `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    paso_uno();   <span class="num">// costo c₁ = ${c1}</span>\n    paso_dos();   <span class="num">// costo c₂ = ${c2}</span>\n<span class="kw">end for</span>\nfinalizar();      <span class="num">// costo c₀ = 1</span>`;
+      const c1 = randomInt(2, 6);
+      const c2 = randomInt(1, 5);
+      const c0 = randomInt(1, 3);
+      const salt = randomInt(10, 999);
+      const signature = `cost:linear:${c1}:${c2}:${c0}:${salt}`;
       const perIter = c1 + c2;
+
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    paso_uno();   <span class="com">// costo c₁ = ${c1}</span>` },
+          { text: `    paso_dos();   <span class="com">// costo c₂ = ${c2}</span>` },
+          { text: `<span class="kw">end for</span>` },
+          { text: `finalizar();      <span class="com">// costo c₀ = ${c0}</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    pasoUno();   <span class="com">// costo c₁ = ${c1}</span>` },
+          { text: `    pasoDos();   <span class="com">// costo c₂ = ${c2}</span>` },
+          { text: `}` },
+          { text: `finalizar();      <span class="com">// costo c₀ = ${c0}</span>` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    paso_uno();   <span class="com">/* costo c₁ = ${c1} */</span>` },
+          { text: `    paso_dos();   <span class="com">/* costo c₂ = ${c2} */</span>` },
+          { text: `}` },
+          { text: `finalizar();      <span class="com">/* costo c₀ = ${c0} */</span>` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `    paso_uno()   <span class="com"># costo c₁ = ${c1}</span>` },
+          { text: `    paso_dos()   <span class="com"># costo c₂ = ${c2}</span>` },
+          { text: `finalizar()      <span class="com"># costo c₀ = ${c0}</span>` },
+        ],
+      };
+
       return {
-        signature: `cost:linear:${c1}:${c2}`,
-        code,
-        prompt: `Si cada instrucción tiene el costo indicado en el comentario, deduzca la función de costo total \\(C(n)\\):`,
+        signature,
+        codeSnippets,
+        prompt: `Si cada instrucción tiene el costo exacto indicado en el comentario, deduzca la función de costo total \\(C(n)\\):`,
         options: shuffled([
-          { value: "correct", tex: `C(n) = ${perIter}n + 1` },
+          { value: "correct", tex: `C(n) = ${perIter}n + ${c0}` },
           { value: "w1", tex: `C(n) = ${c1}n + ${c2}` },
           { value: "w2", tex: `C(n) = ${perIter}n` },
           { value: "w3", tex: `C(n) = n + ${perIter}` },
         ]),
         answer: "correct",
-        reason: `En cada una de las \\(n\\) iteraciones se ejecutan \\(c_1 + c_2 = ${c1} + ${c2} = ${perIter}\\) operaciones, más la instrucción final de costo \\(1\\): \\(C(n) = ${perIter}n + 1\\).`,
+        reason: `En cada una de las \\(n\\) iteraciones se ejecutan \\(c_1 + c_2 = ${c1} + ${c2} = ${perIter}\\) operaciones, más la instrucción final de costo \\(${c0}\\): \\(C(n) = ${perIter}n + ${c0}\\).`,
       };
     }
+
+    // Tipo 1: Bucle anidado triangular con costo unitario k
     if (kind === 1) {
-      const code = `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> i <span class="kw">do</span>\n        operacion(); <span class="num">// costo unitario 1</span>\n    <span class="kw">end for</span>\n<span class="kw">end for</span>`;
+      const k = pickRandom([1, 2, 3]);
+      const salt = randomInt(10, 999);
+      const signature = `cost:poly2:${k}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> i <span class="kw">do</span>` },
+          { text: `        operacion(); <span class="com">// costo unitario c = ${k}</span>` },
+          { text: `    <span class="kw">end for</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> i; j<span class="op">++</span>) {` },
+          { text: `        operacion(); <span class="com">// costo unitario c = ${k}</span>` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> i; j<span class="op">++</span>) {` },
+          { text: `        operacion(); <span class="com">/* costo unitario c = ${k} */</span>` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">1</span>, i <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `        operacion() <span class="com"># costo unitario c = ${k}</span>` },
+        ],
+      };
+
+      const correctTex = k === 1 ? "C(n) = \\frac{1}{2}n^2 + \\frac{1}{2}n" : `C(n) = \\frac{${k}}{2}n^2 + \\frac{${k}}{2}n`;
       return {
-        signature: "cost:poly2",
-        code,
-        prompt: "Deduzca la función de costo polinomial exacta \\(C(n)\\) sumando las iteraciones del ciclo interior:",
+        signature,
+        codeSnippets,
+        prompt: `Deduzca la función de costo polinomial exacta \\(C(n)\\) sumando las iteraciones del ciclo interior (con costo \\(c=${k}\\)):`,
         options: shuffled([
-          { value: "correct", tex: "C(n) = \\frac{1}{2}n^2 + \\frac{1}{2}n" },
-          { value: "w1", tex: "C(n) = n^2 + n" },
-          { value: "w2", tex: "C(n) = \\frac{1}{2}n^2 - \\frac{1}{2}n" },
-          { value: "w3", tex: "C(n) = n^2" },
+          { value: "correct", tex: correctTex },
+          { value: "w1", tex: `C(n) = ${k}n^2 + ${k}n` },
+          { value: "w2", tex: `C(n) = \\frac{${k}}{2}n^2 - \\frac{${k}}{2}n` },
+          { value: "w3", tex: `C(n) = ${k}n^2` },
         ]),
         answer: "correct",
-        reason: "La sumatoria es \\(\\sum_{i=1}^n i = \\frac{n(n+1)}{2} = \\frac{1}{2}n^2 + \\frac{1}{2}n\\).",
+        reason: `La sumatoria es \\(c \\sum_{i=1}^n i = ${k} \\cdot \\frac{n(n+1)}{2} = ${correctTex.replace("C(n) = ", "")}\\).`,
       };
     }
-    const code = `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n        matriz[i][j] <span class="op">=</span> <span class="num">0</span>;\n    <span class="kw">end for</span>\n<span class="kw">end for</span>`;
+
+    // Tipo 2: Matriz cuadrada de orden n x n con constante k
+    if (kind === 2) {
+      const k = pickRandom([1, 2, 4]);
+      const salt = randomInt(10, 999);
+      const signature = `cost:matrix:${k}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `        matriz[i][j] <span class="op">=</span> matriz[i][j] <span class="op">+</span> <span class="num">1</span>; <span class="com">// costo = ${k}</span>` },
+          { text: `    <span class="kw">end for</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">0</span>; j <span class="op">&lt;</span> n; j<span class="op">++</span>) {` },
+          { text: `        matriz[i][j] <span class="op">+=</span> <span class="num">1</span>; <span class="com">// costo = ${k}</span>` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">0</span>; j <span class="op">&lt;</span> n; j<span class="op">++</span>) {` },
+          { text: `        matriz[i][j] <span class="op">+=</span> <span class="num">1</span>; <span class="com">/* costo = ${k} */</span>` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(n):` },
+          { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(n):` },
+          { text: `        matriz[i][j] <span class="op">+=</span> <span class="num">1</span> <span class="com"># costo = ${k}</span>` },
+        ],
+      };
+
+      const correctTex = k === 1 ? "C(n) = n^2" : `C(n) = ${k}n^2`;
+      return {
+        signature,
+        codeSnippets,
+        prompt: `Deduzca la función exacta de costo \\(C(n)\\) para recorrer una matriz cuadrada \\(n \\times n\\) con costo de celda \\(${k}\\):`,
+        options: shuffled([
+          { value: "correct", tex: correctTex },
+          { value: "w1", tex: `C(n) = ${2 * k}n` },
+          { value: "w2", tex: `C(n) = ${k}n(n+1)` },
+          { value: "w3", tex: `C(n) = n^3` },
+        ]),
+        answer: "correct",
+        reason: `Ambos ciclos son independientes de tamaño \\(n\\): \\(\\sum_{i=1}^n \\sum_{j=1}^n ${k} = ${k} \\cdot n \\cdot n = ${correctTex.replace("C(n) = ", "")}\\).`,
+      };
+    }
+
+    // Tipo 3: Ciclo con paso k (k = 2, 3, 4) y costo c por iteración
+    const step = pickRandom([2, 3, 4]);
+    const salt = randomInt(10, 999);
+    const signature = `cost:step:${step}:${salt}`;
+    const codeSnippets = {
+      pseudo: [
+        { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">step</span> <span class="num">${step}</span> <span class="kw">do</span>` },
+        { text: `    procesar_bloque(); <span class="com">// costo unitario c = 1</span>` },
+        { text: `<span class="kw">end for</span>` },
+      ],
+      java: [
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i <span class="op">+=</span> <span class="num">${step}</span>) {` },
+        { text: `    procesarBloque(); <span class="com">// costo unitario c = 1</span>` },
+        { text: `}` },
+      ],
+      c: [
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i <span class="op">+=</span> <span class="num">${step}</span>) {` },
+        { text: `    procesar_bloque(); <span class="com">/* costo unitario c = 1 */</span>` },
+        { text: `}` },
+      ],
+      python: [
+        { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>, <span class="num">${step}</span>):` },
+        { text: `    procesar_bloque() <span class="com"># costo unitario c = 1</span>` },
+      ],
+    };
+
     return {
-      signature: "cost:matrix",
-      code,
-      prompt: "Deduzca la función exacta de costo \\(C(n)\\) para inicializar una matriz cuadrada de orden \\(n\\times n\\):",
+      signature,
+      codeSnippets,
+      prompt: `Deduzca la función exacta de costo \\(C(n)\\) para este ciclo que avanza de \\(${step}\\) en \\(${step}\\):`,
       options: shuffled([
-        { value: "correct", tex: "C(n) = n^2" },
-        { value: "w1", tex: "C(n) = 2n" },
-        { value: "w2", tex: "C(n) = n(n+1)" },
-        { value: "w3", tex: "C(n) = n^3" },
+        { value: "correct", tex: `C(n) = \\lceil n/${step} \\rceil` },
+        { value: "w1", tex: `C(n) = ${step}n` },
+        { value: "w2", tex: `C(n) = n - ${step}` },
+        { value: "w3", tex: `C(n) = \\lfloor n/2 \\rfloor` },
       ]),
       answer: "correct",
-      reason: "Ambos ciclos son independientes y van de 1 a \\(n\\): \\(\\sum_{i=1}^n \\sum_{j=1}^n 1 = n \\cdot n = n^2\\).",
+      reason: `Al iniciar en 1 e incrementar \\(i\\) en \\(${step}\\) en cada paso hasta \\(n\\), el total de operaciones es exactamente \\(\\lceil n/${step} \\rceil\\).`,
     };
   }
 
   function generateAsymptotic() {
-    const kind = randomInt(0, 3);
+    const kind = randomInt(0, 4);
+
+    // Tipo 0: Ciclo exterior n, ciclo interior con salto multiplicativo (n log n)
     if (kind === 0) {
-      const code = `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    j <span class="op">=</span> <span class="num">1</span>\n    <span class="kw">while</span> j <span class="op">&lt;=</span> n <span class="kw">do</span>\n        ejecutar();\n        j <span class="op">=</span> j <span class="op">*</span> <span class="num">2</span>\n    <span class="kw">end while</span>\n<span class="kw">end for</span>`;
+      const base = pickRandom([2, 3, 4]);
+      const salt = randomInt(10, 999);
+      const signature = `asymp:nlogn:${base}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    j <span class="op">=</span> <span class="num">1</span>` },
+          { text: `    <span class="kw">while</span> j <span class="op">&lt;=</span> n <span class="kw">do</span>` },
+          { text: `        ejecutar();` },
+          { text: `        j <span class="op">=</span> j <span class="op">*</span> <span class="num">${base}</span>` },
+          { text: `    <span class="kw">end while</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>;` },
+          { text: `    <span class="kw">while</span> (j <span class="op">&lt;=</span> n) {` },
+          { text: `        ejecutar();` },
+          { text: `        j <span class="op">*=</span> <span class="num">${base}</span>;` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>;` },
+          { text: `    <span class="kw">while</span> (j <span class="op">&lt;=</span> n) {` },
+          { text: `        ejecutar();` },
+          { text: `        j <span class="op">*=</span> <span class="num">${base}</span>;` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `    j <span class="op">=</span> <span class="num">1</span>` },
+          { text: `    <span class="kw">while</span> j <span class="op">&lt;=</span> n:` },
+          { text: `        ejecutar()` },
+          { text: `        j <span class="op">*=</span> <span class="num">${base}</span>` },
+        ],
+      };
+
       return {
-        signature: "asymp:nlogn",
-        code,
-        prompt: "Determine la cota asintótica ajustada \\(\\Theta(g(n))\\) para el siguiente algoritmo estructurado:",
+        signature,
+        codeSnippets,
+        prompt: `Determine la cota asintótica ajustada \\(\\Theta(g(n))\\) donde el ciclo interior avanza con factor \\(j \\leftarrow j \\times ${base}\\):`,
         options: shuffled([
           { value: "correct", tex: "\\Theta(n\\log(n))" },
           { value: "w1", tex: "\\Theta(n^2)" },
@@ -231,31 +711,98 @@
           { value: "w3", tex: "\\Theta(\\log(n))" },
         ]),
         answer: "correct",
-        reason: "El ciclo exterior ejecuta \\(n\\) veces y el interior ejecuta \\(\\approx \\log_2(n)\\) veces en cada iteración. El producto resulta en \\(\\Theta(n\\log(n))\\).",
+        reason: `El ciclo exterior ejecuta \\(n\\) veces y el interior ejecuta \\(\\approx \\log_{${base}}(n)\\) veces. El producto resulta en \\(\\Theta(n\\log(n))\\).`,
       };
     }
+
+    // Tipo 1: Ciclo exterior n con ciclo interior de límite constante K (complejidad Theta(n))
     if (kind === 1) {
-      const code = `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">100</span> <span class="kw">do</span>\n        tarea_fija();\n    <span class="kw">end for</span>\n<span class="kw">end for</span>`;
+      const kConst = pickRandom([50, 100, 250, 500]);
+      const salt = randomInt(10, 999);
+      const signature = `asymp:fixed-inner:${kConst}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">${kConst}</span> <span class="kw">do</span>` },
+          { text: `        tarea_fija();` },
+          { text: `    <span class="kw">end for</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> <span class="num">${kConst}</span>; j<span class="op">++</span>) {` },
+          { text: `        tareaFija();` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> <span class="num">${kConst}</span>; j<span class="op">++</span>) {` },
+          { text: `        tarea_fija();` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">${kConst + 1}</span>):` },
+          { text: `        tarea_fija()` },
+        ],
+      };
+
       return {
-        signature: "asymp:fixed-inner",
-        code,
-        prompt: "Determine la cota asintótica ajustada \\(\\Theta(g(n))\\) para este ciclo anidado con límite constante:",
+        signature,
+        codeSnippets,
+        prompt: `Determine la cota asintótica ajustada \\(\\Theta(g(n))\\) para este ciclo anidado con límite constante \\(${kConst}\\):`,
         options: shuffled([
           { value: "correct", tex: "\\Theta(n)" },
           { value: "w1", tex: "\\Theta(n^2)" },
           { value: "w2", tex: "\\Theta(1)" },
-          { value: "w3", tex: "\\Theta(100n)" },
+          { value: "w3", tex: `\\Theta(${kConst}n)` },
         ]),
         answer: "correct",
-        reason: "El ciclo interior no depende de \\(n\\) y siempre se repite 100 veces (costo constante \\(O(1)\\)). Por tanto, el costo total es lineal \\(\\Theta(n)\\).",
+        reason: `El ciclo interior no depende de \\(n\\) y siempre se repite ${kConst} veces (costo constante \\(O(1)\\)). Por tanto, la cota asintótica es lineal \\(\\Theta(n)\\).`,
       };
     }
+
+    // Tipo 2: Condición cuadrática i * i <= n (complejidad Theta(sqrt(n)))
     if (kind === 2) {
-      const code = `i <span class="op">=</span> <span class="num">1</span>\n<span class="kw">while</span> i <span class="op">*</span> i <span class="op">&lt;=</span> n <span class="kw">do</span>\n    verificar();\n    i <span class="op">=</span> i <span class="op">+</span> <span class="num">1</span>\n<span class="kw">end while</span>`;
+      const step = pickRandom([1, 2]);
+      const salt = randomInt(10, 999);
+      const signature = `asymp:sqrt:${step}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `i <span class="op">=</span> <span class="num">1</span>` },
+          { text: `<span class="kw">while</span> i <span class="op">*</span> i <span class="op">&lt;=</span> n <span class="kw">do</span>` },
+          { text: `    verificar();` },
+          { text: `    i <span class="op">=</span> i <span class="op">+</span> <span class="num">${step}</span>` },
+          { text: `<span class="kw">end while</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>;` },
+          { text: `<span class="kw">while</span> (i <span class="op">*</span> i <span class="op">&lt;=</span> n) {` },
+          { text: `    verificar();` },
+          { text: `    i <span class="op">+=</span> <span class="num">${step}</span>;` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>;` },
+          { text: `<span class="kw">while</span> (i <span class="op">*</span> i <span class="op">&lt;=</span> n) {` },
+          { text: `    verificar();` },
+          { text: `    i <span class="op">+=</span> <span class="num">${step}</span>;` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `i <span class="op">=</span> <span class="num">1</span>` },
+          { text: `<span class="kw">while</span> i <span class="op">*</span> i <span class="op">&lt;=</span> n:` },
+          { text: `    verificar()` },
+          { text: `    i <span class="op">+=</span> <span class="num">${step}</span>` },
+        ],
+      };
+
       return {
-        signature: "asymp:sqrt",
-        code,
-        prompt: "Determine la cota asintótica ajustada \\(\\Theta(g(n))\\) del algoritmo con condición cuadrática en la condición:",
+        signature,
+        codeSnippets,
+        prompt: "Determine la cota asintótica ajustada \\(\\Theta(g(n))\\) del algoritmo con condición cuadrática en la guarda:",
         options: shuffled([
           { value: "correct", tex: "\\Theta(\\sqrt{n})" },
           { value: "w1", tex: "\\Theta(n)" },
@@ -263,32 +810,149 @@
           { value: "w3", tex: "\\Theta(\\log(n))" },
         ]),
         answer: "correct",
-        reason: "El ciclo se detiene cuando \\(i^2 > n\\), lo que equivale a \\(i > \\sqrt{n}\\). Por tanto, la complejidad es \\(\\Theta(\\sqrt{n})\\).",
+        reason: "El ciclo se detiene cuando \\(i^2 > n\\), lo que equivale a \\(i > \\sqrt{n}\\). Con avances aditivos de tamaño constante, la complejidad es \\(\\Theta(\\sqrt{n})\\).",
       };
     }
-    const code = `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n        <span class="kw">for</span> k <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n            operar();\n        <span class="kw">end for</span>\n    <span class="kw">end for</span>\n<span class="kw">end for</span>`;
+
+    // Tipo 3: Tres ciclos anidados independientes de tamaño n (Theta(n^3))
+    if (kind === 3) {
+      const salt = randomInt(10, 999);
+      const signature = `asymp:cubic:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `        <span class="kw">for</span> k <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `            operar();` },
+          { text: `        <span class="kw">end for</span>` },
+          { text: `    <span class="kw">end for</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">0</span>; j <span class="op">&lt;</span> n; j<span class="op">++</span>) {` },
+          { text: `        <span class="kw">for</span> (<span class="kw">int</span> k <span class="op">=</span> <span class="num">0</span>; k <span class="op">&lt;</span> n; k<span class="op">++</span>) {` },
+          { text: `            operar();` },
+          { text: `        }` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">0</span>; j <span class="op">&lt;</span> n; j<span class="op">++</span>) {` },
+          { text: `        <span class="kw">for</span> (<span class="kw">int</span> k <span class="op">=</span> <span class="num">0</span>; k <span class="op">&lt;</span> n; k<span class="op">++</span>) {` },
+          { text: `            operar();` },
+          { text: `        }` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(n):` },
+          { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(n):` },
+          { text: `        <span class="kw">for</span> k <span class="kw">in</span> range(n):` },
+          { text: `            operar()` },
+        ],
+      };
+
+      return {
+        signature,
+        codeSnippets,
+        prompt: "Determine la cota asintótica ajustada \\(\\Theta(g(n))\\) para tres ciclos anidados independientes:",
+        options: shuffled([
+          { value: "correct", tex: "\\Theta(n^3)" },
+          { value: "w1", tex: "\\Theta(n^2)" },
+          { value: "w2", tex: "\\Theta(3n)" },
+          { value: "w3", tex: "\\Theta(n!)" },
+        ]),
+        answer: "correct",
+        reason: "Tres ciclos independientes de 1 a \\(n\\) multiplican sus iteraciones: \\(n \\times n \\times n = \\Theta(n^3)\\).",
+      };
+    }
+
+    // Tipo 4: Salto aditivo grande k (Theta(n))
+    const step = randomInt(3, 8);
+    const salt = randomInt(10, 999);
+    const signature = `asymp:step:${step}:${salt}`;
+    const codeSnippets = {
+      pseudo: [
+        { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">step</span> <span class="num">${step}</span> <span class="kw">do</span>` },
+        { text: `    procesar();` },
+        { text: `<span class="kw">end for</span>` },
+      ],
+      java: [
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i <span class="op">+=</span> <span class="num">${step}</span>) {` },
+        { text: `    procesar();` },
+        { text: `}` },
+      ],
+      c: [
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i <span class="op">+=</span> <span class="num">${step}</span>) {` },
+        { text: `    procesar();` },
+        { text: `}` },
+      ],
+      python: [
+        { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>, <span class="num">${step}</span>):` },
+        { text: `    procesar()` },
+      ],
+    };
+
     return {
-      signature: "asymp:cubic",
-      code,
-      prompt: "Determine la cota asintótica ajustada \\(\\Theta(g(n))\\) para tres ciclos anidados independientes:",
+      signature,
+      codeSnippets,
+      prompt: `Determine la cota asintótica ajustada \\(\\Theta(g(n))\\) para este ciclo que avanza en saltos de \\(${step}\\):`,
       options: shuffled([
-        { value: "correct", tex: "\\Theta(n^3)" },
-        { value: "w1", tex: "\\Theta(n^2)" },
-        { value: "w2", tex: "\\Theta(3n)" },
-        { value: "w3", tex: "\\Theta(n!)" },
+        { value: "correct", tex: "\\Theta(n)" },
+        { value: "w1", tex: `\\Theta(n/${step})` },
+        { value: "w2", tex: "\\Theta(1)" },
+        { value: "w3", tex: "\\Theta(\\log(n))" },
       ]),
       answer: "correct",
-      reason: "Tres ciclos independientes de 1 a \\(n\\) multiplican sus iteraciones: \\(n \\times n \\times n = \\Theta(n^3)\\).",
+      reason: `Aunque se divide entre la constante \\(${step}\\), las constantes multiplicativas se absorben en el análisis asintótico: \\(\\lceil n/${step} \\rceil = \\Theta(n)\\).`,
     };
   }
 
   function generateSimulation() {
-    const kind = randomInt(0, 1);
+    const kind = randomInt(0, 3);
+
+    // Tipo 0: Bucle triangular clásico sum(i)
     if (kind === 0) {
-      const code = `conteo <span class="op">=</span> <span class="num">0</span>\n<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> i <span class="kw">do</span>\n        conteo <span class="op">=</span> conteo <span class="op">+</span> <span class="num">1</span>\n    <span class="kw">end for</span>\n<span class="kw">end for</span>`;
+      const salt = randomInt(10, 999);
+      const signature = `sim:triangular:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `conteo <span class="op">=</span> <span class="num">0</span>` },
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> i <span class="kw">do</span>` },
+          { text: `        conteo <span class="op">=</span> conteo <span class="op">+</span> <span class="num">1</span>` },
+          { text: `    <span class="kw">end for</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">int</span> conteo <span class="op">=</span> <span class="num">0</span>;` },
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> i; j<span class="op">++</span>) {` },
+          { text: `        conteo<span class="op">++</span>;` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">int</span> conteo <span class="op">=</span> <span class="num">0</span>;` },
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> i; j<span class="op">++</span>) {` },
+          { text: `        conteo<span class="op">++</span>;` },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `conteo <span class="op">=</span> <span class="num">0</span>` },
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">1</span>, i <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `        conteo <span class="op">+=</span> <span class="num">1</span>` },
+        ],
+      };
+
       return {
-        signature: "sim:triangular",
-        code,
+        signature,
+        codeSnippets,
         prompt: "Utilice el control interactivo para variar \\(n\\) y verificar experimentalmente cuántas operaciones ejecuta el algoritmo frente a la fórmula teórica:",
         formulaFn: (n) => (n * (n + 1)) / 2,
         formulaTex: "C(n) = \\frac{n(n+1)}{2}",
@@ -300,46 +964,213 @@
           { value: "w3", tex: "C(n) = 2n" },
         ]),
         answer: "correct",
-        reason: "Al variar \\(n\\) se comprueba que para \\(n=5\\) el conteo da 15, para \\(n=10\\) da 55, coincidiendo exactamente con \\(\\frac{n(n+1)}{2}\\).",
+        reason: "Al variar \\(n\\) se comprueba que para \\(n=5\\) el conteo da 15 y para \\(n=10\\) da 55, coincidiendo exactamente con \\(\\frac{n(n+1)}{2}\\).",
       };
     }
-    const code = `conteo <span class="op">=</span> <span class="num">0</span>\ni <span class="op">=</span> <span class="num">1</span>\n<span class="kw">while</span> i <span class="op">&lt;=</span> n <span class="kw">do</span>\n    conteo <span class="op">=</span> conteo <span class="op">+</span> <span class="num">1</span>\n    i <span class="op">=</span> i <span class="op">*</span> <span class="num">2</span>\n<span class="kw">end while</span>`;
+
+    // Tipo 1: Salto multiplicativo i *= factor
+    if (kind === 1) {
+      const factor = pickRandom([2, 3]);
+      const salt = randomInt(10, 999);
+      const signature = `sim:log:${factor}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `conteo <span class="op">=</span> <span class="num">0</span>` },
+          { text: `i <span class="op">=</span> <span class="num">1</span>` },
+          { text: `<span class="kw">while</span> i <span class="op">&lt;=</span> n <span class="kw">do</span>` },
+          { text: `    conteo <span class="op">=</span> conteo <span class="op">+</span> <span class="num">1</span>` },
+          { text: `    i <span class="op">=</span> i <span class="op">*</span> <span class="num">${factor}</span>` },
+          { text: `<span class="kw">end while</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">int</span> conteo <span class="op">=</span> <span class="num">0</span>;` },
+          { text: `<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>;` },
+          { text: `<span class="kw">while</span> (i <span class="op">&lt;=</span> n) {` },
+          { text: `    conteo<span class="op">++</span>;` },
+          { text: `    i <span class="op">*=</span> <span class="num">${factor}</span>;` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">int</span> conteo <span class="op">=</span> <span class="num">0</span>;` },
+          { text: `<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>;` },
+          { text: `<span class="kw">while</span> (i <span class="op">&lt;=</span> n) {` },
+          { text: `    conteo<span class="op">++</span>;` },
+          { text: `    i <span class="op">*=</span> <span class="num">${factor}</span>;` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `conteo <span class="op">=</span> <span class="num">0</span>` },
+          { text: `i <span class="op">=</span> <span class="num">1</span>` },
+          { text: `<span class="kw">while</span> i <span class="op">&lt;=</span> n:` },
+          { text: `    conteo <span class="op">+=</span> <span class="num">1</span>` },
+          { text: `    i <span class="op">*=</span> <span class="num">${factor}</span>` },
+        ],
+      };
+
+      const logFn = factor === 2
+        ? (n) => Math.floor(Math.log2(n)) + 1
+        : (n) => Math.floor(Math.log(n) / Math.log(3)) + 1;
+
+      return {
+        signature,
+        codeSnippets,
+        prompt: `Simule el conteo en tiempo real al variar \\(n\\) para confirmar la función de crecimiento con avance \\(i \\leftarrow i \\times ${factor}\\):`,
+        formulaFn: logFn,
+        formulaTex: `C(n) = \\lfloor \\log_{${factor}}(n) \\rfloor + 1`,
+        initialN: 8,
+        options: shuffled([
+          { value: "correct", tex: `C(n) = \\lfloor \\log_{${factor}}(n) \\rfloor + 1` },
+          { value: "w1", tex: `C(n) = \\frac{n}{${factor}}` },
+          { value: "w2", tex: `C(n) = \\log_{${factor}}(n)` },
+          { value: "w3", tex: `C(n) = ${factor}n` },
+        ]),
+        answer: "correct",
+        reason: `Al probar valores de \\(n\\) con potencias de \\(${factor}\\), se comprueba que el total de iteraciones es \\(\\lfloor \\log_{${factor}}(n) \\rfloor + 1\\).`,
+      };
+    }
+
+    // Tipo 2: Salto aditivo k (k = 2, 3, 4, 5)
+    if (kind === 2) {
+      const step = pickRandom([2, 3, 4, 5]);
+      const salt = randomInt(10, 999);
+      const signature = `sim:step:${step}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `conteo <span class="op">=</span> <span class="num">0</span>` },
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">step</span> <span class="num">${step}</span> <span class="kw">do</span>` },
+          { text: `    conteo <span class="op">=</span> conteo <span class="op">+</span> <span class="num">1</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">int</span> conteo <span class="op">=</span> <span class="num">0</span>;` },
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i <span class="op">+=</span> <span class="num">${step}</span>) {` },
+          { text: `    conteo<span class="op">++</span>;` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">int</span> conteo <span class="op">=</span> <span class="num">0</span>;` },
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i <span class="op">+=</span> <span class="num">${step}</span>) {` },
+          { text: `    conteo<span class="op">++</span>;` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `conteo <span class="op">=</span> <span class="num">0</span>` },
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>, <span class="num">${step}</span>):` },
+          { text: `    conteo <span class="op">+=</span> <span class="num">1</span>` },
+        ],
+      };
+
+      return {
+        signature,
+        codeSnippets,
+        prompt: `Simule las iteraciones del bucle con salto de paso \\(${step}\\) variando \\(n\\):`,
+        formulaFn: (n) => Math.ceil(n / step),
+        formulaTex: `C(n) = \\lceil n/${step} \\rceil`,
+        initialN: 10,
+        options: shuffled([
+          { value: "correct", tex: `C(n) = \\lceil n/${step} \\rceil` },
+          { value: "w1", tex: `C(n) = ${step}n` },
+          { value: "w2", tex: `C(n) = n - ${step}` },
+          { value: "w3", tex: `C(n) = \\lfloor n/2 \\rfloor` },
+        ]),
+        answer: "correct",
+        reason: `Al variar \\(n\\) se verifica empíricamente que las iteraciones coinciden exactamente con \\(\\lceil n/${step} \\rceil\\).`,
+      };
+    }
+
+    // Tipo 3: Triangular estricto j = i + 1 to n
+    const salt = randomInt(10, 999);
+    const signature = `sim:strictly-triangular:${salt}`;
+    const codeSnippets = {
+      pseudo: [
+        { text: `conteo <span class="op">=</span> <span class="num">0</span>` },
+        { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+        { text: `    <span class="kw">for</span> j <span class="op">=</span> i <span class="op">+</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+        { text: `        conteo <span class="op">=</span> conteo <span class="op">+</span> <span class="num">1</span>` },
+        { text: `    <span class="kw">end for</span>` },
+        { text: `<span class="kw">end for</span>` },
+      ],
+      java: [
+        { text: `<span class="kw">int</span> conteo <span class="op">=</span> <span class="num">0</span>;` },
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+        { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> i <span class="op">+</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j<span class="op">++</span>) {` },
+        { text: `        conteo<span class="op">++</span>;` },
+        { text: `    }` },
+        { text: `}` },
+      ],
+      c: [
+        { text: `<span class="kw">int</span> conteo <span class="op">=</span> <span class="num">0</span>;` },
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+        { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> i <span class="op">+</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j<span class="op">++</span>) {` },
+        { text: `        conteo<span class="op">++</span>;` },
+        { text: `    }` },
+        { text: `}` },
+      ],
+      python: [
+        { text: `conteo <span class="op">=</span> <span class="num">0</span>` },
+        { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+        { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(i <span class="op">+</span> <span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+        { text: `        conteo <span class="op">+=</span> <span class="num">1</span>` },
+      ],
+    };
+
     return {
-      signature: "sim:log",
-      code,
-      prompt: "Simule el conteo en tiempo real al variar \\(n\\) para confirmar la función de conteo del bucle:",
-      formulaFn: (n) => Math.floor(Math.log2(n)) + 1,
-      formulaTex: "C(n) = \\lfloor \\log_2(n) \\rfloor + 1",
-      initialN: 8,
+      signature,
+      codeSnippets,
+      prompt: "Simule el conteo para el patrón de comparaciones estrictas por parejas variando el valor de \\(n\\):",
+      formulaFn: (n) => (n * (n - 1)) / 2,
+      formulaTex: "C(n) = \\frac{n(n-1)}{2}",
+      initialN: 6,
       options: shuffled([
-        { value: "correct", tex: "C(n) = \\lfloor \\log_2(n) \\rfloor + 1" },
-        { value: "w1", tex: "C(n) = n / 2" },
-        { value: "w2", tex: "C(n) = \\log_2(n)" },
-        { value: "w3", tex: "C(n) = 2n" },
+        { value: "correct", tex: "C(n) = \\frac{n(n-1)}{2}" },
+        { value: "w1", tex: "C(n) = \\frac{n(n+1)}{2}" },
+        { value: "w2", tex: "C(n) = n(n-1)" },
+        { value: "w3", tex: "C(n) = \\frac{n^2}{2}" },
       ]),
       answer: "correct",
-      reason: "Para \\(n=8\\) el conteo es 4 (pasos 1, 2, 4, 8); para \\(n=16\\) es 5, coincidiendo exactamente con \\(\\lfloor \\log_2(n) \\rfloor + 1\\).",
+      reason: "Al variar \\(n\\) se comprueba que para \\(n=6\\) el conteo es 15, para \\(n=5\\) es 10, coincidiendo exactamente con \\(\\frac{n(n-1)}{2}\\).",
     };
   }
 
   function fallbackQuestion(mode, index) {
-    const unique = 1000 + index;
+    const unique = Date.now() + index;
+    const baseSnippets = (opLine) => ({
+      pseudo: [
+        { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+        { text: `    ${opLine};`, highlight: true },
+        { text: `<span class="kw">end for</span>` },
+      ],
+      java: [
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+        { text: `    ${opLine}();`, highlight: true },
+        { text: `}` },
+      ],
+      c: [
+        { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+        { text: `    ${opLine}();`, highlight: true },
+        { text: `}` },
+      ],
+      python: [
+        { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+        { text: `    ${opLine}()`, highlight: true },
+      ],
+    });
+
     if (mode === "frequency") {
       return {
         signature: `fallback-f:${unique}`,
-        code: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n<span class="target-line">    op();</span>\n<span class="kw">end for</span>`,
-        prompt: "Considere el siguiente ciclo simple:",
-        targetDescription: "la cantidad de ejecuciones de <code>op()</code>",
+        codeSnippets: baseSnippets("operacion_basica"),
+        prompt: "Considere el siguiente ciclo simple con límite \\(n\\):",
         options: [{ value: "correct", tex: "n" }, { value: "w1", tex: "n+1" }, { value: "w2", tex: "n-1" }, { value: "w3", tex: "2n" }],
         answer: "correct",
-        reason: "Un ciclo simple de 1 a \\(n\\) ejecuta \\(n\\) veces.",
+        reason: "Un ciclo simple de 1 a \\(n\\) con paso 1 ejecuta exactamente \\(n\\) veces.",
       };
     }
     if (mode === "cost") {
       return {
         signature: `fallback-c:${unique}`,
-        code: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    op();\n<span class="kw">end for</span>`,
-        prompt: "Deduzca \\(C(n)\\) si cada iteración cuesta 1:",
+        codeSnippets: baseSnippets("instruccion_costo_1"),
+        prompt: "Deduzca \\(C(n)\\) si cada iteración tiene un costo unitario de 1:",
         options: [{ value: "correct", tex: "C(n) = n" }, { value: "w1", tex: "C(n) = n^2" }],
         answer: "correct",
         reason: "\\(C(n) = n\\).",
@@ -348,17 +1179,17 @@
     if (mode === "asymptotic") {
       return {
         signature: `fallback-a:${unique}`,
-        code: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    op();\n<span class="kw">end for</span>`,
-        prompt: "Determine la cota ajustada:",
+        codeSnippets: baseSnippets("ejecutar"),
+        prompt: "Determine la cota asintótica ajustada:",
         options: [{ value: "correct", tex: "\\Theta(n)" }, { value: "w1", tex: "\\Theta(n^2)" }],
         answer: "correct",
-        reason: "Es de orden lineal \\(\\Theta(n)\\).",
+        reason: "El algoritmo ejecuta un número de pasos estrictamente proporcional a \\(n\\): \\(\\Theta(n)\\).",
       };
     }
     return {
       signature: `fallback-s:${unique}`,
-      code: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>\n    op();\n<span class="kw">end for</span>`,
-      prompt: "Simule el conteo lineal:",
+      codeSnippets: baseSnippets("conteo = conteo + 1"),
+      prompt: "Simule el conteo lineal variando \\(n\\):",
       formulaFn: (n) => n,
       formulaTex: "C(n) = n",
       initialN: 5,
@@ -369,6 +1200,11 @@
   }
 
   function nextUniqueQuestion(mode, state) {
+    // Si la memoria de vistos supera 30 elementos, purgar la mitad más antigua para garantizar rotación infinita
+    if (state.seen[mode].length > 30) {
+      state.seen[mode] = state.seen[mode].slice(-15);
+    }
+
     const seen = new Set(state.seen[mode]);
     for (let attempt = 0; attempt < 500; attempt += 1) {
       const q = mode === "frequency" ? generateFrequency()
@@ -380,6 +1216,9 @@
         return q;
       }
     }
+
+    // Si todas las firmas recientes chocaran, generamos un fallback garantizado o vaciamos el historial
+    state.seen[mode] = [];
     const fallback = fallbackQuestion(mode, state.seen[mode].length);
     state.seen[mode].push(fallback.signature);
     return fallback;
@@ -389,12 +1228,14 @@
 
   function renderChoicesQuestion(container, question, modeClass = "") {
     clearMath(container);
+    const codeBlockHtml = renderCodeBlock(question.codeSnippets);
     container.innerHTML = `<p class="self-check-practice__prompt">${question.prompt}</p>
-      <div class="self-check-practice__code-box"><pre><code>${question.code}</code></pre></div>
+      ${codeBlockHtml}
       <fieldset class="self-check-practice__choices ${modeClass}">
         <legend>Seleccione la respuesta correcta</legend>
         ${question.options.map((opt) => `<label><input type="radio" name="chapter4-answer" value="${opt.value}"><span>\\(${opt.tex}\\)</span></label>`).join("")}
       </fieldset>`;
+    attachCodeTabEvents(container);
     typesetMath(container);
   }
 
@@ -412,8 +1253,9 @@
 
   function renderSimulation(container, question) {
     clearMath(container);
+    const codeBlockHtml = renderCodeBlock(question.codeSnippets);
     container.innerHTML = `<p class="self-check-practice__prompt">${question.prompt}</p>
-      <div class="self-check-practice__code-box"><pre><code>${question.code}</code></pre></div>
+      ${codeBlockHtml}
       <div class="self-check-practice__sim-row">
         <label>
           <span class="label-text">\\(\\mathbf{n}\\)</span>
@@ -435,6 +1277,8 @@
         <legend>Fórmula de costo C(n) que predice exactamente estas iteraciones</legend>
         ${question.options.map((opt) => `<label><input type="radio" name="chapter4-answer" value="${opt.value}"><span>\\(${opt.tex}\\)</span></label>`).join("")}
       </fieldset>`;
+
+    attachCodeTabEvents(container);
 
     const range = container.querySelector("[data-sim-range]");
     const nDisplay = container.querySelector("[data-sim-n-display]");

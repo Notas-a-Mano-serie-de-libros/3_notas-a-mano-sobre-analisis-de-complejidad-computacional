@@ -39,6 +39,15 @@ def test_chapter4_practice_includes_code_boxes_and_simulation_controls():
 
     assert "data-chapter4-practice" in page
     assert "self-check-practice__code-box" in script
+    assert "self-check-practice__code-tabs" in script
+    assert "self-check-practice__line-num" in script
     assert "self-check-practice__sim-row" in script
+    assert "Pseudocódigo" in script
+    assert "Java" in script
+    assert '"c"' in script
+    assert "Python" in script
     assert ".self-check-practice__code-box" in stylesheet
+    assert ".self-check-practice__code-tabs" in stylesheet
+    assert ".self-check-practice__line-num" in stylesheet
     assert ".self-check-practice__sim-results" in stylesheet
+
