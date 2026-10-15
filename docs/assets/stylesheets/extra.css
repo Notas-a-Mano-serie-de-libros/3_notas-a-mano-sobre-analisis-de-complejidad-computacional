@@ -2249,19 +2249,19 @@ input {
 .self-check-practice__graph canvas[data-dragging] { cursor: grabbing; }
 .self-check-practice__graph-legend {
   align-items: flex-start;
-  background: rgba(255, 255, 255, .95);
+  background: rgba(255, 255, 255, .96);
   border: 1px solid rgba(80, 80, 80, .28);
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
   box-sizing: border-box;
   color: #333;
   display: inline-flex;
   flex-direction: column;
   font: 12px sans-serif;
-  gap: 5px;
+  gap: 6px;
   left: 92px;
-  max-width: calc(100% - 110px);
-  padding: 6px 12px;
+  max-width: calc(100% - 104px);
+  padding: 8px 16px 8px 12px;
   pointer-events: none;
   position: absolute;
   top: 10px;
@@ -2277,7 +2277,12 @@ input {
 .self-check-practice__legend-row--n0 i { border-top-style: dotted; }
 .self-check-practice__graph-legend sub,
 .self-check-practice__graph-legend sup { line-height: 0; }
-.self-check-practice__graph-legend mjx-container { line-height: 0; margin: 0 !important; }
+.self-check-practice__graph-legend mjx-container {
+  display: inline-block;
+  line-height: normal;
+  margin: 0 2px 0 0 !important;
+  vertical-align: middle;
+}
 .self-check-practice__sr-status { clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
 
 .self-check-practice__actions { align-items: stretch; display: flex; gap: .7rem; margin-top: 1.25rem; }
