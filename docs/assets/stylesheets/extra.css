@@ -2245,6 +2245,44 @@ input {
   padding: 0;
   position: relative;
 }
+.self-check-practice__graph-zoom-controls {
+  display: flex;
+  gap: 0;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 3;
+}
+.self-check-practice__graph-zoom-btn {
+  align-items: center;
+  background: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  color: #333;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 16px;
+  height: 28px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  width: 30px;
+}
+.self-check-practice__graph-zoom-btn:hover { background: #eee; }
+.self-check-practice__graph-zoom-btn.active {
+  background: var(--md-accent-fg-color);
+  border-color: var(--md-accent-fg-color);
+  color: #fff;
+}
+.self-check-practice__graph-selection {
+  background: rgba(21, 101, 192, .15);
+  border: 1px dashed #1565c0;
+  box-sizing: border-box;
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
 .self-check-practice__graph canvas {
   background: #fff;
   cursor: grab;
@@ -2253,6 +2291,7 @@ input {
   touch-action: none;
   width: 100%;
 }
+.self-check-practice__graph canvas[data-selecting] { cursor: crosshair; }
 .self-check-practice__graph canvas[data-dragging] { cursor: grabbing; }
 .self-check-practice__graph-legend {
   align-items: flex-start;
@@ -2260,22 +2299,23 @@ input {
   border: 1px solid rgba(80, 80, 80, .28);
   border-radius: 6px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
-  box-sizing: border-box;
+  box-sizing: content-box;
   color: #333;
   display: inline-flex;
   flex-direction: column;
   font: 12px sans-serif;
   gap: 6px;
   left: 92px;
-  max-width: calc(100% - 104px);
-  padding: 8px 16px 8px 12px;
+  max-width: none;
+  min-width: 250px;
+  padding: 8px 18px 8px 12px;
   pointer-events: none;
   position: absolute;
   top: 10px;
   width: max-content;
   z-index: 2;
 }
-.self-check-practice__legend-row { align-items: center; display: flex; gap: 8px; max-width: 100%; white-space: nowrap; }
+.self-check-practice__legend-row { align-items: center; display: flex; gap: 8px; white-space: nowrap; }
 .self-check-practice__legend-row i { border-top: 3px solid currentColor; display: inline-block; flex: 0 0 22px; height: 0; }
 .self-check-practice__legend-row--curve { color: #1565C0; }
 .self-check-practice__legend-row--bound { color: #B71C1C; }
@@ -2287,7 +2327,7 @@ input {
 .self-check-practice__graph-legend mjx-container {
   display: inline-block;
   line-height: normal;
-  margin: 0 2px 0 0 !important;
+  margin: 0 !important;
   vertical-align: middle;
 }
 .self-check-practice__sr-status { clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }

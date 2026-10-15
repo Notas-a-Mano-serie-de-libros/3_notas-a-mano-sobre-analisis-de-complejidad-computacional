@@ -289,7 +289,31 @@
     const canvas = container.querySelector("[data-witness-graph]"); const cInput = container.querySelector("input[name='witness-c']"); const n0Input = container.querySelector("input[name='witness-n0']");
     const live = container.querySelector("[data-witness-graph-status]");
     const legendC = container.querySelector("[data-witness-legend-c]"); const legendBound = container.querySelector("[data-witness-legend-bound]"); const legendN0 = container.querySelector("[data-witness-legend-n0]");
+    const selectBtn = container.querySelector("[data-witness-zoom-select]");
+    const resetBtn = container.querySelector("[data-witness-zoom-reset]");
+    const selectionBox = container.querySelector("[data-witness-selection]");
+    const defaultStart = Number(canvas.dataset.defaultStart || canvas.dataset.viewStart);
+    const defaultEnd = Number(canvas.dataset.defaultEnd || canvas.dataset.viewEnd);
     let drag = null;
+    let selectionMode = false;
+    let selectionStart = null;
+
+    const cancelSelection = () => {
+      selectionStart = null;
+      if (selectionBox) selectionBox.style.display = "none";
+    };
+
+    const setSelectionMode = (active) => {
+      selectionMode = active;
+      cancelSelection();
+      if (selectBtn) {
+        selectBtn.classList.toggle("active", selectionMode);
+        selectBtn.setAttribute("aria-pressed", selectionMode ? "true" : "false");
+      }
+      if (selectionMode) canvas.dataset.selecting = "true";
+      else delete canvas.dataset.selecting;
+    };
+
     const redraw = () => {
       const c = parseDecimal(cInput.value); const n0 = Number(n0Input.value);
       const start = Number(canvas.dataset.viewStart); const end = Number(canvas.dataset.viewEnd);
@@ -305,16 +329,69 @@
       }
       live.textContent = `Gráfica actualizada: intervalo de ${start} a ${end}, c = ${Number.isFinite(c) ? c.toFixed(2) : "—"} y n₀ = ${Number.isFinite(n0) ? n0 : "—"}.`;
     };
+
+    if (selectBtn) {
+      selectBtn.addEventListener("click", () => setSelectionMode(!selectionMode));
+    }
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        setSelectionMode(false);
+        canvas.dataset.viewStart = String(defaultStart);
+        canvas.dataset.viewEnd = String(defaultEnd);
+        redraw();
+      });
+    }
+
     [cInput, n0Input].forEach((input) => input.addEventListener("input", redraw));
     const position = (event) => { const rect = canvas.getBoundingClientRect(); return { x: event.clientX - rect.left, y: event.clientY - rect.top }; };
     canvas.addEventListener("pointerdown", (event) => {
-      if (cInput.disabled || n0Input.disabled) return; const point = position(event); const geometry = canvas._witnessGeometry; if (!geometry) return;
+      if (cInput.disabled || n0Input.disabled) return;
+      const point = position(event);
+      const geometry = canvas._witnessGeometry;
+      if (!geometry) return;
+
+      if (selectionMode) {
+        const clampedX = Math.max(geometry.padding.left, Math.min(canvas.clientWidth - geometry.padding.right, point.x));
+        const clampedY = Math.max(geometry.padding.top, Math.min(canvas.clientHeight - geometry.padding.bottom, point.y));
+        selectionStart = { x: clampedX, y: clampedY };
+        if (selectionBox) {
+          selectionBox.style.display = "block";
+          selectionBox.style.left = `${clampedX}px`;
+          selectionBox.style.top = `${clampedY}px`;
+          selectionBox.style.width = "0px";
+          selectionBox.style.height = "0px";
+        }
+        canvas.setPointerCapture(event.pointerId);
+        event.preventDefault();
+        return;
+      }
+
       const cDistance = Math.hypot(point.x - geometry.handleX, point.y - geometry.handleY); const n0Distance = Math.abs(point.x - geometry.n0X);
       drag = { kind: cDistance < 24 ? "c" : (n0Distance < 24 ? "n0" : (cDistance < n0Distance ? "c" : "n0")), fixedYMax: geometry.yMax };
       canvas.setPointerCapture(event.pointerId); canvas.dataset.dragging = drag.kind; event.preventDefault();
     });
     canvas.addEventListener("pointermove", (event) => {
-      if (!drag) return; const point = position(event); const geometry = canvas._witnessGeometry;
+      const point = position(event);
+      const geometry = canvas._witnessGeometry;
+      if (!geometry) return;
+
+      if (selectionMode && selectionStart) {
+        const clampedX = Math.max(geometry.padding.left, Math.min(canvas.clientWidth - geometry.padding.right, point.x));
+        const clampedY = Math.max(geometry.padding.top, Math.min(canvas.clientHeight - geometry.padding.bottom, point.y));
+        const left = Math.min(selectionStart.x, clampedX);
+        const top = Math.min(selectionStart.y, clampedY);
+        const width = Math.abs(clampedX - selectionStart.x);
+        const height = Math.abs(clampedY - selectionStart.y);
+        if (selectionBox) {
+          selectionBox.style.left = `${left}px`;
+          selectionBox.style.top = `${top}px`;
+          selectionBox.style.width = `${width}px`;
+          selectionBox.style.height = `${height}px`;
+        }
+        return;
+      }
+
+      if (!drag) return;
       if (drag.kind === "n0") {
         const value = geometry.minimumN + ((point.x - geometry.padding.left) / geometry.plotWidth) * (geometry.xMax - geometry.minimumN);
         n0Input.value = String(Math.max(geometry.minimumN, Math.round(value)));
@@ -324,7 +401,32 @@
       }
       redraw();
     });
-    const stop = (event) => { if (!drag) return; drag = null; delete canvas.dataset.dragging; if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId); redraw(); };
+    const stop = (event) => {
+      if (selectionMode && selectionStart) {
+        const point = position(event);
+        const geometry = canvas._witnessGeometry;
+        const clampedX = Math.max(geometry.padding.left, Math.min(canvas.clientWidth - geometry.padding.right, point.x));
+        const x1 = Math.min(selectionStart.x, clampedX);
+        const x2 = Math.max(selectionStart.x, clampedX);
+        cancelSelection();
+        setSelectionMode(false);
+        if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+        if (x2 - x1 >= 10 && geometry) {
+          const fx = (pixelX) => geometry.minimumN + ((pixelX - geometry.padding.left) / geometry.plotWidth) * (geometry.xMax - geometry.minimumN);
+          const nextStart = Math.max(0, Math.floor(fx(x1)));
+          const nextEnd = Math.max(nextStart + 3, Math.ceil(fx(x2)));
+          canvas.dataset.viewStart = String(nextStart);
+          canvas.dataset.viewEnd = String(nextEnd);
+        }
+        redraw();
+        return;
+      }
+      if (!drag) return;
+      drag = null;
+      delete canvas.dataset.dragging;
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+      redraw();
+    };
     canvas.addEventListener("pointerup", stop); canvas.addEventListener("pointercancel", stop); redraw();
     if (typeof ResizeObserver === "function") new ResizeObserver(redraw).observe(canvas);
   }
@@ -340,7 +442,7 @@
       <p>Sus valores deben hacer verdadera <strong>\\(C(n)${symbol} c\\cdot g(n)\\)</strong>, con <strong>\\(g(n)=${terms.gTex}\\)</strong>, para todo <strong>\\(n\\geq n_0\\)</strong>.</p>
       <div class="self-check-practice__number-fields"><label><span class="label-text">\\(\\mathbf{c}\\)</span><input type="text" inputmode="decimal" autocomplete="off" name="witness-c" aria-describedby="witness-format" value="${initialC.toFixed(2)}"></label><label><span class="label-text">\\(\\mathbf{n}_0\\)</span><input type="number" inputmode="numeric" min="${terms.minimumN}" step="1" name="witness-n0" value="${initialN0}"></label></div><small id="witness-format">Puede escribir los valores o arrastrar la curva de la cota y la línea vertical de la gráfica.</small>
       <p class="self-check-practice__graph-intro">La siguiente gráfica constituye un apoyo visual complementario para que pueda inspeccionar el comportamiento de las curvas y determinar con mayor claridad los valores de \\(c\\) y \\(n_0\\) antes de introducirlos:</p>
-      <div class="self-check-practice__graph${question.relation === "Omega" ? " self-check-practice__graph--lower" : ""}"><canvas data-witness-graph data-view-start="${graphStart}" data-view-end="${graphEnd}" role="img" aria-label="Comparación interactiva entre C de n y c por g de n. Arrastre la curva de la cota para cambiar c o la línea vertical para cambiar n cero."></canvas><div class="self-check-practice__graph-legend" aria-label="Leyenda de la gráfica"><span class="self-check-practice__legend-row self-check-practice__legend-row--curve"><i aria-hidden="true"></i><span data-witness-legend-c></span></span><span class="self-check-practice__legend-row self-check-practice__legend-row--bound"><i aria-hidden="true"></i><span data-witness-legend-bound></span></span><span class="self-check-practice__legend-row self-check-practice__legend-row--n0"><i aria-hidden="true"></i><span data-witness-legend-n0></span></span></div></div><span class="self-check-practice__sr-status" data-witness-graph-status aria-live="polite"></span>`;
+      <div class="self-check-practice__graph${question.relation === "Omega" ? " self-check-practice__graph--lower" : ""}"><div class="self-check-practice__graph-zoom-controls" aria-label="Controles de zoom de la gráfica"><button type="button" class="self-check-practice__graph-zoom-btn" data-witness-zoom-select title="Seleccionar área para hacer zoom" aria-label="Seleccionar área para hacer zoom" aria-pressed="false">□</button><button type="button" class="self-check-practice__graph-zoom-btn" data-witness-zoom-reset title="Restablecer el zoom" aria-label="Restablecer el zoom">↺</button></div><div class="self-check-practice__graph-selection" data-witness-selection></div><canvas data-witness-graph data-default-start="${graphStart}" data-default-end="${graphEnd}" data-view-start="${graphStart}" data-view-end="${graphEnd}" role="img" aria-label="Comparación interactiva entre C de n y c por g de n. Arrastre la curva de la cota para cambiar c o la línea vertical para cambiar n cero."></canvas><div class="self-check-practice__graph-legend" aria-label="Leyenda de la gráfica"><span class="self-check-practice__legend-row self-check-practice__legend-row--curve"><i aria-hidden="true"></i><span data-witness-legend-c></span></span><span class="self-check-practice__legend-row self-check-practice__legend-row--bound"><i aria-hidden="true"></i><span data-witness-legend-bound></span></span><span class="self-check-practice__legend-row self-check-practice__legend-row--n0"><i aria-hidden="true"></i><span data-witness-legend-n0></span></span></div></div><span class="self-check-practice__sr-status" data-witness-graph-status aria-live="polite"></span>`;
     typesetMath(container); setupWitnessGraph(container, question);
   }
 
