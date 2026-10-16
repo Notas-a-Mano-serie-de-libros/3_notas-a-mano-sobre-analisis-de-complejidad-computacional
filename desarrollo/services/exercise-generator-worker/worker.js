@@ -265,7 +265,19 @@ export default {
       }
 
       // Validar que el texto devuelto sea JSON conforme
-      const parsedExercise = JSON.parse(cleanJson);
+      let parsedExercise;
+      try {
+        parsedExercise = JSON.parse(cleanJson);
+      } catch (_jsonErr) {
+        return new Response(
+          JSON.stringify({
+            error: "El modelo no devolvió un JSON parseable.",
+            raw: rawText,
+            cleaned: cleanJson,
+          }),
+          { status: 502, headers }
+        );
+      }
 
       // Verificación de integridad estructural del ejercicio
       if (
