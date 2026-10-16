@@ -30,7 +30,7 @@ jobs:
           node-version: "20"
 
       - name: Deploy Worker with Wrangler Action
-        uses: cloudflare/wrangler-action@392082e81ffbcb9ba746486bc6e0887669449323 # v3.14.0
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: "desarrollo/services/exercise-generator-worker"
