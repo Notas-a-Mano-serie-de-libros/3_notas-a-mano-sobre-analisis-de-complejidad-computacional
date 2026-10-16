@@ -93,7 +93,7 @@ nav:
           - Exponencial: capitulos/capitulo-2/8-complejidad-exponencial.md
           - Factorial: capitulos/capitulo-2/9-complejidad-factorial.md
           - Ejercicios propuestos: capitulos/capitulo-2/ejercicios-propuestos.md
-          - Práctica autocorregible: capitulos/capitulo-2/practica-autocorregible.md
+          - Ejercicios complementarios: capitulos/capitulo-2/practica-autocorregible.md
       - Capítulo 3 · Notación asintótica:
           - Teoría: capitulos/capitulo-3.md
           - Comportamiento asintótico general: capitulos/capitulo-3/notacion-asintotica-representacion-generica.md
