@@ -216,8 +216,6 @@ export default {
     let geminiData = null;
 
     for (const modelName of candidateModels) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 18000);
       try {
         const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
         const geminiPayload = {
@@ -227,8 +225,8 @@ export default {
           contents: [{ role: "user", parts: [{ text: buildUserPrompt(chapter, mode) }] }],
           generationConfig: {
             response_mime_type: "application/json",
-            temperature: 0.7,
-            max_output_tokens: 600,
+            temperature: 0.3,
+            max_output_tokens: 450,
           },
         };
 
@@ -236,10 +234,7 @@ export default {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(geminiPayload),
-          signal: controller.signal,
         });
-
-        clearTimeout(timeoutId);
 
         if (geminiResponse.ok) {
           geminiData = await geminiResponse.json();
@@ -248,7 +243,6 @@ export default {
           lastError = await geminiResponse.text();
         }
       } catch (err) {
-        clearTimeout(timeoutId);
         lastError = err.message;
       }
     }
