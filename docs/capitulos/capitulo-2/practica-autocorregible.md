@@ -63,20 +63,17 @@ $$t = T_0 \cdot T(n) \qquad s = S_0 \cdot S(n)$$
 
 donde $T_0$ denota el tiempo medio por operación básica y $S_0$ el costo unitario de memoria por dato.
 
-### Múltiplos del byte: Sistema Internacional (SI) vs. Norma ISO/IEC 80000-13
+### Bytes decimales y binarios
 
-En computación conviven dos convenciones para expresar cantidades de memoria: el sistema decimal (base 10, SI) utilizado habitualmente por fabricantes de almacenamiento, y el sistema binario (base 2, ISO/IEC 80000-13) que rige la arquitectura interna de direccionamiento digital:
-
-| Magnitud | Sistema Internacional (SI) | Cantidad en bytes (SI) | Norma ISO/IEC 80000-13 | Cantidad en bytes (Binario) |
-| :--- | :--- | :--- | :--- | :--- |
-| **Byte** | [Byte] | $10^0$ | [Byte] | $2^0$ |
-| **Kilo / Kibi** | [Kilobyte] | $10^3$ | [Kibibyte] | $2^{10}$ |
-| **Mega / Mebi** | [Megabyte] | $10^6$ | [Mebibyte] | $2^{20}$ |
-| **Giga / Gibi** | [Gigabyte] | $10^9$ | [Gibibyte] | $2^{30}$ |
-| **Tera / Tebi** | [Terabyte] | $10^{12}$ | [Tebibyte] | $2^{40}$ |
-| **Peta / Pebi** | [Petabyte] | $10^{15}$ | [Pebibyte] | $2^{50}$ |
-| **Exa / Exbi** | [Exabyte] | $10^{18}$ | [Exbibyte] | $2^{60}$ |
-| **Zetta / Zebi** | [Zettabyte] | $10^{21}$ | [Zebibyte] | $2^{70}$ |
+| Sistema decimal | Cantidad | Sistema binario | Cantidad |
+| :--- | ---: | :--- | ---: |
+| [KB] | $10^3\text{ [bytes]}$ | [KiB] | $2^{10}\text{ [bytes]}$ |
+| [MB] | $10^6\text{ [bytes]}$ | [MiB] | $2^{20}\text{ [bytes]}$ |
+| [GB] | $10^9\text{ [bytes]}$ | [GiB] | $2^{30}\text{ [bytes]}$ |
+| [TB] | $10^{12}\text{ [bytes]}$ | [TiB] | $2^{40}\text{ [bytes]}$ |
+| [PB] | $10^{15}\text{ [bytes]}$ | [PiB] | $2^{50}\text{ [bytes]}$ |
+| [EB] | $10^{18}\text{ [bytes]}$ | [EiB] | $2^{60}\text{ [bytes]}$ |
+| [ZB] | $10^{21}\text{ [bytes]}$ | [ZiB] | $2^{70}\text{ [bytes]}$ |
 
 ### Unidades de tiempo de ejecución
 
