@@ -209,15 +209,15 @@ export default {
       );
     }
 
-    // Lista de modelos compatibles para rotación en caso de alta demanda (503)
-    const candidateModels = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-3.5-flash-lite"];
+    // Lista de modelos compatibles para rotación
+    const candidateModels = ["gemini-2.5-flash", "gemini-flash-latest"];
 
     let lastError = null;
     let geminiData = null;
 
     for (const modelName of candidateModels) {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      const timeoutId = setTimeout(() => controller.abort(), 18000);
       try {
         const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
         const geminiPayload = {
@@ -228,7 +228,7 @@ export default {
           generationConfig: {
             response_mime_type: "application/json",
             temperature: 0.7,
-            max_output_tokens: 800,
+            max_output_tokens: 600,
           },
         };
 
