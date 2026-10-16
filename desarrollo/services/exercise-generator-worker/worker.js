@@ -253,8 +253,19 @@ export default {
         );
       }
 
+      // Limpiar posibles bloques markdown ```json ... ``` devueltos por el modelo
+      let cleanJson = rawText.trim();
+      if (cleanJson.startsWith("```")) {
+        cleanJson = cleanJson.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+      }
+      const jsonStart = cleanJson.indexOf("{");
+      const jsonEnd = cleanJson.lastIndexOf("}");
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        cleanJson = cleanJson.slice(jsonStart, jsonEnd + 1);
+      }
+
       // Validar que el texto devuelto sea JSON conforme
-      const parsedExercise = JSON.parse(rawText);
+      const parsedExercise = JSON.parse(cleanJson);
 
       // Verificación de integridad estructural del ejercicio
       if (
