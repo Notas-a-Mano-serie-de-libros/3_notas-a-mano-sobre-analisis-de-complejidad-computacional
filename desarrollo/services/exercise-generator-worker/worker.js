@@ -209,13 +209,8 @@ export default {
       );
     }
 
-    // Lista de modelos compatibles para rotación en caso de sobrecarga temporal
-    const candidateModels = [
-      "gemini-2.5-flash",
-      "gemini-2.5-pro",
-      "gemini-flash-latest",
-      "gemini-pro-latest",
-    ];
+    // Modelos Flash de alta velocidad y cuota gratuita activa
+    const candidateModels = ["gemini-2.5-flash", "gemini-flash-latest"];
 
     let lastError = null;
     let geminiData = null;
