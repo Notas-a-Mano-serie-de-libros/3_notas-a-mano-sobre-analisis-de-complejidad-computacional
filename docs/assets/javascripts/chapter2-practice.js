@@ -623,9 +623,9 @@
     };
   }
 
-  // URL del proxy worker de Cloudflare (se puede configurar en el panel o variable global)
-  // Si no está desplegado o falla la red, el generador local responde de inmediato sin demoras.
-  const AI_WORKER_URL = window.__AI_EXERCISE_WORKER_URL__ || "";
+  // URL del proxy worker de Cloudflare en producción
+  // Si no está disponible o falla la red, el generador local responde de inmediato sin demoras.
+  const AI_WORKER_URL = window.__AI_EXERCISE_WORKER_URL__ || "https://exercise-generator-worker.notas-a-mano.workers.dev";
 
   async function fetchAiQuestion(chapter, mode) {
     if (!AI_WORKER_URL) return null;
