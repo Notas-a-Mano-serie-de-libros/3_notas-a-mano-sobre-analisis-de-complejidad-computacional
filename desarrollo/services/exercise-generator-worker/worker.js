@@ -209,8 +209,13 @@ export default {
       );
     }
 
-    // Lista de modelos compatibles para rotación
-    const candidateModels = ["gemini-2.5-flash", "gemini-flash-latest"];
+    // Lista de modelos compatibles para rotación en caso de sobrecarga temporal
+    const candidateModels = [
+      "gemini-2.5-flash",
+      "gemini-2.5-pro",
+      "gemini-flash-latest",
+      "gemini-pro-latest",
+    ];
 
     let lastError = null;
     let geminiData = null;
