@@ -40,6 +40,7 @@ def test_chapter2_practice_container_and_styles():
     stylesheet = STYLESHEET.read_text(encoding="utf-8")
 
     assert "data-chapter2-practice" in page
+    assert "data-chapter2-practice" in script
     assert "self-check-practice" in stylesheet
     assert "self-check-practice__choices" in stylesheet
     assert "self-check-practice__feedback" in stylesheet
