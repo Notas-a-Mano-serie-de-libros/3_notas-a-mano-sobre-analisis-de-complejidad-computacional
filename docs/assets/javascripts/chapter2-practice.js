@@ -405,6 +405,8 @@
       const c1 = Math.round(c2 * nCruce);
       const salt = randomInt(10, 999);
       const signature = `cross:lin-quad:${c1}:${c2}:${salt}`;
+      const startDomain = 0;
+      const endDomain = Math.round(nCruce * 1.8);
 
       return {
         signature,
@@ -415,10 +417,20 @@
           { value: "correct", tex: `n > ${nCruce}` },
           { value: "w1", tex: `n > ${Math.round(nCruce / 2)}` },
           { value: "w2", tex: `n > ${nCruce * 2}` },
-          { value: "w3", tex: "\\text{El algoritmo } A \\text{ siempre es mejor para todo } n \\ge 1" },
+          { value: "w3", tex: `n > ${Math.round(nCruce / 4)}` },
         ]),
         answer: "correct",
         reason: `Igualando costos: \\(${c1}n = ${c2}n^2 \\implies n = \\frac{${c1}}{${c2}} = ${nCruce}\\). Para \\(n < ${nCruce}\\), el algoritmo cuadrático \\(B\\) ejecuta menos operaciones gracias a su coeficiente menor. El algoritmo lineal \\(A\\) solo resulta más eficiente cuando \\(n > ${nCruce}\\).`,
+        graph: {
+          labelA: `C_A(n) = ${c1}n`,
+          labelB: `C_B(n) = ${c2}n^2`,
+          fnA: (n) => c1 * n,
+          fnB: (n) => c2 * n * n,
+          nCruce,
+          crossoverCondition: "A < B",
+          start: startDomain,
+          end: endDomain,
+        },
       };
     }
 
@@ -430,6 +442,8 @@
       const cFijo = cLin * nCruce;
       const salt = randomInt(10, 999);
       const signature = `cross:const-lin:${cFijo}:${cLin}:${salt}`;
+      const startDomain = 0;
+      const endDomain = Math.round(nCruce * 1.8);
 
       return {
         signature,
@@ -437,30 +451,55 @@
         options: shuffled([
           { value: "correct", tex: `n > ${nCruce}` },
           { value: "w1", tex: `n < ${nCruce}` },
-          { value: "w2", tex: `n = ${cFijo}` },
-          { value: "w3", tex: "\\text{Nunca es preferible porque su costo base es muy alto}" },
+          { value: "w2", tex: `n > ${nCruce * 2}` },
+          { value: "w3", tex: `n < ${Math.round(nCruce / 2)}` },
         ]),
         answer: "correct",
-        reason: `Para \\(n < ${nCruce}\\), \\(${cLin}n < ${cFijo}\\), por lo que el algoritmo lineal \\(B\\) es más rápido. Para \\(n > ${nCruce}\\), el costo lineal supera a la constante y el algoritmo \\(A\\) se vuelve más ventajoso.`,
+        reason: `Para \\(n < ${nCruce}\\), \\(${cLin}n < ${cFijo}\\), por lo que el algoritmo lineal \\(B\\) es más rápido. Para \\(n > ${nCruce}\\), el costo lineal supera a la constante y el algoritmo constante \\(A\\) se vuelve más ventajoso.`,
+        graph: {
+          labelA: `C_A(n) = ${cFijo}`,
+          labelB: `C_B(n) = ${cLin}n`,
+          fnA: () => cFijo,
+          fnB: (n) => cLin * n,
+          nCruce,
+          crossoverCondition: "A < B",
+          start: startDomain,
+          end: endDomain,
+        },
       };
     }
 
-    // Cuadrática vs Exponencial (n^2 vs 2^n)
-    // Para n pequeños: n^2 vs 2^n. 2^n sobrepasa a n^2 a partir de n = 5 (2^4=16 vs 4^2=16; 2^5=32 > 25)
-    // Con constante: c * n^2 vs 2^n
+    // Cuadrática vs Exponencial (16n^2 vs 2^n)
+    // Para n = 10: 16*100 = 1600 > 1024 (2^10)
+    // Para n = 11: 16*121 = 1936 < 2048 (2^11)
+    // Punto de cruce entero: n = 11
     const salt = randomInt(10, 999);
     const signature = `cross:quad-exp:${salt}`;
+    const nCruce = 11;
+    const startDomain = 2;
+    const endDomain = 15;
+
     return {
       signature,
-      prompt: `Considere las funciones \\(C_1(n) = 16n^2\\) y \\(C_2(n) = 2^n\\). Calcule a partir de qué valor entero de \\(n\\) la función exponencial \\(C_2(n)\\) supera permanentemente a la cuadrática \\(C_1(n)\\):`,
+      prompt: `Considere las funciones de costo \\(C_1(n) = 16n^2\\) y \\(C_2(n) = 2^n\\). Calcule a partir de qué valor entero de \\(n\\) la función exponencial \\(C_2(n)\\) supera permanentemente a la cuadrática \\(C_1(n)\\):`,
       options: shuffled([
-        { value: "correct", tex: "n \\ge 9 \\quad (2^9 = 512 > 16 \\times 9^2 = 1\\,296 \\dots \\text{en } n=11: 2^{11} = 2\\,048 > 16\\times 121=1\\,936)" },
-        { value: "w1", tex: "n \\ge 4" },
-        { value: "w2", tex: "n \\ge 30" },
-        { value: "w3", tex: "n \\ge 2" },
+        { value: "correct", tex: "n \\ge 11" },
+        { value: "w1", tex: "n \\ge 5" },
+        { value: "w2", tex: "n \\ge 15" },
+        { value: "w3", tex: "n \\ge 8" },
       ]),
       answer: "correct",
       reason: "Para \\(n=10\\): \\(16(10^2) = 1\\,600\\) y \\(2^{10} = 1\\,024\\). Para \\(n=11\\): \\(16(11^2) = 1\\,936\\) y \\(2^{11} = 2\\,048\\). A partir de \\(n = 11\\) la exponencial domina definitivamente a la función cuadrática.",
+      graph: {
+        labelA: "C_1(n) = 16n^2",
+        labelB: "C_2(n) = 2^n",
+        fnA: (n) => 16 * n * n,
+        fnB: (n) => 2 ** n,
+        nCruce,
+        crossoverCondition: "C2 > C1",
+        start: startDomain,
+        end: endDomain,
+      },
     };
   }
 
@@ -563,6 +602,16 @@
         options: [{ value: "correct", tex: "n = 100" }, { value: "w1", tex: "n = 10" }],
         answer: "correct",
         reason: "\\(100n = n^2 \\implies n = 100\\).",
+        graph: {
+          labelA: "C_A(n) = 100n",
+          labelB: "C_B(n) = n^2",
+          fnA: (n) => 100 * n,
+          fnB: (n) => n * n,
+          nCruce: 100,
+          crossoverCondition: "A = B",
+          start: 0,
+          end: 180,
+        },
       };
     }
     return {
@@ -593,6 +642,299 @@
     const fallback = fallbackQuestion(mode, state.seen[mode].length);
     state.seen[mode].push(fallback.signature);
     return fallback;
+  }
+
+  function niceTicks(lower, upper, count) {
+    const range = Math.max(upper - lower, 1e-9);
+    const raw = range / count;
+    const power = 10 ** Math.floor(Math.log10(raw));
+    const multiplier = [1, 2, 5, 10].find((candidate) => raw <= candidate * power) || 10;
+    const step = multiplier * power;
+    const ticks = [];
+    for (let value = Math.ceil(lower / step) * step; value <= upper + (step * 0.5); value += step) {
+      ticks.push(value);
+    }
+    return ticks;
+  }
+
+  function drawCrossoverGraph(canvas, question, viewStart, viewEnd) {
+    const context = canvas.getContext("2d");
+    if (!context || !question.graph) return;
+    const { fnA, fnB, nCruce } = question.graph;
+    const ratio = window.devicePixelRatio || 1;
+    const width = Math.max(300, canvas.clientWidth);
+    const height = 250;
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    const colors = {
+      curveA: "#1565C0",
+      curveB: "#B71C1C",
+      nCruce: "#2E7D32",
+      grid: "#dddddd",
+      axis: "#333333",
+    };
+
+    const minimumN = viewStart;
+    const xMax = viewEnd;
+    const padding = { left: 86, right: 18, top: 18, bottom: 48 };
+    const plotWidth = width - padding.left - padding.right;
+    const plotHeight = height - padding.top - padding.bottom;
+
+    const values = [];
+    let yMax = 1;
+    const steps = 80;
+    for (let index = 0; index <= steps; index += 1) {
+      const n = minimumN + ((xMax - minimumN) * index) / steps;
+      const valA = Math.max(0, fnA(n));
+      const valB = Math.max(0, fnB(n));
+      values.push({ n, valA, valB });
+      yMax = Math.max(yMax, valA, valB);
+    }
+    yMax *= 1.08;
+
+    const x = (n) => padding.left + ((n - minimumN) / (xMax - minimumN)) * plotWidth;
+    const y = (val) => padding.top + plotHeight - (Math.max(0, val) / yMax) * plotHeight;
+
+    const axisScale = (maximum) => {
+      const exponent = Math.max(0, Math.floor(Math.log10(Math.max(1, maximum))));
+      return exponent < 4 ? { scale: 1, label: "" } : { scale: 10 ** exponent, label: `×10^${exponent}` };
+    };
+    const xScale = axisScale(xMax);
+    const yScale = axisScale(yMax);
+    const tickText = (value, scale) => {
+      const scaled = value / scale;
+      return scaled.toFixed(2).replace(/\.?0+$/, "");
+    };
+
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, width, height);
+    context.font = "12px sans-serif";
+    context.lineWidth = 0.7;
+    context.strokeStyle = colors.grid;
+    context.fillStyle = colors.axis;
+
+    niceTicks(minimumN, xMax, 5).forEach((value) => {
+      const px = x(value);
+      context.beginPath();
+      context.moveTo(px, padding.top);
+      context.lineTo(px, padding.top + plotHeight);
+      context.stroke();
+      context.textAlign = "center";
+      context.textBaseline = "top";
+      context.fillText(tickText(value, xScale.scale), px, padding.top + plotHeight + 7);
+    });
+
+    niceTicks(0, yMax, 5).forEach((value) => {
+      const py = y(value);
+      context.beginPath();
+      context.moveTo(padding.left, py);
+      context.lineTo(width - padding.right, py);
+      context.stroke();
+      context.textAlign = "right";
+      context.textBaseline = "middle";
+      context.fillText(tickText(value, yScale.scale), padding.left - 7, py);
+    });
+
+    context.textAlign = "right";
+    context.textBaseline = "top";
+    if (xScale.label) context.fillText(xScale.label, width - padding.right, padding.top + plotHeight + 22);
+    context.textBaseline = "bottom";
+    if (yScale.label) context.fillText(yScale.label, padding.left, padding.top - 3);
+
+    // Curvas A y B
+    const plotCurve = (key, color) => {
+      context.strokeStyle = color;
+      context.lineWidth = 2.2;
+      context.beginPath();
+      values.forEach((point, index) => {
+        const method = index ? "lineTo" : "moveTo";
+        context[method](x(point.n), y(point[key]));
+      });
+      context.stroke();
+    };
+
+    plotCurve("valA", colors.curveA);
+    plotCurve("valB", colors.curveB);
+
+    // Ejes
+    context.strokeStyle = colors.axis;
+    context.lineWidth = 1.2;
+    context.beginPath();
+    context.moveTo(padding.left, padding.top);
+    context.lineTo(padding.left, padding.top + plotHeight);
+    context.lineTo(width - padding.right, padding.top + plotHeight);
+    context.stroke();
+
+    // Línea vertical en punto de cruce
+    if (nCruce >= minimumN && nCruce <= xMax) {
+      const cruceX = x(nCruce);
+      context.strokeStyle = colors.nCruce;
+      context.lineWidth = 1.6;
+      context.setLineDash([4, 4]);
+      context.beginPath();
+      context.moveTo(cruceX, padding.top);
+      context.lineTo(cruceX, padding.top + plotHeight);
+      context.stroke();
+      context.setLineDash([]);
+    }
+
+    context.fillStyle = colors.axis;
+    context.textAlign = "center";
+    context.textBaseline = "bottom";
+    context.fillText("Tamaño de la entrada (n)", padding.left + plotWidth / 2, height - 3);
+
+    context.save();
+    context.translate(12, padding.top + plotHeight / 2);
+    context.rotate(-Math.PI / 2);
+    context.textAlign = "center";
+    context.textBaseline = "top";
+    context.fillText("Complejidad (operaciones)", 0, 0);
+    context.restore();
+
+    canvas._crossoverGeometry = { padding, plotWidth, plotHeight, minimumN, xMax, yMax };
+  }
+
+  function setupCrossoverGraph(container, question) {
+    const canvas = container.querySelector("[data-crossover-graph]");
+    const selectBtn = container.querySelector("[data-crossover-zoom-select]");
+    const resetBtn = container.querySelector("[data-crossover-zoom-reset]");
+    const selectionBox = container.querySelector("[data-crossover-selection]");
+    const defaultStart = Number(canvas.dataset.defaultStart || canvas.dataset.viewStart);
+    const defaultEnd = Number(canvas.dataset.defaultEnd || canvas.dataset.viewEnd);
+    let selectionMode = false;
+    let selectionStart = null;
+
+    const cancelSelection = () => {
+      selectionStart = null;
+      if (selectionBox) selectionBox.style.display = "none";
+    };
+
+    const setSelectionMode = (active) => {
+      selectionMode = active;
+      cancelSelection();
+      if (selectBtn) {
+        selectBtn.classList.toggle("active", selectionMode);
+        selectBtn.setAttribute("aria-pressed", selectionMode ? "true" : "false");
+      }
+      if (selectionMode) canvas.dataset.selecting = "true";
+      else delete canvas.dataset.selecting;
+    };
+
+    const redraw = () => {
+      const start = Number(canvas.dataset.viewStart);
+      const end = Number(canvas.dataset.viewEnd);
+      if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return;
+      drawCrossoverGraph(canvas, question, start, end);
+    };
+
+    if (selectBtn) {
+      selectBtn.addEventListener("click", () => setSelectionMode(!selectionMode));
+    }
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        setSelectionMode(false);
+        canvas.dataset.viewStart = String(defaultStart);
+        canvas.dataset.viewEnd = String(defaultEnd);
+        redraw();
+      });
+    }
+
+    const position = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    };
+
+    canvas.addEventListener("pointerdown", (event) => {
+      if (!selectionMode) return;
+      const point = position(event);
+      const geometry = canvas._crossoverGeometry;
+      if (!geometry) return;
+      const clampedX = Math.max(geometry.padding.left, Math.min(canvas.clientWidth - geometry.padding.right, point.x));
+      const clampedY = Math.max(geometry.padding.top, Math.min(canvas.clientHeight - geometry.padding.bottom, point.y));
+      selectionStart = { x: clampedX, y: clampedY };
+      if (selectionBox) {
+        selectionBox.style.display = "block";
+        selectionBox.style.left = `${clampedX}px`;
+        selectionBox.style.top = `${clampedY}px`;
+        selectionBox.style.width = "0px";
+        selectionBox.style.height = "0px";
+      }
+      canvas.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+
+    canvas.addEventListener("pointermove", (event) => {
+      if (!selectionMode || !selectionStart) return;
+      const point = position(event);
+      const geometry = canvas._crossoverGeometry;
+      if (!geometry) return;
+      const clampedX = Math.max(geometry.padding.left, Math.min(canvas.clientWidth - geometry.padding.right, point.x));
+      const clampedY = Math.max(geometry.padding.top, Math.min(canvas.clientHeight - geometry.padding.bottom, point.y));
+      const left = Math.min(selectionStart.x, clampedX);
+      const top = Math.min(selectionStart.y, clampedY);
+      const width = Math.abs(clampedX - selectionStart.x);
+      const height = Math.abs(clampedY - selectionStart.y);
+      if (selectionBox) {
+        selectionBox.style.left = `${left}px`;
+        selectionBox.style.top = `${top}px`;
+        selectionBox.style.width = `${width}px`;
+        selectionBox.style.height = `${height}px`;
+      }
+    });
+
+    const stop = (event) => {
+      if (!selectionMode || !selectionStart) return;
+      const point = position(event);
+      const geometry = canvas._crossoverGeometry;
+      const clampedX = Math.max(geometry.padding.left, Math.min(canvas.clientWidth - geometry.padding.right, point.x));
+      const x1 = Math.min(selectionStart.x, clampedX);
+      const x2 = Math.max(selectionStart.x, clampedX);
+      cancelSelection();
+      setSelectionMode(false);
+      if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+      if (x2 - x1 >= 10 && geometry) {
+        const fx = (pixelX) => geometry.minimumN + ((pixelX - geometry.padding.left) / geometry.plotWidth) * (geometry.xMax - geometry.minimumN);
+        const nextStart = Math.max(0, Math.floor(fx(x1)));
+        const nextEnd = Math.max(nextStart + 3, Math.ceil(fx(x2)));
+        canvas.dataset.viewStart = String(nextStart);
+        canvas.dataset.viewEnd = String(nextEnd);
+      }
+      redraw();
+    };
+
+    canvas.addEventListener("pointerup", stop);
+    canvas.addEventListener("pointercancel", stop);
+    redraw();
+    if (typeof ResizeObserver === "function") new ResizeObserver(redraw).observe(canvas);
+  }
+
+  function renderCrossover(container, question) {
+    clearMath(container);
+    const graphStart = question.graph.start;
+    const graphEnd = question.graph.end;
+    container.innerHTML = `<p class="self-check-practice__prompt">${question.prompt}</p>
+      <p class="self-check-practice__graph-intro">La siguiente gráfica interactiva ilustra el comportamiento de ambas funciones de complejidad y resalta el umbral donde se cruzan las curvas de costo computacional:</p>
+      <div class="self-check-practice__graph">
+        <div class="self-check-practice__graph-zoom-controls" aria-label="Controles de zoom de la gráfica">
+          <button type="button" class="self-check-practice__graph-zoom-btn" data-crossover-zoom-select title="Seleccionar área para hacer zoom" aria-label="Seleccionar área para hacer zoom" aria-pressed="false">□</button>
+          <button type="button" class="self-check-practice__graph-zoom-btn" data-crossover-zoom-reset title="Restablecer el zoom" aria-label="Restablecer el zoom">↺</button>
+        </div>
+        <div class="self-check-practice__graph-selection" data-crossover-selection></div>
+        <canvas data-crossover-graph data-default-start="${graphStart}" data-default-end="${graphEnd}" data-view-start="${graphStart}" data-view-end="${graphEnd}" role="img" aria-label="Gráfica de funciones de complejidad y punto de cruce"></canvas>
+        <div class="self-check-practice__graph-legend" aria-label="Leyenda de la gráfica">
+          <span class="self-check-practice__legend-row self-check-practice__legend-row--curve"><i aria-hidden="true"></i><span>\\(${question.graph.labelA}\\)</span></span>
+          <span class="self-check-practice__legend-row self-check-practice__legend-row--bound"><i aria-hidden="true"></i><span>\\(${question.graph.labelB}\\)</span></span>
+          <span class="self-check-practice__legend-row self-check-practice__legend-row--n0"><i aria-hidden="true"></i><span>Punto de cruce \\(n = ${question.graph.nCruce}\\)</span></span>
+        </div>
+      </div>
+      <fieldset class="self-check-practice__choices">
+        <legend>Seleccione la respuesta correcta</legend>
+        ${question.options.map((opt) => `<label><input type="radio" name="chapter2-answer" value="${opt.value}"><span>\\(${opt.tex}\\)</span></label>`).join("")}
+      </fieldset>`;
+    typesetMath(container);
+    setupCrossoverGraph(container, question);
   }
 
   function renderChoicesQuestion(container, question) {
@@ -656,7 +998,11 @@
       solved = false;
       panel.querySelector("[data-practice-level]").textContent = modes[mode].level;
       panel.querySelector("[data-practice-title]").textContent = modes[mode].title;
-      renderChoicesQuestion(questionContainer, current);
+      if (mode === "crossover") {
+        renderCrossover(questionContainer, current);
+      } else {
+        renderChoicesQuestion(questionContainer, current);
+      }
       checkLabel.textContent = "Comprobar respuesta";
       showFeedback("", "");
     };
