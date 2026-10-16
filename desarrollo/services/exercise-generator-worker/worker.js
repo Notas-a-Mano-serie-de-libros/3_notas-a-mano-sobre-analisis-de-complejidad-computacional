@@ -203,7 +203,7 @@ export default {
     const timeoutId = setTimeout(() => controller.abort(), 6000);
 
     try {
-      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
       const geminiPayload = {
         system_instruction: {
