@@ -291,15 +291,12 @@ export default {
         headers,
       });
     } catch (err) {
-      clearTimeout(timeoutId);
-      const isTimeout = err.name === "AbortError";
       return new Response(
         JSON.stringify({
-          error: isTimeout
-            ? "Tiempo de espera agotado al conectar con el modelo."
-            : "Error interno al procesar la generación.",
+          error: "Error interno al procesar la respuesta del modelo.",
+          details: err.message,
         }),
-        { status: isTimeout ? 504 : 500, headers }
+        { status: 500, headers }
       );
     }
   },
