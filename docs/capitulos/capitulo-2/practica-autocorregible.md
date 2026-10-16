@@ -69,26 +69,28 @@ En computación conviven dos convenciones para expresar cantidades de memoria: e
 
 | Magnitud | Sistema Internacional (SI) | Cantidad en bytes (SI) | Norma ISO/IEC 80000-13 | Cantidad en bytes (Binario) |
 | :--- | :--- | :--- | :--- | :--- |
-| **Byte** | Byte [B] | $10^0 = 1$ | Byte [B] | $2^0 = 1$ |
-| **Kilo / Kibi** | Kilobyte [KB] | $10^3 = 1\,000$ | Kibibyte [KiB] | $2^{10} = 1\,024$ |
-| **Mega / Mebi** | Megabyte [MB] | $10^6 = 1\,000\,000$ | Mebibyte [MiB] | $2^{20} = 1\,048\,576$ |
-| **Giga / Gibi** | Gigabyte [GB] | $10^9 = 1\,000\,000\,000$ | Gibibyte [GiB] | $2^{30} = 1\,073\,741\,824$ |
-| **Tera / Tebi** | Terabyte [TB] | $10^{12} = 1\,000\,000\,000\,000$ | Tebibyte [TiB] | $2^{40} = 1\,099\,511\,627\,776$ |
-| **Peta / Pebi** | Petabyte [PB] | $10^{15} = 10^{15}$ | Pebibyte [PiB] | $2^{50} \approx 1.125 \times 10^{15}$ |
+| **Byte** | [Byte] | $10^0$ | [Byte] | $2^0$ |
+| **Kilo / Kibi** | [Kilobyte] | $10^3$ | [Kibibyte] | $2^{10}$ |
+| **Mega / Mebi** | [Megabyte] | $10^6$ | [Mebibyte] | $2^{20}$ |
+| **Giga / Gibi** | [Gigabyte] | $10^9$ | [Gibibyte] | $2^{30}$ |
+| **Tera / Tebi** | [Terabyte] | $10^{12}$ | [Tebibyte] | $2^{40}$ |
+| **Peta / Pebi** | [Petabyte] | $10^{15}$ | [Pebibyte] | $2^{50}$ |
+| **Exa / Exbi** | [Exabyte] | $10^{18}$ | [Exbibyte] | $2^{60}$ |
+| **Zetta / Zebi** | [Zettabyte] | $10^{21}$ | [Zebibyte] | $2^{70}$ |
 
 ### Unidades de tiempo de ejecución
 
 Para interpretar los órdenes de magnitud de $T_0$ y el tiempo total $t$, considere las siguientes equivalencias y factores de escala canónicos:
 
-| Unidad | Símbolo | Equivalencia en segundos [s] | Factor respecto a la unidad base |
+| Unidad | Símbolo | Equivalencia en [s] | Factor respecto a la unidad base |
 | :--- | :--- | :--- | :--- |
-| **Nanosegundo** | [ns] | $10^{-9}\text{ s} = 0.000\,000\,001\text{ s}$ | $1\text{ s} = 10^9\text{ ns}$ |
-| **Microsegundo** | [$\mu$s] | $10^{-6}\text{ s} = 0.000\,001\text{ s}$ | $1\text{ s} = 10^6\,\mu\text{s}$ |
-| **Milisegundo** | [ms] | $10^{-3}\text{ s} = 0.001\text{ s}$ | $1\text{ s} = 10^3\text{ ms}$ |
-| **Segundo** | [s] | $1\text{ s} = 10^0\text{ s}$ | Unidad base SI |
-| **Minuto** | [min] | $60\text{ s}$ | $1\text{ min} = 60\text{ s}$ |
-| **Hora** | [h] | $3\,600\text{ s}$ | $1\text{ h} = 60\text{ min} = 3\,600\text{ s}$ |
-| **Día** | [d] | $86\,400\text{ s}$ | $1\text{ d} = 24\text{ h} = 86\,400\text{ s}$ |
+| **Nanosegundo** | [ns] | $10^{-9}\text{ [s]}$ | $1\text{ [s]} = 10^9\text{ [ns]}$ |
+| **Microsegundo** | [$\mu$s] | $10^{-6}\text{ [s]}$ | $1\text{ [s]} = 10^6\text{ [}\mu\text{s]}$ |
+| **Milisegundo** | [ms] | $10^{-3}\text{ [s]}$ | $1\text{ [s]} = 10^3\text{ [ms]}$ |
+| **Segundo** | [s] | $10^0\text{ [s]}$ | Unidad base SI |
+| **Minuto** | [min] | $60\text{ [s]}$ | $1\text{ [min]} = 60\text{ [s]}$ |
+| **Hora** | [h] | $3\,600\text{ [s]}$ | $1\text{ [h]} = 60\text{ [min]} = 3\,600\text{ [s]}$ |
+| **Día** | [d] | $86\,400\text{ [s]}$ | $1\text{ [d]} = 24\text{ [h]} = 86\,400\text{ [s]}$ |
 
 <nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../ejercicios-propuestos/">← 2.2 Ejercicios propuestos</a><a class="section-step__index" href="../">Capítulo 2</a></nav>
 
