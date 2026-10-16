@@ -2422,10 +2422,25 @@ input {
   margin: 0 !important;
   padding: 0 !important;
 }
+.self-check-practice__code-box code {
+  background: transparent !important;
+  border: 0 !important;
+  color: inherit;
+  display: block;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0 !important;
+  padding: 0 !important;
+}
 .self-check-practice__code-line {
+  align-items: baseline;
   border-left: 3px solid transparent;
   box-sizing: border-box;
   display: flex;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
   padding: 0 .9rem 0 0;
   width: 100%;
 }
@@ -2433,8 +2448,8 @@ input {
   box-sizing: border-box;
   color: #9e9e9e;
   flex: 0 0 2.5rem;
-  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
-  font-size: .84rem;
+  font-family: inherit;
+  font-size: inherit;
   font-variant-numeric: tabular-nums;
   line-height: inherit;
   padding-right: .8rem;
@@ -2443,6 +2458,10 @@ input {
 }
 .self-check-practice__line-code {
   flex: 1 1 auto;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre;
 }
 .self-check-practice__code-line.target-line {
   background: color-mix(in srgb, var(--md-accent-fg-color) 12%, transparent);
