@@ -97,7 +97,7 @@
   // --- Generador Nivel 1: Propiedades formales de C(n) ---
 
   function generateProperties() {
-    const kind = randomInt(0, 4);
+    const kind = randomInt(0, 7);
 
     if (kind === 0) {
       // Parábola con raíces positivas: decrece y se hace negativa
@@ -111,7 +111,7 @@
         signature: `prop:quad:${b}:${c}:${salt}`,
         prompt: `Considere la función candidata \\(C(n) = n^2 - ${b}n + ${c}\\) definida para \\(n \\in \\mathbb{N}\\). Determine si cumple los requisitos formales de una función de complejidad:`,
         options: shuffled([
-          { value: "correct", tex: `\\text{No es válida: viola la no negatividad y la monotonía (decrece para } n < ${vertex} \\text{ y es negativa en } (${r1}, ${r2})\\text{)}` },
+          { value: "correct", tex: `\\text{No es válida: viola no negatividad y monotonía (decrece para } n < ${vertex} \\text{ y es negativa en } (${r1}, ${r2})\\text{)}` },
           { value: "w1", tex: "\\text{Es válida porque al ser cuadrática siempre tiende a infinito cuando } n \\to \\infty" },
           { value: "w2", tex: "\\text{Es válida únicamente si se restringe el dominio a números reales positivos}" },
           { value: "w3", tex: "\\text{No es válida únicamente porque } n \\text{ no puede ser un número entero}" },
@@ -141,7 +141,7 @@
     }
 
     if (kind === 2) {
-      // Función estrictamente decreciente: 1/n o e^(-n)
+      // Función estrictamente decreciente: k / (n + 1)
       const k = randomInt(5, 50);
       const salt = randomInt(10, 999);
       return {
@@ -176,29 +176,82 @@
       };
     }
 
-    // Caso 4: Polinomio monótono no decreciente válido
-    const a = randomInt(2, 5);
-    const b = randomInt(3, 9);
-    const c = randomInt(1, 10);
+    if (kind === 4) {
+      // Polinomio monótono no decreciente válido
+      const a = randomInt(2, 5);
+      const b = randomInt(3, 9);
+      const c = randomInt(1, 10);
+      const salt = randomInt(10, 999);
+      return {
+        signature: `prop:poly:${a}:${b}:${c}:${salt}`,
+        prompt: `Evalúe la función \\(C(n) = ${a}n^2 + ${b}n + ${c}\\) para \\(n \\in \\mathbb{N}\\):`,
+        options: shuffled([
+          { value: "correct", tex: "\\text{Es completamente válida: satisface restricción del dominio, no negatividad y crecimiento monótono}" },
+          { value: "w1", tex: "\\text{No es válida porque tiene un término independiente que no depende de } n" },
+          { value: "w2", tex: "\\text{No es válida porque mezcla órdenes cuadrático y lineal}" },
+          { value: "w3", tex: "\\text{Es válida únicamente cuando } n \\to \\infty" },
+        ]),
+        answer: "correct",
+        reason: "Con coeficientes estrictamente positivos, \\(C(n) \\ge 0\\) para todo \\(n \\ge 0\\) y para cualesquiera \\(n_1 \\le n_2\\) se tiene \\(C(n_1) \\le C(n_2)\\).",
+      };
+    }
+
+    if (kind === 5) {
+      // Función con exponencial decreciente negativa: C(n) = 2^n - 3^n
+      const salt = randomInt(10, 999);
+      return {
+        signature: `prop:negexp:${salt}`,
+        prompt: "Considere la función candidata \\(C(n) = 2^n - 3^n\\) para \\(n \\in \\mathbb{N}\\). Determine si es admisible como función de complejidad:",
+        options: shuffled([
+          { value: "correct", tex: "\\text{No es válida: para todo } n \\ge 1 \\text{ resulta negativa y monótonamente decreciente}" },
+          { value: "w1", tex: "\\text{Es válida porque combina dos bases exponenciales enteras}" },
+          { value: "w2", tex: "\\text{Es válida porque en } n = 0 \\text{ vale } 0" },
+          { value: "w3", tex: "\\text{No es válida únicamente porque las funciones exponenciales no se pueden restar}" },
+        ]),
+        answer: "correct",
+        reason: "Como \\(3^n > 2^n\\) para todo \\(n \\ge 1\\), \\(C(n) < 0\\) violando la no negatividad y haciéndose cada vez más negativa, violando el crecimiento monótono.",
+      };
+    }
+
+    if (kind === 6) {
+      // Función piso o techo escalón: C(n) = floor(n / 2) + 1
+      const div = pickRandom([2, 4, 8]);
+      const salt = randomInt(10, 999);
+      return {
+        signature: `prop:floor:${div}:${salt}`,
+        prompt: `Considere la función escalón \\(C(n) = \\lfloor \\frac{n}{${div}} \\rfloor + 1\\) con \\(n \\in \\mathbb{N}\\). ¿Cumple los requisitos formales de una función de complejidad?`,
+        options: shuffled([
+          { value: "correct", tex: "\\text{Sí es válida: su dominio es } \\mathbb{N}\\text{, es no negativa y es monótona no decreciente}" },
+          { value: "w1", tex: "\\text{No es válida porque al tener tramos horizontales viola el crecimiento estrictamente creciente}" },
+          { value: "w2", tex: "\\text{No es válida porque la función piso no es diferenciable en todos los puntos}" },
+          { value: "w3", tex: "\\text{Es válida únicamente para valores pares de } n" },
+        ]),
+        answer: "correct",
+        reason: "La propiedad requerida es 'monótona no decreciente' (\\(n_1 \\le n_2 \\implies C(n_1) \\le C(n_2)\\)), lo que permite mesetas donde el costo permanece igual. No se exige crecimiento estrictamente creciente ni diferenciabilidad continua.",
+      };
+    }
+
+    // Caso 7: Racional acotada que no crece hacia infinito C(n) = (10n) / (n + 1)
+    const top = randomInt(10, 50);
     const salt = randomInt(10, 999);
     return {
-      signature: `prop:poly:${a}:${b}:${c}:${salt}`,
-      prompt: `Evalúe la función \\(C(n) = ${a}n^2 + ${b}n + ${c}\\) para \\(n \\in \\mathbb{N}\\):`,
+      signature: `prop:asymp:${top}:${salt}`,
+      prompt: `Analice la función \\(C(n) = \\frac{${top}n}{n + 1}\\) definida para \\(n \\in \\mathbb{N}\\):`,
       options: shuffled([
-        { value: "correct", tex: "\\text{Es completamente válida: satisface restricción del dominio, no negatividad y crecimiento monótono}" },
-        { value: "w1", tex: "\\text{No es válida porque tiene un término independiente que no depende de } n" },
-        { value: "w2", tex: "\\text{No es válida porque mezcla órdenes cuadrático y lineal}" },
-        { value: "w3", tex: "\\text{Es válida únicamente cuando } n \\to \\infty" },
+        { value: "correct", tex: `\\text{Es formalmente válida: es no negativa y monótona creciente (acotada asintóticamente por } ${top}\\text{)}` },
+        { value: "w1", tex: "\\text{No es válida porque toda función de complejidad debe tender a infinito cuando } n \\to \\infty" },
+        { value: "w2", tex: "\\text{No es válida porque contiene una división entre variables}" },
+        { value: "w3", tex: "\\text{Es válida únicamente si } n < 10" },
       ]),
       answer: "correct",
-      reason: "Con coeficientes estrictamente positivos, \\(C(n) \\ge 0\\) para todo \\(n \\ge 0\\) y para cualesquiera \\(n_1 \\le n_2\\) se tiene \\(C(n_1) \\le C(n_2)\\).",
+      reason: "Formalmente cumple: dominio en \\(\\mathbb{N}\\), \\(C(n) \\ge 0\\) y su derivada \\(\\frac{" + top + "}{(n+1)^2} > 0\\) garantiza monotonía no decreciente, modelando por ejemplo un costo acotado por un búfer superior.",
     };
   }
 
   // --- Generador Nivel 2: Fórmulas canónicas t = T0 * T(n) y s = S0 * S(n) ---
 
   function generateCanonical() {
-    const kind = randomInt(0, 4);
+    const kind = randomInt(0, 6);
 
     // Tipo 0: Tiempo lineal o log-lineal
     if (kind === 0) {
@@ -353,6 +406,54 @@
       };
     }
 
+    // Tipo 5: Tiempo a partir de frecuencia de reloj f (GHz) y T0 = 1/f
+    if (kind === 5) {
+      const ghz = pickRandom([2, 2.5, 3, 4]); // GHz
+      const t0Nano = 1 / ghz; // ns por instrucción
+      const n = pickRandom([50000, 100000, 200000]);
+      const ops = n; // lineal
+      const totalNs = ops * t0Nano;
+      const totalMicros = totalNs / 1000;
+      const salt = randomInt(10, 999);
+      const signature = `canon:freq:${ghz}:${n}:${salt}`;
+
+      return {
+        signature,
+        prompt: `Un procesador opera a una frecuencia de reloj \\(f = ${ghz}\\text{ GHz}\\) (es decir, cada ciclo dura \\(T_0 = \\frac{1}{f} = \\frac{1}{${ghz} \\times 10^9\\text{ s}} = ${t0Nano.toFixed(2)}\\text{ ns}\\)). Si un algoritmo ejecuta una instrucción por ciclo con complejidad lineal \\(T(n) = n\\) para \\(n = ${n.toLocaleString("es-CO")}\\), determine el tiempo total \\(t = T_0 \\cdot T(n)\\):`,
+        options: shuffled([
+          { value: "correct", tex: `t \\approx ${totalMicros.toFixed(2)}\\,\\mu\\text{s} \\quad (${totalNs.toFixed(0)}\\text{ ns})` },
+          { value: "w1", tex: `t = ${(totalMicros * 1000).toFixed(1)}\\text{ ms}` },
+          { value: "w2", tex: `t \\approx ${(totalMicros / 10).toFixed(2)}\\,\\mu\\text{s}` },
+          { value: "w3", tex: `t = ${(totalNs / 1000000).toFixed(2)}\\text{ s}` },
+        ]),
+        answer: "correct",
+        reason: `\\(t = T_0 \\cdot T(n) = (${t0Nano.toFixed(2)} \\times 10^{-9}\\text{ s}) \\cdot ${n} = ${(totalNs * 1e-9).toExponential(2)}\\text{ s} = ${totalMicros.toFixed(2)}\\,\\mu\\text{s}\\).`,
+      };
+    }
+
+    // Tipo 6: Matriz bidimensional N x N y consumo espacial en MiB / GiB
+    if (kind === 6) {
+      const n = pickRandom([1024, 2048, 4096]);
+      const bytesPerEntry = 8; // double / int64
+      const totalBytes = bytesPerEntry * n * n;
+      const mib = totalBytes / (1024 * 1024);
+      const salt = randomInt(10, 999);
+      const signature = `canon:matrix:${n}:${salt}`;
+
+      return {
+        signature,
+        prompt: `Una matriz cuadrada de dimensión \\(${n} \\times ${n}\\) almacena números en coma flotante de doble precisión (\\(S_0 = 8\\text{ bytes}\\) por elemento) con complejidad espacial cuadrática \\(S(n) = n^2\\). Calcule la memoria total \\(s\\) expresada exactamente en **mebibytes (MiB)**:`,
+        options: shuffled([
+          { value: "correct", tex: `s = ${mib.toLocaleString("es-CO")}\\text{ MiB}` },
+          { value: "w1", tex: `s = ${(mib * 1000 / 1024).toFixed(1)}\\text{ MiB}` },
+          { value: "w2", tex: `s = ${(mib / 8).toLocaleString("es-CO")}\\text{ MiB}` },
+          { value: "w3", tex: `s = ${(totalBytes / 1000000).toFixed(1)}\\text{ MiB}` },
+        ]),
+        answer: "correct",
+        reason: `Total de elementos: \\(n^2 = ${n}^2 = ${(n * n).toLocaleString("es-CO")}\\). Total en bytes: \\(8 \\times ${(n * n).toLocaleString("es-CO")} = ${totalBytes.toLocaleString("es-CO")}\\text{ B}\\). Dividiendo entre \\(2^{20} = 1\\,048\\,576\\text{ B/MiB}\\): \\(s = ${mib.toLocaleString("es-CO")}\\text{ MiB}\\).`,
+      };
+    }
+
     // Tipo 4: Explosión exponencial o factorial
     const n = pickRandom([20, 25, 30, 35]);
     const salt = randomInt(10, 999);
@@ -395,7 +496,7 @@
   // --- Generador Nivel 3: Puntos de cruce (Constantes vs. Crecimiento) ---
 
   function generateCrossover() {
-    const kind = randomInt(0, 2);
+    const kind = randomInt(0, 3);
 
     if (kind === 0) {
       // Lineal con constante grande vs. Cuadrática con constante pequeña
@@ -469,6 +570,42 @@
       };
     }
 
+    if (kind === 2) {
+      // Raíz cuadrada con constante grande vs Lineal con constante pequeña
+      // c_sq * sqrt(n) = c_lin * n => sqrt(n) = c_sq / c_lin => n = (c_sq / c_lin)^2
+      const cLin = pickRandom([1, 2]);
+      const sqrtCruce = pickRandom([10, 20, 30]);
+      const cSq = cLin * sqrtCruce;
+      const nCruce = sqrtCruce * sqrtCruce;
+      const salt = randomInt(10, 999);
+      const signature = `cross:sqrt-lin:${cSq}:${cLin}:${salt}`;
+      const startDomain = 0;
+      const endDomain = Math.round(nCruce * 1.8);
+
+      return {
+        signature,
+        prompt: `Dos algoritmos compiten para resolver una búsqueda indexada. El algoritmo \\(A\\) ejecuta \\(C_A(n) = ${cSq}\\sqrt{n}\\) operaciones elementales, mientras que el algoritmo \\(B\\) ejecuta \\(C_B(n) = ${cLin}n\\) operaciones. ¿A partir de qué valor exacto de \\(n\\) el algoritmo sublineal \\(A\\) se vuelve estrictamente superior (requiere menos operaciones) que el algoritmo \\(B\\)?`,
+        options: shuffled([
+          { value: "correct", tex: `n > ${nCruce}` },
+          { value: "w1", tex: `n > ${sqrtCruce}` },
+          { value: "w2", tex: `n > ${nCruce * 2}` },
+          { value: "w3", tex: `n > ${Math.round(nCruce / 2)}` },
+        ]),
+        answer: "correct",
+        reason: `Igualando costos: \\(${cSq}\\sqrt{n} = ${cLin}n \\implies \\frac{n}{\\sqrt{n}} = \\sqrt{n} = \\frac{${cSq}}{${cLin}} = ${sqrtCruce}\\). Elevando al cuadrado: \\(n = (${sqrtCruce})^2 = ${nCruce}\\). Para \\(n > ${nCruce}\\), el crecimiento sublineal de \\(\\sqrt{n}\\) supera definitivamente al costo lineal.`,
+        graph: {
+          labelA: `C_A(n) = ${cSq}\\sqrt{n}`,
+          labelB: `C_B(n) = ${cLin}n`,
+          fnA: (n) => cSq * Math.sqrt(n),
+          fnB: (n) => cLin * n,
+          nCruce,
+          crossoverCondition: "A < B",
+          start: startDomain,
+          end: endDomain,
+        },
+      };
+    }
+
     // Cuadrática vs Exponencial (16n^2 vs 2^n)
     // Para n = 10: 16*100 = 1600 > 1024 (2^10)
     // Para n = 11: 16*121 = 1936 < 2048 (2^11)
@@ -506,7 +643,7 @@
   // --- Generador Nivel 4: Viabilidad física y escala interactiva ---
 
   function generateViability() {
-    const kind = randomInt(0, 2);
+    const kind = randomInt(0, 4);
 
     if (kind === 0) {
       // Restricción de tiempo límite (ejercicio 4 y 6 del libro)
@@ -519,10 +656,6 @@
       const salt = randomInt(10, 999);
       const signature = `viab:limit:${maxSec}:${nExp}:${t0Micros}:${salt}`;
 
-      // n = 10^6:
-      // lineal: 10^6 ops
-      // n log n: ~ 2 * 10^7 ops
-      // n^2: 10^12 ops
       return {
         signature,
         prompt: `Por restricciones de diseño en tiempo real, un sistema debe procesar \\(n = 10^{${nExp}}\\) datos en menos de \\(${maxSec}\\text{ segundos}\\). La arquitectura disponible ejecuta cada instrucción elemental en \\(T_0 = ${t0Micros}\\,\\mu\\text{s}\\) (máximo admitido: \\(\\frac{${maxSec}\\text{ s}}{${t0Micros}\\times 10^{-6}\\text{ s}} = ${maxOps.toExponential()}\\) operaciones). ¿Cuál es la mayor familia de complejidad admisible que cumple estrictamente esta restricción?`,
@@ -538,8 +671,8 @@
     }
 
     if (kind === 1) {
-      // Sensibilidad de escala: qué pasa si duplicamos o decuplicamos n
-      const factor = pickRandom([2, 10]);
+      // Sensibilidad de escala: qué pasa si duplicamos o decuplicamos n en cuadrática
+      const factor = pickRandom([2, 5, 10]);
       const salt = randomInt(10, 999);
       const signature = `viab:scale:quad:${factor}:${salt}`;
       const mult = factor * factor;
@@ -555,6 +688,45 @@
         ]),
         answer: "correct",
         reason: `Para funciones homogéneas de grado 2: \\(T(${factor}n) = (${factor}n)^2 = ${factor}^2 \\cdot n^2 = ${mult} \\cdot T(n)\\). Al aumentar la entrada ${factor} veces, el tiempo se incrementa ${mult} veces.`,
+      };
+    }
+
+    if (kind === 2) {
+      // Sensibilidad de escala en complejidad cúbica
+      const factor = pickRandom([2, 3, 10]);
+      const salt = randomInt(10, 999);
+      const signature = `viab:scale:cubic:${factor}:${salt}`;
+      const mult = factor * factor * factor;
+
+      return {
+        signature,
+        prompt: `Un algoritmo de multiplicación de matrices clásico tiene una complejidad analítica cúbica \\(T(n) = n^3\\). Si se incrementa el tamaño del problema multiplicándolo por \\(${factor}\\) (pasando de \\(n\\) a \\(${factor}n\\)), ¿en qué factor se incrementará el tiempo de cómputo resultante?`,
+        options: shuffled([
+          { value: "correct", tex: `\\text{Se multiplica por } ${mult} \\quad (${factor}^3)` },
+          { value: "w1", tex: `\\text{Se multiplica por } ${factor * 3}` },
+          { value: "w2", tex: `\\text{Se multiplica por } ${factor * factor}` },
+          { value: "w3", tex: `\\text{Aumenta en } ${mult} \\text{ segundos exactos}` },
+        ]),
+        answer: "correct",
+        reason: `Debido a la propiedad de potencia de orden 3: \\(T(${factor}n) = (${factor}n)^3 = ${factor}^3 \\cdot n^3 = ${mult} \\cdot T(n)\\). Escalar la entrada por ${factor} dispara el esfuerzo computacional ${mult} veces.`,
+      };
+    }
+
+    if (kind === 3) {
+      // Factorial: n! vs (n+1)!
+      const salt = randomInt(10, 999);
+      const signature = `viab:scale:fact:${salt}`;
+      return {
+        signature,
+        prompt: `En un algoritmo de enumeración exhaustiva de permutaciones (fuerza bruta) con complejidad factorial \\(T(n) = n!\\), ¿qué relación guarda el costo al procesar un único elemento adicional \\(T(n+1)\\) respecto al costo original \\(T(n)\\)?`,
+        options: shuffled([
+          { value: "correct", tex: "T(n+1) = (n+1) \\cdot T(n)" },
+          { value: "w1", tex: "T(n+1) = T(n) + 1" },
+          { value: "w2", tex: "T(n+1) = 2 \\cdot T(n)" },
+          { value: "w3", tex: "T(n+1) = (T(n))^2" },
+        ]),
+        answer: "correct",
+        reason: "Por definición recursiva del factorial: \\((n+1)! = (n+1) \\cdot n! = (n+1) \\cdot T(n)\\). Esto implica que cada elemento adicional multiplica todo el tiempo anterior por \\((n+1)\\), haciendo imposible escalar más allá de valores muy reducidos de \\(n\\).",
       };
     }
 

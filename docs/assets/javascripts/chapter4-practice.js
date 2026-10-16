@@ -162,7 +162,7 @@
   // --- Generadores de ejercicios para Capítulo 4 ---
 
   function generateFrequency() {
-    const kind = randomInt(0, 5);
+    const kind = randomInt(0, 7);
 
     // Tipo 0: Salto aditivo constante con paso k (k entre 2 y 7)
     if (kind === 0) {
@@ -411,33 +411,130 @@
     }
 
     // Tipo 5: Salto variable dependiente del índice exterior (paso i)
+    if (kind === 5) {
+      const salt = randomInt(10, 999);
+      const signature = `freq:harmonic:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">step</span> i <span class="kw">do</span>` },
+          { text: `        operacion_basica();`, highlight: true },
+          { text: `    <span class="kw">end for</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j <span class="op">+=</span> i) {` },
+          { text: `        operacionBasica();`, highlight: true },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j <span class="op">+=</span> i) {` },
+          { text: `        operacion_basica();`, highlight: true },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>, i):` },
+          { text: `        operacion_basica()`, highlight: true },
+        ],
+      };
+
+      return {
+        signature,
+        codeSnippets,
+        prompt: "Considere el siguiente ciclo anidado con salto variable \\(j \\leftarrow j + i\\) dependiente del ciclo exterior:",
+        options: shuffled([
+          { value: "correct", tex: "\\approx n \\ln(n)" },
+          { value: "w1", tex: "n^2" },
+          { value: "w2", tex: "\\frac{n(n+1)}{2}" },
+          { value: "w3", tex: "n" },
+        ]),
+        answer: "correct",
+        reason: "Para cada \\(i\\), el ciclo interior ejecuta \\(\\approx n/i\\) veces. La suma total es \\(\\sum_{i=1}^n \\frac{n}{i} = n \\sum_{i=1}^n \\frac{1}{i} \\approx n \\ln(n)\\) (serie armónica).",
+      };
+    }
+
+    // Tipo 6: Ciclos anidados rectangulares independientes con factores m y n
+    if (kind === 6) {
+      const mult = pickRandom([2, 3, 5]);
+      const salt = randomInt(10, 999);
+      const signature = `freq:rect:${mult}:${salt}`;
+      const codeSnippets = {
+        pseudo: [
+          { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
+          { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">${mult}</span> <span class="op">*</span> n <span class="kw">do</span>` },
+          { text: `        operacion_basica();`, highlight: true },
+          { text: `    <span class="kw">end for</span>` },
+          { text: `<span class="kw">end for</span>` },
+        ],
+        java: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> <span class="num">${mult}</span> <span class="op">*</span> n; j<span class="op">++</span>) {` },
+          { text: `        operacionBasica();`, highlight: true },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        c: [
+          { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
+          { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> <span class="num">${mult}</span> <span class="op">*</span> n; j<span class="op">++</span>) {` },
+          { text: `        operacion_basica();`, highlight: true },
+          { text: `    }` },
+          { text: `}` },
+        ],
+        python: [
+          { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">${mult}</span> <span class="op">*</span> n <span class="op">+</span> <span class="num">1</span>):` },
+          { text: `        operacion_basica()`, highlight: true },
+        ],
+      };
+
+      return {
+        signature,
+        codeSnippets,
+        prompt: `Considere el siguiente ciclo anidado donde el ciclo interior ejecuta hasta \\(${mult}n\\):`,
+        options: shuffled([
+          { value: "correct", tex: `${mult}n^2` },
+          { value: "w1", tex: `\\frac{${mult}n(n+1)}{2}` },
+          { value: "w2", tex: `n^2 + ${mult}n` },
+          { value: "w3", tex: `${mult + 1}n` },
+        ]),
+        answer: "correct",
+        reason: `El ciclo exterior ejecuta \\(n\\) veces y en cada una de ellas el ciclo interior ejecuta exactamente \\(${mult}n\\) veces: \\(n \\times (${mult}n) = ${mult}n^2\\).`,
+      };
+    }
+
+    // Tipo 7: Ciclo exterior lineal, ciclo interior dependiente que parte en i (j = i to n)
     const salt = randomInt(10, 999);
-    const signature = `freq:harmonic:${salt}`;
+    const signature = `freq:from-i-to-n:${salt}`;
     const codeSnippets = {
       pseudo: [
         { text: `<span class="kw">for</span> i <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">do</span>` },
-        { text: `    <span class="kw">for</span> j <span class="op">=</span> <span class="num">1</span> <span class="kw">to</span> n <span class="kw">step</span> i <span class="kw">do</span>` },
+        { text: `    <span class="kw">for</span> j <span class="op">=</span> i <span class="kw">to</span> n <span class="kw">do</span>` },
         { text: `        operacion_basica();`, highlight: true },
         { text: `    <span class="kw">end for</span>` },
         { text: `<span class="kw">end for</span>` },
       ],
       java: [
         { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
-        { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j <span class="op">+=</span> i) {` },
+        { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> i; j <span class="op">&lt;=</span> n; j<span class="op">++</span>) {` },
         { text: `        operacionBasica();`, highlight: true },
         { text: `    }` },
         { text: `}` },
       ],
       c: [
         { text: `<span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">1</span>; i <span class="op">&lt;=</span> n; i<span class="op">++</span>) {` },
-        { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> <span class="num">1</span>; j <span class="op">&lt;=</span> n; j <span class="op">+=</span> i) {` },
+        { text: `    <span class="kw">for</span> (<span class="kw">int</span> j <span class="op">=</span> i; j <span class="op">&lt;=</span> n; j<span class="op">++</span>) {` },
         { text: `        operacion_basica();`, highlight: true },
         { text: `    }` },
         { text: `}` },
       ],
       python: [
         { text: `<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>):` },
-        { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(<span class="num">1</span>, n <span class="op">+</span> <span class="num">1</span>, i):` },
+        { text: `    <span class="kw">for</span> j <span class="kw">in</span> range(i, n <span class="op">+</span> <span class="num">1</span>):` },
         { text: `        operacion_basica()`, highlight: true },
       ],
     };
@@ -445,15 +542,15 @@
     return {
       signature,
       codeSnippets,
-      prompt: "Considere el siguiente ciclo anidado con salto variable \\(j \\leftarrow j + i\\) dependiente del ciclo exterior:",
+      prompt: "Considere el siguiente ciclo anidado triangular inclusivo donde \\(j\\) comienza en \\(i\\) y termina en \\(n\\):",
       options: shuffled([
-        { value: "correct", tex: "\\approx n \\ln(n)" },
-        { value: "w1", tex: "n^2" },
-        { value: "w2", tex: "\\frac{n(n+1)}{2}" },
-        { value: "w3", tex: "n" },
+        { value: "correct", tex: "\\frac{n(n+1)}{2}" },
+        { value: "w1", tex: "\\frac{n(n-1)}{2}" },
+        { value: "w2", tex: "n^2" },
+        { value: "w3", tex: "\\frac{n^2 + 1}{2}" },
       ]),
       answer: "correct",
-      reason: "Para cada \\(i\\), el ciclo interior ejecuta \\(\\approx n/i\\) veces. La suma total es \\(\\sum_{i=1}^n \\frac{n}{i} = n \\sum_{i=1}^n \\frac{1}{i} \\approx n \\ln(n)\\) (serie armónica).",
+      reason: "Para cada \\(i\\) entre 1 y \\(n\\), el ciclo interior ejecuta \\(n - i + 1\\) veces. La suma decreciente es \\(n + (n-1) + \\dots + 1 = \\frac{n(n+1)}{2}\\).",
     };
   }
 

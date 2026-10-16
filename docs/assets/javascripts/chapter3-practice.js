@@ -66,6 +66,7 @@
 
   function familyTex(value) {
     if (value === "log") return "\\Theta(\\log(n))";
+    if (value === "sqrt") return "\\Theta(\\sqrt{n})";
     if (value === "linear") return "\\Theta(n)";
     if (value === "nlogn") return "\\Theta(n\\log(n))";
     if (value === "factorial") return "\\Theta(n!)";
@@ -85,18 +86,18 @@
   }
 
   function generateDominant() {
-    const kind = randomInt(0, 4); const a = randomInt(2, 97); const b = randomInt(2, 97); const constant = randomInt(1, 97);
+    const kind = randomInt(0, 6); const a = randomInt(2, 97); const b = randomInt(2, 97); const constant = randomInt(1, 97);
     if (kind === 1) return {
       signature: `log:${a}:${b}:${constant}`, expression: `${a}n\\log(n)+${b}n+${constant}`, answer: "nlogn",
       options: shuffled(["linear", "log", "nlogn", "poly:2"]),
-      reason: "El factor \\(\\log(n)\\) hace que \\(n\\log(n)\\) domine al término lineal.",
+      reason: "El factor \\(\\log(n)\\) hace que \\(n\\log(n)\\) domine estrictamente al término lineal \\(n\\).",
     };
     if (kind === 2) {
       const base = randomInt(2, 9); const degree = randomInt(2, 7);
       return {
         signature: `exp:${a}:${base}:${b}:${degree}:${constant}`, expression: `${a}\\cdot ${base}^{n}+${b}n^{${degree}}+${constant}`,
         answer: `exp:${base}`, options: shuffled([`poly:${degree}`, `exp:${base}`, "factorial", "nlogn"]),
-        reason: "Una exponencial de base mayor que uno termina superando a cualquier polinomio de grado fijo.",
+        reason: "Una función exponencial con base mayor a 1 supera asintóticamente a cualquier potencia polinómica de grado fijo.",
       };
     }
     if (kind === 3) {
@@ -104,14 +105,32 @@
       return {
         signature: `factorial:${a}:${b}:${base}:${constant}`, expression: `${a}n!+${b}\\cdot ${base}^{n}+${constant}`,
         answer: "factorial", options: shuffled(["factorial", `exp:${base}`, "nlogn", "poly:4"]),
-        reason: "El factorial termina superando a toda exponencial de base constante y, por tanto, también a los términos polinómicos y log-lineales.",
+        reason: "El crecimiento factorial \\(n!\\) supera a cualquier función exponencial de base constante y a cualquier término polinomial.",
       };
     }
     if (kind === 4) return {
       signature: `linear:${a}:${b}:${constant}`, expression: `${a}n+${b}\\log(n)+${constant}`, answer: "linear",
       options: shuffled(["log", "linear", "nlogn", "poly:2"]),
-      reason: "El término lineal crece más rápido que el logarítmico; los coeficientes y la constante no alteran esa comparación.",
+      reason: "El término lineal \\(n\\) crece más rápido que la función logarítmica; los coeficientes constantes no alteran la jerarquía asintótica.",
     };
+    if (kind === 5) {
+      // Raíz cuadrada vs lineal o logarítmico
+      return {
+        signature: `sqrt:${a}:${b}:${constant}`, expression: `${a}\\sqrt{n}+${b}\\log(n)+${constant}`, answer: "sqrt",
+        options: shuffled(["log", "sqrt", "linear", "nlogn"]),
+        reason: "La potencia fraccionaria \\(n^{1/2} = \\sqrt{n}\\) domina estrictamente a \\(\\log(n)\\) al tender \\(n\\to\\infty\\).",
+      };
+    }
+    if (kind === 6) {
+      // Cúbica vs Cuadrática con coeficientes contrastantes
+      const aSmall = randomInt(2, 5);
+      const bBig = randomInt(500, 2000);
+      return {
+        signature: `cubic-quad:${aSmall}:${bBig}:${constant}`, expression: `${aSmall}n^3+${bBig}n^2+${constant}`, answer: "poly:3",
+        options: shuffled(["poly:2", "poly:3", "poly:4", "nlogn"]),
+        reason: "A pesar de que el coeficiente cuadrático es mucho mayor inicialmente, el término de grado superior \\(n^3\\) domina asintóticamente.",
+      };
+    }
     const degree = randomInt(2, 8); const lowerDegree = randomInt(1, degree - 1); const optionDegrees = [];
     [degree, lowerDegree, degree + 1, degree + 2, 1].forEach((value) => {
       if (!optionDegrees.includes(value) && optionDegrees.length < 4) optionDegrees.push(value);
@@ -120,12 +139,13 @@
       signature: `poly:${a}:${degree}:${b}:${lowerDegree}:${constant}`,
       expression: `${a}n^{${degree}}+${b}${powerTerm(lowerDegree)}+${constant}`, answer: `poly:${degree}`,
       options: shuffled(optionDegrees.map((value) => `poly:${value}`)),
-      reason: `El exponente mayor es \\(${degree}\\); los términos de grados menores se vuelven relativamente despreciables.`,
+      reason: `El exponente mayor es \\(${degree}\\); los términos de grados menores se vuelven despreciables en el límite.`,
     };
   }
 
   const comparisonFamilies = [
     { key: "log", name: "logarítmica", expression: (coefficient, constant) => `${coefficient}\\log(n)+${constant}` },
+    { key: "sqrt", name: "sublineal (raíz)", expression: (coefficient, constant) => `${coefficient}\\sqrt{n}+${constant}` },
     { key: "linear", name: "lineal", expression: (coefficient, constant) => `${coefficient}n+${constant}` },
     { key: "nlogn", name: "log-lineal", expression: (coefficient, constant) => `${coefficient}n\\log(n)+${constant}` },
     { key: "quadratic", name: "cuadrática", expression: (coefficient, constant) => `${coefficient}n^{2}+${constant}` },
