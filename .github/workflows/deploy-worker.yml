@@ -29,12 +29,11 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Deploy Worker with Wrangler Action
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "desarrollo/services/exercise-generator-worker"
-          secrets: |
-            GEMINI_API_KEY
+      - name: Deploy Worker with Wrangler
+        working-directory: "desarrollo/services/exercise-generator-worker"
         env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          npx wrangler deploy
+          echo "${GEMINI_API_KEY}" | npx wrangler secret put GEMINI_API_KEY
