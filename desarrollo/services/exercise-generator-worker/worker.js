@@ -209,48 +209,57 @@ export default {
       );
     }
 
-    // 6. Solicitud a Google Gemini con Timeout de seguridad (12 segundos)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    // Lista de modelos compatibles para rotación en caso de alta demanda (503)
+    const candidateModels = ["gemini-2.5-flash", "gemini-3.5-flash", "gemini-flash-latest", "gemini-3.5-flash-lite"];
+
+    let lastError = null;
+    let geminiData = null;
+
+    for (const modelName of candidateModels) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      try {
+        const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+        const geminiPayload = {
+          system_instruction: {
+            parts: [{ text: SYSTEM_INSTRUCTIONS[`chapter${chapter}`] || SYSTEM_INSTRUCTIONS.chapter2 }],
+          },
+          contents: [{ role: "user", parts: [{ text: buildUserPrompt(chapter, mode) }] }],
+          generationConfig: {
+            response_mime_type: "application/json",
+            temperature: 0.7,
+            max_output_tokens: 800,
+          },
+        };
+
+        const geminiResponse = await fetch(geminiEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(geminiPayload),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (geminiResponse.ok) {
+          geminiData = await geminiResponse.json();
+          break;
+        } else {
+          lastError = await geminiResponse.text();
+        }
+      } catch (err) {
+        clearTimeout(timeoutId);
+        lastError = err.message;
+      }
+    }
 
     try {
-      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
-
-      const geminiPayload = {
-        system_instruction: {
-          parts: [{ text: SYSTEM_INSTRUCTIONS[`chapter${chapter}`] || SYSTEM_INSTRUCTIONS.chapter2 }],
-        },
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: buildUserPrompt(chapter, mode) }],
-          },
-        ],
-        generationConfig: {
-          response_mime_type: "application/json",
-          temperature: 0.7,
-          max_output_tokens: 800,
-        },
-      };
-
-      const geminiResponse = await fetch(geminiEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(geminiPayload),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!geminiResponse.ok) {
-        const errorText = await geminiResponse.text();
+      if (!geminiData) {
         return new Response(
-          JSON.stringify({ error: "Error devuelto por el proveedor de IA.", details: errorText }),
+          JSON.stringify({ error: "Error devuelto por el proveedor de IA.", details: lastError }),
           { status: 502, headers }
         );
       }
-
-      const geminiData = await geminiResponse.json();
       const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!rawText) {
