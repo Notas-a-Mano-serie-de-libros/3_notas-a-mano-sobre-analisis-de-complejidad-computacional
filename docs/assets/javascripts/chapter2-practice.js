@@ -623,6 +623,42 @@
     };
   }
 
+  // URL del proxy worker de Cloudflare (se puede configurar en el panel o variable global)
+  // Si no está desplegado o falla la red, el generador local responde de inmediato sin demoras.
+  const AI_WORKER_URL = window.__AI_EXERCISE_WORKER_URL__ || "";
+
+  async function fetchAiQuestion(chapter, mode) {
+    if (!AI_WORKER_URL) return null;
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(`${AI_WORKER_URL}/api/exercise`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chapter, mode }),
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!data.prompt || !Array.isArray(data.options) || !data.answer || !data.reason) return null;
+      // Sanitizar funciones matemáticas si vienen como string en graph
+      if (data.graph && typeof data.graph.fnA === "string" && typeof data.graph.fnB === "string") {
+        try {
+          const fnAStr = data.graph.fnA.replace(/[^0-9n+\-*/().\s]/g, "");
+          const fnBStr = data.graph.fnB.replace(/[^0-9n+\-*/().\s]/g, "");
+          data.graph.fnA = (n) => Function("n", `"use strict"; return (${fnAStr});`)(n);
+          data.graph.fnB = (n) => Function("n", `"use strict"; return (${fnBStr});`)(n);
+        } catch (_err) {
+          data.graph = null;
+        }
+      }
+      return data;
+    } catch (_err) {
+      return null;
+    }
+  }
+
   function nextUniqueQuestion(mode, state) {
     if (state.seen[mode].length > 30) {
       state.seen[mode] = state.seen[mode].slice(-15);
@@ -992,19 +1028,32 @@
       if (focus) feedback.focus({ preventScroll: true });
     };
 
-    const newQuestion = () => {
-      current = nextUniqueQuestion(mode, state);
-      saveState(panel, state);
-      solved = false;
-      panel.querySelector("[data-practice-level]").textContent = modes[mode].level;
-      panel.querySelector("[data-practice-title]").textContent = modes[mode].title;
+    const renderCurrent = () => {
       if (mode === "crossover") {
         renderCrossover(questionContainer, current);
       } else {
         renderChoicesQuestion(questionContainer, current);
       }
+    };
+
+    const newQuestion = async () => {
+      current = nextUniqueQuestion(mode, state);
+      saveState(panel, state);
+      solved = false;
+      panel.querySelector("[data-practice-level]").textContent = modes[mode].level;
+      panel.querySelector("[data-practice-title]").textContent = modes[mode].title;
+      renderCurrent();
       checkLabel.textContent = "Comprobar respuesta";
       showFeedback("", "");
+
+      // Si hay un endpoint de IA configurado, intentar traer uno inédito en segundo plano
+      if (AI_WORKER_URL) {
+        const aiQuestion = await fetchAiQuestion(2, mode);
+        if (aiQuestion && !solved) {
+          current = aiQuestion;
+          renderCurrent();
+        }
+      }
     };
 
     const checkAnswer = () => {
