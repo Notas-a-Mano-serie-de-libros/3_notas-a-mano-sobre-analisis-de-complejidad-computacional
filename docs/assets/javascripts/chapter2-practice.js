@@ -354,25 +354,41 @@
     }
 
     // Tipo 4: Explosión exponencial o factorial
-    const n = pickRandom([20, 25, 30]);
+    const n = pickRandom([20, 25, 30, 35]);
     const salt = randomInt(10, 999);
     const signature = `canon:exp:${n}:${salt}`;
     const ops = Math.pow(2, n);
     // en segundos si T0 = 1 microsegundo
     const sec = ops * 1e-6;
-    const days = sec / 86400;
+
+    let timeText = "";
+    if (sec < 60) {
+      timeText = `t \\approx ${sec.toFixed(1)}\\text{ segundos}`;
+    } else if (sec < 3600) {
+      const min = sec / 60;
+      timeText = `t \\approx ${min.toFixed(1)}\\text{ minutos} \\quad (${sec.toFixed(0)}\\text{ s})`;
+    } else if (sec < 86400) {
+      const hours = sec / 3600;
+      timeText = `t \\approx ${hours.toFixed(1)}\\text{ horas} \\quad (${(sec / 60).toFixed(0)}\\text{ min})`;
+    } else if (sec < 31536000) {
+      const days = sec / 86400;
+      timeText = `t \\approx ${days.toFixed(1)}\\text{ días}`;
+    } else {
+      const years = sec / 31536000;
+      timeText = `t \\approx ${years.toLocaleString("es-CO", { maximumFractionDigits: 1 })}\\text{ años}`;
+    }
 
     return {
       signature,
-      prompt: `Si un algoritmo tiene complejidad temporal exponencial \\(T(n) = 2^n\\) y una máquina ejecuta \\(10^6\\) instrucciones por segundo (\\(T_0 = 1\\,\\mu\\text{s}\\)), calcule el tiempo total teórico aproximado para procesar apenas \\(n = ${n}\\) datos:`,
+      prompt: `Si un algoritmo tiene complejidad temporal exponencial \\(T(n) = 2^n\\) y una máquina ejecuta \\(10^6\\) instrucciones por segundo (\\(T_0 = 1\\,\\mu\\text{s}\\)), calcule el tiempo total teórico para procesar \\(n = ${n}\\) datos expresado en una unidad adecuada:`,
       options: shuffled([
-        { value: "correct", tex: n < 25 ? `t \\approx ${sec.toFixed(1)}\\text{ segundos}` : `t \\approx ${days.toFixed(1)}\\text{ días}` },
-        { value: "w1", tex: `t \\approx ${(n * 1e-6).toFixed(4)}\\text{ segundos}` },
-        { value: "w2", tex: `t \\approx ${(n * n * 1e-6).toFixed(4)}\\text{ segundos}` },
-        { value: "w3", tex: `t \\approx ${Math.pow(10, n / 10).toFixed(1)}\\text{ milisegundos}` },
+        { value: "correct", tex: timeText },
+        { value: "w1", tex: `t \\approx ${(sec * 1000).toFixed(1)}\\text{ milisegundos}` },
+        { value: "w2", tex: `t \\approx ${(ops * 1e-9).toFixed(3)}\\text{ microsegundos}` },
+        { value: "w3", tex: `t \\approx ${(n * 1e-3).toFixed(2)}\\text{ segundos}` },
       ]),
       answer: "correct",
-      reason: `\\(T(${n}) = 2^{${n}} = ${ops.toLocaleString("es-CO")}\\) operaciones. Con \\(T_0 = 10^{-6}\\text{ s}\\), el tiempo es \\(t = ${ops} \\times 10^{-6}\\text{ s} = ${sec.toFixed(1)}\\text{ s}\\)${n >= 25 ? ` \\((\\approx ${days.toFixed(1)}\\text{ días})\\)` : ""}, ilustrando por qué el crecimiento exponencial se vuelve físicamente inviable para valores moderados de \\(n\\).`,
+      reason: `\\(T(${n}) = 2^{${n}} = ${ops.toLocaleString("es-CO")}\\) operaciones. Con \\(T_0 = 10^{-6}\\text{ s}\\), el tiempo es \\(t = ${ops} \\times 10^{-6}\\text{ s} = ${sec.toLocaleString("es-CO", { maximumFractionDigits: 1 })}\\text{ s}\\), lo que equivale de forma natural a: ${timeText.replace(/\\approx/g, "\\approx").replace(/\\quad/g, " ")}, ilustrando cómo el crecimiento exponencial se desborda rápidamente.`,
     };
   }
 
