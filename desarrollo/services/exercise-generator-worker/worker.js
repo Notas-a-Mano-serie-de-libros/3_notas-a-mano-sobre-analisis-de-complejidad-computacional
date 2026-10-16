@@ -210,14 +210,14 @@ export default {
     }
 
     try {
-      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
       const geminiPayload = {
         contents: [
           {
             role: "user",
             parts: [
               {
-                text: `${SYSTEM_INSTRUCTIONS[`chapter${chapter}`] || SYSTEM_INSTRUCTIONS.chapter2}\n\nTarea específica: ${buildUserPrompt(chapter, mode)}`,
+                text: `${SYSTEM_INSTRUCTIONS[`chapter${chapter}`] || SYSTEM_INSTRUCTIONS.chapter2}\n\n${buildUserPrompt(chapter, mode)}`,
               },
             ],
           },
@@ -225,7 +225,7 @@ export default {
         generationConfig: {
           response_mime_type: "application/json",
           temperature: 0.2,
-          max_output_tokens: 400,
+          max_output_tokens: 350,
         },
       };
 
