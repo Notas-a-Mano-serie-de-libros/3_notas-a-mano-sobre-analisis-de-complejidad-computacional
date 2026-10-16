@@ -1,0 +1,40 @@
+name: Deploy AI Worker
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "desarrollo/services/exercise-generator-worker/**"
+      - ".github/workflows/deploy-worker.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-ai-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy-worker:
+    name: Deploy Exercise Generator Worker to Cloudflare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+
+      - name: Deploy Worker with Wrangler Action
+        uses: cloudflare/wrangler-action@392082e81ffbcb9ba746486bc6e0887669449323 # v3.14.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: "desarrollo/services/exercise-generator-worker"
+          secrets: |
+            GEMINI_API_KEY
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
