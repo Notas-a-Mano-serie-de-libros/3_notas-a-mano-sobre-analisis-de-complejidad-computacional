@@ -5,7 +5,7 @@ Este microservicio corre como un **Cloudflare Worker Serverless** para generar e
 ## Blindajes de Seguridad Implementados en `worker.js`
 
 1. **CORS Restringido**:
-   - Solo responde a solicitudes originadas desde `https://notas-a-mano-serie-de-libros.github.io` y entornos locales de desarrollo (`http://localhost:8000`).
+   - Solo responde a solicitudes originadas desde `https://notas-a-mano-serie-de-libros.github.io` y servidores locales autorizados.
 
 2. **Inmunidad a Prompt Injection**:
    - El cliente **no envía texto libre** ni instrucciones.
