@@ -209,9 +209,9 @@ export default {
       );
     }
 
-    // 6. Solicitud a Google Gemini con Timeout de seguridad (6 segundos)
+    // 6. Solicitud a Google Gemini con Timeout de seguridad (12 segundos)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     try {
       const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
@@ -229,7 +229,7 @@ export default {
         generationConfig: {
           response_mime_type: "application/json",
           temperature: 0.7,
-          max_output_tokens: 1500,
+          max_output_tokens: 800,
         },
       };
 
