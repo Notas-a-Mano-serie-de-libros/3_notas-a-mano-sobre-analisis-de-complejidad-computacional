@@ -11,7 +11,9 @@ Los ejercicios cierran el capítulo y permiten aplicar las funciones de compleji
 <small class="lab-action__note">El documento se abrirá en una pestaña nueva.</small>
 </div>
 
-<nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../9-complejidad-factorial/">← 2.1.2.9 Complejidad factorial</a><a class="section-step__index" href="../">Capítulo 2</a></nav>
+Para entrenar con problemas generados de forma continua con retroalimentación inmediata, continúe a la [práctica autocorregible](../practica-autocorregible/).
+
+<nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../9-complejidad-factorial/">← 2.1.2.9 Complejidad factorial</a><a class="section-step__index" href="../">Capítulo 2</a><a href="../practica-autocorregible/">Práctica autocorregible →</a></nav>
 
 ---
 

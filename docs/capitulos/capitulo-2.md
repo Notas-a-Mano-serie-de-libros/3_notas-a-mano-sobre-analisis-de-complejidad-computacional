@@ -59,6 +59,7 @@ Cada sección presenta el código del libro y enlaza su simulación. Las instruc
 <li><a href="8-complejidad-exponencial/"><strong>Complejidad exponencial</strong></a></li>
 <li><a href="9-complejidad-factorial/"><strong>Complejidad factorial</strong></a></li>
 <li><a href="ejercicios-propuestos/"><strong>Ejercicios propuestos</strong></a></li>
+<li><a href="practica-autocorregible/"><strong>Práctica autocorregible</strong></a></li>
 </ul>
 </section>
 
