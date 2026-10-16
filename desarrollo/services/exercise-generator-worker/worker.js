@@ -132,8 +132,19 @@ export default {
 
     const headers = getCorsHeaders(request);
 
-    // 2. Solo aceptar POST
-    if (request.method !== "POST") {
+    // 2. Manejo de GET para diagnóstico de modelos disponibles
+    if (request.method === "GET") {
+      const url = new URL(request.url);
+      if (url.pathname === "/models" && env.GEMINI_API_KEY) {
+        try {
+          const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${env.GEMINI_API_KEY}`);
+          const listData = await listRes.json();
+          const names = listData.models ? listData.models.map((m) => m.name) : listData;
+          return new Response(JSON.stringify(names), { status: 200, headers });
+        } catch (e) {
+          return new Response(JSON.stringify({ error: e.message }), { status: 500, headers });
+        }
+      }
       return new Response(JSON.stringify({ error: "Método no permitido. Use POST." }), {
         status: 405,
         headers,
