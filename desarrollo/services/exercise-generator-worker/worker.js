@@ -224,8 +224,29 @@ export default {
         ],
         generationConfig: {
           response_mime_type: "application/json",
+          response_schema: {
+            type: "OBJECT",
+            properties: {
+              signature: { type: "STRING" },
+              prompt: { type: "STRING" },
+              options: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    value: { type: "STRING" },
+                    tex: { type: "STRING" },
+                  },
+                  required: ["value", "tex"],
+                },
+              },
+              answer: { type: "STRING" },
+              reason: { type: "STRING" },
+            },
+            required: ["signature", "prompt", "options", "answer", "reason"],
+          },
           temperature: 0.2,
-          max_output_tokens: 350,
+          max_output_tokens: 650,
         },
       };
 
