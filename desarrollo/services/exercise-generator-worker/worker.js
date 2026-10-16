@@ -209,51 +209,41 @@ export default {
       );
     }
 
-    // Modelos Flash de alta velocidad y cuota gratuita activa
-    const candidateModels = ["gemini-2.5-flash", "gemini-flash-latest"];
-
-    let lastError = null;
-    let geminiData = null;
-
-    for (const modelName of candidateModels) {
-      try {
-        const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-        const geminiPayload = {
-          system_instruction: {
-            parts: [{ text: SYSTEM_INSTRUCTIONS[`chapter${chapter}`] || SYSTEM_INSTRUCTIONS.chapter2 }],
-          },
-          contents: [{ role: "user", parts: [{ text: buildUserPrompt(chapter, mode) }] }],
-          generationConfig: {
-            response_mime_type: "application/json",
-            temperature: 0.3,
-            max_output_tokens: 450,
-          },
-        };
-
-        const geminiResponse = await fetch(geminiEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(geminiPayload),
-        });
-
-        if (geminiResponse.ok) {
-          geminiData = await geminiResponse.json();
-          break;
-        } else {
-          lastError = await geminiResponse.text();
-        }
-      } catch (err) {
-        lastError = err.message;
-      }
-    }
-
     try {
-      if (!geminiData) {
+      const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      const geminiPayload = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: `${SYSTEM_INSTRUCTIONS[`chapter${chapter}`] || SYSTEM_INSTRUCTIONS.chapter2}\n\nTarea específica: ${buildUserPrompt(chapter, mode)}`,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          response_mime_type: "application/json",
+          temperature: 0.2,
+          max_output_tokens: 400,
+        },
+      };
+
+      const geminiResponse = await fetch(geminiEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(geminiPayload),
+      });
+
+      if (!geminiResponse.ok) {
+        const errorText = await geminiResponse.text();
         return new Response(
-          JSON.stringify({ error: "Error devuelto por el proveedor de IA.", details: lastError }),
+          JSON.stringify({ error: "Error devuelto por el proveedor de IA.", details: errorText }),
           { status: 502, headers }
         );
       }
+
+      const geminiData = await geminiResponse.json();
       const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!rawText) {
