@@ -1,6 +1,7 @@
 name = "exercise-generator-worker"
 main = "worker.js"
 compatibility_date = "2024-10-01"
+workers_dev = true
 
 [vars]
 # Las claves sensibles (como GEMINI_API_KEY) se configuran mediante:

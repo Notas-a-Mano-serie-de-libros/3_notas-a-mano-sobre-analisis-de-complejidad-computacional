@@ -632,7 +632,7 @@
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), 4000);
-      const res = await fetch(`${AI_WORKER_URL}/api/exercise`, {
+      const res = await fetch(AI_WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chapter, mode }),
