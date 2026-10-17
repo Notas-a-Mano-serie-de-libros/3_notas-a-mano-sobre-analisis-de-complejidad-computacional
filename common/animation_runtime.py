@@ -32,10 +32,11 @@ class OutputCache:
 
         srcdoc = mathjax_srcdoc(formula)
         visibility = "visibility:hidden;" if hidden else ""
+        position = "position:absolute;top:0;left:0;" if hidden else ""
         html = (
             '<iframe class="formula-mathjax-frame" '
             f'srcdoc="{escape(srcdoc, quote=True)}" '
-            'style="display:block;width:100%;border:0;overflow:hidden;'
+            f'style="display:block;width:100%;border:0;overflow:hidden;{position}'
             f'height:{height}px;background:transparent;{visibility}" '
             'scrolling="no"></iframe>'
         )

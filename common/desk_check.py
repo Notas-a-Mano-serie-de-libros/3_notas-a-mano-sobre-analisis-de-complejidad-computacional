@@ -653,14 +653,20 @@ def sort_desk_rows(state, limit=DESK_ROW_LIMIT):
     events = trace.materialize() if hasattr(trace, "materialize") else trace
     last = min(step, len(events) - 1)
     algo_key = pseudocode_algorithm_key(state)
+    cache = state.setdefault("_desk_row_cache", {})
     rows = []
     for index in range(max(1, last - limit + 1), last + 1):
+        if index in cache:
+            rows.append(cache[index])
+            continue
         event = events[index]
         variables = event.get("desk_vars")
         if variables is None:
             variables = latex_to_text(event.get("formula", ""))
         line = sort_infer_line(algo_key, event)
-        rows.append(desk_row(index, line, variables, event.get("message"), event.get("arr")))
+        row = desk_row(index, line, variables, event.get("message"), event.get("arr"))
+        cache[index] = row
+        rows.append(row)
     return rows
 
 
