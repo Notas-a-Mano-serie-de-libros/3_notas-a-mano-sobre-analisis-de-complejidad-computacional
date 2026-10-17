@@ -371,15 +371,6 @@ class TestCapitulo7IndividualNotebooks(unittest.TestCase):
             "6_busqueda_ternaria.ipynb": "ternaria",
         }
 
-        chart_names = {
-            "1_busqueda_secuencial.ipynb": "Secuencial",
-            "2_busqueda_binaria.ipynb": "Binaria",
-            "3_busqueda_interpolacion.ipynb": "Interpolación",
-            "4_busqueda_saltos.ipynb": "Saltos",
-            "5_busqueda_exponencial.ipynb": "Exponencial",
-            "6_busqueda_ternaria.ipynb": "Ternaria",
-        }
-
         for notebook_name, simulation_name in expected.items():
             with self.subTest(notebook=notebook_name):
                 notebook = json.loads((PROJECT_ROOT / "simulaciones" / "capitulo7" / "notebooks" / notebook_name).read_text())
@@ -387,7 +378,6 @@ class TestCapitulo7IndividualNotebooks(unittest.TestCase):
                 if notebook_name == "3_busqueda_interpolacion.ipynb":
                     sources = ["".join(cell["source"]) for cell in code_cells]
                     self.assertTrue(any(f'SIMULATION_NAME = "{simulation_name}"' in source for source in sources))
-                    self.assertTrue(any('run_single_chart("Interpolación")' in source for source in sources))
                     self.assertTrue(any("run_general_formula_visual" in source for source in sources))
                     self.assertTrue(any("run_interpolation_visual" in source for source in sources))
                     self.assertTrue(any("def interpolation_search" in source for source in sources))
@@ -397,7 +387,7 @@ class TestCapitulo7IndividualNotebooks(unittest.TestCase):
                         self.assertIsNone(cell.get("execution_count"))
                     continue
 
-                expected_code_cells = 3 if notebook_name == "6_busqueda_ternaria.ipynb" else 2
+                expected_code_cells = 2 if notebook_name == "6_busqueda_ternaria.ipynb" else 1
                 self.assertEqual(len(code_cells), expected_code_cells)
 
                 # Cell 0: simulation bootstrap
@@ -416,25 +406,25 @@ class TestCapitulo7IndividualNotebooks(unittest.TestCase):
                 self.assertEqual(code_cells[0].get("outputs"), [])
                 self.assertIsNone(code_cells[0].get("execution_count"))
 
-                # Cell 1: run_single_chart invocation
-                chart_source = "".join(code_cells[1]["source"])
-                self.assertIn("run_single_chart", chart_source)
-                self.assertIn("busquedas_chart", chart_source)
-                self.assertNotIn("from busquedas_chart import", chart_source)
-                self.assertIn("search_metrics.py", chart_source)
-                self.assertIn(f'run_single_chart("{chart_names[notebook_name]}")', chart_source)
-                self.assertEqual(code_cells[1].get("outputs"), [])
-                self.assertIsNone(code_cells[1].get("execution_count"))
-
                 if notebook_name == "6_busqueda_ternaria.ipynb":
-                    asymptotic_source = "".join(code_cells[2]["source"])
+                    asymptotic_source = "".join(code_cells[1]["source"])
                     self.assertIn("log2_n", asymptotic_source)
                     self.assertIn("log3_n", asymptotic_source)
                     self.assertIn("two_log3_n", asymptotic_source)
                     self.assertIn('"figure.dpi": 500', asymptotic_source)
                     self.assertIn('"savefig.dpi": 500', asymptotic_source)
-                    self.assertEqual(code_cells[2].get("outputs"), [])
-                    self.assertIsNone(code_cells[2].get("execution_count"))
+                    self.assertEqual(code_cells[1].get("outputs"), [])
+                    self.assertIsNone(code_cells[1].get("execution_count"))
+
+    def test_notebooks_omit_efficiency_by_array_size_section(self):
+        notebook_dir = PROJECT_ROOT / "simulaciones" / "capitulo7" / "notebooks"
+
+        for notebook_path in sorted(notebook_dir.glob("*.ipynb")):
+            with self.subTest(notebook=notebook_path.name):
+                self.assertNotIn(
+                    "Eficiencia por tamaño de arreglo",
+                    notebook_path.read_text(encoding="utf-8"),
+                )
 
 
 class TestCapitulo7BusquedaExponencial(unittest.TestCase):

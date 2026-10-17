@@ -965,9 +965,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         ).read_text(encoding="utf-8")
         chart_source = (DOMAIN_DIR / "ordenamientos_chart.py").read_text(encoding="utf-8")
 
-        self.assertEqual(len(code_cells), 2)
+        self.assertEqual(len(code_cells), 1)
         self.assertIn('SIMULATION_NAME = "radix"', "".join(code_cells[0]["source"]))
-        self.assertIn('run_single_chart("Radix")', "".join(code_cells[1]["source"]))
         for cell in code_cells:
             self.assertEqual(cell.get("outputs"), [])
             self.assertIsNone(cell.get("execution_count"))
@@ -1101,7 +1100,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         app_source = (DOMAIN_DIR / "4_ordenamiento_shell_app.py").read_text(encoding="utf-8")
 
-        self.assertEqual(len(code_cells), 3)
+        self.assertEqual(len(code_cells), 2)
         self.assertIn('SIMULATION_NAME = "shell_comparacion"', "".join(code_cells[-1]["source"]))
         self.assertIn('"shell_comparacion": "run_shell_comparacion"', bootstrap)
         self.assertIn("def run_shell_comparacion", launchers)
@@ -1116,7 +1115,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         app_source = (DOMAIN_DIR / "3_ordenamiento_insercion_app.py").read_text(encoding="utf-8")
 
-        self.assertEqual(len(code_cells), 4)
+        self.assertEqual(len(code_cells), 3)
         self.assertIn('SIMULATION_NAME = "insercion_binaria"', "".join(code_cells[1]["source"]))
         self.assertIn('SIMULATION_NAME = "insercion_comparacion"', "".join(code_cells[2]["source"]))
         self.assertIn('"insercion_binaria": "run_insercion_binaria"', bootstrap)
@@ -1134,7 +1133,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         app_source = (DOMAIN_DIR / "6_ordenamiento_rapido_app.py").read_text(encoding="utf-8")
 
-        self.assertEqual(len(code_cells), 4)
+        self.assertEqual(len(code_cells), 3)
         self.assertIn('SIMULATION_NAME = "rapido_comparacion"', "".join(code_cells[1]["source"]))
         self.assertIn('SIMULATION_NAME = "rapido_pivotes"', "".join(code_cells[2]["source"]))
         self.assertIn('"rapido_comparacion": "run_rapido_comparacion"', bootstrap)
@@ -1336,27 +1335,18 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
             "6_ordenamiento_rapido.ipynb": "rapido",
         }
 
-        chart_names = {
-            "1_ordenamiento_burbuja.ipynb": "Burbuja",
-            "2_ordenamiento_seleccion.ipynb": "Selección",
-            "3_ordenamiento_insercion.ipynb": "Inserción",
-            "4_ordenamiento_shell.ipynb": "Shell",
-            "5_ordenamiento_mezcla.ipynb": "Mezcla",
-            "6_ordenamiento_rapido.ipynb": "Rápido",
-        }
-
         for notebook_name, simulation_name in expected.items():
             with self.subTest(notebook=notebook_name):
                 notebook = json.loads((NOTEBOOK_DIR / notebook_name).read_text())
                 code_cells = [cell for cell in notebook["cells"] if cell["cell_type"] == "code"]
                 if notebook_name == "3_ordenamiento_insercion.ipynb":
-                    expected_code_cells = 4
-                elif notebook_name == "4_ordenamiento_shell.ipynb":
                     expected_code_cells = 3
-                elif notebook_name == "6_ordenamiento_rapido.ipynb":
-                    expected_code_cells = 4
-                else:
+                elif notebook_name == "4_ordenamiento_shell.ipynb":
                     expected_code_cells = 2
+                elif notebook_name == "6_ordenamiento_rapido.ipynb":
+                    expected_code_cells = 3
+                else:
+                    expected_code_cells = 1
                 self.assertEqual(len(code_cells), expected_code_cells)
 
                 # Cell 0: simulation bootstrap
@@ -1375,15 +1365,13 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
                 self.assertEqual(code_cells[0].get("outputs"), [])
                 self.assertIsNone(code_cells[0].get("execution_count"))
 
-                # run_single_chart invocation
-                chart_source = next("".join(cell["source"]) for cell in code_cells if "run_single_chart" in "".join(cell["source"]))
-                self.assertIn("run_single_chart", chart_source)
-                self.assertIn("ordenamientos_chart", chart_source)
-                self.assertNotIn("from ordenamientos_chart import", chart_source)
-                self.assertIn("sort_metrics.py", chart_source)
-                self.assertIn(f'run_single_chart("{chart_names[notebook_name]}")', chart_source)
-                self.assertEqual(code_cells[1].get("outputs"), [])
-                self.assertIsNone(code_cells[1].get("execution_count"))
+    def test_notebooks_omit_efficiency_by_array_size_section(self):
+        for notebook_path in sorted(NOTEBOOK_DIR.glob("*.ipynb")):
+            with self.subTest(notebook=notebook_path.name):
+                self.assertNotIn(
+                    "Eficiencia por tamaño de arreglo",
+                    notebook_path.read_text(encoding="utf-8"),
+                )
 
 
 if __name__ == "__main__":
