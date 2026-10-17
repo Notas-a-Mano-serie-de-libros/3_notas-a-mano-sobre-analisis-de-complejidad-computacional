@@ -895,7 +895,7 @@ def sort_styles():
       .sort-simulation-root {{
         width: 100%;
         max-width: 100%;
-        overflow-x: hidden;
+        overflow: visible;
         padding: 14px 4px;
         background: #ffffff;
         color: #333333;
@@ -1881,7 +1881,7 @@ def sort_controls_grid(groups):
     )
 
 
-def build_sort_panel(parameters, result, title="Simulación de ordenamiento", procedure=None, desk_check=None):
+def build_sort_panel(parameters, result, title="Simulación de ordenamiento", procedure=None, desk_check=None, action_row=None):
     result.add_class("sort-result-content")
     sections = [
         ViewSection(SECTION_CONFIGURATION, parameters, ("sort-subpanel-content",))
@@ -1903,6 +1903,7 @@ def build_sort_panel(parameters, result, title="Simulación de ordenamiento", pr
             root_class="sort-simulation-root",
             panel_prefix="sort",
             styles=sort_styles(),
+            action_row=action_row,
             sections=tuple(sections),
         )
     )
@@ -2041,21 +2042,19 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         ]
     else:
         control_rows = [controls_grid(first_row, columns=len(first_row))]
+    action_row = sort_action_button_row([step_button, auto_button, finish_button, reset_button, book_button])
     layout = widgets.VBox(
-        control_rows
-        + [
-            sort_action_button_row([step_button, auto_button, finish_button, reset_button, book_button]),
-        ],
+        control_rows,
         layout=widgets.Layout(width="100%", grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px"),
     )
-    return controls, layout
+    return controls, layout, action_row
 
 
 def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap_sequence=False, has_partition=False, has_radix_max=False):
     if colab_output is not None:
         colab_output.enable_custom_widget_manager()
 
-    controls, controls_layout = build_controls(
+    controls, controls_layout, action_row = build_controls(
         has_pivot=has_pivot,
         has_tree=has_tree,
         has_gap_sequence=has_gap_sequence,
@@ -2284,6 +2283,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         html_output,
         procedure=formula_output,
         desk_check=desk_output,
+        action_row=action_row,
     )
     display(layout)
     update_radix_control_visibility()

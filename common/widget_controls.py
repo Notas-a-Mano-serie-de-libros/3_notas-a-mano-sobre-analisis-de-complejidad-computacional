@@ -121,9 +121,16 @@ def shared_ui_styles(root_selector):
 {root} .lab-stepper > *,
 {root} .stepper > * {{ margin: 0 !important; }}
 {root} .simulation-action-row {{
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: var(--md-header-height, 0px) !important;
+  z-index: 50 !important;
+  background: var(--simulation-surface, #ffffff) !important;
   width: 100% !important;
   gap: 0 !important;
-  margin: {STANDARD_ACTION_MARGIN_TOP}px 0 0 !important;
+  margin: 0 !important;
+  padding: 8px 12px !important;
+  border-bottom: 1px solid var(--simulation-panel-border, #dedede) !important;
   justify-content: flex-end !important;
 }}
 {root} [class*="subpanel-title"],
@@ -151,7 +158,7 @@ def shared_ui_styles(root_selector):
   width: 100% !important;
   min-width: 0 !important;
   background: var(--simulation-surface) !important;
-  overflow-x: hidden !important;
+  overflow: visible !important;
 }}
 {root} [class*="subpanel"],
 {root} [class*="widget-panel"] {{

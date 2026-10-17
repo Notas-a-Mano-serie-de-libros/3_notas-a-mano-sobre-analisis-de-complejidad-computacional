@@ -364,7 +364,7 @@ def _build_search_css() -> str:
   .search-simulation-root {{
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow: visible;
     background: #ffffff;
     color: #2f2f2f;
     padding: 14px 4px;
@@ -1201,7 +1201,7 @@ def run_search_app(
         [step_button, auto_button, finish_button, reset_button, book_button]
     )
     parameters_content = widgets.VBox(
-        [first_row_box, button_row],
+        [first_row_box],
         layout=widgets.Layout(width="100%"),
     )
     formula_output.add_class("search-formula-content")
@@ -1212,6 +1212,7 @@ def run_search_app(
             root_class="search-simulation-root",
             panel_prefix="search",
             styles=_SEARCH_CSS,
+            action_row=button_row,
             sections=(
                 ViewSection(SECTION_CONFIGURATION, parameters_content, ("search-subpanel-content",)),
                 ViewSection(SECTION_PROCEDURE, formula_output, ("search-subpanel-content",)),

@@ -60,6 +60,7 @@ class SimulationViewSpec:
     panel_prefix: str
     sections: tuple[ViewSection, ...]
     styles: str = ""
+    action_row: widgets.Widget | None = None
 
 
 def action_button(action: str, *, disabled=False, label=None, width=None):
@@ -107,9 +108,20 @@ def build_simulation_view(spec: SimulationViewSpec):
             )
         )
 
+    items = []
+    if spec.action_row is not None:
+        if panels:
+            items.append(panels[0])
+            items.append(spec.action_row)
+            items.extend(panels[1:])
+        else:
+            items.append(spec.action_row)
+    else:
+        items = panels
+
     panel_content = widgets.VBox(
-        panels,
-        layout=widgets.Layout(width="100%", grid_gap="0px"),
+        items,
+        layout=widgets.Layout(width="100%", grid_gap="0px", overflow="visible"),
     )
     panel_content.add_class(f"{spec.panel_prefix}-panel-content")
     css_widget = widgets.HTML(
@@ -122,7 +134,7 @@ def build_simulation_view(spec: SimulationViewSpec):
             width="100%",
             max_width="100%",
             grid_gap="0px",
-            overflow="hidden",
+            overflow="visible",
         ),
     )
     root.add_class(spec.root_class)

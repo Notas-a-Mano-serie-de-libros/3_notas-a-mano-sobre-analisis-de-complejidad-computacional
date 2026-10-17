@@ -149,7 +149,7 @@ def step_binary_search(state):
     if state["phase"] == "select":
         state["mid"] = state["low"] + (state["high"] - state["low"]) // 2
         state["arr"][state["mid"]]["role"] = "current"
-        state["formula"] = build_formula(state)
+        state["formula"] = symbolic_formula()
         label_range(state)
         state["general_message"] = f"Evalúa m en la posición {state['mid']}."
         state["phase"] = "compare"
