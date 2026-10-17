@@ -19,206 +19,252 @@ _INITIAL_HINT = "Presione Paso siguiente o Ejecución automática para iniciar l
 # {gt}, {lt}, {le}, {ge} y {order} se adaptan al orden ascendente/descendente.
 PSEUDOCODE = {
     "secuencial": (
-        (None, "procedimiento busquedaSecuencial(A, n, x)"),
-        ("loop", "  para i ← 0 hasta n - 1 hacer"),
-        ("compare", "    si A[i] = x entonces"),
-        ("found", "      retornar i"),
-        ("not_found", "  retornar -1"),
+        (None, "función buscar(arr, x)"),
+        ("loop", "    para i en rango(longitud(arr))"),
+        ("compare", "        si arr[i] == x entonces"),
+        ("found", "            retornar verdadero"),
+        ("not_found", "    retornar falso"),
     ),
     "binaria": (
-        (None, "procedimiento busquedaBinaria(A, n, x)"),
-        ("init", "  a ← 0;  b ← n - 1"),
-        ("while", "  mientras a ≤ b hacer"),
-        ("mid", "    m ← a + ⌊(b - a) / 2⌋"),
-        ("found", "    si A[m] = x entonces retornar m"),
-        ("go_right", "    sino si A[m] < x entonces a ← m + 1"),
-        ("go_left", "    sino b ← m - 1"),
-        ("not_found", "  retornar -1"),
+        (None, "función buscar(arr, a, b, x)"),
+        ("while", "    mientras a <= b"),
+        ("mid", "        m ← a + (b - a) div 2"),
+        ("found", "        si arr[m] == x entonces"),
+        (None, "            retornar verdadero"),
+        ("go_right", "        si x > arr[m] entonces"),
+        (None, "            a ← m + 1"),
+        ("go_left", "        si no"),
+        (None, "            b ← m - 1"),
+        ("not_found", "    retornar falso"),
     ),
     "interpolacion": (
-        (None, "procedimiento busquedaInterpolacion(A, n, x)"),
-        ("init", "  a ← 0;  b ← n - 1"),
-        ("while", "  mientras a ≤ b y A[a] ≤ x ≤ A[b] hacer"),
-        ("probe", "    p ← a + ⌊(b - a) · (x - A[a]) / (A[b] - A[a])⌋"),
-        ("found", "    si A[p] = x entonces retornar p"),
-        ("go_right", "    sino si A[p] < x entonces a ← p + 1"),
-        ("go_left", "    sino b ← p - 1"),
-        ("not_found", "  retornar -1"),
+        (None, "función buscar(arr, a, b, x)"),
+        ("while", "    mientras a <= b y x >= arr[a] y x <= arr[b]"),
+        (None, "        num ← (b - a) * (x - arr[a])"),
+        (None, "        den ← arr[b] - arr[a]"),
+        (None, "        si den == 0 entonces"),
+        (None, "            retornar arr[a] == x"),
+        ("probe", "        p ← a + num div den"),
+        ("found", "        si arr[p] == x entonces"),
+        (None, "            retornar verdadero"),
+        ("go_right", "        si x > arr[p] entonces"),
+        (None, "            a ← p + 1"),
+        ("go_left", "        si no"),
+        (None, "            b ← p - 1"),
+        ("not_found", "    retornar falso"),
     ),
     "saltos": (
-        (None, "procedimiento busquedaSaltos(A, n, x)"),
-        ("init", "  salto ← ⌊√n⌋;  inicio ← 0"),
-        ("block_loop", "  mientras inicio < n hacer"),
-        (None, "    fin ← min(inicio + salto, n)"),
-        ("decide", "    si A[fin - 1] ≥ x entonces"),
-        ("linear", "      para i ← inicio hasta fin - 1 hacer"),
-        ("compare", "        si A[i] = x entonces"),
-        ("found", "          retornar i"),
-        (None, "      retornar -1"),
-        ("next_block", "    inicio ← fin"),
-        ("not_found", "  retornar -1"),
+        (None, "función buscar(arr, x)"),
+        (None, "    n ← longitud(arr)"),
+        (None, "    si n == 0 entonces"),
+        (None, "        retornar falso"),
+        ("init", "    paso ← raízEntera(n)"),
+        (None, "    anterior ← 0"),
+        (None, "    delta ← paso"),
+        ("decide", "    mientras arr[min(delta, n) - 1] < x"),
+        ("next_block", "        anterior ← delta"),
+        (None, "        delta += paso"),
+        (None, "        si anterior >= n entonces"),
+        (None, "            retornar falso"),
+        ("linear", "    para i en rango(anterior, min(delta, n))"),
+        ("compare", "        si arr[i] == x entonces"),
+        ("found", "            retornar verdadero"),
+        ("not_found", "    retornar falso"),
     ),
     "exponencial": (
-        (None, "procedimiento busquedaExponencial(A, n, x)"),
-        ("init", "  i ← 0"),
-        ("exp_while", "  mientras i < n y A[i] < x hacer"),
-        ("exp_next", "    i ← (i = 0) ? 1 : 2 · i"),
-        ("range", "  a ← ⌊i / 2⌋;  b ← min(i, n - 1)"),
-        ("bin_while", "  mientras a ≤ b hacer           // búsqueda binaria"),
-        ("mid", "    m ← a + ⌊(b - a) / 2⌋"),
-        ("found", "    si A[m] = x entonces retornar m"),
-        ("go_right", "    sino si A[m] < x entonces a ← m + 1"),
-        ("go_left", "    sino b ← m - 1"),
-        ("not_found", "  retornar -1"),
+        (None, "función buscar(arr, x)"),
+        (None, "    n ← longitud(arr)"),
+        (None, "    si n == 0 entonces"),
+        (None, "        retornar falso"),
+        (None, "    si arr[0] == x entonces"),
+        (None, "        retornar verdadero"),
+        ("init", "    i ← 1"),
+        ("exp_while", "    mientras i < n y arr[i] <= x"),
+        ("exp_next", "        i *= 2"),
+        ("range", "    a ← i div 2"),
+        (None, "    b ← min(i, n - 1)"),
+        (None, "    retornar busquedaBinaria(arr, a, b, x)"),
+        (None, ""),
+        (None, "función busquedaBinaria(arr, a, b, x)"),
+        ("bin_while", "    mientras a <= b"),
+        ("mid", "        m ← a + (b - a) div 2"),
+        ("found", "        si arr[m] == x entonces"),
+        (None, "            retornar verdadero"),
+        ("go_right", "        si x > arr[m] entonces"),
+        (None, "            a ← m + 1"),
+        ("go_left", "        si no"),
+        (None, "            b ← m - 1"),
+        ("not_found", "    retornar falso"),
     ),
     "ternaria": (
-        (None, "procedimiento busquedaTernaria(A, n, x)"),
-        ("init", "  a ← 0;  b ← n - 1"),
-        ("while", "  mientras a ≤ b hacer"),
-        ("points", "    m1 ← ⌊a + (b - a) / 3⌋;  m2 ← ⌊b - (b - a) / 3⌋"),
-        ("found", "    si A[m1] = x o A[m2] = x entonces retornar ese índice"),
-        ("go_left", "    si x < A[m1] entonces b ← m1 - 1"),
-        ("go_right", "    sino si x > A[m2] entonces a ← m2 + 1"),
-        ("go_middle", "    sino a ← m1 + 1;  b ← m2 - 1"),
-        ("not_found", "  retornar -1"),
+        (None, "función buscar(arr, a, b, x)"),
+        ("while", "    mientras a <= b"),
+        ("points", "        m1 ← a + (b - a) div 3"),
+        (None, "        m2 ← b - (b - a + 2) div 3"),
+        ("found", "        si arr[m1] == x o arr[m2] == x entonces"),
+        (None, "            retornar verdadero"),
+        ("go_left", "        si x < arr[m1] entonces"),
+        (None, "            b ← m1 - 1"),
+        ("go_right", "        si no, si x > arr[m2] entonces"),
+        (None, "            a ← m2 + 1"),
+        ("go_middle", "        si no"),
+        (None, "            a ← m1 + 1"),
+        (None, "            b ← m2 - 1"),
+        ("not_found", "    retornar falso"),
     ),
     "burbuja": (
-        (None, "procedimiento burbuja(A, n)"),
-        ("outer", "  para i ← 0 hasta n - 2 hacer"),
-        (None, "    intercambiado ← falso"),
-        ("bound", "    b ← n - 1 - i"),
-        ("inner", "    para j ← 0 hasta b - 1 hacer"),
-        ("compare", "      si A[j] {gt} A[j + 1] entonces"),
-        ("swap", "        intercambiar A[j] con A[j + 1];  intercambiado ← verdadero"),
-        ("fix", "    A[b] queda en su posición final"),
-        ("early", "    si no intercambiado entonces terminar"),
-        ("end", "  retornar A"),
+        (None, "función ordenar(arr)"),
+        ("outer", "    para i en rango(longitud(arr) - 1, 0, -1)"),
+        (None, "        intercambiado ← falso"),
+        ("inner", "        para j en rango(i)"),
+        ("compare", "            si arr[j] {gt} arr[j + 1] entonces"),
+        (None, "                temp ← arr[j]"),
+        ("swap", "                arr[j] ← arr[j + 1]"),
+        (None, "                arr[j + 1] ← temp"),
+        (None, "                intercambiado ← verdadero"),
+        ("fix", "        si no intercambiado entonces"),
+        ("end", "            break"),
     ),
     "seleccion": (
-        (None, "procedimiento seleccion(A, n)"),
-        ("outer", "  para i ← n - 1 hasta 1 (decreciendo) hacer"),
-        ("init", "    m ← 0"),
-        ("inner", "    para j ← 1 hasta i hacer"),
-        ("compare", "      si A[j] {gt} A[m] entonces"),
-        ("update", "        m ← j"),
-        ("keep", "    si m ≠ i entonces"),
-        ("swap", "      intercambiar A[m] con A[i]"),
-        ("end", "  retornar A"),
+        (None, "función ordenar(arr)"),
+        ("outer", "    para i en rango(longitud(arr) - 1)"),
+        ("init", "        max ← 0"),
+        ("inner", "        para j en rango(1, longitud(arr) - i)"),
+        ("compare", "            si arr[j] {gt} arr[max] entonces"),
+        ("update", "                max ← j"),
+        ("keep", "        temp ← arr[max]"),
+        ("swap", "        arr[max] ← arr[longitud(arr) - 1 - i]"),
+        ("end", "        arr[longitud(arr) - 1 - i] ← temp"),
     ),
     "insercion": (
-        (None, "procedimiento insercion(A, n)"),
-        ("outer", "  para i ← 1 hasta n - 1 hacer"),
-        ("pick", "    x ← A[i];  j ← i - 1"),
-        ("while", "    mientras j ≥ 0 y A[j] {gt} x hacer"),
-        ("shift", "      A[j + 1] ← A[j];  j ← j - 1"),
-        ("insert", "    A[j + 1] ← x"),
-        ("end", "  retornar A"),
+        (None, "función ordenar(arr)"),
+        ("outer", "    para i en rango(1, longitud(arr))"),
+        ("pick", "        clave ← arr[i]"),
+        (None, "        j ← i - 1"),
+        ("while", "        mientras j >= 0 y arr[j] {gt} clave"),
+        ("shift", "            arr[j + 1] ← arr[j]"),
+        (None, "            j -= 1"),
+        ("insert", "        arr[j + 1] ← clave"),
     ),
     "insercion_binaria": (
-        (None, "procedimiento insercionBinaria(A, n)"),
-        ("outer", "  para i ← 1 hasta n - 1 hacer"),
-        ("pick", "    x ← A[i];  a ← 0;  b ← i"),
-        ("while", "    mientras a < b hacer"),
-        ("mid", "      m ← a + ⌊(b - a) / 2⌋"),
-        ("range", "      si A[m] {le} x entonces a ← m + 1  sino b ← m"),
-        ("pos", "    pos ← a"),
-        ("shift", "    para j ← i hasta pos + 1 (decreciendo): A[j] ← A[j - 1]"),
-        ("insert", "    A[pos] ← x"),
-        ("end", "  retornar A"),
+        (None, "función ordenar(arr)"),
+        ("outer", "    para i en rango(1, longitud(arr))"),
+        ("pick", "        clave ← arr[i]; a ← 0; b ← i"),
+        ("while", "        mientras a < b"),
+        ("mid", "            m ← a + (b - a) div 2"),
+        ("range", "            si arr[m] {le} clave entonces a ← m + 1  si no b ← m"),
+        ("pos", "        pos ← a"),
+        ("shift", "        para j en rango(i, pos, -1): arr[j] ← arr[j - 1]"),
+        ("insert", "        arr[pos] ← clave"),
     ),
     "shell": (
-        (None, "procedimiento shell(A, n)"),
-        ("gap", "  para cada salto h de la secuencia (de mayor a menor) hacer"),
-        ("outer", "    para k ← h hasta n - 1 hacer"),
-        ("pick", "      j ← k"),
-        ("while", "      mientras j ≥ h hacer"),
-        ("compare", "        si A[j - h] {gt} A[j] entonces"),
-        ("swap", "          intercambiar A[j - h] con A[j];  j ← j - h"),
-        (None, "        sino salir del ciclo"),
-        ("place", "      el elemento queda ubicado en su subarreglo"),
-        ("end", "  retornar A"),
+        (None, "función ordenar(arr)"),
+        ("gap", "    para cada salto h de la secuencia decreciente"),
+        ("outer", "        para k en rango(h, longitud(arr))"),
+        ("pick", "            j ← k"),
+        ("while", "            mientras j >= h y arr[j - h] {gt} arr[j]"),
+        ("swap", "                intercambiar arr[j - h] con arr[j]"),
+        ("place", "                j -= h"),
+        ("end", "    retornar arr"),
     ),
     "mezcla": (
-        ("call", "// llamada inicial: mezcla(A, 0, n - 1)"),
-        (None, "procedimiento mezcla(A, inicio, fin)"),
-        ("base", "  si inicio ≥ fin entonces retornar"),
-        ("divide", "  medio ← ⌊(inicio + fin) / 2⌋"),
-        (None, "  mezcla(A, inicio, medio);  mezcla(A, medio + 1, fin)"),
-        (None, "  intercalar(A, inicio, medio, fin)"),
+        (None, "función ordenar(arr, a, b)"),
+        ("base", "    si a >= b entonces retornar"),
+        ("divide", "    m ← a + (b - a) div 2"),
+        (None, "    ordenar(arr, a, m)"),
+        (None, "    ordenar(arr, m + 1, b)"),
+        ("call", "    combinar(arr, a, m, b)"),
         (None, ""),
-        (None, "procedimiento intercalar(A, inicio, medio, fin)"),
-        ("merge_init", "  i ← inicio;  j ← medio + 1;  k ← inicio"),
-        (None, "  mientras k ≤ fin hacer"),
-        ("merge_loop", "    si j > fin o (i ≤ medio y A[i] {le} A[j]) entonces"),
-        (None, "      B[k] ← A[i];  i ← i + 1"),
-        (None, "    sino  B[k] ← A[j];  j ← j + 1"),
-        (None, "    k ← k + 1"),
-        ("merge_done", "  copiar B[inicio..fin] en A[inicio..fin]"),
-        ("end", "// A queda ordenado"),
+        (None, "función combinar(arr, a, m, b)"),
+        (None, "    izquierda ← arr[a:m + 1]"),
+        (None, "    derecha ← arr[m + 1:b + 1]"),
+        ("merge_init", "    i ← 0; j ← 0; k ← a"),
+        ("merge_loop", "    mientras i < longitud(izquierda) y j < longitud(derecha)"),
+        (None, "        si izquierda[i] {le} derecha[j] entonces arr[k] ← izquierda[i]; i += 1"),
+        (None, "        si no arr[k] ← derecha[j]; j += 1"),
+        (None, "        k += 1"),
+        (None, "    mientras i < longitud(izquierda): arr[k] ← izquierda[i]; i += 1; k += 1"),
+        (None, "    mientras j < longitud(derecha): arr[k] ← derecha[j]; j += 1; k += 1"),
+        ("merge_done", "    // subarreglo combinado"),
+        ("end", "// ordenamiento finalizado"),
     ),
     "rapido_lomuto": (
-        ("work", "procedimiento rapido(A, inicio, fin)"),
-        ("base", "  si inicio ≥ fin entonces retornar"),
-        ("pivot", "  elegir el pivote según la estrategia"),
-        ("move", "  llevar el pivote a la posición fin"),
-        (None, "  i ← inicio"),
-        (None, "  para j ← inicio hasta fin - 1 hacer"),
-        ("compare", "    si A[j] {le} pivote entonces"),
-        ("apply", "      intercambiar A[i] con A[j];  i ← i + 1"),
-        ("place", "  intercambiar A[i] con A[fin]"),
-        ("recurse", "  rapido(A, inicio, i - 1);  rapido(A, i + 1, fin)"),
-        ("end", "// A queda ordenado"),
+        (None, "función ordenar(arr, a, b)"),
+        ("base", "    si a >= b entonces retornar"),
+        ("work", "    p ← particionar(arr, a, b)"),
+        (None, "    ordenar(arr, a, p - 1)"),
+        (None, "    ordenar(arr, p + 1, b)"),
+        (None, ""),
+        (None, "función particionar(arr, a, b)"),
+        ("pivot", "    pivote ← arr[b]"),
+        (None, "    i ← a"),
+        (None, "    para j en rango(a, b)"),
+        ("compare", "        si arr[j] {le} pivote entonces"),
+        ("apply", "            intercambiar arr[i] con arr[j]; i += 1"),
+        ("place", "    intercambiar arr[i] con arr[b]"),
+        (None, "    retornar i"),
+        ("end", "// partición completada"),
     ),
     "rapido_hoare": (
-        ("work", "procedimiento rapido(A, inicio, fin)"),
-        ("base", "  si inicio ≥ fin entonces retornar"),
-        ("pivot", "  elegir el pivote (permanece en su posición p)"),
-        (None, "  i ← inicio;  j ← fin"),
-        (None, "  repetir"),
-        ("scan_i", "    mientras A[i] {le} pivote hacer  i ← i + 1"),
-        ("scan_j", "    mientras A[j] {ge} pivote hacer  j ← j - 1"),
-        ("cross", "    si i ≥ j entonces salir del ciclo"),
-        ("swap", "    intercambiar A[i] con A[j];  i ← i + 1;  j ← j - 1"),
-        ("place", "  colocar el pivote en su posición final p"),
-        ("recurse", "  rapido(A, inicio, p - 1);  rapido(A, p + 1, fin)"),
-        ("end", "// A queda ordenado"),
+        (None, "función ordenar(arr, a, b)"),
+        ("base", "    si a >= b entonces retornar"),
+        ("work", "    p ← particionar(arr, a, b)"),
+        (None, "    ordenar(arr, a, p - 1)"),
+        (None, "    ordenar(arr, p + 1, b)"),
+        (None, ""),
+        (None, "función particionar(arr, a, b)"),
+        ("pivot", "    pivote ← arr[a]"),
+        (None, "    i ← a + 1; j ← b"),
+        ("cross", "    mientras i <= j"),
+        ("scan_i", "        mientras i <= j y arr[i] < pivote: i += 1"),
+        ("scan_j", "        mientras i <= j y arr[j] > pivote: j -= 1"),
+        ("swap", "        si i <= j entonces intercambiar arr[i] con arr[j]; i += 1; j -= 1"),
+        ("place", "    intercambiar arr[a] con arr[j]"),
+        (None, "    retornar j"),
+        ("end", "// partición completada"),
     ),
     "radix": (
-        (None, "procedimiento radix(A, n, base)"),
-        ("passes", "  p ← cantidad de dígitos de la clave máxima"),
-        (None, "  para i ← 1 hasta p hacer"),
-        (None, "    crear las cubetas C[0 .. base - 1] vacías"),
-        ("distribute", "    para cada x en A (de izquierda a derecha) hacer"),
-        (None, "      d ← ⌊x / base^(i - 1)⌋ mod base;  agregar x a C[d]"),
-        (None, "    k ← 0"),
-        ("collect", "    para cada cubeta C[d] en orden {order} hacer"),
-        (None, "      para cada x en C[d]: A[k] ← x;  k ← k + 1"),
-        ("pass_end", "    // pasada i terminada"),
-        ("end", "  retornar A"),
+        (None, "función ordenar(arr)"),
+        ("passes", "    maximo ← max(arr); d ← floor(log10(maximo)) + 1"),
+        (None, "    para i en rango(1, d + 1)"),
+        (None, "        ordenarPorDigito(arr, i)"),
+        (None, ""),
+        (None, "función ordenarPorDigito(arr, i)"),
+        (None, "    n ← longitud(arr); exp ← 10 ** (i - 1)"),
+        (None, "    conteo ← [0] * 10; salida ← [0] * n"),
+        ("distribute", "    para valor en arr: conteo[(valor div exp) % 10] += 1"),
+        (None, "    para j en rango(1, 10): conteo[j] += conteo[j - 1]"),
+        ("collect", "    para j en rango(n - 1, -1, -1)"),
+        (None, "        d ← (arr[j] div exp) % 10; salida[conteo[d] - 1] ← arr[j]; conteo[d] -= 1"),
+        ("pass_end", "    arr[:] ← salida"),
+        ("end", "// arreglo ordenado"),
     ),
 }
 
 _ORDER_TOKENS = {
-    False: {"{gt}": ">", "{lt}": "<", "{le}": "≤", "{ge}": "≥", "{order}": "ascendente"},
-    True: {"{gt}": "<", "{lt}": ">", "{le}": "≥", "{ge}": "≤", "{order}": "descendente"},
+    False: {"{gt}": ">", "{lt}": "<", "{le}": "<=", "{ge}": ">=", "{order}": "ascendente"},
+    True: {"{gt}": "<", "{lt}": ">", "{le}": ">=", "{ge}": "<=", "{order}": "descendente"},
 }
 
 _STYLES = """<style>
 .desk-check { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; color: inherit; font-family: inherit; }
-.desk-check__code { flex: 1 1 340px; min-width: 260px; max-width: 100%; border: 1px solid rgba(128,128,128,.4); padding: 8px 0; overflow-x: auto; }
-.desk-check__line { display: flex; border-left: 4px solid transparent; font: 13px/1.65 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; padding: 0 12px 0 0; }
-.desk-check__num { flex: 0 0 34px; text-align: right; padding-right: 12px; opacity: .55; user-select: none; }
-.desk-check__line--active { background: rgba(139,75,50,.20); border-left-color: #8b4b32; font-weight: 700; }
-.desk-check__line--active .desk-check__num { opacity: 1; color: #8b4b32; }
-.desk-check__trace { flex: 2 1 460px; min-width: 280px; max-height: 340px; overflow: auto; border: 1px solid rgba(128,128,128,.4); }
-.desk-check__table { width: 100%; border-collapse: collapse; font-size: 13px; line-height: 1.45; }
-.desk-check__table th, .desk-check__table td { border-bottom: 1px solid rgba(128,128,128,.3); padding: 5px 9px; text-align: left; vertical-align: top; }
-.desk-check__table th { position: sticky; top: 0; background: rgba(128,128,128,.18); backdrop-filter: blur(6px); z-index: 1; }
-.desk-check__table tr:last-child td { font-weight: 600; background: rgba(139,75,50,.12); }
-.desk-check__table td.desk-check__step { text-align: right; white-space: nowrap; }
+.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 6px 0; overflow-x: auto; background: var(--md-code-bg-color, rgba(128,128,128,.04)); }
+.desk-check__line { display: flex; align-items: stretch; font: 13px/1.65 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; min-height: 1.65em; }
+.desk-check__num { flex: 0 0 38px; width: 38px; min-width: 38px; display: flex; align-items: center; justify-content: center; text-align: center; background: rgba(128,128,128,.10); border-right: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); margin-right: 12px; color: var(--md-default-fg-color--light, inherit); opacity: .75; user-select: none; box-sizing: border-box; }
+.desk-check__line--active { background: rgba(139,75,50,.18); font-weight: 700; }
+.desk-check__line--active .desk-check__num { background: rgba(139,75,50,.30); border-right-color: #8b4b32; color: #8b4b32; opacity: 1; font-weight: 700; }
+.desk-check__trace { flex: 2 1 480px; min-width: 300px; max-height: 350px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; position: relative; }
+.desk-check__table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 1.45; }
+.desk-check__table th, .desk-check__table td { border-bottom: 1px solid rgba(128,128,128,.25); padding: 6px 10px; text-align: left; vertical-align: middle; }
+.desk-check__table th { position: sticky; top: 0; background: var(--md-default-bg-color, #ffffff); background-color: rgba(246, 245, 243, 0.98); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10; box-shadow: 0 1px 0 rgba(128,128,128,.35); font-weight: 600; }
+.desk-check__table tr:last-child td { font-weight: 600; background: rgba(139,75,50,.10); }
+.desk-check__table td.desk-check__step { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.desk-check__table th.desk-check__step { text-align: center; }
 .desk-check__table td.desk-check__mono { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; }
-.desk-check__note { font-size: 12px; opacity: .75; margin: 6px 9px; }
-.desk-check__empty { font-size: 13px; opacity: .8; padding: 12px; }
+.desk-check__table td.desk-check__var { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; text-align: center; white-space: nowrap; }
+.desk-check__table th.desk-check__var { text-align: center; }
+.desk-check__note { font-size: 12px; opacity: .75; margin: 6px 10px; }
+.desk-check__empty { font-size: 13px; opacity: .8; padding: 14px; }
 </style>"""
 
 
@@ -283,11 +329,49 @@ def latex_to_text(formula):
     return text
 
 
+def parse_desk_vars(variables):
+    """Extrae un diccionario {nombre_variable: valor} a partir del texto de variables."""
+
+    if isinstance(variables, dict):
+        return {str(k): str(v) for k, v in variables.items()}
+    text = str(variables or "").strip()
+    if not text:
+        return {}
+    parts = re.split(r"[,;]\s*", text)
+    result = {}
+    for part in parts:
+        part = part.strip()
+        if not part or "↔" in part or "valores de h" in part:
+            continue
+        if "<" in part and "=" in part and ("A[" in part or "a[" in part):
+            subparts = re.split(r"\s*[<>]+\s*", part)
+            for sp in subparts:
+                if "=" in sp:
+                    k, v = sp.split("=", 1)
+                    result[k.strip()] = v.strip()
+            continue
+        m = re.match(r"^([a-zA-Z_áéíóúÁÉÍÓÚ][a-zA-Z0-9_áéíóúÁÉÍÓÚ\[\]\s+-]*?)\s*(?:=|←)\s*(.+)$", part)
+        if m:
+            var_name = m.group(1).strip()
+            rest = m.group(2).strip()
+            if "=" in rest:
+                eqs = [e.strip() for e in rest.split("=")]
+                val = eqs[-1] if not (eqs[-1].isalpha() and len(eqs[-1]) == 1 and eqs[0].isdigit()) else eqs[0]
+            else:
+                val = rest
+            val = re.split(r"\s*[<>≤≥]\s*", val)[0].strip()
+            if var_name:
+                result[var_name] = val
+    return result
+
+
 def desk_row(step, line, variables, action, array=None):
+    var_dict = parse_desk_vars(variables)
     return {
         "step": step,
         "line": line,
         "vars": variables or "",
+        "var_dict": var_dict,
         "action": action or "",
         "array": None if array is None else list(array),
     }
@@ -354,7 +438,7 @@ def _search_line_and_variables(algorithm, before, after):
         if complete:
             return "not_found", f"salto = {jump}, x = {target}"
         if phase == "show_block":
-            return "block_loop", f"salto = {jump}, inicio = {start}, fin = {end}"
+            return "decide", f"salto = {jump}, inicio = {start}, fin = {end}"
         if phase == "decide_block":
             last = _node_value(before, before["block_end"] - 1)
             if after.get("phase") == "linear_show":
@@ -574,6 +658,20 @@ def _format_array(values):
     return "[" + ", ".join("—" if value is None else str(value) for value in values) + "]"
 
 
+def _collect_variable_columns(rows):
+    """Obtiene el conjunto ordenado de nombres de variables presentes en las filas."""
+    columns = []
+    for row in rows:
+        var_dict = row.get("var_dict")
+        if not var_dict and row.get("vars"):
+            var_dict = parse_desk_vars(row["vars"])
+        if var_dict:
+            for key in var_dict.keys():
+                if key not in columns:
+                    columns.append(key)
+    return columns
+
+
 def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, show_array=False, limit=DESK_ROW_LIMIT):
     """HTML del panel: pseudocódigo con la línea activa y tabla de seguimiento."""
 
@@ -596,23 +694,45 @@ def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, sh
     line_numbers = {key: number for number, (key, _text) in enumerate(lines, start=1) if key}
 
     if visible:
+        var_cols = _collect_variable_columns(visible)
         body = []
         for row in visible:
             number = line_numbers.get(row["line"])
             line_cell = str(number) if number is not None else "—"
+            row_vars = row.get("var_dict")
+            if not row_vars and row.get("vars"):
+                row_vars = parse_desk_vars(row["vars"])
+            row_vars = row_vars or {}
+
+            if var_cols:
+                var_cells = "".join(
+                    f'<td class="desk-check__var">{escape(str(row_vars.get(col, "—")))}</td>'
+                    for col in var_cols
+                )
+            else:
+                var_cells = f'<td class="desk-check__mono">{escape(row["vars"]) or "—"}</td>'
+
             array_cell = f'<td class="desk-check__mono">{escape(_format_array(row["array"]))}</td>' if show_array and row["array"] is not None else ("<td></td>" if show_array else "")
             body.append(
                 f'<tr><td class="desk-check__step">{row["step"]}</td><td class="desk-check__step">{line_cell}</td>'
-                f'<td class="desk-check__mono">{escape(row["vars"]) or "—"}</td>{array_cell}'
+                f'{var_cells}{array_cell}'
                 f'<td>{escape(row["action"])}</td></tr>'
             )
+
+        if var_cols:
+            var_headers = "".join(f'<th class="desk-check__var">{escape(col)}</th>' for col in var_cols)
+        else:
+            var_headers = "<th>Variables</th>"
+
         array_head = "<th>Arreglo</th>" if show_array else ""
         hidden = (rows[0]["step"] > 1) if rows else False
         note = ""
         if len(rows) > limit or hidden:
             note = f'<p class="desk-check__note">Se muestran los últimos {len(visible)} pasos' + (f" de {total_steps}" if total_steps else "") + ".</p>"
         trace_html = (
-            f'{note}<table class="desk-check__table"><thead><tr><th>Paso</th><th>Línea</th><th>Variables</th>{array_head}<th>Acción</th></tr></thead>'
+            f'{note}<table class="desk-check__table"><thead><tr>'
+            f'<th class="desk-check__step">Paso</th><th class="desk-check__step">Línea</th>'
+            f'{var_headers}{array_head}<th>Acción</th></tr></thead>'
             f'<tbody>{"".join(body)}</tbody></table>'
         )
     else:
@@ -631,6 +751,7 @@ __all__ = [
     "PSEUDOCODE",
     "desk_row",
     "latex_to_text",
+    "parse_desk_vars",
     "pseudocode_algorithm_key",
     "pseudocode_for",
     "render_desk_check",
