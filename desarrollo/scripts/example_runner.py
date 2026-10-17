@@ -213,8 +213,9 @@ def render_runner(listing: dict, executable_only: bool = False, *, include_pseud
     java_hidden = " hidden" if include_pseudocode else ""
     pseudocode_disabled = " disabled" if include_pseudocode else ""
     execution_attribute = " data-execution-ui hidden" if include_pseudocode else ""
+    pseudocode_active = " data-pseudocode-active" if include_pseudocode else ""
     return (
-        '<div class="example-runner" data-example-runner>'
+        f'<div class="example-runner" data-example-runner{pseudocode_active}>'
         "<details open><summary>Ver código y editar entradas</summary>"
         f'<input type="hidden" data-runner-language value="{initial_language}">'
         '<div class="runner-language-tabs" role="tablist" aria-label="Lenguaje del ejemplo">'

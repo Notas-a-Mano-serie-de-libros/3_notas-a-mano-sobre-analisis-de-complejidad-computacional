@@ -122,6 +122,7 @@
           note.hidden = isPseudocode ? note.dataset.runnerNote !== "pseudocode" : note.dataset.runnerNote === "pseudocode";
         });
         panel.querySelectorAll("[data-execution-ui]").forEach(element => { element.hidden = isPseudocode; });
+        panel.toggleAttribute("data-pseudocode-active", isPseudocode);
         runButton.disabled = isPseudocode;
         stopButton.disabled = true;
         resetButton.disabled = isPseudocode;

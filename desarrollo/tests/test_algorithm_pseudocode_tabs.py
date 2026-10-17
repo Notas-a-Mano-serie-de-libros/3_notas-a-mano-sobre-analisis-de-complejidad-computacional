@@ -20,6 +20,7 @@ def test_every_executable_search_and_sort_listing_has_a_pseudocode_tab():
 
         runner_count += page_runners
         assert source.count('data-runner-language value="pseudocode"') == page_runners, path
+        assert source.count('data-example-runner data-pseudocode-active') == page_runners, path
         assert source.count('data-language-tab="pseudocode"') == page_runners, path
         assert source.count('aria-selected="true" data-language-tab="pseudocode"') == page_runners, path
         assert source.count('data-language="pseudocode"') == page_runners, path
@@ -43,9 +44,11 @@ def test_pseudocode_mode_hides_execution_only_controls():
     assert 'if (language.value === "pseudocode") return;' in source
     assert 'runButton.disabled = isPseudocode;' in source
     assert 'resetButton.disabled = isPseudocode;' in source
+    assert 'panel.toggleAttribute("data-pseudocode-active", isPseudocode);' in source
 
 
 def test_code_editor_uses_the_compact_font_size():
     source = (PROJECT_ROOT / "docs/assets/stylesheets/extra.css").read_text(encoding="utf-8")
 
     assert "font: .7rem/1.45 var(--md-code-font-family)" in source
+    assert "[data-example-runner][data-pseudocode-active] .example-runner-actions { margin-bottom: .8rem; }" in source

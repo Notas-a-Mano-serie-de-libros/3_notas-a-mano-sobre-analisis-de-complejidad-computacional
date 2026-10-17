@@ -1625,6 +1625,7 @@ input {
   align-items: center;
   gap: 0;
 }
+[data-example-runner][data-pseudocode-active] .example-runner-actions { margin-bottom: .8rem; }
 .md-typeset .example-runner-actions button,
 .md-typeset .example-runner-actions .colab-button {
   flex: 0 0 auto;
