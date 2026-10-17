@@ -193,7 +193,8 @@ class TestCapitulo7BusquedaTernaria(unittest.TestCase):
         self.assertIn("def enforce_target_membership", common_source)
         self.assertIn("target = enforce_target_membership", common_source)
         self.assertIn("def update_target_position_visibility", common_source)
-        self.assertIn('target_position_input.layout.display = None if target_mode_input.value == TARGET_EXISTS else "none"', common_source)
+        self.assertIn("set_widget_visibility(", common_source)
+        self.assertIn("target_mode_input.value == TARGET_EXISTS", common_source)
         self.assertIn('ui_state["first_row"].children = tuple(row_controls)', common_source)
         self.assertIn('display="flex"', common_source)
         self.assertIn('flex_flow="row wrap"', common_source)
@@ -1272,9 +1273,27 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("def on_target_position_change", source)
         self.assertIn("enforce_target_membership", source)
         self.assertIn("def update_target_position_visibility", source)
-        self.assertIn('display_value = None if target_mode_input.value == TARGET_EXISTS else "none"', source)
-        self.assertIn("target_position_input.layout.display = display_value", source)
-        self.assertIn('control_groups["target_position"].layout.display = display_value', source)
+        self.assertIn("visible = target_mode_input.value == TARGET_EXISTS", source)
+        self.assertIn("set_widget_visibility(target_position_input, visible)", source)
+        self.assertIn('set_widget_visibility(control_groups["target_position"], visible)', source)
+
+    def test_target_position_visibility_is_restored_after_hiding(self):
+        common = self.launchers._load_module(
+            "search_common.py",
+            "capitulo7_search_common_visibility_test",
+        )
+        controls = common.create_search_controls(
+            common.DEFAULT_SIZE,
+            common.MAX_SIZE,
+            common.DEFAULT_TARGET,
+        )
+        target_position = controls["target_position"]
+
+        common.set_widget_visibility(target_position, False)
+        self.assertEqual(target_position.layout.display, "none")
+
+        common.set_widget_visibility(target_position, True)
+        self.assertEqual(target_position.layout.display, "")
 
     def test_target_position_selects_existing_value_location(self):
         module = self.launchers._load_module(

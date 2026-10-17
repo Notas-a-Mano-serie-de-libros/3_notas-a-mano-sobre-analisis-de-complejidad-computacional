@@ -23,6 +23,7 @@ from search_common import (
     enforce_target_membership,
     generate_sorted_values,
     resolve_node_style,
+    set_widget_visibility,
 )
 
 from common.simulation_views import (
@@ -790,9 +791,9 @@ def run_app():
         control_state["updating"] = False
 
     def update_target_position_visibility():
-        display_value = None if target_mode_input.value == TARGET_EXISTS else "none"
-        target_position_input.layout.display = display_value
-        control_groups["target_position"].layout.display = display_value
+        visible = target_mode_input.value == TARGET_EXISTS
+        set_widget_visibility(target_position_input, visible)
+        set_widget_visibility(control_groups["target_position"], visible)
 
     def build_state(values=None, target_override=None):
         size = len(values) if values is not None else size_input.value

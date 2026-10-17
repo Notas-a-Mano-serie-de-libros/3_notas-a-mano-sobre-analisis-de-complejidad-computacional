@@ -103,6 +103,11 @@ def colab_pause(seconds=0.45):
     pause(seconds, colab_output)
 
 
+def set_widget_visibility(widget, visible):
+    """Set an explicit display value so detached controls become visible again."""
+    widget.layout.display = "" if visible else "none"
+
+
 def generate_sorted_values(size=DEFAULT_SIZE):
     return sorted(random.sample(range(101), size))
 
@@ -981,7 +986,10 @@ def run_search_app(
         control_state["updating"] = False
 
     def update_target_position_visibility():
-        target_position_input.layout.display = None if target_mode_input.value == TARGET_EXISTS else "none"
+        set_widget_visibility(
+            target_position_input,
+            target_mode_input.value == TARGET_EXISTS,
+        )
         if ui_state["first_row"] is not None:
             row_controls = first_row_controls()
             ui_state["first_row"].children = tuple(row_controls)
@@ -1204,6 +1212,7 @@ __all__ = [
     "HIGHLIGHT_RANGE_ROLE_STYLES",
     "SEQUENTIAL_ROLE_STYLES",
     "colab_pause",
+    "set_widget_visibility",
     "generate_sorted_values",
     "calculate_target",
     "choose_target",
