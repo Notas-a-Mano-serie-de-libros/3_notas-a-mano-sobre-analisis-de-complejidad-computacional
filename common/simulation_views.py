@@ -17,6 +17,7 @@ from common.widget_controls import (
 SECTION_CONFIGURATION = "Configuración"
 SECTION_PROCEDURE = "Procedimiento"
 SECTION_RESULT = "Resultado"
+SECTION_DESK_CHECK = "Prueba de escritorio"
 
 
 def standard_view_styles(root_selector: str) -> str:

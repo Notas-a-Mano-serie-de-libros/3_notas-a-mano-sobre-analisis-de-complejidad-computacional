@@ -10,8 +10,10 @@ import ipywidgets as widgets
 from IPython.display import display
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
+from common.desk_check import render_desk_check, search_desk_row
 from common.simulation_views import (
     SECTION_CONFIGURATION,
+    SECTION_DESK_CHECK,
     SECTION_PROCEDURE,
     SECTION_RESULT,
     SimulationViewSpec,
@@ -952,6 +954,8 @@ def run_search_app(
         )
     )
     html_output = widgets.HTML(layout=widgets.Layout(width="100%"))
+    desk_output = widgets.HTML(layout=widgets.Layout(width="100%"))
+    desk_rows: list[dict] = []
     control_state = {"updating": False}
     render_cache = OutputCache()
     ui_state = {"first_row": None}
@@ -1023,6 +1027,11 @@ def run_search_app(
             render_html(state),
             state.get("formula_reserved_height"),
         )
+        desk_output.value = render_desk_check(
+            state.get("algorithm"),
+            desk_rows,
+            total_steps=state.get("step_total"),
+        )
 
     def sync_execution_buttons():
         complete = state["search_complete"]
@@ -1042,6 +1051,7 @@ def run_search_app(
         if control_state["updating"]:
             return
         state = build_state()
+        desk_rows.clear()
         enable_controls_for_new_array()
         redraw()
 
@@ -1049,6 +1059,7 @@ def run_search_app(
         nonlocal state
         update_target_position_visibility()
         state = build_state(values=current_values())
+        desk_rows.clear()
         enable_controls_for_new_array()
         redraw()
 
@@ -1057,6 +1068,7 @@ def run_search_app(
         if control_state["updating"]:
             return
         state = build_state(values=current_values())
+        desk_rows.clear()
         enable_controls_for_new_array()
         redraw()
 
@@ -1068,13 +1080,16 @@ def run_search_app(
         size_input.value = len(book_array)
         control_state["updating"] = False
         state = build_state(values=book_array)
+        desk_rows.clear()
         enable_controls_for_new_array()
         redraw()
 
     def run_single_step(*_args):
         if not state["search_complete"]:
+            before = copy_search_state(state)
             step_search(state)
             state["step_index"] = min(state.get("step_index", 0) + 1, state.get("step_total", 0))
+            desk_rows.append(search_desk_row(state.get("algorithm"), before, state, state["step_index"]))
         redraw()
         sync_execution_buttons()
 
@@ -1082,10 +1097,14 @@ def run_search_app(
         nonlocal state
         set_disabled((auto_button, step_button, reset_button, book_button), True)
         finish_button.disabled = False
+        prev = copy_search_state(state)
         for snapshot in build_search_trace(state, step_search):
             if execution_state["run_id"] != run_id:
                 return
             state = snapshot
+            step = state.get("step_index", len(desk_rows) + 1)
+            desk_rows.append(search_desk_row(state.get("algorithm"), prev, state, step))
+            prev = copy_search_state(state)
             redraw()
             await asyncio.sleep(0.45)
         if execution_state["run_id"] == run_id:
@@ -1097,10 +1116,14 @@ def run_search_app(
         nonlocal state
         set_disabled((auto_button, step_button, reset_button, book_button), True)
         finish_button.disabled = False
+        prev = copy_search_state(state)
         for snapshot in build_search_trace(state, step_search):
             if execution_state["run_id"] != run_id:
                 return
             state = snapshot
+            step = state.get("step_index", len(desk_rows) + 1)
+            desk_rows.append(search_desk_row(state.get("algorithm"), prev, state, step))
+            prev = copy_search_state(state)
             redraw()
             colab_pause(0.45)
         if execution_state["run_id"] == run_id:
@@ -1125,8 +1148,12 @@ def run_search_app(
         execution_state["run_id"] += 1
         set_disabled((auto_button, finish_button, step_button, reset_button, book_button), True)
         final_state = None
+        prev = copy_search_state(state)
         for snapshot in build_search_trace(state, step_search):
             final_state = snapshot
+            step = final_state.get("step_index", len(desk_rows) + 1)
+            desk_rows.append(search_desk_row(final_state.get("algorithm"), prev, final_state, step))
+            prev = copy_search_state(final_state)
         if final_state is not None:
             state = final_state
             state["step_index"] = state.get("step_total", state.get("step_index", 0))
@@ -1169,6 +1196,7 @@ def run_search_app(
     )
     formula_output.add_class("search-formula-content")
     html_output.add_class("search-result-content")
+    desk_output.add_class("search-desk-check-content")
     layout = build_simulation_view(
         SimulationViewSpec(
             root_class="search-simulation-root",
@@ -1178,6 +1206,7 @@ def run_search_app(
                 ViewSection(SECTION_CONFIGURATION, parameters_content, ("search-subpanel-content",)),
                 ViewSection(SECTION_PROCEDURE, formula_output, ("search-subpanel-content",)),
                 ViewSection(SECTION_RESULT, html_output, ("search-subpanel-content",)),
+                ViewSection(SECTION_DESK_CHECK, desk_output, ("search-subpanel-content",)),
             ),
         )
     )

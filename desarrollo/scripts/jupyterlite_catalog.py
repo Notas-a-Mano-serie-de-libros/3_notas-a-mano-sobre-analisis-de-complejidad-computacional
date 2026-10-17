@@ -195,6 +195,7 @@ CHAPTER_CONFIGS = {
                 "__init__.py",
                 "animation_runtime.py",
                 "chart_runtime.py",
+                "desk_check.py",
                 "exercise_laboratory.py",
                 "experimental_simulation.py",
                 "graphics.py",
@@ -245,6 +246,23 @@ CHAPTER_CONFIGS = {
             "notebooks/ejercicios_propuestos.ipynb",
         ),
         "runtime_files": tuple(
+            Path(f"common/{name}")
+            for name in (
+                "__init__.py",
+                "animation_runtime.py",
+                "chart_runtime.py",
+                "desk_check.py",
+                "exercise_laboratory.py",
+                "experimental_simulation.py",
+                "graphics.py",
+                "plot_style.py",
+                "remote_fetch.py",
+                "simulation_views.py",
+                "visual_roles.py",
+                "widget_controls.py",
+            )
+        )
+        + tuple(
             Path(path)
             for path in (
                 "core/__init__.py",

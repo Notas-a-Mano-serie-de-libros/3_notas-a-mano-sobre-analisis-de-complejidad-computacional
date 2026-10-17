@@ -9,8 +9,14 @@ import ipywidgets as widgets
 from IPython.display import display
 
 from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
+from common.desk_check import (
+    pseudocode_algorithm_key,
+    render_desk_check,
+    sort_desk_rows,
+)
 from common.simulation_views import (
     SECTION_CONFIGURATION,
+    SECTION_DESK_CHECK,
     SECTION_PROCEDURE,
     SECTION_RESULT,
     SimulationViewSpec,
@@ -1875,7 +1881,7 @@ def sort_controls_grid(groups):
     )
 
 
-def build_sort_panel(parameters, result, title="Simulación de ordenamiento", procedure=None):
+def build_sort_panel(parameters, result, title="Simulación de ordenamiento", procedure=None, desk_check=None):
     result.add_class("sort-result-content")
     sections = [
         ViewSection(SECTION_CONFIGURATION, parameters, ("sort-subpanel-content",))
@@ -1887,6 +1893,11 @@ def build_sort_panel(parameters, result, title="Simulación de ordenamiento", pr
     sections.append(
         ViewSection(SECTION_RESULT, result, ("sort-subpanel-content",))
     )
+    if desk_check is not None:
+        desk_check.add_class("sort-desk-check-content")
+        sections.append(
+            ViewSection(SECTION_DESK_CHECK, desk_check, ("sort-subpanel-content",))
+        )
     return build_simulation_view(
         SimulationViewSpec(
             root_class="sort-simulation-root",
@@ -2062,6 +2073,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         ),
     )
     html_output = widgets.HTML()
+    desk_output = widgets.HTML(layout=widgets.Layout(width="100%"))
     control_state = {"updating": False}
     render_cache = OutputCache()
     execution_state = {"run_id": 0}
@@ -2133,6 +2145,12 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             formula,
             render_state_html(state, include_styles=False),
             state.get("formula_reserved_height"),
+        )
+        desk_output.value = render_desk_check(
+            pseudocode_algorithm_key(state),
+            sort_desk_rows(state),
+            descending=state.get("descending", False),
+            total_steps=len(state["trace"]) if state.get("trace") is not None else None,
         )
 
     def sync_execution_buttons():
@@ -2265,6 +2283,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         controls_layout,
         html_output,
         procedure=formula_output,
+        desk_check=desk_output,
     )
     display(layout)
     update_radix_control_visibility()

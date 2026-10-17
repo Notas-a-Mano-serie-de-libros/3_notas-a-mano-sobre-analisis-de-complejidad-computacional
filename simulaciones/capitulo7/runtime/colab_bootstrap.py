@@ -16,6 +16,7 @@ REQUIRED_FILES = (
     "common/widget_controls.py",
     "common/remote_fetch.py",
     "common/simulation_views.py",
+    "common/desk_check.py",
     "core/__init__.py",
     "core/search/__init__.py",
     "simulaciones/capitulo7/runtime/launchers.py",
