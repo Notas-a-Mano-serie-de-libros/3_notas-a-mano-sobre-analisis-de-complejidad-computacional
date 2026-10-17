@@ -60,4 +60,7 @@ def test_code_alignment_does_not_override_line_or_syntax_colors():
     assert "color: #9e9e9e;" in stylesheet
     assert ".self-check-practice__code-line.target-line .self-check-practice__line-num" in stylesheet
     assert "color: var(--md-accent-fg-color);" in stylesheet
+    assert ".self-check-practice__code-box .self-check-practice__code-line.target-line" in stylesheet
+    assert "background-color: rgba(126, 63, 44, .12) !important;" in stylesheet
+    assert "background-color: color-mix(in srgb, var(--md-accent-fg-color) 12%, transparent) !important;" in stylesheet
 

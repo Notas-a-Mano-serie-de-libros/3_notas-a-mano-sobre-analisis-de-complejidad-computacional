@@ -2462,8 +2462,9 @@ input {
   line-height: inherit;
   white-space: pre;
 }
-.self-check-practice__code-line.target-line {
-  background: color-mix(in srgb, var(--md-accent-fg-color) 12%, transparent);
+.self-check-practice__code-box .self-check-practice__code-line.target-line {
+  background-color: rgba(126, 63, 44, .12) !important;
+  background-color: color-mix(in srgb, var(--md-accent-fg-color) 12%, transparent) !important;
   border-left-color: var(--md-accent-fg-color);
   font-weight: 600;
 }
