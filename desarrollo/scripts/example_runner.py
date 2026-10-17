@@ -191,39 +191,43 @@ def render_runner(listing: dict, executable_only: bool = False, *, include_pseud
     ) if include_pseudocode else ""
     pseudocode_tab = (
         f'<button type="button" role="tab" id="pseudocode-tab-{key}" aria-controls="pseudocode-code-{key}" '
-        'aria-selected="false" tabindex="-1" data-language-tab="pseudocode">Pseudocódigo</button>'
+        'aria-selected="true" data-language-tab="pseudocode">Pseudocódigo</button>'
     ) if include_pseudocode else ""
     pseudocode_panel = (
         f'<div id="pseudocode-code-{key}" role="tabpanel" aria-labelledby="pseudocode-tab-{key}" '
-        f'class="python-code-editor highlight" data-language="pseudocode" hidden '
+        f'class="python-code-editor highlight" data-language="pseudocode" '
         f'aria-label="Pseudocódigo · {title}"><pre><code>{pseudocode_html}</code></pre></div>'
     ) if include_pseudocode else ""
     pseudocode_note = (
-        '<p data-runner-note="pseudocode" hidden>Este pseudocódigo resume la lógica del algoritmo y es de solo lectura.</p>'
+        '<p data-runner-note="pseudocode">Este pseudocódigo resume la lógica del algoritmo y es de solo lectura.</p>'
     ) if include_pseudocode else ""
     editable_note = (
-        '<p data-runner-note="editable">Solo las líneas de entrada resaltadas son editables. '
+        '<p data-runner-note="editable" hidden>Solo las líneas de entrada resaltadas son editables. '
         'La implementación y la llamada al algoritmo son de solo lectura.</p>'
         if include_pseudocode
         else "<p>Solo las líneas de entrada resaltadas son editables. La implementación y la llamada al algoritmo son de solo lectura.</p>"
     )
-    execution_attribute = " data-execution-ui" if include_pseudocode else ""
+    initial_language = "pseudocode" if include_pseudocode else "java"
+    java_selected = "false" if include_pseudocode else "true"
+    java_inactive = ' tabindex="-1"' if include_pseudocode else ""
+    java_hidden = " hidden" if include_pseudocode else ""
+    execution_attribute = " data-execution-ui hidden" if include_pseudocode else ""
     return (
         '<div class="example-runner" data-example-runner>'
         "<details open><summary>Ver código y editar entradas</summary>"
-        '<input type="hidden" data-runner-language value="java">'
+        f'<input type="hidden" data-runner-language value="{initial_language}">'
         '<div class="runner-language-tabs" role="tablist" aria-label="Lenguaje del ejemplo">'
-        f'<button type="button" role="tab" id="java-tab-{key}" aria-controls="java-code-{key}" aria-selected="true" data-language-tab="java">Java</button>'
         f'{pseudocode_tab}'
+        f'<button type="button" role="tab" id="java-tab-{key}" aria-controls="java-code-{key}" aria-selected="{java_selected}"{java_inactive} data-language-tab="java">Java</button>'
         f'<button type="button" role="tab" id="python-tab-{key}" aria-controls="runner-{key}" aria-selected="false" tabindex="-1" data-language-tab="python">Python</button>'
         f'<button type="button" role="tab" id="c-tab-{key}" aria-controls="c-code-{key}" aria-selected="false" tabindex="-1" data-language-tab="c">C</button></div>'
         f'{editable_note}'
         f'{pseudocode_note}'
-        f'<div id="java-code-{key}" role="tabpanel" aria-labelledby="java-tab-{key}" class="python-code-editor highlight" data-language="java" data-java-class="{java_class}" aria-label="Código Java · {title}"><pre><code>{java_html}</code></pre></div>'
         f'{pseudocode_panel}'
+        f'<div id="java-code-{key}" role="tabpanel" aria-labelledby="java-tab-{key}" class="python-code-editor highlight" data-language="java" data-java-class="{java_class}"{java_hidden} aria-label="Código Java · {title}"><pre><code>{java_html}</code></pre></div>'
         f'<div id="runner-{key}" role="tabpanel" aria-labelledby="python-tab-{key}" class="python-code-editor highlight" data-language="python" hidden aria-label="Código Python · {title}"><pre><code>{editor_html}</code></pre></div>'
         f'<div id="c-code-{key}" role="tabpanel" aria-labelledby="c-tab-{key}" class="python-code-editor highlight" data-language="c" data-c-key="{c_key}" hidden aria-label="Código C · {title}"><pre><code>{c_html}</code></pre></div>'
-        '<p class="java-runtime-credit runtime-credit" data-runtime-credit="java">Java se ejecuta en tu navegador con <a href="https://cheerpj.com/" target="_blank" rel="noopener">CheerpJ</a>.</p>'
+        f'<p class="java-runtime-credit runtime-credit" data-runtime-credit="java"{java_hidden}>Java se ejecuta en tu navegador con <a href="https://cheerpj.com/" target="_blank" rel="noopener">CheerpJ</a>.</p>'
         '<p class="runtime-credit" data-runtime-credit="python" hidden>Python se ejecuta en tu navegador con <a href="https://pyodide.org/en/stable/" target="_blank" rel="noopener">Pyodide</a>.</p>'
         '<p class="runtime-credit" data-runtime-credit="c" hidden>C se ejecuta en tu navegador mediante <a href="https://webassembly.org/" target="_blank" rel="noopener">WebAssembly</a>.</p>'
         f'<div class="example-runner-actions"{execution_attribute}><button type="button" data-run><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg><span>Ejecutar</span></button>'

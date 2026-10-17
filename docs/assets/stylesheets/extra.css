@@ -1532,7 +1532,7 @@ input {
 .python-code-editor pre {
   margin: 0; padding: 0; max-height: none; overflow-x: auto; overflow-y: hidden;
   border: 1px solid var(--md-default-fg-color--lighter); border-radius: .2rem;
-  font: .75rem/1.5 var(--md-code-font-family); tab-size: 4;
+  font: .7rem/1.45 var(--md-code-font-family); tab-size: 4;
   background: var(--md-code-bg-color);
 }
 .python-code-editor pre > code { display: block; padding: 0; margin: 0; font: inherit; background: none; min-width: max-content; }
