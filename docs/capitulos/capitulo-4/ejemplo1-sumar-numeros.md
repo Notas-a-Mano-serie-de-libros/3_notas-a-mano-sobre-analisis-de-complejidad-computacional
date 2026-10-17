@@ -44,11 +44,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo4/notebooks/ejemplo1_(sumar_numeros).ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo1_(sumar_numeros).ipynb" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo1_(sumar_numeros).ipynb&revision=a6d849c36586" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo1_(sumar_numeros).ipynb"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo1_(sumar_numeros).ipynb&revision=a6d849c36586"
     title="Simulación interactiva de Sumar dos números en JupyterLite"
     loading="lazy"
     allow="clipboard-read; clipboard-write"

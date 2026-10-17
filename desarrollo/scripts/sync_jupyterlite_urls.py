@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import re
 from pathlib import Path
 
@@ -24,7 +25,11 @@ DEMO_END = "<!-- jupyterlite-demo:end -->"
 def notebook_url(chapter: int, notebook: Path) -> str:
     profile = profile_for_chapter(chapter)
     encoded_path = str(notebook).replace("/", "%2F")
-    return f"jupyterlite/{profile}/notebooks/index.html?path={encoded_path}"
+    revision = hashlib.sha256((ROOT / notebook).read_bytes()).hexdigest()[:12]
+    return (
+        f"jupyterlite/{profile}/notebooks/index.html?path={encoded_path}"
+        f"&revision={revision}"
+    )
 
 
 def normalize_demo_presentation(content: str) -> str:
@@ -103,10 +108,22 @@ def synchronize(check: bool = False) -> list[Path]:
         updated = normalize_demo_presentation(content)
         for notebook in notebooks:
             target = notebook_url(chapter, notebook)
-            previous = f"jupyterlite/capitulo-{chapter}/notebooks/index.html?path={str(notebook).replace('/', '%2F')}"
-            if previous in updated:
-                updated = updated.replace(previous, target)
-            elif target not in updated:
+            encoded_path = str(notebook).replace("/", "%2F")
+            current_base = (
+                f"jupyterlite/{profile_for_chapter(chapter)}/notebooks/index.html"
+                f"?path={encoded_path}"
+            )
+            legacy_base = (
+                f"jupyterlite/capitulo-{chapter}/notebooks/index.html"
+                f"?path={encoded_path}"
+            )
+            updated, replacements = re.subn(
+                rf"(?:{re.escape(current_base)}|{re.escape(legacy_base)})"
+                r"(?:&revision=[0-9a-f]+)?",
+                target,
+                updated,
+            )
+            if not replacements and target not in updated:
                 errors.append(
                     f"{path.relative_to(ROOT)}: no se encontró la incrustación de {notebook}"
                 )

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
+from pathlib import Path
 from types import SimpleNamespace
 
 from desarrollo.scripts.build_jupyterlite_demo import (
@@ -53,6 +55,13 @@ def test_jupyterlite_demo_sources_and_configuration_exist():
         for chapter in range(4, 9)
         for path in chapter_content_files(chapter)
     )
+
+
+def test_notebook_urls_include_content_revision():
+    notebook = Path("simulaciones/capitulo7/notebooks/1_busqueda_secuencial.ipynb")
+    revision = hashlib.sha256((PROJECT_ROOT / notebook).read_bytes()).hexdigest()[:12]
+
+    assert notebook_url(7, notebook).endswith(f"&revision={revision}")
 
 
 def test_autorun_extension_executes_after_the_default_kernel_is_ready():
