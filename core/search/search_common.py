@@ -888,16 +888,25 @@ def create_search_controls(default_size=DEFAULT_SIZE, max_size=MAX_SIZE, default
         description="Posición",
         width="190px",
     )
+    step_back_button = action_button("step_back")
     step_button = action_button("step")
     auto_button = action_button("play")
     finish_button = action_button("finish")
     reset_button = action_button("reset")
     book_button = action_button("book")
+    speed_input = dropdown_control(
+        options=(("0.5x", 0.5), ("1x", 1.0), ("2x", 2.0)),
+        value=1.0,
+        description="Velocidad",
+        width="160px",
+    )
     return {
         "size": size_input,
         "target_mode": target_mode_input,
         "target_position": target_position_input,
         "target_readout": target_readout,
+        "speed": speed_input,
+        "step_back": step_back_button,
         "step": step_button,
         "auto": auto_button,
         "finish": finish_button,
@@ -908,6 +917,7 @@ def create_search_controls(default_size=DEFAULT_SIZE, max_size=MAX_SIZE, default
             "target_mode": search_labeled_control("Elemento", target_mode_input),
             "target_position": search_labeled_control("Posición", target_position_input),
             "target_readout": search_labeled_control("Objetivo", target_readout),
+            "speed": search_labeled_control("Velocidad", speed_input),
         },
     }
 
@@ -938,11 +948,13 @@ def run_search_app(
     target_mode_input = controls["target_mode"]
     target_position_input = controls["target_position"]
     target_readout = controls["target_readout"]
+    step_back_button = controls["step_back"]
     step_button = controls["step"]
     auto_button = controls["auto"]
     finish_button = controls["finish"]
     reset_button = controls["reset"]
     book_button = controls["book"]
+    speed_input = controls["speed"]
     formula_output = widgets.HTML(
         value="",
         layout=widgets.Layout(
@@ -956,6 +968,7 @@ def run_search_app(
     html_output = widgets.HTML(layout=widgets.Layout(width="100%"))
     desk_output = widgets.HTML(layout=widgets.Layout(width="100%"))
     desk_rows: list[dict] = []
+    state_history: list[dict] = []
     control_state = {"updating": False}
     render_cache = OutputCache()
     ui_state = {"first_row": None}
@@ -981,6 +994,7 @@ def run_search_app(
         if target_mode_input.value == TARGET_EXISTS:
             row_controls.append(groups["target_position"])
         row_controls.append(groups["target_readout"])
+        row_controls.append(groups["speed"])
         row_controls.extend(extra_controls.values())
         return row_controls
 
@@ -1044,6 +1058,7 @@ def run_search_app(
         )
 
     def sync_execution_buttons():
+        step_back_button.disabled = len(state_history) <= 1
         complete = state["search_complete"]
         step_button.disabled = complete
         auto_button.disabled = complete
@@ -1055,6 +1070,7 @@ def run_search_app(
         step_button.disabled = False
         auto_button.disabled = False
         finish_button.disabled = False
+        step_back_button.disabled = True
 
     def reset_algorithm(*_args):
         nonlocal state
@@ -1062,6 +1078,8 @@ def run_search_app(
             return
         state = build_state()
         desk_rows.clear()
+        state_history.clear()
+        state_history.append(copy_search_state(state))
         enable_controls_for_new_array()
         redraw()
 
@@ -1070,6 +1088,8 @@ def run_search_app(
         update_target_position_visibility()
         state = build_state(values=current_values())
         desk_rows.clear()
+        state_history.clear()
+        state_history.append(copy_search_state(state))
         enable_controls_for_new_array()
         redraw()
 
@@ -1079,6 +1099,8 @@ def run_search_app(
             return
         state = build_state(values=current_values())
         desk_rows.clear()
+        state_history.clear()
+        state_history.append(copy_search_state(state))
         enable_controls_for_new_array()
         redraw()
 
@@ -1091,8 +1113,20 @@ def run_search_app(
         control_state["updating"] = False
         state = build_state(values=book_array)
         desk_rows.clear()
+        state_history.clear()
+        state_history.append(copy_search_state(state))
         enable_controls_for_new_array()
         redraw()
+
+    def run_step_back(*_args):
+        nonlocal state
+        if len(state_history) > 1:
+            state_history.pop()
+            state = copy_search_state(state_history[-1])
+            if desk_rows:
+                desk_rows.pop()
+            redraw()
+            sync_execution_buttons()
 
     def run_single_step(*_args):
         if not state["search_complete"]:
@@ -1100,12 +1134,13 @@ def run_search_app(
             step_search(state)
             state["step_index"] = min(state.get("step_index", 0) + 1, state.get("step_total", 0))
             desk_rows.append(search_desk_row(state.get("algorithm"), before, state, state["step_index"]))
+            state_history.append(copy_search_state(state))
         redraw()
         sync_execution_buttons()
 
     async def run_auto_async(run_id):
         nonlocal state
-        set_disabled((auto_button, step_button, reset_button, book_button), True)
+        set_disabled((auto_button, step_button, step_back_button, reset_button, book_button), True)
         finish_button.disabled = False
         prev = copy_search_state(state)
         for snapshot in build_search_trace(state, step_search):
@@ -1114,9 +1149,11 @@ def run_search_app(
             state = snapshot
             step = state.get("step_index", len(desk_rows) + 1)
             desk_rows.append(search_desk_row(state.get("algorithm"), prev, state, step))
+            state_history.append(copy_search_state(state))
             prev = copy_search_state(state)
             redraw()
-            await asyncio.sleep(0.45)
+            speed = float(speed_input.value or 1.0)
+            await asyncio.sleep(0.45 / speed)
         if execution_state["run_id"] == run_id:
             reset_button.disabled = False
             book_button.disabled = False
@@ -1124,7 +1161,7 @@ def run_search_app(
 
     def run_auto_sync(run_id):
         nonlocal state
-        set_disabled((auto_button, step_button, reset_button, book_button), True)
+        set_disabled((auto_button, step_button, step_back_button, reset_button, book_button), True)
         finish_button.disabled = False
         prev = copy_search_state(state)
         for snapshot in build_search_trace(state, step_search):
@@ -1133,9 +1170,11 @@ def run_search_app(
             state = snapshot
             step = state.get("step_index", len(desk_rows) + 1)
             desk_rows.append(search_desk_row(state.get("algorithm"), prev, state, step))
+            state_history.append(copy_search_state(state))
             prev = copy_search_state(state)
             redraw()
-            colab_pause(0.45)
+            speed = float(speed_input.value or 1.0)
+            colab_pause(0.45 / speed)
         if execution_state["run_id"] == run_id:
             reset_button.disabled = False
             book_button.disabled = False
@@ -1156,13 +1195,14 @@ def run_search_app(
         if state["search_complete"]:
             return
         execution_state["run_id"] += 1
-        set_disabled((auto_button, finish_button, step_button, reset_button, book_button), True)
+        set_disabled((auto_button, finish_button, step_button, step_back_button, reset_button, book_button), True)
         final_state = None
         prev = copy_search_state(state)
         for snapshot in build_search_trace(state, step_search):
             final_state = snapshot
             step = final_state.get("step_index", len(desk_rows) + 1)
             desk_rows.append(search_desk_row(final_state.get("algorithm"), prev, final_state, step))
+            state_history.append(copy_search_state(final_state))
             prev = copy_search_state(final_state)
         if final_state is not None:
             state = final_state
@@ -1172,6 +1212,7 @@ def run_search_app(
         book_button.disabled = False
         sync_execution_buttons()
 
+    step_back_button.on_click(run_step_back)
     step_button.on_click(run_single_step)
     auto_button.on_click(run_auto)
     finish_button.on_click(finish_without_animation)
@@ -1198,7 +1239,7 @@ def run_search_app(
     ui_state["first_row"] = first_row_box
     update_target_position_visibility()
     button_row = actions(
-        [step_button, auto_button, finish_button, reset_button, book_button]
+        [step_back_button, step_button, auto_button, finish_button, reset_button, book_button]
     )
     parameters_content = widgets.VBox(
         [first_row_box],
@@ -1223,6 +1264,8 @@ def run_search_app(
     )
     display(layout)
     state = build_state()
+    state_history.append(copy_search_state(state))
+    step_back_button.disabled = True
     redraw()
 
 

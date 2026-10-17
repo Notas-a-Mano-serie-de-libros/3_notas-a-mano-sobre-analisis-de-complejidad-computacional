@@ -1984,6 +1984,14 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         width="220px",
         description_style=SORT_CONTROL_STYLE,
     )
+    speed_dropdown = dropdown_control(
+        options=(("0.5x", 0.5), ("1x", 1.0), ("2x", 2.0)),
+        value=1.0,
+        description="Velocidad",
+        width="160px",
+        description_style=SORT_CONTROL_STYLE,
+    )
+    step_back_button = action_button("step_back")
     step_button = action_button("step")
     auto_button = action_button("play")
     finish_button = action_button("finish")
@@ -2000,6 +2008,8 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         "radix_data_type": radix_type_dropdown,
         "radix_number_mode": radix_number_mode_dropdown,
         "radix_base": radix_base_dropdown,
+        "speed": speed_dropdown,
+        "step_back": step_back_button,
         "step": step_button,
         "auto": auto_button,
         "finish": finish_button,
@@ -2010,20 +2020,21 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
     size_group = labeled_control("Tamaño", size_input, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
     view_group = labeled_control("Vista", view_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
     order_group = labeled_control("Orden", order_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
-    first_row = [size_group, view_group, order_group]
+    speed_group = labeled_control("Velocidad", speed_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
+    first_row = [size_group, view_group, order_group, speed_group]
     second_row = []
     if has_pivot:
-        first_row.append(labeled_control("Pivote", pivot_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH))
+        second_row.append(labeled_control("Pivote", pivot_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH))
     if has_partition:
-        first_row.append(labeled_control("Partición", partition_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH))
+        second_row.append(labeled_control("Partición", partition_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH))
     if has_gap_sequence:
-        first_row.append(labeled_control("h", gap_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH))
+        second_row.append(labeled_control("h", gap_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH))
     if has_radix_max:
         radix_type_group = labeled_control("Tipo de dato", radix_type_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
         radix_max_group = labeled_control("Valor máximo", radix_max_input, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
         radix_number_group = labeled_control("Números", radix_number_mode_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
         radix_base_group = labeled_control("Base", radix_base_dropdown, SORT_CONTROL_FIELD_WIDTH, group_width=SORT_CONTROL_GROUP_WIDTH)
-        first_row.append(radix_type_group)
+        second_row.append(radix_type_group)
         controls["_groups"].update(
             {
                 "radix_max": radix_max_group,
@@ -2032,17 +2043,14 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
             }
         )
         second_row.extend([radix_max_group, radix_number_group, radix_base_group])
-    if has_radix_max:
-        empty_group = widgets.Box(layout=widgets.Layout(width=f"{SORT_CONTROL_GROUP_WIDTH}px"))
-        control_rows = [controls_grid(first_row + second_row + [empty_group], columns=4)]
-    elif len(first_row) > 3:
+    if second_row:
         control_rows = [
-            controls_grid(first_row[:3], columns=3),
-            controls_grid(first_row[3:], columns=len(first_row[3:])),
+            controls_grid(first_row, columns=len(first_row)),
+            controls_grid(second_row, columns=len(second_row)),
         ]
     else:
         control_rows = [controls_grid(first_row, columns=len(first_row))]
-    action_row = sort_action_button_row([step_button, auto_button, finish_button, reset_button, book_button])
+    action_row = sort_action_button_row([step_back_button, step_button, auto_button, finish_button, reset_button, book_button])
     layout = widgets.VBox(
         control_rows,
         layout=widgets.Layout(width="100%", grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px"),
@@ -2154,6 +2162,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
 
     def sync_execution_buttons():
         complete = state["sorting_complete"]
+        controls["step_back"].disabled = state.get("step_index", 0) <= 0
         controls["step"].disabled = complete
         controls["auto"].disabled = complete
         controls["finish"].disabled = complete
@@ -2185,6 +2194,15 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         redraw()
         sync_execution_buttons()
 
+    def step_back_once(*_args):
+        if state.get("step_index", 0) > 0:
+            trace = state["trace"]
+            state["step_index"] -= 1
+            apply_event(state, trace[state["step_index"]])
+            state["sorting_complete"] = False
+            redraw()
+            sync_execution_buttons()
+
     def step_once(*_args):
         if not state["sorting_complete"]:
             step_sort(state)
@@ -2193,27 +2211,29 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
 
     async def run_auto_async(run_id):
         nonlocal state
-        set_disabled((controls["step"], controls["auto"], controls["reset"], controls["book"]), True)
+        set_disabled((controls["step_back"], controls["step"], controls["auto"], controls["reset"], controls["book"]), True)
         controls["finish"].disabled = False
         for snapshot in build_sort_trace():
             if execution_state["run_id"] != run_id:
                 return
             state = snapshot
             redraw()
-            await asyncio.sleep(0.08)
+            speed = float(controls["speed"].value or 1.0)
+            await asyncio.sleep(0.08 / speed)
         if execution_state["run_id"] == run_id:
             sync_execution_buttons()
 
     def run_auto_sync(run_id):
         nonlocal state
-        set_disabled((controls["step"], controls["auto"], controls["reset"], controls["book"]), True)
+        set_disabled((controls["step_back"], controls["step"], controls["auto"], controls["reset"], controls["book"]), True)
         controls["finish"].disabled = False
         for snapshot in build_sort_trace():
             if execution_state["run_id"] != run_id:
                 return
             state = snapshot
             redraw()
-            colab_pause()
+            speed = float(controls["speed"].value or 1.0)
+            colab_pause(0.08 / speed)
         if execution_state["run_id"] == run_id:
             sync_execution_buttons()
 
@@ -2232,7 +2252,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         if state["sorting_complete"]:
             return
         execution_state["run_id"] += 1
-        set_disabled((controls["step"], controls["auto"], controls["finish"]), True)
+        set_disabled((controls["step_back"], controls["step"], controls["auto"], controls["finish"]), True)
         final_state = None
         for snapshot in build_sort_trace():
             final_state = snapshot
@@ -2256,6 +2276,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         redraw()
         sync_execution_buttons()
 
+    controls["step_back"].on_click(step_back_once)
     controls["step"].on_click(step_once)
     controls["auto"].on_click(run_auto)
     controls["finish"].on_click(finish_without_animation)
@@ -2288,6 +2309,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     display(layout)
     update_radix_control_visibility()
     redraw()
+    sync_execution_buttons()
 
 
 __all__ = [

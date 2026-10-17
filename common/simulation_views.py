@@ -37,6 +37,7 @@ ACTION_SPECS = {
     "sort": ActionSpec("Ordenar", "play", "150px"),
     "search": ActionSpec("Buscar", "search", "150px"),
     "play": ActionSpec("Ejecución automática", "play", "190px"),
+    "step_back": ActionSpec("Paso anterior", "step-backward", "150px"),
     "step": ActionSpec("Paso siguiente", "step-forward", "150px"),
     "finish": ActionSpec("Finalizar", "fast-forward", "150px"),
     "reset": ActionSpec("Generar nuevo arreglo", "refresh", "190px"),

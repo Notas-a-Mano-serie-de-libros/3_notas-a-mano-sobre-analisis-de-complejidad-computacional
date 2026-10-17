@@ -267,6 +267,7 @@ _STYLES = """<style>
 .desk-check__table td.desk-check__mono { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; }
 .desk-check__table td.desk-check__var { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; text-align: center; white-space: nowrap; }
 .desk-check__table th.desk-check__var { text-align: center; }
+.desk-check__table tbody tr:hover td { background: rgba(139,75,50,.07) !important; cursor: default; }
 .desk-check__note { font-size: 12px; opacity: .75; margin: 6px 10px; }
 .desk-check__empty { font-size: 13px; opacity: .8; padding: 14px; }
 </style>"""
