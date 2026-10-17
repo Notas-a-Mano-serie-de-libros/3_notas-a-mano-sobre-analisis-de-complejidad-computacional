@@ -2425,7 +2425,6 @@ input {
 .self-check-practice__code-box code {
   background: transparent !important;
   border: 0 !important;
-  color: inherit;
   display: block;
   font-family: inherit;
   font-size: inherit;

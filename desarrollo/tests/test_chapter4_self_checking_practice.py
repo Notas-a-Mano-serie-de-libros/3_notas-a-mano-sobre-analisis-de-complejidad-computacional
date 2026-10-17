@@ -51,3 +51,13 @@ def test_chapter4_practice_includes_code_boxes_and_simulation_controls():
     assert ".self-check-practice__line-num" in stylesheet
     assert ".self-check-practice__sim-results" in stylesheet
 
+
+def test_code_alignment_does_not_override_line_or_syntax_colors():
+    stylesheet = STYLESHEET.read_text(encoding="utf-8")
+    code_rule = stylesheet.split(".self-check-practice__code-box code {", 1)[1].split("}", 1)[0]
+
+    assert "color:" not in code_rule
+    assert "color: #9e9e9e;" in stylesheet
+    assert ".self-check-practice__code-line.target-line .self-check-practice__line-num" in stylesheet
+    assert "color: var(--md-accent-fg-color);" in stylesheet
+
