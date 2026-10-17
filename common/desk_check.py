@@ -29,8 +29,8 @@ PSEUDOCODE = {
         (None, "función buscar(arr, a, b, x)"),
         ("while", "    mientras a <= b"),
         ("mid", "        m ← a + (b - a) div 2"),
-        ("found", "        si arr[m] == x entonces"),
-        (None, "            retornar verdadero"),
+        ("compare", "        si arr[m] == x entonces"),
+        ("found", "            retornar verdadero"),
         ("go_right", "        si x > arr[m] entonces"),
         (None, "            a ← m + 1"),
         ("go_left", "        si no"),
@@ -45,8 +45,8 @@ PSEUDOCODE = {
         (None, "        si den == 0 entonces"),
         (None, "            retornar arr[a] == x"),
         ("probe", "        p ← a + num div den"),
-        ("found", "        si arr[p] == x entonces"),
-        (None, "            retornar verdadero"),
+        ("compare", "        si arr[p] == x entonces"),
+        ("found", "            retornar verdadero"),
         ("go_right", "        si x > arr[p] entonces"),
         (None, "            a ← p + 1"),
         ("go_left", "        si no"),
@@ -88,8 +88,8 @@ PSEUDOCODE = {
         (None, "función busquedaBinaria(arr, a, b, x)"),
         ("bin_while", "    mientras a <= b"),
         ("mid", "        m ← a + (b - a) div 2"),
-        ("found", "        si arr[m] == x entonces"),
-        (None, "            retornar verdadero"),
+        ("compare", "        si arr[m] == x entonces"),
+        ("found", "            retornar verdadero"),
         ("go_right", "        si x > arr[m] entonces"),
         (None, "            a ← m + 1"),
         ("go_left", "        si no"),
@@ -101,8 +101,8 @@ PSEUDOCODE = {
         ("while", "    mientras a <= b"),
         ("points", "        m1 ← a + (b - a) div 3"),
         (None, "        m2 ← b - (b - a + 2) div 3"),
-        ("found", "        si arr[m1] == x o arr[m2] == x entonces"),
-        (None, "            retornar verdadero"),
+        ("compare", "        si arr[m1] == x o arr[m2] == x entonces"),
+        ("found", "            retornar verdadero"),
         ("go_left", "        si x < arr[m1] entonces"),
         (None, "            b ← m1 - 1"),
         ("go_right", "        si no, si x > arr[m2] entonces"),
@@ -248,12 +248,15 @@ _ORDER_TOKENS = {
 
 _STYLES = """<style>
 .desk-check { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; color: inherit; font-family: inherit; }
-.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 6px 0; overflow-x: auto; background: var(--md-code-bg-color, rgba(128,128,128,.04)); }
+.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 0; overflow-x: auto; background: var(--md-code-bg-color, rgba(128,128,128,.04)); }
 .desk-check__line { display: flex; align-items: stretch; font: 13px/1.65 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; min-height: 1.65em; }
+.desk-check__line:first-child .desk-check__num { border-top-left-radius: 3px; }
+.desk-check__line:last-child .desk-check__num { border-bottom-left-radius: 3px; }
 .desk-check__num { flex: 0 0 38px; width: 38px; min-width: 38px; display: flex; align-items: center; justify-content: center; text-align: center; background: rgba(128,128,128,.10); border-right: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); margin-right: 12px; color: var(--md-default-fg-color--light, inherit); opacity: .75; user-select: none; box-sizing: border-box; }
 .desk-check__line--active { background: rgba(139,75,50,.18); font-weight: 700; }
 .desk-check__line--active .desk-check__num { background: rgba(139,75,50,.30); border-right-color: #8b4b32; color: #8b4b32; opacity: 1; font-weight: 700; }
-.desk-check__trace { flex: 2 1 480px; min-width: 300px; max-height: 350px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; position: relative; }
+.desk-check__trace { flex: 2 1 480px; min-width: 300px; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; display: flex; flex-direction: column; overflow: hidden; background: var(--md-default-bg-color, #ffffff); }
+.desk-check__table-wrap { width: 100%; max-height: 350px; overflow-y: auto; overflow-x: auto; position: relative; }
 .desk-check__table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 1.45; }
 .desk-check__table th, .desk-check__table td { border-bottom: 1px solid rgba(128,128,128,.25); padding: 6px 10px; text-align: left; vertical-align: middle; }
 .desk-check__table th { position: sticky; top: 0; background: var(--md-default-bg-color, #ffffff); background-color: rgba(246, 245, 243, 0.98); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10; box-shadow: 0 1px 0 rgba(128,128,128,.35); font-weight: 600; text-align: center; }
@@ -324,6 +327,7 @@ def latex_to_text(formula):
     text = _SUBSCRIPT_CHAR.sub(r"\1[\2]", text)
     text = _SUPERSCRIPT.sub(r"^\1", text)
     text = text.replace("{", "").replace("}", "")
+    text = re.sub(r"\b[Aa]\[", "arr[", text)
     text = re.sub(r"\s+", " ", text).strip(" ;,")
     if text.lower().startswith("arreglo ordenado"):
         return ""
@@ -334,7 +338,10 @@ def parse_desk_vars(variables):
     """Extrae un diccionario {nombre_variable: valor} a partir del texto de variables."""
 
     if isinstance(variables, dict):
-        return {str(k): str(v) for k, v in variables.items()}
+        return {
+            re.sub(r"\b[Aa]\[", "arr[", str(k)): str(v)
+            for k, v in variables.items()
+        }
     text = str(variables or "").strip()
     if not text:
         return {}
@@ -344,16 +351,18 @@ def parse_desk_vars(variables):
         part = part.strip()
         if not part or "↔" in part or "valores de h" in part:
             continue
-        if "<" in part and "=" in part and ("A[" in part or "a[" in part):
+        if "<" in part and "=" in part and ("A[" in part or "a[" in part or "arr[" in part):
             subparts = re.split(r"\s*[<>]+\s*", part)
             for sp in subparts:
                 if "=" in sp:
                     k, v = sp.split("=", 1)
-                    result[k.strip()] = v.strip()
+                    k_clean = re.sub(r"\b[Aa]\[", "arr[", k.strip())
+                    result[k_clean] = v.strip()
             continue
         m = re.match(r"^([a-zA-Z_áéíóúÁÉÍÓÚ][a-zA-Z0-9_áéíóúÁÉÍÓÚ\[\]\s+-]*?)\s*(?:=|←)\s*(.+)$", part)
         if m:
             var_name = m.group(1).strip()
+            var_name = re.sub(r"\b[Aa]\[", "arr[", var_name)
             rest = m.group(2).strip()
             if "=" in rest:
                 eqs = [e.strip() for e in rest.split("=")]
@@ -402,32 +411,32 @@ def _search_line_and_variables(algorithm, before, after):
     if algorithm == "secuencial":
         index = before.get("current_index", 0)
         if found:
-            return "found", f"i = {found_index}, A[i] = {target} = x"
+            return "found", f"i = {found_index}, arr[i] = {target} = x"
         if complete:
             return "not_found", f"i = {len(after['arr'])}, x = {target}"
         if phase == "show_current":
             return "loop", f"i = {index}, x = {target}"
-        return "compare", f"i = {index}, A[i] = {_node_value(before, index)}, x = {target}"
+        return "compare", f"i = {index}, arr[i] = {_node_value(before, index)}, x = {target}"
 
     if algorithm == "binaria":
         low, high, mid = after["low"], after["high"], after["mid"]
         if found:
-            return "found", f"m = {found_index}, A[m] = {target} = x"
+            return "found", f"m = {found_index}, arr[m] = {target} = x"
         if complete:
             return "not_found", f"a = {low}, b = {high} (a > b)"
         if phase == "select":
-            return "mid", f"a = {low}, b = {high}, m = {mid}, A[m] = {_node_value(after, mid)}"
+            return "mid", f"a = {low}, b = {high}, m = {mid}, arr[m] = {_node_value(after, mid)}"
         direction = "go_right" if _node_value(before, before["mid"]) < target else "go_left"
         return direction, f"a = {low}, b = {high}, x = {target}"
 
     if algorithm == "interpolacion":
         low, high, pos = after["low"], after["high"], after["pos"]
         if found:
-            return "found", f"p = {found_index}, A[p] = {target} = x"
+            return "found", f"p = {found_index}, arr[p] = {target} = x"
         if complete:
             return "not_found", f"a = {low}, b = {high}, x = {target}"
         if phase == "probe":
-            return "probe", f"a = {low}, b = {high}, p = {pos}, A[p] = {_node_value(after, pos)}"
+            return "probe", f"a = {low}, b = {high}, p = {pos}, arr[p] = {_node_value(after, pos)}"
         direction = "go_right" if _node_value(before, before["pos"]) < target else "go_left"
         return direction, f"a = {low}, b = {high}, x = {target}"
 
@@ -435,7 +444,7 @@ def _search_line_and_variables(algorithm, before, after):
         jump, start, end = after["jump_size"], after["block_start"], after["block_end"]
         linear = after.get("linear_index")
         if found:
-            return "found", f"i = {found_index}, A[i] = {target} = x"
+            return "found", f"i = {found_index}, arr[i] = {target} = x"
         if complete:
             return "not_found", f"salto = {jump}, x = {target}"
         if phase == "show_block":
@@ -443,42 +452,42 @@ def _search_line_and_variables(algorithm, before, after):
         if phase == "decide_block":
             last = _node_value(before, before["block_end"] - 1)
             if after.get("phase") == "linear_show":
-                return "decide", f"fin = {before['block_end']}, A[fin - 1] = {last} ≥ x = {target}"
-            return "next_block", f"A[fin - 1] = {last} < x = {target}; inicio = {start}, fin = {end}"
+                return "decide", f"fin = {before['block_end']}, arr[fin - 1] = {last} ≥ x = {target}"
+            return "next_block", f"arr[fin - 1] = {last} < x = {target}; inicio = {start}, fin = {end}"
         if phase == "linear_show":
             return "linear", f"i = {linear}"
         index = before.get("linear_index")
-        return "compare", f"i = {index}, A[i] = {_node_value(before, index)}, x = {target}"
+        return "compare", f"i = {index}, arr[i] = {_node_value(before, index)}, x = {target}"
 
     if algorithm == "exponencial":
         index = before.get("current_index")
         if found:
             mid = after.get("mid")
             if mid is not None and str(phase).startswith("binary"):
-                return "found", f"m = {found_index}, A[m] = {target} = x"
-            return "found", f"i = {found_index}, A[i] = {target} = x"
+                return "found", f"m = {found_index}, arr[m] = {target} = x"
+            return "found", f"i = {found_index}, arr[i] = {target} = x"
         if complete:
             return "not_found", f"a = {after.get('low')}, b = {after.get('high')}"
         if phase == "exponential_show":
             if after.get("phase") == "range_show":
                 return "range", f"i = {index}, a = {after['low']}, b = {after['high']}"
-            return "exp_while", f"i = {index}, A[i] = {_node_value(before, index)}, x = {target}"
+            return "exp_while", f"i = {index}, arr[i] = {_node_value(before, index)}, x = {target}"
         if phase == "exponential_compare":
             if after.get("phase") == "range_show":
                 return "range", f"i = {index}, a = {after['low']}, b = {after['high']}"
-            return "exp_next", f"A[i] = {_node_value(before, index)} < x = {target}; i = {after['current_index']}"
+            return "exp_next", f"arr[i] = {_node_value(before, index)} < x = {target}; i = {after['current_index']}"
         if phase == "range_show":
             return "bin_while", f"a = {after['low']}, b = {after['high']}"
         if phase == "binary_select":
             mid = after["mid"]
-            return "mid", f"a = {after['low']}, b = {after['high']}, m = {mid}, A[m] = {_node_value(after, mid)}"
+            return "mid", f"a = {after['low']}, b = {after['high']}, m = {mid}, arr[m] = {_node_value(after, mid)}"
         direction = "go_right" if _node_value(before, before["mid"]) < target else "go_left"
         return direction, f"a = {after['low']}, b = {after['high']}, x = {target}"
 
     if algorithm == "ternaria":
         low, high = after["a"], after["b"]
         if found:
-            return "found", f"A[{found_index}] = {target} = x"
+            return "found", f"arr[{found_index}] = {target} = x"
         if complete:
             return "not_found", f"a = {low}, b = {high}, x = {target}"
         if phase == "select":
@@ -491,7 +500,7 @@ def _search_line_and_variables(algorithm, before, after):
             line = "go_right"
         else:
             line = "go_middle"
-        return line, f"a = {low}, b = {high}, A[m1] = {first}, A[m2] = {second}, x = {target}"
+        return line, f"a = {low}, b = {high}, arr[m1] = {first}, arr[m2] = {second}, x = {target}"
 
     return None, ""
 
@@ -731,10 +740,10 @@ def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, sh
         if len(rows) > limit or hidden:
             note = f'<p class="desk-check__note">Se muestran los últimos {len(visible)} pasos' + (f" de {total_steps}" if total_steps else "") + ".</p>"
         trace_html = (
-            f'{note}<table class="desk-check__table"><thead><tr>'
+            f'<div class="desk-check__table-wrap"><table class="desk-check__table"><thead><tr>'
             f'<th class="desk-check__step">Paso</th><th class="desk-check__step">Línea</th>'
             f'{var_headers}{array_head}<th class="desk-check__action">Acción</th></tr></thead>'
-            f'<tbody>{"".join(body)}</tbody></table>'
+            f'<tbody>{"".join(body)}</tbody></table></div>{note}'
         )
     else:
         trace_html = f'<div class="desk-check__empty">{escape(_INITIAL_HINT)}</div>'
