@@ -71,7 +71,7 @@ def format_state(state: str) -> str:
     return state if "\\(" in state else f"`{state}`"
 
 
-def render(listings: list[dict], level: int = 4, detail: dict | None = None, *, include_walkthrough: bool = True, permutations_example: bool = False, minimal_example: bool = False) -> str:
+def render(listings: list[dict], level: int = 4, detail: dict | None = None, *, include_walkthrough: bool = True, permutations_example: bool = False, minimal_example: bool = False, algorithm_pseudocode: bool = False) -> str:
     parts = [START]
     if permutations_example:
         parts.append(render_permutations_example())
@@ -99,7 +99,13 @@ def render(listings: list[dict], level: int = 4, detail: dict | None = None, *, 
         else:
             parts.append("#" * level + " " + listing["title"])
         executable_only = listing["folio"] in {247, 254, 262, 268, 273, 278, 290, 298, 307, 312, 321, 323, 327, 329, 333, 341, 349, 363, "shell"}
-        parts.append(render_runner(listing, executable_only=executable_only))
+        parts.append(
+            render_runner(
+                listing,
+                executable_only=executable_only,
+                include_pseudocode=algorithm_pseudocode,
+            )
+        )
         if listing.get("explanation"):
             parts.append("**Explicación:** " + listing["explanation"])
         if listing.get("note"):
@@ -144,6 +150,7 @@ def sync(check: bool = False) -> list[str]:
             include_walkthrough=not relative.startswith("capitulo-2/"),
             permutations_example=relative == "capitulo-2/9-complejidad-factorial.md",
             minimal_example=relative.startswith("capitulo-4/"),
+            algorithm_pseudocode=relative.startswith(("capitulo-7/", "capitulo-8/")),
         )
         marked = re.compile(re.escape(START) + r".*?" + re.escape(END), re.S)
         if check:

@@ -1556,11 +1556,12 @@ input {
 .java-runtime-frame { position: fixed; bottom: 0; right: 0; width: 1px; height: 1px; opacity: .01; pointer-events: none; border: 0; }
 
 /* Pestañas de lenguaje con la convención visual de las pestañas de contenido. */
-.runner-language-tabs { display: flex; border-bottom: .05rem solid var(--md-default-fg-color--lightest); }
+.runner-language-tabs { display: flex; overflow-x: auto; border-bottom: .05rem solid var(--md-default-fg-color--lightest); }
 .runner-language-tabs [role="tab"] { padding: .8em 1.25em; border: 0; border-bottom: .1rem solid transparent; background: transparent; color: var(--md-default-fg-color--light); font-size: .64rem; font-weight: 700; cursor: pointer; transition: color .25s, border-color .25s; }
 .runner-language-tabs [role="tab"][aria-selected="true"] { color: var(--md-accent-fg-color); border-bottom-color: var(--md-accent-fg-color); }
 .runner-language-tabs [role="tab"]:hover { color: var(--md-accent-fg-color); }
 .runner-language-tabs [role="tab"]:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: -2px; }
+.example-runner [data-execution-ui][hidden] { display: none !important; }
 
 /* Numeración visual que no forma parte del código ejecutado o editable. */
 .python-code-editor pre > code {

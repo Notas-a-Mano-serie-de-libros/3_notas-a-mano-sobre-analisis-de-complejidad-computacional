@@ -114,6 +114,11 @@
         if (active === panel) finish("Ejecución detenida al cambiar de lenguaje.", undefined, true);
         panel.querySelectorAll("[data-language]").forEach(editor => { editor.hidden = editor.dataset.language !== language.value; });
         panel.querySelectorAll("[data-runtime-credit]").forEach(note => { note.hidden = note.dataset.runtimeCredit !== language.value; });
+        const isPseudocode = language.value === "pseudocode";
+        panel.querySelectorAll("[data-runner-note]").forEach(note => {
+          note.hidden = isPseudocode ? note.dataset.runnerNote !== "pseudocode" : note.dataset.runnerNote === "pseudocode";
+        });
+        panel.querySelectorAll("[data-execution-ui]").forEach(element => { element.hidden = isPseudocode; });
         panel.querySelector("[data-status]").textContent = "Listo para ejecutar.";
         panel.querySelector("[data-output]").textContent = "El resultado aparecerá aquí.";
       });
@@ -167,6 +172,7 @@
       });
       panel.querySelector("[data-stop]").addEventListener("click", () => finish("Ejecución detenida.", undefined, true));
       panel.querySelector("[data-run]").addEventListener("click", () => {
+        if (language.value === "pseudocode") return;
         if (active) finish("Ejecución detenida para iniciar otro ejemplo.", undefined, true);
         active = panel;
         activeLanguage = language.value;
