@@ -93,6 +93,9 @@
       const editableLines = [...panel.querySelectorAll("[data-editable]")];
       const initial = editableLines.map(line => line.innerHTML);
       const language = panel.querySelector("[data-runner-language]");
+      const runButton = panel.querySelector("[data-run]");
+      const stopButton = panel.querySelector("[data-stop]");
+      const resetButton = panel.querySelector("[data-reset]");
       const source = () => [...panel.querySelectorAll('[data-language="python"] [data-code-line]')].map(line => line.textContent).join("\n") + "\n";
       const tabs = [...panel.querySelectorAll("[data-language-tab]")];
       const selectTab = (tab) => {
@@ -119,6 +122,9 @@
           note.hidden = isPseudocode ? note.dataset.runnerNote !== "pseudocode" : note.dataset.runnerNote === "pseudocode";
         });
         panel.querySelectorAll("[data-execution-ui]").forEach(element => { element.hidden = isPseudocode; });
+        runButton.disabled = isPseudocode;
+        stopButton.disabled = true;
+        resetButton.disabled = isPseudocode;
         panel.querySelector("[data-status]").textContent = "Listo para ejecutar.";
         panel.querySelector("[data-output]").textContent = "El resultado aparecerá aquí.";
       });
@@ -165,6 +171,7 @@
         });
       });
       panel.querySelector("[data-reset]").addEventListener("click", () => {
+        if (language.value === "pseudocode") return;
         if (active === panel) finish("Ejecución detenida.", undefined, true);
         editableLines.forEach((line, index) => { line.innerHTML = initial[index]; });
         panel.querySelector("[data-status]").textContent = "Ejemplo restablecido.";

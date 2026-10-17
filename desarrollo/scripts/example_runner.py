@@ -199,7 +199,7 @@ def render_runner(listing: dict, executable_only: bool = False, *, include_pseud
         f'aria-label="Pseudocódigo · {title}"><pre><code>{pseudocode_html}</code></pre></div>'
     ) if include_pseudocode else ""
     pseudocode_note = (
-        '<p data-runner-note="pseudocode">Este pseudocódigo resume la lógica del algoritmo y es de solo lectura.</p>'
+        '<p data-runner-note="pseudocode">El pseudocódigo es una representación general del algoritmo y no se puede ejecutar.</p>'
     ) if include_pseudocode else ""
     editable_note = (
         '<p data-runner-note="editable" hidden>Solo las líneas de entrada resaltadas son editables. '
@@ -211,6 +211,7 @@ def render_runner(listing: dict, executable_only: bool = False, *, include_pseud
     java_selected = "false" if include_pseudocode else "true"
     java_inactive = ' tabindex="-1"' if include_pseudocode else ""
     java_hidden = " hidden" if include_pseudocode else ""
+    pseudocode_disabled = " disabled" if include_pseudocode else ""
     execution_attribute = " data-execution-ui hidden" if include_pseudocode else ""
     return (
         '<div class="example-runner" data-example-runner>'
@@ -222,17 +223,17 @@ def render_runner(listing: dict, executable_only: bool = False, *, include_pseud
         f'<button type="button" role="tab" id="python-tab-{key}" aria-controls="runner-{key}" aria-selected="false" tabindex="-1" data-language-tab="python">Python</button>'
         f'<button type="button" role="tab" id="c-tab-{key}" aria-controls="c-code-{key}" aria-selected="false" tabindex="-1" data-language-tab="c">C</button></div>'
         f'{editable_note}'
-        f'{pseudocode_note}'
         f'{pseudocode_panel}'
+        f'{pseudocode_note}'
         f'<div id="java-code-{key}" role="tabpanel" aria-labelledby="java-tab-{key}" class="python-code-editor highlight" data-language="java" data-java-class="{java_class}"{java_hidden} aria-label="Código Java · {title}"><pre><code>{java_html}</code></pre></div>'
         f'<div id="runner-{key}" role="tabpanel" aria-labelledby="python-tab-{key}" class="python-code-editor highlight" data-language="python" hidden aria-label="Código Python · {title}"><pre><code>{editor_html}</code></pre></div>'
         f'<div id="c-code-{key}" role="tabpanel" aria-labelledby="c-tab-{key}" class="python-code-editor highlight" data-language="c" data-c-key="{c_key}" hidden aria-label="Código C · {title}"><pre><code>{c_html}</code></pre></div>'
         f'<p class="java-runtime-credit runtime-credit" data-runtime-credit="java"{java_hidden}>Java se ejecuta en tu navegador con <a href="https://cheerpj.com/" target="_blank" rel="noopener">CheerpJ</a>.</p>'
         '<p class="runtime-credit" data-runtime-credit="python" hidden>Python se ejecuta en tu navegador con <a href="https://pyodide.org/en/stable/" target="_blank" rel="noopener">Pyodide</a>.</p>'
         '<p class="runtime-credit" data-runtime-credit="c" hidden>C se ejecuta en tu navegador mediante <a href="https://webassembly.org/" target="_blank" rel="noopener">WebAssembly</a>.</p>'
-        f'<div class="example-runner-actions"{execution_attribute}><button type="button" data-run><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg><span>Ejecutar</span></button>'
+        f'<div class="example-runner-actions"><button type="button" data-run{pseudocode_disabled}><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg><span>Ejecutar</span></button>'
         '<button type="button" data-stop disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6h12v12H6z"/></svg><span>Detener</span></button>'
-        '<button type="button" data-reset><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg><span>Reestablecer</span></button></div>'
+        f'<button type="button" data-reset{pseudocode_disabled}><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg><span>Reestablecer</span></button></div>'
         f'<p data-status{execution_attribute} role="status">Listo para ejecutar.</p>'
         f'<pre data-output{execution_attribute} aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></details></div>'
     )

@@ -24,6 +24,11 @@ def test_every_executable_search_and_sort_listing_has_a_pseudocode_tab():
         assert source.count('aria-selected="true" data-language-tab="pseudocode"') == page_runners, path
         assert source.count('data-language="pseudocode"') == page_runners, path
         assert source.count('data-runner-note="pseudocode"') == page_runners, path
+        assert source.count('data-run disabled') == page_runners, path
+        assert source.count('data-reset disabled') == page_runners, path
+        assert source.count(
+            "El pseudocódigo es una representación general del algoritmo y no se puede ejecutar."
+        ) == page_runners, path
         assert len(re.findall(r'aria-controls="pseudocode-code-[a-f0-9]{12}"', source)) == page_runners, path
         assert len(re.findall(r'data-language="pseudocode"(?! hidden)', source)) == page_runners, path
 
@@ -36,6 +41,8 @@ def test_pseudocode_mode_hides_execution_only_controls():
     assert 'language.value === "pseudocode"' in source
     assert 'panel.querySelectorAll("[data-execution-ui]")' in source
     assert 'if (language.value === "pseudocode") return;' in source
+    assert 'runButton.disabled = isPseudocode;' in source
+    assert 'resetButton.disabled = isPseudocode;' in source
 
 
 def test_code_editor_uses_the_compact_font_size():
