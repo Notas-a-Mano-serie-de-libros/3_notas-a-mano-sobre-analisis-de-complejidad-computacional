@@ -221,7 +221,6 @@ def step_interpolation_search(state):
         return
 
     pos_value = state["arr"][state["pos"]]["value"]
-    state["formula"] = symbolic_formula()
 
     if pos_value == state["target"]:
         finish_found(state, state["pos"])

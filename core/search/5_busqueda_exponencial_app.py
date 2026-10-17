@@ -364,8 +364,6 @@ def step_exponential_search(state):
             finish_found(state, state["mid"], formula=build_mid_formula(state))
             return
 
-        state["formula"] = symbolic_mid_formula(state)
-
         if mid_value < state["target"]:
             state["general_message"] = f"Búsqueda binaria: {mid_value} es menor que {state['target']}; descarta la mitad izquierda."
             mark_discarded_left(state, state["mid"])

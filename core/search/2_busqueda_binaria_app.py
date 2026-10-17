@@ -156,7 +156,6 @@ def step_binary_search(state):
         return
 
     mid_value = state["arr"][state["mid"]]["value"]
-    state["formula"] = symbolic_formula()
 
     if mid_value == state["target"]:
         finish_found(state, state["mid"])

@@ -274,7 +274,6 @@ def step_ternary_search(state):
 
     state["a"] = new_a
     state["b"] = new_b
-    state["formula"] = symbolic_formula(state)
 
     if state["a"] > state["b"]:
         finish_not_found(state)

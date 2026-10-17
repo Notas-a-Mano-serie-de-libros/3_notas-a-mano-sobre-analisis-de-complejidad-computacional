@@ -1018,8 +1018,18 @@ def run_search_app(
     def current_values():
         return [node["value"] for node in state["arr"]]
 
+    last_active_formula = None
+
     def redraw():
-        formula = state.get("formula")
+        nonlocal last_active_formula
+        raw_formula = state.get("formula")
+        # Si la fórmula actual es None o vacía y ya teníamos una fórmula previa del algoritmo, mantenerla
+        if raw_formula:
+            last_active_formula = raw_formula
+            formula = raw_formula
+        else:
+            formula = last_active_formula or raw_formula
+
         render_cache.update_outputs(
             formula_output,
             html_output,

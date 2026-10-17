@@ -375,14 +375,83 @@ def parse_desk_vars(variables):
     return result
 
 
+def simplify_desk_action(action):
+    """Simplifica la frase de acción para la prueba de escritorio: (condición); acción corta."""
+    if not action:
+        return ""
+    text = str(action).strip()
+    text = re.sub(r"^(?:Búsqueda (?:lineal|binaria|secuencial)|Fase de saltos|Fase exponencial):\s*", "", text)
+
+    m = re.match(r"^(-?\d+)\s+es menor que\s+(-?\d+);\s*(.+?)\.?$", text, re.IGNORECASE)
+    if m:
+        outcome = m.group(3).replace("la mitad ", "mitad ")
+        return f"{m.group(1)} < {m.group(2)}; {outcome}"
+
+    m = re.match(r"^(-?\d+)\s+es mayor que\s+(-?\d+);\s*(.+?)\.?$", text, re.IGNORECASE)
+    if m:
+        outcome = m.group(3).replace("la mitad ", "mitad ")
+        return f"{m.group(1)} > {m.group(2)}; {outcome}"
+
+    m = re.match(r"^(-?\d+)\s+es mayor o igual que\s+(-?\d+);\s*(.+?)\.?$", text, re.IGNORECASE)
+    if m:
+        outcome = re.sub(r"comienza la búsqueda secuencial en este bloque", "inicia búsqueda secuencial", m.group(3), flags=re.IGNORECASE)
+        return f"{m.group(1)} ≥ {m.group(2)}; {outcome}"
+
+    m = re.match(r"^(-?\d+)\s+no coincide;\s*(.+?)\.?$", text, re.IGNORECASE)
+    if m:
+        outcome = re.sub(r"avanza al siguiente elemento", "avanza siguiente", m.group(2), flags=re.IGNORECASE)
+        outcome = re.sub(r"avanza dentro del bloque", "avanza en bloque", outcome, flags=re.IGNORECASE)
+        return f"{m.group(1)} ≠ x; {outcome}"
+
+    m = re.match(r"^(-?\d+)\s+está entre\s+(-?\d+)\s+y\s+(-?\d+);\s*(.+?)\.?$", text, re.IGNORECASE)
+    if m:
+        return f"{m.group(2)} < {m.group(1)} < {m.group(3)}; {m.group(4)}"
+
+    m = re.match(r"^[Ee]valúa\s+([a-zA-Z0-9_]+)\s+en la posición\s+(-?\d+)\.?$", text)
+    if m:
+        return f"Evalúa {m.group(1)} = {m.group(2)}"
+
+    m = re.match(r"^[Ee]stima\s+([a-zA-Z0-9_]+)\s+en la posición\s+(-?\d+).*$", text)
+    if m:
+        return f"Estima {m.group(1)} = {m.group(2)}"
+
+    m = re.match(r"^[Cc]ompara contra\s+(.+?)\.?$", text)
+    if m:
+        c = m.group(1).replace(" y ", ", ")
+        return f"Compara {c}"
+
+    m = re.match(r"^[Mm]uestra el bloque\s+(\[[^\]]+\])\.?$", text)
+    if m:
+        return f"Bloque {m.group(1)}"
+
+    m = re.match(r"^[Cc]ompara la posición\s+(-?\d+).*$", text)
+    if m:
+        return f"Compara pos {m.group(1)}"
+
+    m = re.match(r"^[Cc]omienza en la posición\s+(-?\d+)\.?$", text)
+    if m:
+        return f"Inicia en pos {m.group(1)}"
+
+    m = re.match(r"^[Cc]ompara las posiciones\s+(-?\d+)\s+y\s+(-?\d+)\.?$", text)
+    if m:
+        return f"Compara pos {m.group(1)} y {m.group(2)}"
+
+    m = re.match(r"^[Ii]ntercambia las posiciones\s+(-?\d+)\s+y\s+(-?\d+)\.?$", text)
+    if m:
+        return f"Intercambia pos {m.group(1)} y {m.group(2)}"
+
+    return text.rstrip(".")
+
+
 def desk_row(step, line, variables, action, array=None):
     var_dict = parse_desk_vars(variables)
+    short_action = simplify_desk_action(action)
     return {
         "step": step,
         "line": line,
         "vars": variables or "",
         "var_dict": var_dict,
-        "action": action or "",
+        "action": short_action,
         "array": None if array is None else list(array),
     }
 
