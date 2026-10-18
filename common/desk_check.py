@@ -295,9 +295,9 @@ _STYLES = """<style>
 .desk-check__table th, .desk-check__table td { border-bottom: 1px solid rgba(128,128,128,.25); padding: 5px 8px; text-align: left; vertical-align: middle; }
 .desk-check__table th { position: sticky; top: 0; background: var(--md-default-bg-color, #ffffff); background-color: rgba(246, 245, 243, 0.98); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10; box-shadow: 0 1px 0 rgba(128,128,128,.35); font-weight: 600; text-align: center; }
 .desk-check__table tr:last-child td { font-weight: 600; background: rgba(139,75,50,.10); }
-.desk-check__table td.desk-check__step, .desk-check__table th.desk-check__step { width: 44px; min-width: 38px; max-width: 50px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; padding: 5px 4px; }
+.desk-check__table td.desk-check__step, .desk-check__table th.desk-check__step { width: 1%; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; padding: 5px 6px; }
 .desk-check__table td.desk-check__mono { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; }
-.desk-check__table td.desk-check__var, .desk-check__table th.desk-check__var { width: 1%; font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; text-align: center; white-space: nowrap; padding: 5px 6px; }
+.desk-check__table td.desk-check__var, .desk-check__table th.desk-check__var { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; text-align: center; white-space: nowrap; padding: 5px 8px; }
 .desk-check__table tbody tr:hover td { background: rgba(139,75,50,.07) !important; cursor: default; }
 .desk-check__note { font-size: 12px; opacity: .75; margin: 4px 8px; flex: 0 0 auto; }
 .desk-check__empty { font-size: 13px; opacity: .8; padding: 14px; flex: 1 1 auto; display: flex; align-items: center; }
