@@ -96,7 +96,7 @@ __all__ = [
 def formula_iframe_height(formula):
     row_breaks = re.findall(r"\\\\(?:\[(\d+(?:\.\d+)?)pt\])?", formula)
     rows = max(1, len(row_breaks) + 1)
-    explicit_spacing = sum(float(value) * 1.34 for value in row_breaks if value)
+    explicit_spacing = sum(float(value) * 1.15 for value in row_breaks if value)
     environments = (
         formula.count(r"\begin{array}") +
         formula.count(r"\begin{aligned}") +
@@ -104,8 +104,8 @@ def formula_iframe_height(formula):
     )
     tall_terms = formula.count(r"\frac") + formula.count(r"\left\lfloor") + formula.count(r"\right\rfloor")
     tall_rows = min(rows, max(0, tall_terms // 2))
-    height = 32 + rows * 25 + explicit_spacing + environments * 8 + tall_rows * 17
-    return max(42, min(520, int(round(height))))
+    height = 18 + rows * 20 + explicit_spacing + environments * 4 + tall_rows * 10
+    return max(36, min(520, int(round(height))))
 
 
 def mathjax_srcdoc(formula):
