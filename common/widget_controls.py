@@ -132,6 +132,9 @@ def shared_ui_styles(root_selector):
   padding: 8px 12px !important;
   border-bottom: 1px solid var(--simulation-panel-border, #dedede) !important;
   justify-content: flex-end !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
 }}
 {root} [class*="subpanel-title"],
 {root} [class*="configuration-summary"],
