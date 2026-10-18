@@ -1073,9 +1073,10 @@ def run_search_app(
         step_back_button.disabled = True
 
     def reset_algorithm(*_args):
-        nonlocal state
+        nonlocal state, last_active_formula
         if control_state["updating"]:
             return
+        last_active_formula = None
         state = build_state()
         desk_rows.clear()
         state_history.clear()
@@ -1084,8 +1085,9 @@ def run_search_app(
         redraw()
 
     def on_target_mode_change(*_args):
-        nonlocal state
+        nonlocal state, last_active_formula
         update_target_position_visibility()
+        last_active_formula = None
         state = build_state(values=current_values())
         desk_rows.clear()
         state_history.clear()
@@ -1094,9 +1096,10 @@ def run_search_app(
         redraw()
 
     def on_target_position_change(*_args):
-        nonlocal state
+        nonlocal state, last_active_formula
         if control_state["updating"]:
             return
+        last_active_formula = None
         state = build_state(values=current_values())
         desk_rows.clear()
         state_history.clear()
@@ -1105,12 +1108,13 @@ def run_search_app(
         redraw()
 
     def generate_book_array(*_args):
-        nonlocal state
+        nonlocal state, last_active_formula
         if book_array is None:
             return
         control_state["updating"] = True
         size_input.value = len(book_array)
         control_state["updating"] = False
+        last_active_formula = None
         state = build_state(values=book_array)
         desk_rows.clear()
         state_history.clear()
