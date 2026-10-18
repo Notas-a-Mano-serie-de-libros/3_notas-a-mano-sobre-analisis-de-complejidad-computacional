@@ -98,7 +98,7 @@ def count_interpolation(values, target):
         denominator = values[high] - values[low]
         if denominator == 0:
             return steps
-        pos = low + ((high - low) * (target - values[low])) // denominator
+        pos = low + (int(high - low) * int(target - values[low])) // int(denominator)
         if pos < low or pos > high:
             return steps
         if values[pos] == target:
