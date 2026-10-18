@@ -280,7 +280,7 @@ _ORDER_TOKENS = {
 }
 
 _STYLES = """<style>
-.desk-check { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; color: inherit; font-family: inherit; font-size: 13px; }
+.desk-check { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; color: #111111; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; }
 .desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 0; overflow-x: auto; overflow-y: hidden; background: var(--md-code-bg-color, rgba(128,128,128,.04)); box-sizing: border-box; }
 .desk-check__code-inner { display: inline-block; min-width: 100%; padding-right: 28px; box-sizing: border-box; }
 .desk-check__line { display: flex; align-items: stretch; width: 100%; font: 13px/1.65 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; min-height: 1.65em; box-sizing: border-box; }
@@ -291,17 +291,15 @@ _STYLES = """<style>
 .desk-check__line--active .desk-check__num { background: rgba(139,75,50,.30); border-right-color: #8b4b32; color: #8b4b32; opacity: 1; font-weight: 700; }
 .desk-check__trace { flex: 2 1 480px; min-width: 300px; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; display: flex; flex-direction: column; overflow: hidden; background: var(--md-default-bg-color, #ffffff); box-sizing: border-box; height: calc(var(--desk-code-lines, 20) * 1.65em + 2px); max-height: calc(var(--desk-code-lines, 20) * 1.65em + 2px); min-height: 0; }
 .desk-check__table-wrap { width: 100%; flex: 1 1 auto; overflow-y: auto; overflow-x: auto; position: relative; min-height: 0; }
-.desk-check__table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 1.45; }
-.desk-check__table th, .desk-check__table td { border-bottom: 1px solid rgba(128,128,128,.25); padding: 6px 10px; text-align: left; vertical-align: middle; }
+.desk-check__table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.45; }
+.desk-check__table th, .desk-check__table td { border-bottom: 1px solid rgba(128,128,128,.25); padding: 5px 8px; text-align: left; vertical-align: middle; }
 .desk-check__table th { position: sticky; top: 0; background: var(--md-default-bg-color, #ffffff); background-color: rgba(246, 245, 243, 0.98); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10; box-shadow: 0 1px 0 rgba(128,128,128,.35); font-weight: 600; text-align: center; }
 .desk-check__table tr:last-child td { font-weight: 600; background: rgba(139,75,50,.10); }
-.desk-check__table td.desk-check__step { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.desk-check__table th.desk-check__step { text-align: center; }
+.desk-check__table td.desk-check__step, .desk-check__table th.desk-check__step { width: 44px; min-width: 38px; max-width: 50px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; padding: 5px 4px; }
 .desk-check__table td.desk-check__mono { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; }
-.desk-check__table td.desk-check__var { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; text-align: center; white-space: nowrap; }
-.desk-check__table th.desk-check__var { text-align: center; }
+.desk-check__table td.desk-check__var, .desk-check__table th.desk-check__var { width: 1%; font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 12px; text-align: center; white-space: nowrap; padding: 5px 6px; }
 .desk-check__table tbody tr:hover td { background: rgba(139,75,50,.07) !important; cursor: default; }
-.desk-check__note { font-size: 12px; opacity: .75; margin: 6px 10px; flex: 0 0 auto; }
+.desk-check__note { font-size: 12px; opacity: .75; margin: 4px 8px; flex: 0 0 auto; }
 .desk-check__empty { font-size: 13px; opacity: .8; padding: 14px; flex: 1 1 auto; display: flex; align-items: center; }
 </style>"""
 
@@ -850,11 +848,16 @@ def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, sh
         note = ""
         if len(rows) > limit or hidden:
             note = f'<p class="desk-check__note">Se muestran los últimos {len(visible)} pasos' + (f" de {total_steps}" if total_steps else "") + ".</p>"
+        scroll_trigger = (
+            '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\'/%3E" style="display:none;" '
+            'onload="var w=this.closest(\'.desk-check\')?.querySelector(\'.desk-check__table-wrap\');if(w)w.scrollTop=w.scrollHeight;" '
+            'onerror="var w=this.closest(\'.desk-check\')?.querySelector(\'.desk-check__table-wrap\');if(w)w.scrollTop=w.scrollHeight;">'
+        )
         trace_html = (
             f'<div class="desk-check__table-wrap"><table class="desk-check__table"><thead><tr>'
             f'<th class="desk-check__step">Paso</th><th class="desk-check__step">Línea</th>'
             f'{var_headers}{array_head}</tr></thead>'
-            f'<tbody>{"".join(body)}</tbody></table></div>{note}'
+            f'<tbody>{"".join(body)}</tbody></table>{scroll_trigger}</div>{note}'
         )
     else:
         trace_html = f'<div class="desk-check__empty">{escape(_INITIAL_HINT)}</div>'

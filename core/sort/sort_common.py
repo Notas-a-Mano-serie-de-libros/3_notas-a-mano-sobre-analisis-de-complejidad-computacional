@@ -116,14 +116,14 @@ SORT_LEGEND_ROLES_BY_ALGORITHM = {
     "radix": (ROLE_COMPARE, ROLE_WRITE, ROLE_BOUNDARY, ROLE_SORTED),
 }
 INITIAL_MESSAGES = {
-    "burbuja": (start_message("burbuja"), ""),
-    "seleccion": (start_message("seleccion"), ""),
-    "insercion": (start_message("insercion"), ""),
-    "insercion_binaria": (start_message("insercion_binaria"), ""),
+    "burbuja": (start_message("burbuja"), r"i = 0,\quad b = n - 1"),
+    "seleccion": (start_message("seleccion"), r"i = n - 1,\quad \text{candidato} = a_0"),
+    "insercion": (start_message("insercion"), r"i = 1,\quad j = 0"),
+    "insercion_binaria": (start_message("insercion_binaria"), r"i = 1,\quad a = 0,\quad b = 1"),
     "shell": (start_message("shell"), ""),
-    "mezcla": (start_message("mezcla"), ""),
-    "rapido": (start_message("rapido"), ""),
-    "radix": (start_message("radix"), ""),
+    "mezcla": (start_message("mezcla"), r"\text{fase} = \text{inicio}"),
+    "rapido": (start_message("rapido"), r"\text{fase} = \text{inicio}"),
+    "radix": (start_message("radix"), r"\text{fase} = \text{inicio}"),
 }
 
 
@@ -461,16 +461,7 @@ def label_html(label):
 
 
 def message_html(message):
-    text = str(message or "")
-    action, separator, detail = text.partition(":")
-    if not separator:
-        action, separator, detail = text.partition(". ")
-    if not separator:
-        return f'<span class="sort-message-action">{escape(text)}</span><span class="sort-message-detail">&nbsp;</span>'
-    return (
-        f'<span class="sort-message-action">{escape(action.rstrip(". "))}</span>'
-        f'<span class="sort-message-detail">{escape(detail)}</span>'
-    )
+    return escape(str(message or ""))
 
 
 def simulation_min_height(state):
@@ -480,21 +471,21 @@ def simulation_min_height(state):
     cache_key = (view, algorithm, size, state.get("radix_base", 10)) if algorithm == "radix" else (view, algorithm, size)
     if cache_key in _SIMULATION_HEIGHT_CACHE:
         return _SIMULATION_HEIGHT_CACHE[cache_key]
-    message_height = 72
-    phase_height = 52
-    legend_height = 58
+    message_height = 36
+    phase_height = 28 if sort_phase_label(state).strip() else 0
+    legend_height = 42
     result_width = SORT_RESULT_WIDTH
-    vertical_padding = 34
+    vertical_padding = 12
     radix_panel_height = 52 + int(state.get("radix_base", 10)) * 31 if algorithm == "radix" else 0
     if view == "barras":
-        height = message_height + phase_height + legend_height + 360 + radix_panel_height + vertical_padding
+        height = message_height + phase_height + legend_height + SORT_BAR_AREA_HEIGHT + 24 + 44 + radix_panel_height + vertical_padding
     elif view == "arbol":
         row_height = QUICK_TREE_ROW_HEIGHT if algorithm == "rapido" else MERGE_TREE_ROW_HEIGHT
         tree_height = (tree_max_depth_for_state(state) + 1) * row_height
         height = message_height + phase_height + legend_height + tree_height + vertical_padding
     else:
         rows = max(1, (len(state["arr"]) + 7) // 8)
-        height = message_height + phase_height + legend_height + rows * 142 + result_width + vertical_padding
+        height = message_height + phase_height + legend_height + rows * 110 + result_width + vertical_padding
     _SIMULATION_HEIGHT_CACHE[cache_key] = height
     return height
 
@@ -1102,34 +1093,33 @@ def sort_styles():
         background: #ffffff;
         border: 0;
         border-radius: 0;
-        padding: 0 14px 14px;
+        padding: 0 8px 8px;
       }}
       .sort-message {{
-        font-size: var(--sort-message-size);
+        font-family: '{FONT_FAMILY}', serif;
+        font-size: 22px;
         font-weight: 400;
         text-align: center;
-        height: 64px;
+        height: 32px;
         line-height: 28px;
-        margin: 4px 0 8px;
+        margin: 2px 0 6px;
         display: flex;
         align-items: center;
-        flex-direction: column;
         justify-content: center;
         overflow: hidden;
         box-sizing: border-box;
       }}
       .sort-message-action {{
         color: var(--sort-text);
-        font-weight: 600;
+        font-weight: 400;
       }}
       .sort-message-detail {{
-        color: var(--sort-text-secondary);
-        font-size: 0.82em;
-        min-height: 22px;
+        color: var(--sort-text);
+        font-size: 1em;
       }}
       .sort-phase-strip {{
-        height: 24px;
-        line-height: 22px;
+        height: 22px;
+        line-height: 20px;
         margin: 0 auto 4px;
         width: min(100%, {SORT_VISUAL_WIDTH}px);
         text-align: center;
@@ -1141,7 +1131,7 @@ def sort_styles():
       .sort-step-strip {{
         height: 22px;
         line-height: 20px;
-        margin: 0 auto 8px;
+        margin: 0 auto 6px;
         width: min(100%, {SORT_VISUAL_WIDTH}px);
         text-align: center;
         font-size: 15px;
@@ -1363,12 +1353,12 @@ def sort_styles():
         contain: layout paint;
       }}
       .bar-nodes {{
-        min-height: 360px;
+        min-height: 320px;
         display: flex;
         align-items: flex-end;
         justify-content: center;
         gap: 0;
-        padding: 0 8px;
+        padding: 0 4px;
         width: 100%;
         position: relative;
       }}
@@ -1823,12 +1813,13 @@ def render_state_html(state, include_styles=True):
     result = render_sort_result_symbol(state)
     result_offset = sort_result_offset(state, view)
     styles = sort_styles() if include_styles else ""
+    phase_markup = f'<div class="sort-phase-strip">{phase}</div>' if phase.strip() else ""
     return f"""
     {styles}
     <div class="{app_class}" style="min-height:{min_height}px; height:{min_height}px; overflow:hidden;">
       {legend}
       <div class="sort-message">{message_html(state["message"])}</div>
-      <div class="sort-phase-strip">{phase}</div>
+      {phase_markup}
       <div class="sort-step-strip">{step_status}</div>
       <div class="sort-array-line sort-array-line-{css_token(view)}">
         {items_markup}
@@ -2144,7 +2135,15 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             step_sort(probe)
             yield copy_sort_state(probe)
 
+    last_active_formula = None
+
     def redraw():
+        nonlocal last_active_formula
+        raw_formula = state.get("formula")
+        if raw_formula:
+            last_active_formula = raw_formula
+        elif last_active_formula:
+            state["formula"] = last_active_formula
         formula = displaystyle_formula(state["formula"])
         render_cache.update_outputs(
             formula_output,
@@ -2170,9 +2169,10 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         controls["book"].disabled = False
 
     def reset_algorithm(*_args):
-        nonlocal state
+        nonlocal state, last_active_formula
         if control_state["updating"]:
             return
+        last_active_formula = None
         change = _args[0] if _args else {}
         update_radix_control_visibility()
         sync_radix_max = not (
@@ -2184,9 +2184,10 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         sync_execution_buttons()
 
     def reset_for_view(change):
-        nonlocal state
+        nonlocal state, last_active_formula
         if control_state["updating"] or change["name"] != "value":
             return
+        last_active_formula = None
         control_state["updating"] = True
         controls["size"].value = default_size_for_view(change["new"])
         control_state["updating"] = False
@@ -2262,13 +2263,15 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         sync_execution_buttons()
 
     def generate_new(*_args):
-        nonlocal state
+        nonlocal state, last_active_formula
+        last_active_formula = None
         state = build_state(sync_radix_max=False)
         redraw()
         sync_execution_buttons()
 
     def generate_book(*_args):
-        nonlocal state
+        nonlocal state, last_active_formula
+        last_active_formula = None
         control_state["updating"] = True
         controls["size"].value = len(book_array)
         control_state["updating"] = False
