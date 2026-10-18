@@ -294,7 +294,6 @@ _STYLES = """<style>
 .desk-check__table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 1.45; }
 .desk-check__table th, .desk-check__table td { border-bottom: 1px solid rgba(128,128,128,.25); padding: 6px 10px; text-align: left; vertical-align: middle; }
 .desk-check__table th { position: sticky; top: 0; background: var(--md-default-bg-color, #ffffff); background-color: rgba(246, 245, 243, 0.98); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10; box-shadow: 0 1px 0 rgba(128,128,128,.35); font-weight: 600; text-align: center; }
-.desk-check__table th.desk-check__action { text-align: left; }
 .desk-check__table tr:last-child td { font-weight: 600; background: rgba(139,75,50,.10); }
 .desk-check__table td.desk-check__step { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .desk-check__table th.desk-check__step { text-align: center; }
@@ -838,8 +837,7 @@ def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, sh
             array_cell = f'<td class="desk-check__mono">{escape(_format_array(row["array"]))}</td>' if show_array and row["array"] is not None else ("<td></td>" if show_array else "")
             body.append(
                 f'<tr><td class="desk-check__step">{row["step"]}</td><td class="desk-check__step">{line_cell}</td>'
-                f'{var_cells}{array_cell}'
-                f'<td>{escape(row["action"])}</td></tr>'
+                f'{var_cells}{array_cell}</tr>'
             )
 
         if var_cols:
@@ -855,7 +853,7 @@ def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, sh
         trace_html = (
             f'<div class="desk-check__table-wrap"><table class="desk-check__table"><thead><tr>'
             f'<th class="desk-check__step">Paso</th><th class="desk-check__step">Línea</th>'
-            f'{var_headers}{array_head}<th class="desk-check__action">Acción</th></tr></thead>'
+            f'{var_headers}{array_head}</tr></thead>'
             f'<tbody>{"".join(body)}</tbody></table></div>{note}'
         )
     else:
