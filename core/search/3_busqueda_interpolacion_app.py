@@ -214,7 +214,7 @@ def step_interpolation_search(state):
             )
 
         state["arr"][state["pos"]]["role"] = "current"
-        state["formula"] = symbolic_formula()
+        state["formula"] = build_formula(state, low_value, high_value)
         label_range(state)
         state["general_message"] = f"Estima p en la posición {state['pos']} usando la distribución de valores."
         state["phase"] = "compare"

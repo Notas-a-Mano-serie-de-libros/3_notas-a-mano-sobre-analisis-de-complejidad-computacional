@@ -239,7 +239,7 @@ def step_ternary_search(state):
         state["m1"] = math.floor(state["a"] + (state["b"] - state["a"]) / 3)
         state["m2"] = math.floor(state["b"] - (state["b"] - state["a"]) / 3)
 
-        state["formula"] = symbolic_formula()
+        state["formula"] = build_formula(state)
         paint_points(state)
 
         state["general_message"] = f"Compara contra m1 = {state['m1']} y m2 = {state['m2']}."
