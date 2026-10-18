@@ -281,17 +281,15 @@ _ORDER_TOKENS = {
 
 _STYLES = """<style>
 .desk-check { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; color: inherit; font-family: inherit; }
-.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 4px 0; overflow-x: auto; background: var(--md-code-bg-color, rgba(128,128,128,.04)); box-sizing: border-box; }
-.desk-check__line { display: flex; align-items: stretch; width: 100%; min-width: max-content; font: 13px/1.65 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; min-height: 1.65em; box-sizing: border-box; padding: 0 14px 0 0; }
+.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 6px 16px 6px 0; overflow-x: auto; background: var(--md-code-bg-color, rgba(128,128,128,.04)); box-sizing: border-box; }
+.desk-check__line { display: flex; align-items: stretch; width: 100%; min-width: max-content; font: 13px/1.65 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; min-height: 1.65em; box-sizing: border-box; padding: 0 16px 0 0; }
 .desk-check__line:first-child .desk-check__num { border-top-left-radius: 3px; }
 .desk-check__line:last-child .desk-check__num { border-bottom-left-radius: 3px; }
-.desk-check__line--blank { min-height: 1.1em; }
-.desk-check__line--blank .desk-check__num { opacity: 0; background: transparent; }
 .desk-check__num { flex: 0 0 38px; width: 38px; min-width: 38px; display: flex; align-items: center; justify-content: center; text-align: center; background: rgba(128,128,128,.10); border-right: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); margin-right: 12px; color: var(--md-default-fg-color--light, inherit); opacity: .75; user-select: none; box-sizing: border-box; }
 .desk-check__line--active { background: rgba(139,75,50,.18); font-weight: 700; }
 .desk-check__line--active .desk-check__num { background: rgba(139,75,50,.30); border-right-color: #8b4b32; color: #8b4b32; opacity: 1; font-weight: 700; }
-.desk-check__trace { flex: 2 1 480px; min-width: 300px; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; display: flex; flex-direction: column; overflow: hidden; background: var(--md-default-bg-color, #ffffff); max-height: 350px; box-sizing: border-box; }
-.desk-check__table-wrap { width: 100%; max-height: 350px; overflow-y: auto; overflow-x: auto; position: relative; }
+.desk-check__trace { flex: 2 1 480px; min-width: 300px; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; display: flex; flex-direction: column; overflow: hidden; background: var(--md-default-bg-color, #ffffff); box-sizing: border-box; }
+.desk-check__table-wrap { width: 100%; flex: 1 1 auto; overflow-y: auto; overflow-x: auto; position: relative; }
 .desk-check__table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; line-height: 1.45; }
 .desk-check__table th, .desk-check__table td { border-bottom: 1px solid rgba(128,128,128,.25); padding: 6px 10px; text-align: left; vertical-align: middle; }
 .desk-check__table th { position: sticky; top: 0; background: var(--md-default-bg-color, #ffffff); background-color: rgba(246, 245, 243, 0.98); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10; box-shadow: 0 1px 0 rgba(128,128,128,.35); font-weight: 600; text-align: center; }
@@ -304,7 +302,7 @@ _STYLES = """<style>
 .desk-check__table th.desk-check__var { text-align: center; }
 .desk-check__table tbody tr:hover td { background: rgba(139,75,50,.07) !important; cursor: default; }
 .desk-check__note { font-size: 12px; opacity: .75; margin: 6px 10px; }
-.desk-check__empty { font-size: 13px; opacity: .8; padding: 14px; }
+.desk-check__empty { font-size: 13px; opacity: .8; padding: 14px; flex: 1 1 auto; display: flex; align-items: center; }
 </style>"""
 
 
@@ -805,24 +803,16 @@ def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, sh
 
     code_html = []
     line_numbers = {}
-    current_number = 1
-    for key, text in lines:
-        if not text.strip():
-            code_html.append(
-                '<div class="desk-check__line desk-check__line--blank">'
-                '<span class="desk-check__num">&nbsp;</span><span>&nbsp;</span></div>'
-            )
-            continue
-        number = current_number
-        current_number += 1
+    for number, (key, text) in enumerate(lines, start=1):
         if key:
             line_numbers[key] = number
         is_active = key is not None and key == active
         css = "desk-check__line desk-check__line--active" if is_active else "desk-check__line"
         current = ' aria-current="step"' if is_active else ""
+        line_content = escape(text) if text.strip() else "&nbsp;"
         code_html.append(
             f'<div class="{css}"{current}><span class="desk-check__num">{number}</span>'
-            f'<span>{escape(text) or " "}</span></div>'
+            f'<span>{line_content}</span></div>'
         )
 
     if visible:
