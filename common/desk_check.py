@@ -281,7 +281,7 @@ _ORDER_TOKENS = {
 
 _STYLES = """<style>
 .desk-check { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; color: inherit; font-family: inherit; }
-.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 4px 0; overflow-y: auto; overflow-x: auto; background: var(--md-code-bg-color, rgba(128,128,128,.04)); max-height: 350px; box-sizing: border-box; }
+.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 4px 0; overflow-x: auto; background: var(--md-code-bg-color, rgba(128,128,128,.04)); box-sizing: border-box; }
 .desk-check__line { display: flex; align-items: stretch; width: 100%; min-width: max-content; font: 13px/1.65 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; min-height: 1.65em; box-sizing: border-box; padding: 0 14px 0 0; }
 .desk-check__line:first-child .desk-check__num { border-top-left-radius: 3px; }
 .desk-check__line:last-child .desk-check__num { border-bottom-left-radius: 3px; }
