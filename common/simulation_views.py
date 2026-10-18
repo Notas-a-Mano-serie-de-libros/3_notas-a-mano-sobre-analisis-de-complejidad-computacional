@@ -60,6 +60,7 @@ class ViewSection:
 class ViewTabs:
     tabs: tuple[tuple[str, widgets.Widget] | tuple[str, widgets.Widget, tuple[str, ...]], ...]
     default_index: int = 0
+    on_tab_change: object | None = None
 
 
 @dataclass(frozen=True)
@@ -111,6 +112,7 @@ def build_simulation_view(spec: SimulationViewSpec):
                     section.tabs,
                     prefix=spec.panel_prefix,
                     default_index=section.default_index,
+                    on_tab_change=section.on_tab_change,
                 )
             )
         elif isinstance(section, ViewSection):

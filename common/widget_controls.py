@@ -413,7 +413,7 @@ def collapsible_panel(title, content, *, prefix, open_by_default=True):
     return panel
 
 
-def tabbed_panel(tabs, *, prefix, default_index=0):
+def tabbed_panel(tabs, *, prefix, default_index=0, on_tab_change=None):
     """Panel con pestañas horizontales para alternar entre contenidos."""
 
     normalized_tabs = []
@@ -459,8 +459,11 @@ def tabbed_panel(tabs, *, prefix, default_index=0):
         def _make_handler(idx):
             def _handler(_):
                 nonlocal active_index
-                active_index = idx
-                update_tabs()
+                if active_index != idx:
+                    active_index = idx
+                    update_tabs()
+                    if on_tab_change is not None:
+                        on_tab_change(idx)
             return _handler
         btn.on_click(_make_handler(i))
 

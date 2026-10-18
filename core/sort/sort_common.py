@@ -1896,7 +1896,7 @@ def sort_controls_grid(groups):
     )
 
 
-def build_sort_panel(parameters, result, title="Simulación de ordenamiento", procedure=None, desk_check=None, action_row=None):
+def build_sort_panel(parameters, result, title="Simulación de ordenamiento", procedure=None, desk_check=None, action_row=None, on_tab_change=None):
     result.add_class("sort-result-content")
     sections = [
         ViewSection(SECTION_CONFIGURATION, parameters, ("sort-subpanel-content",))
@@ -1912,7 +1912,8 @@ def build_sort_panel(parameters, result, title="Simulación de ordenamiento", pr
                 (
                     ("Ejecución visual", result, ("sort-subpanel-content", "sort-result-content")),
                     ("Prueba de escritorio", desk_check, ("sort-subpanel-content", "sort-desk-check-content")),
-                )
+                ),
+                on_tab_change=on_tab_change,
             )
         )
     else:
@@ -2216,6 +2217,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         nonlocal state, last_active_formula
         if control_state["updating"]:
             return
+        execution_state["run_id"] += 1
         last_active_formula = None
         change = _args[0] if _args else {}
         update_radix_control_visibility()
@@ -2354,12 +2356,16 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     desk_output.add_class("sort-subpanel-content")
     desk_output.add_class("sort-desk-check-content")
 
+    def on_tab_change(_idx):
+        reset_algorithm()
+
     layout = build_sort_panel(
         controls_layout,
         html_output,
         procedure=formula_output,
         desk_check=desk_output,
         action_row=action_row,
+        on_tab_change=on_tab_change,
     )
     display(layout)
     update_radix_control_visibility()

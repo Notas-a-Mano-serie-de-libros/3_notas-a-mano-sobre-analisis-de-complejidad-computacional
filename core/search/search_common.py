@@ -1106,6 +1106,7 @@ def run_search_app(
         nonlocal state, last_active_formula
         if control_state["updating"]:
             return
+        execution_state["run_id"] += 1
         last_active_formula = None
         state = build_state()
         desk_rows.clear()
@@ -1315,7 +1316,8 @@ def run_search_app(
                     (
                         ("Ejecución visual", html_output, ("search-subpanel-content", "search-result-content")),
                         ("Prueba de escritorio", desk_output, ("search-subpanel-content", "search-desk-check-content")),
-                    )
+                    ),
+                    on_tab_change=lambda _idx: reset_algorithm(),
                 ),
             ),
         )
