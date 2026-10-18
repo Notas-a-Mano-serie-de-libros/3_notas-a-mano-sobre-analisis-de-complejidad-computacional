@@ -121,18 +121,64 @@ def shared_ui_styles(root_selector):
 {root} .lab-stepper > *,
 {root} .stepper > * {{ margin: 0 !important; }}
 {root} .simulation-action-row {{
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
   background: var(--simulation-surface, #ffffff) !important;
   width: 100% !important;
   gap: 0 !important;
   margin: 0 !important;
   padding: 8px 12px !important;
-  border-top: 1px solid var(--simulation-panel-border, #dedede) !important;
-  border-bottom: 0 !important;
-  box-shadow: none !important;
+  border-bottom: 1px solid var(--simulation-panel-border, #dedede) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
   justify-content: flex-end !important;
   flex-wrap: nowrap !important;
   overflow-x: auto !important;
   box-sizing: border-box !important;
+}}
+{root} [class*="-tab-bar"] {{
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-bottom: 1px solid var(--simulation-panel-border, #dedede) !important;
+  background: var(--simulation-muted-surface, #f7f7f7) !important;
+  display: flex !important;
+  flex-flow: row nowrap !important;
+  box-sizing: border-box !important;
+}}
+{root} button[class*="-tab-button"] {{
+  height: 44px !important;
+  min-height: 44px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  font-family: sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}}
+{root} button[class*="-tab-button"] + button[class*="-tab-button"] {{
+  border-left: 1px solid var(--simulation-panel-border, #dedede) !important;
+}}
+{root} button[class*="-tab-active"] {{
+  background: var(--simulation-surface, #ffffff) !important;
+  color: #1976d2 !important;
+  font-weight: 700 !important;
+  border-bottom: 3px solid #1976d2 !important;
+}}
+{root} button[class*="-tab-inactive"] {{
+  background: var(--simulation-muted-surface, #f7f7f7) !important;
+  color: #666666 !important;
+  border-bottom: 3px solid transparent !important;
+}}
+{root} button[class*="-tab-inactive"]:hover {{
+  background: #eeeeee !important;
+  color: #333333 !important;
 }}
 {root} [class*="subpanel-title"],
 {root} [class*="configuration-summary"],
@@ -364,6 +410,80 @@ def collapsible_panel(title, content, *, prefix, open_by_default=True):
         layout=widgets.Layout(width="100%", grid_gap="0px"),
     )
     panel.add_class(f"{prefix}-subpanel")
+    return panel
+
+
+def tabbed_panel(tabs, *, prefix, default_index=0):
+    """Panel con pestañas horizontales para alternar entre contenidos."""
+
+    normalized_tabs = []
+    content_widgets = []
+    for item in tabs:
+        title = item[0]
+        content = item[1]
+        classes = item[2] if len(item) > 2 else ()
+        for c in classes:
+            content.add_class(c)
+        normalized_tabs.append((title, content))
+        content_widgets.append(content)
+
+    active_index = default_index
+    tab_buttons = []
+
+    for i, (title, _) in enumerate(normalized_tabs):
+        btn = widgets.Button(
+            description=title,
+            layout=widgets.Layout(
+                height="44px",
+                flex="1 1 0",
+                width="auto",
+                margin="0",
+                padding="0",
+            ),
+        )
+        btn.add_class(f"{prefix}-tab-button")
+        tab_buttons.append(btn)
+
+    def update_tabs():
+        for i, (btn, content) in enumerate(zip(tab_buttons, content_widgets)):
+            is_active = (i == active_index)
+            content.layout.display = "block" if is_active else "none"
+            if is_active:
+                btn.remove_class(f"{prefix}-tab-inactive")
+                btn.add_class(f"{prefix}-tab-active")
+            else:
+                btn.remove_class(f"{prefix}-tab-active")
+                btn.add_class(f"{prefix}-tab-inactive")
+
+    for i, btn in enumerate(tab_buttons):
+        def _make_handler(idx):
+            def _handler(_):
+                nonlocal active_index
+                active_index = idx
+                update_tabs()
+            return _handler
+        btn.on_click(_make_handler(i))
+
+    update_tabs()
+
+    tab_bar = widgets.HBox(
+        tab_buttons,
+        layout=widgets.Layout(width="100%", grid_gap="0px", margin="0", padding="0", overflow="hidden"),
+    )
+    tab_bar.add_class(f"{prefix}-tab-bar")
+
+    content_box = widgets.VBox(
+        content_widgets,
+        layout=widgets.Layout(width="100%", grid_gap="0px", margin="0", padding="0", overflow="visible"),
+    )
+    content_box.add_class(f"{prefix}-tab-content")
+
+    panel = widgets.VBox(
+        [tab_bar, content_box],
+        layout=widgets.Layout(width="100%", grid_gap="0px"),
+    )
+    panel.add_class(f"{prefix}-subpanel")
+    panel.add_class(f"{prefix}-tab-panel")
     return panel
 
 

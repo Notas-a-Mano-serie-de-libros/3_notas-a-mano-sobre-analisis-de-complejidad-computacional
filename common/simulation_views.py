@@ -12,6 +12,7 @@ from common.widget_controls import (
     button_control,
     collapsible_panel,
     shared_ui_styles,
+    tabbed_panel,
 )
 
 SECTION_CONFIGURATION = "Configuración"
@@ -56,10 +57,16 @@ class ViewSection:
 
 
 @dataclass(frozen=True)
+class ViewTabs:
+    tabs: tuple[tuple[str, widgets.Widget] | tuple[str, widgets.Widget, tuple[str, ...]], ...]
+    default_index: int = 0
+
+
+@dataclass(frozen=True)
 class SimulationViewSpec:
     root_class: str
     panel_prefix: str
-    sections: tuple[ViewSection, ...]
+    sections: tuple[ViewSection | ViewTabs, ...]
     styles: str = ""
     action_row: widgets.Widget | None = None
 
@@ -98,16 +105,27 @@ def build_simulation_view(spec: SimulationViewSpec):
 
     panels = []
     for section in spec.sections:
-        for css_class in section.content_classes:
-            section.content.add_class(css_class)
-        panels.append(
-            collapsible_panel(
-                section.title,
-                section.content,
-                prefix=spec.panel_prefix,
-                open_by_default=section.open_by_default,
+        if isinstance(section, ViewTabs):
+            panels.append(
+                tabbed_panel(
+                    section.tabs,
+                    prefix=spec.panel_prefix,
+                    default_index=section.default_index,
+                )
             )
-        )
+        elif isinstance(section, ViewSection):
+            for css_class in section.content_classes:
+                section.content.add_class(css_class)
+            panels.append(
+                collapsible_panel(
+                    section.title,
+                    section.content,
+                    prefix=spec.panel_prefix,
+                    open_by_default=section.open_by_default,
+                )
+            )
+        else:
+            panels.append(section)
 
     items = []
     if spec.action_row is not None:
