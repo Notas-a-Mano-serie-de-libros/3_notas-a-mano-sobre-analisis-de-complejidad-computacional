@@ -281,7 +281,7 @@ _ORDER_TOKENS = {
 
 _STYLES = """<style>
 .desk-check { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; color: #111111; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; }
-.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 0; overflow-x: auto; overflow-y: hidden; background: var(--md-code-bg-color, rgba(128,128,128,.04)); box-sizing: border-box; }
+.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 0; overflow-x: auto; overflow-y: hidden; background: var(--md-code-bg-color, rgba(128,128,128,.04)); box-sizing: border-box; height: calc(var(--desk-code-lines, 20) * 1.65em + 2px); }
 .desk-check__code-inner { display: inline-block; min-width: 100%; padding-right: 28px; box-sizing: border-box; }
 .desk-check__line { display: flex; align-items: stretch; width: 100%; font: 13px/1.65 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; min-height: 1.65em; box-sizing: border-box; }
 .desk-check__line:first-child .desk-check__num { border-top-left-radius: 3px; }
@@ -849,7 +849,7 @@ def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, sh
         if len(rows) > limit or hidden:
             note = f'<p class="desk-check__note">Se muestran los últimos {len(visible)} pasos' + (f" de {total_steps}" if total_steps else "") + ".</p>"
         scroll_trigger = (
-            '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\'/%3E" style="display:none;" '
+            '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="display:none;" '
             'onload="var w=this.closest(\'.desk-check\')?.querySelector(\'.desk-check__table-wrap\');if(w)w.scrollTop=w.scrollHeight;" '
             'onerror="var w=this.closest(\'.desk-check\')?.querySelector(\'.desk-check__table-wrap\');if(w)w.scrollTop=w.scrollHeight;">'
         )
