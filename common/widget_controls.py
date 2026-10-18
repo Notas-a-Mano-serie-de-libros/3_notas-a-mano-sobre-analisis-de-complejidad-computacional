@@ -123,14 +123,15 @@ def shared_ui_styles(root_selector):
 {root} .simulation-action-row {{
   position: -webkit-sticky !important;
   position: sticky !important;
-  top: var(--md-header-height, 0px) !important;
-  z-index: 50 !important;
+  top: 0 !important;
+  z-index: 100 !important;
   background: var(--simulation-surface, #ffffff) !important;
   width: 100% !important;
   gap: 0 !important;
   margin: 0 !important;
   padding: 8px 12px !important;
   border-bottom: 1px solid var(--simulation-panel-border, #dedede) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
   justify-content: flex-end !important;
   flex-wrap: nowrap !important;
   overflow-x: auto !important;
