@@ -967,6 +967,12 @@ def run_search_app(
     )
     html_output = widgets.HTML(layout=widgets.Layout(width="100%"))
     desk_output = widgets.HTML(layout=widgets.Layout(width="100%"))
+    desk_step_back_button = action_button("step_back")
+    desk_step_button = action_button("step")
+    desk_auto_button = action_button("play")
+    desk_finish_button = action_button("finish")
+    desk_reset_button = action_button("reset")
+    desk_book_button = action_button("book")
     desk_rows: list[dict] = []
     state_history: list[dict] = []
     control_state = {"updating": False}
@@ -1058,19 +1064,33 @@ def run_search_app(
         )
 
     def sync_execution_buttons():
-        step_back_button.disabled = len(state_history) <= 1
+        is_back_disabled = len(state_history) <= 1
+        step_back_button.disabled = is_back_disabled
+        desk_step_back_button.disabled = is_back_disabled
         complete = state["search_complete"]
         step_button.disabled = complete
+        desk_step_button.disabled = complete
         auto_button.disabled = complete
+        desk_auto_button.disabled = complete
         finish_button.disabled = complete
+        desk_finish_button.disabled = complete
 
     def enable_controls_for_new_array():
-        reset_button.disabled = False
-        book_button.disabled = False
-        step_button.disabled = False
-        auto_button.disabled = False
-        finish_button.disabled = False
+        for btn in (
+            reset_button,
+            desk_reset_button,
+            book_button,
+            desk_book_button,
+            step_button,
+            desk_step_button,
+            auto_button,
+            desk_auto_button,
+            finish_button,
+            desk_finish_button,
+        ):
+            btn.disabled = False
         step_back_button.disabled = True
+        desk_step_back_button.disabled = True
 
     def reset_algorithm(*_args):
         nonlocal state, last_active_formula
@@ -1144,8 +1164,23 @@ def run_search_app(
 
     async def run_auto_async(run_id):
         nonlocal state
-        set_disabled((auto_button, step_button, step_back_button, reset_button, book_button), True)
+        set_disabled(
+            (
+                auto_button,
+                desk_auto_button,
+                step_button,
+                desk_step_button,
+                step_back_button,
+                desk_step_back_button,
+                reset_button,
+                desk_reset_button,
+                book_button,
+                desk_book_button,
+            ),
+            True,
+        )
         finish_button.disabled = False
+        desk_finish_button.disabled = False
         prev = copy_search_state(state)
         for snapshot in build_search_trace(state, step_search):
             if execution_state["run_id"] != run_id:
@@ -1160,13 +1195,30 @@ def run_search_app(
             await asyncio.sleep(0.45 / speed)
         if execution_state["run_id"] == run_id:
             reset_button.disabled = False
+            desk_reset_button.disabled = False
             book_button.disabled = False
+            desk_book_button.disabled = False
             sync_execution_buttons()
 
     def run_auto_sync(run_id):
         nonlocal state
-        set_disabled((auto_button, step_button, step_back_button, reset_button, book_button), True)
+        set_disabled(
+            (
+                auto_button,
+                desk_auto_button,
+                step_button,
+                desk_step_button,
+                step_back_button,
+                desk_step_back_button,
+                reset_button,
+                desk_reset_button,
+                book_button,
+                desk_book_button,
+            ),
+            True,
+        )
         finish_button.disabled = False
+        desk_finish_button.disabled = False
         prev = copy_search_state(state)
         for snapshot in build_search_trace(state, step_search):
             if execution_state["run_id"] != run_id:
@@ -1181,7 +1233,9 @@ def run_search_app(
             colab_pause(0.45 / speed)
         if execution_state["run_id"] == run_id:
             reset_button.disabled = False
+            desk_reset_button.disabled = False
             book_button.disabled = False
+            desk_book_button.disabled = False
             sync_execution_buttons()
 
     def run_auto(*_args):
@@ -1199,7 +1253,23 @@ def run_search_app(
         if state["search_complete"]:
             return
         execution_state["run_id"] += 1
-        set_disabled((auto_button, finish_button, step_button, step_back_button, reset_button, book_button), True)
+        set_disabled(
+            (
+                auto_button,
+                desk_auto_button,
+                finish_button,
+                desk_finish_button,
+                step_button,
+                desk_step_button,
+                step_back_button,
+                desk_step_back_button,
+                reset_button,
+                desk_reset_button,
+                book_button,
+                desk_book_button,
+            ),
+            True,
+        )
         final_state = None
         prev = copy_search_state(state)
         for snapshot in build_search_trace(state, step_search):
@@ -1213,15 +1283,23 @@ def run_search_app(
             state["step_index"] = state.get("step_total", state.get("step_index", 0))
         redraw()
         reset_button.disabled = False
+        desk_reset_button.disabled = False
         book_button.disabled = False
+        desk_book_button.disabled = False
         sync_execution_buttons()
 
     step_back_button.on_click(run_step_back)
+    desk_step_back_button.on_click(run_step_back)
     step_button.on_click(run_single_step)
+    desk_step_button.on_click(run_single_step)
     auto_button.on_click(run_auto)
+    desk_auto_button.on_click(run_auto)
     finish_button.on_click(finish_without_animation)
+    desk_finish_button.on_click(finish_without_animation)
     reset_button.on_click(reset_algorithm)
+    desk_reset_button.on_click(reset_algorithm)
     book_button.on_click(generate_book_array)
+    desk_book_button.on_click(generate_book_array)
     size_input.observe(lambda change: reset_algorithm() if change["name"] == "value" else None, names="value")
     target_mode_input.observe(lambda change: on_target_mode_change() if change["name"] == "value" else None, names="value")
     target_position_input.observe(lambda change: on_target_position_change() if change["name"] == "value" else None, names="value")
@@ -1245,24 +1323,39 @@ def run_search_app(
     button_row = actions(
         [step_back_button, step_button, auto_button, finish_button, reset_button, book_button]
     )
+    desk_button_row = actions(
+        [desk_step_back_button, desk_step_button, desk_auto_button, desk_finish_button, desk_reset_button, desk_book_button]
+    )
     parameters_content = widgets.VBox(
         [first_row_box],
         layout=widgets.Layout(width="100%"),
     )
     formula_output.add_class("search-formula-content")
     html_output.add_class("search-result-content")
+    result_content = widgets.VBox(
+        [html_output, button_row],
+        layout=widgets.Layout(width="100%", grid_gap="0px", overflow="visible"),
+    )
+    result_content.add_class("search-result-content")
+
     desk_output.add_class("search-desk-check-content")
+    desk_content = widgets.VBox(
+        [desk_output, desk_button_row],
+        layout=widgets.Layout(width="100%", grid_gap="0px", overflow="visible"),
+    )
+    desk_content.add_class("search-desk-check-content")
+
     layout = build_simulation_view(
         SimulationViewSpec(
             root_class="search-simulation-root",
             panel_prefix="search",
             styles=_SEARCH_CSS,
-            action_row=button_row,
+            action_row=None,
             sections=(
                 ViewSection(SECTION_CONFIGURATION, parameters_content, ("search-subpanel-content",)),
                 ViewSection(SECTION_PROCEDURE, formula_output, ("search-subpanel-content",)),
-                ViewSection(SECTION_RESULT, html_output, ("search-subpanel-content",)),
-                ViewSection(SECTION_DESK_CHECK, desk_output, ("search-subpanel-content",)),
+                ViewSection(SECTION_RESULT, result_content, ("search-subpanel-content",)),
+                ViewSection(SECTION_DESK_CHECK, desk_content, ("search-subpanel-content",)),
             ),
         )
     )
@@ -1270,6 +1363,7 @@ def run_search_app(
     state = build_state()
     state_history.append(copy_search_state(state))
     step_back_button.disabled = True
+    desk_step_back_button.disabled = True
     redraw()
 
 

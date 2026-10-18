@@ -2159,14 +2159,29 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             total_steps=len(state["trace"]) if state.get("trace") is not None else None,
         )
 
+    desk_step_back = action_button("step_back")
+    desk_step = action_button("step")
+    desk_auto = action_button("play")
+    desk_finish = action_button("finish")
+    desk_reset = action_button("reset")
+    desk_book = action_button("book")
+    desk_action_row = sort_action_button_row([desk_step_back, desk_step, desk_auto, desk_finish, desk_reset, desk_book])
+
     def sync_execution_buttons():
         complete = state["sorting_complete"]
-        controls["step_back"].disabled = state.get("step_index", 0) <= 0
+        is_back_disabled = state.get("step_index", 0) <= 0
+        controls["step_back"].disabled = is_back_disabled
+        desk_step_back.disabled = is_back_disabled
         controls["step"].disabled = complete
+        desk_step.disabled = complete
         controls["auto"].disabled = complete
+        desk_auto.disabled = complete
         controls["finish"].disabled = complete
+        desk_finish.disabled = complete
         controls["reset"].disabled = False
+        desk_reset.disabled = False
         controls["book"].disabled = False
+        desk_book.disabled = False
 
     def reset_algorithm(*_args):
         nonlocal state, last_active_formula
@@ -2212,8 +2227,23 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
 
     async def run_auto_async(run_id):
         nonlocal state
-        set_disabled((controls["step_back"], controls["step"], controls["auto"], controls["reset"], controls["book"]), True)
+        set_disabled(
+            (
+                controls["step_back"],
+                desk_step_back,
+                controls["step"],
+                desk_step,
+                controls["auto"],
+                desk_auto,
+                controls["reset"],
+                desk_reset,
+                controls["book"],
+                desk_book,
+            ),
+            True,
+        )
         controls["finish"].disabled = False
+        desk_finish.disabled = False
         for snapshot in build_sort_trace():
             if execution_state["run_id"] != run_id:
                 return
@@ -2226,8 +2256,23 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
 
     def run_auto_sync(run_id):
         nonlocal state
-        set_disabled((controls["step_back"], controls["step"], controls["auto"], controls["reset"], controls["book"]), True)
+        set_disabled(
+            (
+                controls["step_back"],
+                desk_step_back,
+                controls["step"],
+                desk_step,
+                controls["auto"],
+                desk_auto,
+                controls["reset"],
+                desk_reset,
+                controls["book"],
+                desk_book,
+            ),
+            True,
+        )
         controls["finish"].disabled = False
+        desk_finish.disabled = False
         for snapshot in build_sort_trace():
             if execution_state["run_id"] != run_id:
                 return
@@ -2253,7 +2298,19 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         if state["sorting_complete"]:
             return
         execution_state["run_id"] += 1
-        set_disabled((controls["step_back"], controls["step"], controls["auto"], controls["finish"]), True)
+        set_disabled(
+            (
+                controls["step_back"],
+                desk_step_back,
+                controls["step"],
+                desk_step,
+                controls["auto"],
+                desk_auto,
+                controls["finish"],
+                desk_finish,
+            ),
+            True,
+        )
         final_state = None
         for snapshot in build_sort_trace():
             final_state = snapshot
@@ -2280,11 +2337,17 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         sync_execution_buttons()
 
     controls["step_back"].on_click(step_back_once)
+    desk_step_back.on_click(step_back_once)
     controls["step"].on_click(step_once)
+    desk_step.on_click(step_once)
     controls["auto"].on_click(run_auto)
+    desk_auto.on_click(run_auto)
     controls["finish"].on_click(finish_without_animation)
+    desk_finish.on_click(finish_without_animation)
     controls["reset"].on_click(generate_new)
+    desk_reset.on_click(generate_new)
     controls["book"].on_click(generate_book)
+    desk_book.on_click(generate_book)
     controls["size"].observe(reset_algorithm, names="value")
     controls["view"].observe(reset_for_view, names="value")
     controls["order"].observe(reset_algorithm, names="value")
@@ -2302,12 +2365,28 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     html_output.add_class("sort-subpanel-content")
     html_output.add_class("sort-result-content")
 
+    result_box = widgets.VBox(
+        [html_output, action_row],
+        layout=widgets.Layout(width="100%", grid_gap="0px", overflow="visible"),
+    )
+    result_box.add_class("sort-subpanel-content")
+    result_box.add_class("sort-result-content")
+
+    desk_box = widgets.VBox(
+        [desk_output, desk_action_row],
+        layout=widgets.Layout(width="100%", grid_gap="0px", overflow="visible"),
+    )
+    desk_box.add_class("sort-subpanel-content")
+    desk_box.add_class("sort-desk-check-content")
+    desk_output.add_class("sort-subpanel-content")
+    desk_output.add_class("sort-desk-check-content")
+
     layout = build_sort_panel(
         controls_layout,
-        html_output,
+        result_box,
         procedure=formula_output,
-        desk_check=desk_output,
-        action_row=action_row,
+        desk_check=desk_box,
+        action_row=None,
     )
     display(layout)
     update_radix_control_visibility()
