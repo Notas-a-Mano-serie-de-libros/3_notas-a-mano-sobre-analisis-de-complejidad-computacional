@@ -16,7 +16,6 @@ from common.desk_check import (
 )
 from common.simulation_views import (
     SECTION_CONFIGURATION,
-    SECTION_DESK_CHECK,
     SECTION_PROCEDURE,
     SECTION_RESULT,
     SimulationViewSpec,

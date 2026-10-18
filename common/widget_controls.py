@@ -430,7 +430,7 @@ def tabbed_panel(tabs, *, prefix, default_index=0):
     active_index = default_index
     tab_buttons = []
 
-    for i, (title, _) in enumerate(normalized_tabs):
+    for title, _ in normalized_tabs:
         btn = widgets.Button(
             description=title,
             layout=widgets.Layout(
@@ -445,7 +445,7 @@ def tabbed_panel(tabs, *, prefix, default_index=0):
         tab_buttons.append(btn)
 
     def update_tabs():
-        for i, (btn, content) in enumerate(zip(tab_buttons, content_widgets)):
+        for i, (btn, content) in enumerate(zip(tab_buttons, content_widgets, strict=True)):
             is_active = (i == active_index)
             content.layout.display = "block" if is_active else "none"
             if is_active:

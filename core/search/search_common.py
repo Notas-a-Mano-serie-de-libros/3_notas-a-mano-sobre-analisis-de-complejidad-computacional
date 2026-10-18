@@ -13,9 +13,7 @@ from common.animation_runtime import OutputCache, formula_iframe_height, pause, 
 from common.desk_check import render_desk_check, search_desk_row
 from common.simulation_views import (
     SECTION_CONFIGURATION,
-    SECTION_DESK_CHECK,
     SECTION_PROCEDURE,
-    SECTION_RESULT,
     SimulationViewSpec,
     ViewSection,
     ViewTabs,
