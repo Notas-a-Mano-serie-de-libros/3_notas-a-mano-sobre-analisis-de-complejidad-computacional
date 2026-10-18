@@ -23,6 +23,7 @@ PSEUDOCODE = {
         ("loop", "    para i en rango(longitud(arr))"),
         ("compare", "        si arr[i] == x entonces"),
         ("found", "            retornar verdadero"),
+        (None, ""),
         ("not_found", "    retornar falso"),
     ),
     "binaria": (
@@ -35,6 +36,7 @@ PSEUDOCODE = {
         (None, "            a ← m + 1"),
         ("go_left", "        si no"),
         (None, "            b ← m - 1"),
+        (None, ""),
         ("not_found", "    retornar falso"),
     ),
     "interpolacion": (
@@ -44,6 +46,7 @@ PSEUDOCODE = {
         (None, "        den ← arr[b] - arr[a]"),
         (None, "        si den == 0 entonces"),
         (None, "            retornar arr[a] == x"),
+        (None, ""),
         ("probe", "        p ← a + num div den"),
         ("compare", "        si arr[p] == x entonces"),
         ("found", "            retornar verdadero"),
@@ -51,6 +54,7 @@ PSEUDOCODE = {
         (None, "            a ← p + 1"),
         ("go_left", "        si no"),
         (None, "            b ← p - 1"),
+        (None, ""),
         ("not_found", "    retornar falso"),
     ),
     "saltos": (
@@ -58,17 +62,21 @@ PSEUDOCODE = {
         (None, "    n ← longitud(arr)"),
         (None, "    si n == 0 entonces"),
         (None, "        retornar falso"),
+        (None, ""),
         ("init", "    paso ← raízEntera(n)"),
         (None, "    anterior ← 0"),
         (None, "    delta ← paso"),
+        (None, ""),
         ("decide", "    mientras arr[min(delta, n) - 1] < x"),
         ("next_block", "        anterior ← delta"),
         (None, "        delta += paso"),
         (None, "        si anterior >= n entonces"),
         (None, "            retornar falso"),
+        (None, ""),
         ("linear", "    para i en rango(anterior, min(delta, n))"),
         ("compare", "        si arr[i] == x entonces"),
         ("found", "            retornar verdadero"),
+        (None, ""),
         ("not_found", "    retornar falso"),
     ),
     "exponencial": (
@@ -78,9 +86,11 @@ PSEUDOCODE = {
         (None, "        retornar falso"),
         (None, "    si arr[0] == x entonces"),
         (None, "        retornar verdadero"),
+        (None, ""),
         ("init", "    i ← 1"),
         ("exp_while", "    mientras i < n y arr[i] <= x"),
         ("exp_next", "        i *= 2"),
+        (None, ""),
         ("range", "    a ← i div 2"),
         (None, "    b ← min(i, n - 1)"),
         (None, "    retornar busquedaBinaria(arr, a, b, x)"),
@@ -94,6 +104,7 @@ PSEUDOCODE = {
         (None, "            a ← m + 1"),
         ("go_left", "        si no"),
         (None, "            b ← m - 1"),
+        (None, ""),
         ("not_found", "    retornar falso"),
     ),
     "ternaria": (
@@ -101,6 +112,7 @@ PSEUDOCODE = {
         ("while", "    mientras a <= b"),
         ("points", "        m1 ← a + (b - a) div 3"),
         (None, "        m2 ← b - (b - a + 2) div 3"),
+        (None, ""),
         ("compare", "        si arr[m1] == x o arr[m2] == x entonces"),
         ("found", "            retornar verdadero"),
         ("go_left", "        si x < arr[m1] entonces"),
@@ -110,18 +122,21 @@ PSEUDOCODE = {
         ("go_middle", "        si no"),
         (None, "            a ← m1 + 1"),
         (None, "            b ← m2 - 1"),
+        (None, ""),
         ("not_found", "    retornar falso"),
     ),
     "burbuja": (
         (None, "función ordenar(arr)"),
         ("outer", "    para i en rango(longitud(arr) - 1, 0, -1)"),
         (None, "        intercambiado ← falso"),
+        (None, ""),
         ("inner", "        para j en rango(i)"),
         ("compare", "            si arr[j] {gt} arr[j + 1] entonces"),
         (None, "                temp ← arr[j]"),
         ("swap", "                arr[j] ← arr[j + 1]"),
         (None, "                arr[j + 1] ← temp"),
         (None, "                intercambiado ← verdadero"),
+        (None, ""),
         ("fix", "        si no intercambiado entonces"),
         ("end", "            break"),
     ),
@@ -129,9 +144,11 @@ PSEUDOCODE = {
         (None, "función ordenar(arr)"),
         ("outer", "    para i en rango(longitud(arr) - 1)"),
         ("init", "        max ← 0"),
+        (None, ""),
         ("inner", "        para j en rango(1, longitud(arr) - i)"),
         ("compare", "            si arr[j] {gt} arr[max] entonces"),
         ("update", "                max ← j"),
+        (None, ""),
         ("keep", "        temp ← arr[max]"),
         ("swap", "        arr[max] ← arr[longitud(arr) - 1 - i]"),
         ("end", "        arr[longitud(arr) - 1 - i] ← temp"),
@@ -141,18 +158,22 @@ PSEUDOCODE = {
         ("outer", "    para i en rango(1, longitud(arr))"),
         ("pick", "        clave ← arr[i]"),
         (None, "        j ← i - 1"),
+        (None, ""),
         ("while", "        mientras j >= 0 y arr[j] {gt} clave"),
         ("shift", "            arr[j + 1] ← arr[j]"),
         (None, "            j -= 1"),
+        (None, ""),
         ("insert", "        arr[j + 1] ← clave"),
     ),
     "insercion_binaria": (
         (None, "función ordenar(arr)"),
         ("outer", "    para i en rango(1, longitud(arr))"),
         ("pick", "        clave ← arr[i]; a ← 0; b ← i"),
+        (None, ""),
         ("while", "        mientras a < b"),
         ("mid", "            m ← a + (b - a) div 2"),
         ("range", "            si arr[m] {le} clave entonces a ← m + 1  si no b ← m"),
+        (None, ""),
         ("pos", "        pos ← a"),
         ("shift", "        para j en rango(i, pos, -1): arr[j] ← arr[j - 1]"),
         ("insert", "        arr[pos] ← clave"),
@@ -162,9 +183,11 @@ PSEUDOCODE = {
         ("gap", "    para cada salto h de la secuencia decreciente"),
         ("outer", "        para k en rango(h, longitud(arr))"),
         ("pick", "            j ← k"),
+        (None, ""),
         ("while", "            mientras j >= h y arr[j - h] {gt} arr[j]"),
         ("swap", "                intercambiar arr[j - h] con arr[j]"),
         ("place", "                j -= h"),
+        (None, ""),
         ("end", "    retornar arr"),
     ),
     "mezcla": (
@@ -179,12 +202,15 @@ PSEUDOCODE = {
         (None, "    izquierda ← arr[a:m + 1]"),
         (None, "    derecha ← arr[m + 1:b + 1]"),
         ("merge_init", "    i ← 0; j ← 0; k ← a"),
+        (None, ""),
         ("merge_loop", "    mientras i < longitud(izquierda) y j < longitud(derecha)"),
         (None, "        si izquierda[i] {le} derecha[j] entonces arr[k] ← izquierda[i]; i += 1"),
         (None, "        si no arr[k] ← derecha[j]; j += 1"),
         (None, "        k += 1"),
+        (None, ""),
         (None, "    mientras i < longitud(izquierda): arr[k] ← izquierda[i]; i += 1; k += 1"),
         (None, "    mientras j < longitud(derecha): arr[k] ← derecha[j]; j += 1; k += 1"),
+        (None, ""),
         ("merge_done", "    // subarreglo combinado"),
         ("end", "// ordenamiento finalizado"),
     ),
@@ -198,9 +224,11 @@ PSEUDOCODE = {
         (None, "función particionar(arr, a, b)"),
         ("pivot", "    pivote ← arr[b]"),
         (None, "    i ← a"),
+        (None, ""),
         (None, "    para j en rango(a, b)"),
         ("compare", "        si arr[j] {le} pivote entonces"),
         ("apply", "            intercambiar arr[i] con arr[j]; i += 1"),
+        (None, ""),
         ("place", "    intercambiar arr[i] con arr[b]"),
         (None, "    retornar i"),
         ("end", "// partición completada"),
@@ -215,10 +243,12 @@ PSEUDOCODE = {
         (None, "función particionar(arr, a, b)"),
         ("pivot", "    pivote ← arr[a]"),
         (None, "    i ← a + 1; j ← b"),
+        (None, ""),
         ("cross", "    mientras i <= j"),
         ("scan_i", "        mientras i <= j y arr[i] < pivote: i += 1"),
         ("scan_j", "        mientras i <= j y arr[j] > pivote: j -= 1"),
         ("swap", "        si i <= j entonces intercambiar arr[i] con arr[j]; i += 1; j -= 1"),
+        (None, ""),
         ("place", "    intercambiar arr[a] con arr[j]"),
         (None, "    retornar j"),
         ("end", "// partición completada"),
@@ -232,10 +262,13 @@ PSEUDOCODE = {
         (None, "función ordenarPorDigito(arr, i)"),
         (None, "    n ← longitud(arr); exp ← 10 ** (i - 1)"),
         (None, "    conteo ← [0] * 10; salida ← [0] * n"),
+        (None, ""),
         ("distribute", "    para valor en arr: conteo[(valor div exp) % 10] += 1"),
         (None, "    para j en rango(1, 10): conteo[j] += conteo[j - 1]"),
+        (None, ""),
         ("collect", "    para j en rango(n - 1, -1, -1)"),
         (None, "        d ← (arr[j] div exp) % 10; salida[conteo[d] - 1] ← arr[j]; conteo[d] -= 1"),
+        (None, ""),
         ("pass_end", "    arr[:] ← salida"),
         ("end", "// arreglo ordenado"),
     ),
@@ -248,10 +281,12 @@ _ORDER_TOKENS = {
 
 _STYLES = """<style>
 .desk-check { display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; color: inherit; font-family: inherit; }
-.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 6px 0; overflow-y: auto; overflow-x: auto; background: var(--md-code-bg-color, rgba(128,128,128,.04)); max-height: 350px; box-sizing: border-box; }
-.desk-check__line { display: flex; align-items: stretch; width: 100%; min-width: max-content; font: 13px/1.8 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; min-height: 1.8em; box-sizing: border-box; padding: 2px 14px 2px 0; }
+.desk-check__code { flex: 1 1 360px; min-width: 280px; max-width: 100%; border: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); border-radius: 4px; padding: 4px 0; overflow-y: auto; overflow-x: auto; background: var(--md-code-bg-color, rgba(128,128,128,.04)); max-height: 350px; box-sizing: border-box; }
+.desk-check__line { display: flex; align-items: stretch; width: 100%; min-width: max-content; font: 13px/1.65 SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; white-space: pre; min-height: 1.65em; box-sizing: border-box; padding: 0 14px 0 0; }
 .desk-check__line:first-child .desk-check__num { border-top-left-radius: 3px; }
 .desk-check__line:last-child .desk-check__num { border-bottom-left-radius: 3px; }
+.desk-check__line--blank { min-height: 1.1em; }
+.desk-check__line--blank .desk-check__num { opacity: 0; background: transparent; }
 .desk-check__num { flex: 0 0 38px; width: 38px; min-width: 38px; display: flex; align-items: center; justify-content: center; text-align: center; background: rgba(128,128,128,.10); border-right: 1px solid var(--md-default-fg-color--lighter, rgba(128,128,128,.35)); margin-right: 12px; color: var(--md-default-fg-color--light, inherit); opacity: .75; user-select: none; box-sizing: border-box; }
 .desk-check__line--active { background: rgba(139,75,50,.18); font-weight: 700; }
 .desk-check__line--active .desk-check__num { background: rgba(139,75,50,.30); border-right-color: #8b4b32; color: #8b4b32; opacity: 1; font-weight: 700; }
@@ -769,7 +804,19 @@ def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, sh
     active = visible[-1]["line"] if visible else None
 
     code_html = []
-    for number, (key, text) in enumerate(lines, start=1):
+    line_numbers = {}
+    current_number = 1
+    for key, text in lines:
+        if not text.strip():
+            code_html.append(
+                '<div class="desk-check__line desk-check__line--blank">'
+                '<span class="desk-check__num">&nbsp;</span><span>&nbsp;</span></div>'
+            )
+            continue
+        number = current_number
+        current_number += 1
+        if key:
+            line_numbers[key] = number
         is_active = key is not None and key == active
         css = "desk-check__line desk-check__line--active" if is_active else "desk-check__line"
         current = ' aria-current="step"' if is_active else ""
@@ -777,7 +824,6 @@ def render_desk_check(algorithm, rows, *, descending=False, total_steps=None, sh
             f'<div class="{css}"{current}><span class="desk-check__num">{number}</span>'
             f'<span>{escape(text) or " "}</span></div>'
         )
-    line_numbers = {key: number for number, (key, _text) in enumerate(lines, start=1) if key}
 
     if visible:
         var_cols = _collect_variable_columns(visible)
