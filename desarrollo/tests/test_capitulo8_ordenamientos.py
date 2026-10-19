@@ -356,8 +356,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertNotIn("widgets.HTMLMath", source)
         self.assertIn("render_cache.update_outputs(", source)
         self.assertIn("def calculate_sort_formula_reserved_height(state):", source)
-        self.assertNotIn('next_state["formula_reserved_height"] = calculate_sort_formula_reserved_height(next_state)', source)
-        self.assertNotIn('state.get("formula_reserved_height")', source)
+        self.assertIn('next_state["formula_reserved_height"] = calculate_sort_formula_reserved_height(next_state)', source)
+        self.assertIn('state.get("formula_reserved_height")', source)
         self.assertIn("def build_sort_trace():", source)
         self.assertIn("yield copy_sort_state(probe)", source)
         self.assertIn("for snapshot in build_sort_trace():", source)
@@ -389,7 +389,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             self.common.displaystyle_formula(r"\begin{array}{l} p = 3 \\[8pt] i = 1 \end{array}"),
         )
 
-    def test_every_sort_reuses_one_formula_host_with_dynamic_height(self):
+    def test_every_sort_reuses_one_formula_host_with_stable_reserved_height(self):
         runtime = load_module_from_path(
             "capitulo8_animation_runtime_formula_test",
             PROJECT_ROOT / "common" / "animation_runtime.py",
@@ -403,11 +403,12 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             cache = runtime.OutputCache()
             host = output.children[0]
             host_html = host.value
+            reserved_height = self.common.calculate_sort_formula_reserved_height(state)
             rendered = 0
 
             for _ in range(5000):
                 formula = self.common.displaystyle_formula(state["formula"])
-                cache.update_formula(output, formula)
+                cache.update_formula(output, formula, reserved_height)
                 rendered += 1
 
                 self.assertIs(output.children[0], host, name)
@@ -415,7 +416,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                 self.assertEqual(host.value.count("formula-mathjax-host"), 1, name)
                 self.assertEqual(
                     output._frame.layout.height,
-                    f"{runtime.formula_iframe_height(formula)}px",
+                    f"{reserved_height}px",
                     name,
                 )
                 if state["sorting_complete"]:

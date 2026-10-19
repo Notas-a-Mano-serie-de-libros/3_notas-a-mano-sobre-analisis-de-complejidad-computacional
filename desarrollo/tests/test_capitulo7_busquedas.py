@@ -784,7 +784,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn('extra_controls={"uniform"', source)
         self.assertNotIn("widgets.Checkbox", source)
 
-    def test_formula_output_adapts_to_current_content(self):
+    def test_formula_output_reserves_stable_space(self):
         common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
         runtime_source = (PROJECT_ROOT / "common" / "animation_runtime.py").read_text(encoding="utf-8")
 
@@ -794,8 +794,9 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn('overflow="visible"', common_source)
         self.assertIn("widget.layout.min_height", runtime_source)
         self.assertIn("formula_iframe_height(formula)", runtime_source)
-        self.assertNotIn('state["formula_reserved_height"]', common_source)
-        self.assertNotIn('state.get("formula_reserved_height")', common_source)
+        self.assertIn("calculate_formula_reserved_height(state, step_search)", common_source)
+        self.assertIn('state["formula_reserved_height"]', common_source)
+        self.assertIn('state.get("formula_reserved_height")', common_source)
         self.assertIn("self.formula_height", runtime_source)
         self.assertIn("align-items:flex-start", runtime_source)
         self.assertIn("enableAssistiveMml: false", runtime_source)
@@ -815,6 +816,42 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                 source = (PROJECT_ROOT / "core" / "search" / filename).read_text(encoding="utf-8")
                 self.assertIn(r"\begin{{array}}{{l}}", source)
                 self.assertNotIn(r"\begin{{gathered}}", source)
+
+    def test_every_search_keeps_its_reserved_formula_height(self):
+        runtime = load_module_from_path(
+            "capitulo7_animation_runtime_formula_test",
+            PROJECT_ROOT / "common" / "animation_runtime.py",
+        )
+        common = self.launchers._load_module("search_common.py", "capitulo7_search_common_stable_height_test")
+        cases = (
+            ("secuencial", "1_busqueda_secuencial_app.py", "step_linear_search"),
+            ("binaria", "2_busqueda_binaria_app.py", "step_binary_search"),
+            ("interpolacion", "3_busqueda_interpolacion_app.py", "step_interpolation_search"),
+            ("saltos", "4_busqueda_saltos_app.py", "step_jump_search"),
+            ("exponencial", "5_busqueda_exponencial_app.py", "step_exponential_search"),
+            ("ternaria", "6_busqueda_ternaria_app.py", "step_ternary_search"),
+        )
+        values = list(range(0, 64, 2))
+
+        for name, filename, step_name in cases:
+            with self.subTest(name=name):
+                module = self.launchers._load_module(filename, f"capitulo7_{name}_stable_height_test")
+                state = module.create_state(size=len(values), target=62, values=values)
+                step = getattr(module, step_name)
+                reserved_height = common.calculate_formula_reserved_height(state, step)
+                output = runtime.FormulaOutput()
+                cache = runtime.OutputCache()
+                host = output.children[0]
+
+                for _ in range(512):
+                    cache.update_formula(output, state.get("formula", ""), reserved_height)
+                    self.assertIs(output.children[0], host)
+                    self.assertEqual(output._frame.layout.height, f"{reserved_height}px")
+                    if state["search_complete"]:
+                        break
+                    step(state)
+                else:
+                    self.fail(f"{name} excedió el máximo de pasos")
 
     def test_exponential_formula_space_is_reserved_before_binary_phase(self):
         module = self.launchers._load_module("5_busqueda_exponencial_app.py", "capitulo7_exponential_reserved_height_test")

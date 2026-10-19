@@ -72,10 +72,11 @@ class OutputCache:
         return html
 
     def update_formula(self, widget, formula, reserved_height=None):
-        if formula == self.formula:
-            return False
         height = formula_iframe_height(formula) if formula else 0
-        self.formula_height = height if reserved_height is None else reserved_height
+        formula_height = height if reserved_height is None else reserved_height
+        if formula == self.formula and formula_height == self.formula_height:
+            return False
+        self.formula_height = formula_height
         if hasattr(widget, "layout"):
             widget.layout.min_height = f"{self.formula_height}px"
         if hasattr(widget, "set_formula"):
