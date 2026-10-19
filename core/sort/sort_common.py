@@ -267,6 +267,7 @@ def create_state(algorithm, size=None, descending=False, values=None, view="barr
         "sorting_complete": False,
     }
     if algorithm == "mezcla":
+        initial_event["merge_tree_phase"] = "start"
         initial_event["merge_tree_max_depth"] = tree_max_depth_for_state(
             {"algorithm": algorithm, "arr": values, "initial_values": values}
         )
@@ -709,7 +710,7 @@ def sort_phase_label(state):
         "write": "Fase: reconstrucción",
         "complete": "Fase: finalizada",
         "divide": "Fase: división",
-        "merge": "Fase: mezcla",
+        "merge": "Fase: combinación",
         "start": "Fase: inicio",
         "initial": "Fase: inicio",
     }
@@ -1181,15 +1182,19 @@ def sort_styles():
       }}
       .sort-phase-distribution .sort-phase-strip,
       .sort-phase-write .sort-phase-strip,
+      .sort-phase-divide .sort-phase-strip,
+      .sort-phase-merge .sort-phase-strip,
       .sort-phase-complete .sort-phase-strip {{
         border-left: 6px solid currentColor;
         font-weight: 700;
       }}
-      .sort-phase-distribution .sort-phase-strip {{
+      .sort-phase-distribution .sort-phase-strip,
+      .sort-phase-divide .sort-phase-strip {{
         color: #8f2f2b;
         background: #fff5f4;
       }}
-      .sort-phase-write .sort-phase-strip {{
+      .sort-phase-write .sort-phase-strip,
+      .sort-phase-merge .sort-phase-strip {{
         color: #765600;
         background: #fff9e6;
       }}

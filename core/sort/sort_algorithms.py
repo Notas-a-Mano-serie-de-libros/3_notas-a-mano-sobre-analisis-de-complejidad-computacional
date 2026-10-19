@@ -604,7 +604,18 @@ def merge_trace(values, descending=False):
     initial = list(values)
     n = len(initial)
     if n == 0:
-        return _empty_trace("mezcla")
+        return [
+            make_event([], start_message("mezcla"), "", merge_tree_phase="start"),
+            make_event(
+                [],
+                final_message("mezcla"),
+                r"\text{arreglo ordenado}",
+                [],
+                [],
+                True,
+                merge_tree_phase="complete",
+            ),
+        ]
 
     def node(start, values, depth=0, parent=None):
         item = {
@@ -651,10 +662,11 @@ def merge_trace(values, descending=False):
             )
         return nodes
 
-    def tree_meta(focus=None, complete=False):
+    def tree_meta(focus=None, complete=False, phase="start"):
         return {
             "merge_tree_nodes": snapshot(focus=focus, complete=complete),
             "merge_tree_max_depth": max_tree_depth,
+            "merge_tree_phase": phase,
         }
 
     trace = [
@@ -664,7 +676,7 @@ def merge_trace(values, descending=False):
             "",
             flat_roles,
             [""] * n,
-            **tree_meta(),
+            **tree_meta(phase="start"),
         )
     ]
 
@@ -692,12 +704,22 @@ def merge_trace(values, descending=False):
             r"fase = \text{inicio}",
             flat_roles,
             [""] * n,
-            **tree_meta(focus=root),
+            **tree_meta(focus=root, phase="start"),
         )
     )
 
-    def append_event(message, formula, focus=None, complete=False):
-        trace.append(make_event(flat_values, message, formula, flat_roles, [""] * n, complete, **tree_meta(focus=focus, complete=complete)))
+    def append_event(message, formula, focus=None, complete=False, phase="start"):
+        trace.append(
+            make_event(
+                flat_values,
+                message,
+                formula,
+                flat_roles,
+                [""] * n,
+                complete,
+                **tree_meta(focus=focus, complete=complete, phase=phase),
+            )
+        )
 
     while actions:
         action, current = actions.pop(0)
@@ -715,7 +737,12 @@ def merge_trace(values, descending=False):
             set_flat_focus(current["start"], current["end"])
             for index in range(current["start"], current["end"] + 1):
                 flat_roles[index] = "current"
-            append_event(f"Divide el subarreglo {current['values']}.", rf"inicio = {current['start']},\quad fin = {current['end']}", focus=current)
+            append_event(
+                f"Divide el subarreglo {current['values']}.",
+                rf"inicio = {current['start']},\quad fin = {current['end']}",
+                focus=current,
+                phase="divide",
+            )
             continue
 
         if action == "leaf":
@@ -724,7 +751,12 @@ def merge_trace(values, descending=False):
             current["roles"] = ["sorted"]
             set_flat_focus(current["start"], current["end"])
             flat_roles[current["start"]] = "sorted"
-            append_event(f"El subarreglo [{current['values'][0]}] ya está ordenado.", rf"caso\ base = [{current['values'][0]}]", focus=current)
+            append_event(
+                f"El subarreglo [{current['values'][0]}] ya está ordenado.",
+                rf"caso\ base = [{current['values'][0]}]",
+                focus=current,
+                phase="divide",
+            )
             continue
 
         left_values = list(current["left"]["values"])
@@ -736,7 +768,12 @@ def merge_trace(values, descending=False):
         current["visible"] = True
         current["sorted"] = False
         set_flat_focus(current["start"], current["end"])
-        append_event(f"Mezcla {left_values} y {right_values}.", r"i = 0,\quad j = 0,\quad k = 0", focus=current)
+        append_event(
+            f"Combina {left_values} y {right_values}.",
+            r"i = 0,\quad j = 0,\quad k = 0",
+            focus=current,
+            phase="merge",
+        )
 
         while True:
             clear_roles()
@@ -752,7 +789,12 @@ def merge_trace(values, descending=False):
                 for offset, value in enumerate(current["values"]):
                     flat_values[current["start"] + offset] = value
                     flat_roles[current["start"] + offset] = "sorted"
-                append_event("Termina de ordenar el subarreglo.", rf"inicio = {current['start']},\quad fin = {current['end']}", focus=current)
+                append_event(
+                    "Termina de combinar el subarreglo.",
+                    rf"inicio = {current['start']},\quad fin = {current['end']}",
+                    focus=current,
+                    phase="merge",
+                )
                 break
 
             current["roles"][k] = "write"
@@ -780,7 +822,12 @@ def merge_trace(values, descending=False):
             else:
                 selected = "mayor" if descending else "menor"
                 message = f"Compara {left} y {right}; inserta el {selected}."
-            append_event(message, rf"i = {i},\quad j = {j},\quad k = {k}", focus=current)
+            append_event(
+                message,
+                rf"i = {i},\quad j = {j},\quad k = {k}",
+                focus=current,
+                phase="merge",
+            )
 
             if right is None or (left is not None and ordered(left, right, descending)):
                 value = left
@@ -796,7 +843,13 @@ def merge_trace(values, descending=False):
     root["roles"] = ["sorted"] * len(root["values"])
     root["sorted"] = True
     flat_roles = ["sorted"] * n
-    append_event(final_message("mezcla"), r"\text{arreglo ordenado}", focus=root, complete=True)
+    append_event(
+        final_message("mezcla"),
+        r"\text{arreglo ordenado}",
+        focus=root,
+        complete=True,
+        phase="complete",
+    )
     return trace
 
 

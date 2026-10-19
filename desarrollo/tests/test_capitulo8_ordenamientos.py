@@ -547,6 +547,37 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("color:#6b7280", second_html)
         self.assertIn("#dae8fc", second_html)
 
+    def test_merge_reports_division_and_combination_phases_like_radix(self):
+        module = self.modules["mezcla"]
+        state = module.create_state(size=4, values=[38, 27, 43, 3], view="arbol")
+
+        self.assertEqual(state["merge_tree_phase"], "start")
+        self.assertIn("sort-phase-start", module.render_state_html(state))
+        self.assertIn("Fase: inicio", module.render_state_html(state))
+
+        while state.get("merge_tree_phase") != "divide":
+            module.step_merge_sort(state)
+        divide_html = module.render_state_html(state)
+        self.assertIn("sort-phase-divide", divide_html)
+        self.assertIn("Fase: división", divide_html)
+        self.assertIn("Divide el subarreglo", state["message"])
+
+        while state.get("merge_tree_phase") != "merge":
+            module.step_merge_sort(state)
+        merge_html = module.render_state_html(state)
+        self.assertIn("sort-phase-merge", merge_html)
+        self.assertIn("Fase: combinación", merge_html)
+        self.assertIn("Combina", state["message"])
+
+        self.run_until_complete(module, "step_merge_sort", state)
+        completed_html = module.render_state_html(state)
+        self.assertEqual(state["merge_tree_phase"], "complete")
+        self.assertIn("sort-phase-complete", completed_html)
+        self.assertIn("Fase: finalizada", completed_html)
+
+        phases = {event.get("merge_tree_phase") for event in state["trace"]}
+        self.assertEqual(phases, {"start", "divide", "merge", "complete"})
+
     def test_merge_tree_preserves_base_merge_and_hide_behavior(self):
         module = self.modules["mezcla"]
         state = module.create_state(size=8, values=[95, 131, 111, 57, 158, 16, 25, 98], view="arbol")
