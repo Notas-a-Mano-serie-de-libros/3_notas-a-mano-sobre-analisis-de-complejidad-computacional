@@ -49,11 +49,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo5/notebooks/1_metodos_solucion_relaciones_recurrencia.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/algebra-simbolica/notebooks/index.html?path=simulaciones%2Fcapitulo5%2Fnotebooks%2F1_metodos_solucion_relaciones_recurrencia.ipynb&revision=ec1481f65674" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/algebra-simbolica/notebooks/index.html?path=simulaciones%2Fcapitulo5%2Fnotebooks%2F1_metodos_solucion_relaciones_recurrencia.ipynb&revision=85a4d50db046" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/algebra-simbolica/notebooks/index.html?path=simulaciones%2Fcapitulo5%2Fnotebooks%2F1_metodos_solucion_relaciones_recurrencia.ipynb&revision=ec1481f65674"
+    src="../../../jupyterlite/algebra-simbolica/notebooks/index.html?path=simulaciones%2Fcapitulo5%2Fnotebooks%2F1_metodos_solucion_relaciones_recurrencia.ipynb&revision=85a4d50db046"
     title="Simulación interactiva de Métodos para analizar relaciones de recurrencia en JupyterLite"
     loading="lazy"
     allow="clipboard-read; clipboard-write"

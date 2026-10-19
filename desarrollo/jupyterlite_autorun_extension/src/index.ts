@@ -8,9 +8,16 @@ import {
 const WIDGET_NOTEBOOK_PATH =
   /(?:^|\/)simulaciones\/capitulo(?:2|4|5|6|7|8)\/notebooks\//;
 const EMBEDDED_HEIGHT_MESSAGE = "notas-a-mano:jupyterlite-height";
+const EMBEDDED_READY_MESSAGE = "notas-a-mano:jupyterlite-ready";
+const EMBEDDED_ERROR_MESSAGE = "notas-a-mano:jupyterlite-error";
 const installedWidgetKernels = new Set<string>();
 const keyboardEnhancedTabs = new WeakSet<HTMLElement>();
 let accessibleId = 0;
+
+function reportEmbeddedState(type: string, detail = ""): void {
+  if (window.parent === window) return;
+  window.parent.postMessage({ type, detail }, window.location.origin);
+}
 
 function enhanceSimulationAccessibility(root: HTMLElement): void {
   root.querySelectorAll<HTMLElement>('[class*="-subpanel-title"]').forEach((button) => {
@@ -210,8 +217,13 @@ const plugin: JupyterFrontEndPlugin<void> = {
         if (panel.isDisposed) return;
         await NotebookActions.runAll(panel.content, panel.context.sessionContext);
         scheduleHeightReport();
+        reportEmbeddedState(EMBEDDED_READY_MESSAGE);
       })().catch((error: unknown) => {
         console.error("No fue posible ejecutar automáticamente la simulación JupyterLite.", error);
+        reportEmbeddedState(
+          EMBEDDED_ERROR_MESSAGE,
+          error instanceof Error ? error.message : String(error),
+        );
       });
     };
 

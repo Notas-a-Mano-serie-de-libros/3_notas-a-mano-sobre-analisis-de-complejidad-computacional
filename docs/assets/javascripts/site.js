@@ -105,21 +105,47 @@ function prepareAccessibleTables(root = document) {
 }
 
 const jupyterLiteHeightMessage = "notas-a-mano:jupyterlite-height";
+const jupyterLiteReadyMessage = "notas-a-mano:jupyterlite-ready";
+const jupyterLiteErrorMessage = "notas-a-mano:jupyterlite-error";
 let jupyterLiteHeightListenerReady = false;
+
+function jupyterLiteFrameForSource(source) {
+  return Array.from(
+    document.querySelectorAll("iframe.jupyterlite-demo__frame"),
+  ).find((candidate) => candidate.contentWindow === source);
+}
+
+function setJupyterLiteStatus(frame, message, state) {
+  const demo = frame.closest(".jupyterlite-demo");
+  const status = demo?.querySelector(".jupyterlite-demo__status");
+  if (!status) return;
+  status.textContent = message;
+  status.dataset.state = state;
+}
 
 function prepareJupyterLiteFrames(root = document) {
   if (!jupyterLiteHeightListenerReady) {
     window.addEventListener("message", (event) => {
       if (event.origin !== window.location.origin) return;
+      const frame = jupyterLiteFrameForSource(event.source);
+      if (!frame) return;
+
+      if (event.data?.type === jupyterLiteReadyMessage) {
+        setJupyterLiteStatus(frame, "Simulación lista", "ready");
+        return;
+      }
+      if (event.data?.type === jupyterLiteErrorMessage) {
+        setJupyterLiteStatus(
+          frame,
+          "No se pudo iniciar. Recarga la página o usa pantalla completa.",
+          "error",
+        );
+        return;
+      }
       if (event.data?.type !== jupyterLiteHeightMessage) return;
 
       const height = Number(event.data.height);
       if (!Number.isFinite(height) || height < 320 || height > 30000) return;
-
-      const frame = Array.from(
-        document.querySelectorAll("iframe.jupyterlite-demo__frame"),
-      ).find((candidate) => candidate.contentWindow === event.source);
-      if (!frame) return;
 
       frame.style.height = `${Math.ceil(height)}px`;
       frame.dataset.contentHeight = String(Math.ceil(height));
@@ -131,6 +157,18 @@ function prepareJupyterLiteFrames(root = document) {
     if (frame.dataset.autoHeightInitialized) return;
     frame.dataset.autoHeightInitialized = "true";
     frame.setAttribute("scrolling", "no");
+    const toolbar = frame.closest(".jupyterlite-demo")?.querySelector(
+      ".jupyterlite-demo__toolbar",
+    );
+    if (toolbar && !toolbar.querySelector(".jupyterlite-demo__status")) {
+      const status = document.createElement("span");
+      status.className = "jupyterlite-demo__status";
+      status.dataset.state = "loading";
+      status.setAttribute("role", "status");
+      status.setAttribute("aria-live", "polite");
+      status.textContent = "Preparando simulación…";
+      toolbar.append(status);
+    }
   });
 }
 

@@ -1974,6 +1974,22 @@ input {
   text-transform: uppercase;
 }
 
+.md-typeset .jupyterlite-demo__toolbar .jupyterlite-demo__status {
+  color: var(--notas-muted);
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-left: auto;
+  text-transform: none;
+}
+
+.md-typeset .jupyterlite-demo__status[data-state="ready"] {
+  color: #2e7d32;
+}
+
+.md-typeset .jupyterlite-demo__status[data-state="error"] {
+  color: #b3261e;
+}
+
 .md-typeset .jupyterlite-demo__actions {
   align-items: center;
   background: color-mix(in srgb, var(--md-default-fg-color) 5%, var(--md-default-bg-color));

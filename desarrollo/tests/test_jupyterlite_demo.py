@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ast
-import hashlib
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -59,7 +58,7 @@ def test_jupyterlite_demo_sources_and_configuration_exist():
 
 def test_notebook_urls_include_content_revision():
     notebook = Path("simulaciones/capitulo7/notebooks/1_busqueda_secuencial.ipynb")
-    revision = hashlib.sha256((PROJECT_ROOT / notebook).read_bytes()).hexdigest()[:12]
+    revision = content_storage_name(7).rsplit(" · ", 1)[1]
 
     assert notebook_url(7, notebook).endswith(f"&revision={revision}")
 
@@ -94,6 +93,9 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert 'setAttribute("role", "tabpanel")' in extension
     assert 'event.key === "ArrowRight"' in extension
     assert 'event.key === "Home"' in extension
+    assert '"notas-a-mano:jupyterlite-ready"' in extension
+    assert '"notas-a-mano:jupyterlite-error"' in extension
+    assert "reportEmbeddedState(EMBEDDED_READY_MESSAGE)" in extension
 
 
 def test_chapter2_bootstrap_repairs_only_missing_runtime_files(tmp_path):
@@ -146,9 +148,16 @@ def test_portal_resizes_embedded_jupyterlite_frames_from_trusted_messages():
 
     assert '"notas-a-mano:jupyterlite-height"' in site_javascript
     assert "event.origin !== window.location.origin" in site_javascript
-    assert "candidate.contentWindow === event.source" in site_javascript
+    assert "candidate.contentWindow === source" in site_javascript
+    assert "jupyterLiteFrameForSource(event.source)" in site_javascript
     assert 'frame.setAttribute("scrolling", "no")' in site_javascript
     assert "frame.style.height" in site_javascript
+    assert '"notas-a-mano:jupyterlite-ready"' in site_javascript
+    assert '"notas-a-mano:jupyterlite-error"' in site_javascript
+    assert 'status.textContent = "Preparando simulación…"' in site_javascript
+    assert 'setJupyterLiteStatus(frame, "Simulación lista", "ready")' in site_javascript
+    assert 'role", "status"' in site_javascript
+    assert ".jupyterlite-demo__status" in stylesheet
     assert ".jupyterlite-demo__frame" in stylesheet
     assert "overflow: hidden;" in stylesheet
 

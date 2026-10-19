@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import re
 from pathlib import Path
 
 try:
+    from desarrollo.scripts.build_jupyterlite_demo import content_storage_name
     from desarrollo.scripts.jupyterlite_catalog import (
         PAGE_NOTEBOOKS,
         profile_for_chapter,
     )
 except ModuleNotFoundError:
+    from build_jupyterlite_demo import content_storage_name
     from jupyterlite_catalog import PAGE_NOTEBOOKS, profile_for_chapter
 
 
@@ -25,7 +26,9 @@ DEMO_END = "<!-- jupyterlite-demo:end -->"
 def notebook_url(chapter: int, notebook: Path) -> str:
     profile = profile_for_chapter(chapter)
     encoded_path = str(notebook).replace("/", "%2F")
-    revision = hashlib.sha256((ROOT / notebook).read_bytes()).hexdigest()[:12]
+    # La URL debe cambiar también cuando cambia cualquier runtime compartido o
+    # la extensión de autoejecución, no solo cuando se edita el notebook.
+    revision = content_storage_name(chapter).rsplit(" · ", 1)[1]
     return (
         f"jupyterlite/{profile}/notebooks/index.html?path={encoded_path}"
         f"&revision={revision}"
