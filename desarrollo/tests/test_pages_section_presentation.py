@@ -9,6 +9,42 @@ SECTION_PAGES = PROJECT_ROOT / "docs" / "capitulos"
 STYLES = (PROJECT_ROOT / "docs" / "assets" / "stylesheets" / "extra.css").read_text(encoding="utf-8")
 
 
+def test_header_source_can_shrink_without_expanding_the_page_at_high_zoom():
+    source_rule = re.search(r"\.md-header__source\s*\{(?P<body>.*?)\}", STYLES, flags=re.DOTALL)
+    repository_rule = re.search(
+        r"\.md-header__source \.md-source__repository\s*\{(?P<body>.*?)\}",
+        STYLES,
+        flags=re.DOTALL,
+    )
+
+    assert source_rule and repository_rule
+    assert "flex: 0 1 auto" in source_rule.group("body")
+    assert "max-width: 100%" in source_rule.group("body")
+    assert "min-width: 0" in source_rule.group("body")
+    assert "overflow: hidden" in source_rule.group("body")
+    assert "max-width: none" not in repository_rule.group("body")
+    assert "overflow: visible" not in repository_rule.group("body")
+    assert "text-overflow: ellipsis" in repository_rule.group("body")
+    search_rule = STYLES.split(".md-header .md-search", 1)[1].split("}", 1)[0]
+    assert "flex: 1 1 auto" in search_rule
+    assert "max-width: 100%" in search_rule
+    assert "min-width: 0" in search_rule
+
+
+def test_home_layout_reflows_without_fixed_two_column_minimums():
+    hero_rule = STYLES.split(".book-hero {", 1)[1].split("}", 1)[0]
+    heading_rule = STYLES.split(".learning-roadmap__heading {", 1)[1].split("}", 1)[0]
+
+    assert "display: flex" in hero_rule
+    assert "flex-flow: row wrap" in hero_rule
+    assert "grid-template-columns" not in hero_rule
+    assert ".book-hero > :first-child" in STYLES
+    assert ".book-hero > :last-child" in STYLES
+    assert "flex-wrap: wrap" in heading_rule
+    assert ".learning-roadmap__heading > *" in STYLES
+    assert "overflow-wrap: anywhere" in STYLES
+
+
 def test_section_numbers_remain_on_one_line_and_match_title_color():
     number_rule = re.search(r"\.chapter-entry__number\s*\{(?P<body>.*?)\}", STYLES, flags=re.DOTALL)
     assert number_rule
