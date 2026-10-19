@@ -932,7 +932,8 @@ def sort_styles():
       .sort-simulation-root {{
         width: 100%;
         max-width: 100%;
-        overflow: visible;
+        overflow-x: hidden;
+        overflow-y: visible;
         padding: 14px 4px;
         background: #ffffff;
         color: #333333;
@@ -1136,6 +1137,43 @@ def sort_styles():
       }}
       .sort-comparison-configuration .simulation-action-row {{
         margin:16px 0 14px!important;
+        padding:0!important;
+        border:0!important;
+        box-shadow:none!important;
+        flex-wrap:wrap!important;
+        overflow-x:hidden!important;
+      }}
+      .sort-comparison-controls-row {{
+        width:100%!important;
+        max-width:100%!important;
+        min-width:0!important;
+        flex-flow:row wrap!important;
+        overflow:hidden!important;
+      }}
+      .sort-comparison-controls-row > * {{
+        max-width:100%!important;
+        min-width:0!important;
+      }}
+      .sort-comparison-controls-row > .widget-vbox {{
+        flex:0 1 {SORT_CONTROL_GROUP_WIDTH}px!important;
+      }}
+      .sort-comparison-controls-row > .widget-hbox {{
+        width:auto!important;
+        flex:1 1 620px!important;
+        flex-flow:row wrap!important;
+        overflow:hidden!important;
+      }}
+      .sort-comparison-controls-row .sort-algorithm-options-frame {{
+        max-width:100%!important;
+        min-width:0!important;
+        flex:1 1 auto!important;
+        overflow:hidden!important;
+      }}
+      .sort-comparison-controls-row .sort-algorithm-options-frame > .widget-box {{
+        width:100%!important;
+        max-width:100%!important;
+        min-width:0!important;
+        overflow:hidden!important;
       }}
       .sort-simulation-root button.sort-tab-button,
       .sort-simulation-root button[class*="-tab-button"] {{

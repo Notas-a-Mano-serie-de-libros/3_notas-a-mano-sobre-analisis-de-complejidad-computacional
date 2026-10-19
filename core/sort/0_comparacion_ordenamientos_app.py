@@ -64,7 +64,7 @@ ALGORITHM_ROW_GAP = 2
 ALGORITHM_FIELD_PADDING_X = 8
 ALGORITHM_FIELD_PADDING_Y = 5
 ALGORITHM_FIELD_WIDTH = sum(ALGORITHM_COLUMN_WIDTHS) + (len(ALGORITHM_COLUMN_WIDTHS) - 1) * ALGORITHM_COLUMN_GAP + 2 * ALGORITHM_FIELD_PADDING_X + 2
-ALGORITHM_LABEL_WIDTH = 150
+ALGORITHM_LABEL_WIDTH = 128
 ALGORITHM_GROUP_WIDTH = ALGORITHM_LABEL_WIDTH + ALGORITHM_FIELD_WIDTH + STANDARD_LABEL_CONTROL_GAP
 ROW_HTML_CACHE_LIMIT = 512
 _ROW_HTML_CACHE = {}
@@ -778,7 +778,7 @@ def run_app():
                     justify_content="flex-start",
                     overflow="visible",
                 ),
-            ),
+            ).add_class("sort-comparison-controls-row"),
             sort_action_button_row([auto_button, finish_button, reset_button]),
         ],
         layout=widgets.Layout(width="100%", grid_gap="0"),

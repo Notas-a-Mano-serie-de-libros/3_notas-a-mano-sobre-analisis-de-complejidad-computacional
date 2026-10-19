@@ -56,14 +56,14 @@ COMPARISON_PANEL_CSS = """
 .comparison-simulation-root,.comparison-simulation-root *{box-sizing:border-box}
 .comparison-simulation-root .widget-html,.comparison-simulation-root .widget-html-content,.comparison-simulation-root .widget-htmlmath,.comparison-simulation-root .widget-htmlmath-content{color:#333!important;background:transparent!important}
 .comparison-simulation-root .widget-html-content,.comparison-simulation-root .widget-htmlmath-content{margin:0!important}
-.comparison-main-panel{width:100%;border:1px solid #dedede;border-radius:5px;overflow:hidden;background:#fff}
+.comparison-main-panel{width:100%;max-width:100%;min-width:0;border:1px solid #dedede;border-radius:5px;overflow:hidden;background:#fff}
 .comparison-panel-title,.comparison-subpanel-title{width:100%;margin:0;padding:10px 14px;border-bottom:1px solid #e2e2e2;background:#f7f7f7;color:#333;font-weight:700;line-height:1.35;text-align:left}
 .comparison-panel-content{width:100%;padding:0;background:#fff}
 .comparison-subpanel{width:100%;margin:0;border:1px solid #e1e1e1;background:#fff}
 .comparison-subpanel+.comparison-subpanel{border-top:0}
 .comparison-subpanel-title{padding:8px 12px;border-bottom-color:#e5e5e5}
 button.comparison-subpanel-title{height:44px!important;min-height:44px!important;border:0!important;border-bottom:1px solid #e5e5e5!important;border-radius:0!important;background:#f7f7f7!important;font-family:sans-serif!important;font-size:16px!important;text-align:left!important}
-.comparison-subpanel-content{width:100%;padding:12px;background:#fff}
+.comparison-subpanel-content{width:100%;max-width:100%;min-width:0;padding:12px 12px;background:#fff}
 .comparison-result-content{padding:0!important}
 .comparison-result-content>.widget-html-content,
 .comparison-result-content>.widget-box{margin:0!important;padding:0!important}
@@ -101,16 +101,23 @@ button.comparison-subpanel-title{height:44px!important;min-height:44px!important
   row-gap:12px!important;
   align-items:center!important;
   justify-content:start!important;
-  width:auto!important;
-  overflow:visible!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  overflow:hidden!important;
 }
+.comparison-controls-grid>*{max-width:100%!important;min-width:0!important}
 .comparison-action-row{
   display:flex!important;
   flex-wrap:wrap!important;
   justify-content:flex-end!important;
   align-items:center!important;
   width:100%!important;
-  overflow:visible!important;
+  min-width:0!important;
+  padding:0!important;
+  border:0!important;
+  box-shadow:none!important;
+  overflow-x:hidden!important;
   gap:0!important;
 }
 .comparison-action-row>.widget-button{margin:0!important;border-color:#cfcfcf!important;border-radius:0!important}

@@ -62,6 +62,20 @@ def test_search_and_sort_control_families_wrap_without_fixed_grids():
         )
 
 
+def test_search_and_sort_comparisons_do_not_create_horizontal_scrollbars():
+    search = source("core/search/0_comparacion_busquedas_app.py")
+    sort_common = source("core/sort/sort_common.py")
+    sort_comparison = source("core/sort/0_comparacion_ordenamientos_app.py")
+
+    assert ".comparison-controls-grid>*{max-width:100%!important;min-width:0!important}" in search
+    assert "overflow-x:hidden!important" in search
+    assert "padding:12px 12px" in search
+    assert ".sort-comparison-controls-row" in sort_common
+    assert "flex-flow:row wrap!important" in sort_common
+    assert "overflow-x:hidden!important" in sort_common
+    assert 'add_class("sort-comparison-controls-row")' in sort_comparison
+
+
 def test_chapters_seven_and_eight_buttons_share_the_same_visual_contract():
     widget_sources = (
         source("core/search/search_common.py"),
