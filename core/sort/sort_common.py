@@ -1163,6 +1163,9 @@ def sort_styles():
         box-sizing: border-box;
         overflow: hidden;
       }}
+      .sort-phase-strip-below {{
+        margin: 4px auto 0;
+      }}
       .sort-step-strip {{
         height: 22px;
         line-height: 20px;
@@ -1847,18 +1850,26 @@ def render_state_html(state, include_styles=True):
     result = render_sort_result_symbol(state)
     result_offset = sort_result_offset(state, view)
     styles = sort_styles() if include_styles else ""
-    phase_markup = f'<div class="sort-phase-strip">{phase}</div>' if phase.strip() else ""
+    phase_position = "above" if view == "arbol" else "below"
+    phase_markup = (
+        f'<div class="sort-phase-strip sort-phase-strip-{phase_position}">{phase}</div>'
+        if phase.strip()
+        else ""
+    )
+    phase_above = phase_markup if phase_position == "above" else ""
+    phase_below = phase_markup if phase_position == "below" else ""
     return f"""
     {styles}
     <div class="{app_class}" style="min-height:{min_height}px; height:auto; overflow:visible;">
       {legend}
       <div class="sort-message">{message_html(state["message"])}</div>
-      {phase_markup}
+      {phase_above}
       <div class="sort-step-strip">{step_status}</div>
       <div class="sort-array-line sort-array-line-{css_token(view)}">
         {items_markup}
         <div class="sort-result" style="margin-top:{result_offset}px;" aria-live="polite">{result}</div>
       </div>
+      {phase_below}
       {radix_buckets}
     </div>
     """

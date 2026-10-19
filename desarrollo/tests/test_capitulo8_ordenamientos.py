@@ -578,6 +578,30 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         phases = {event.get("merge_tree_phase") for event in state["trace"]}
         self.assertEqual(phases, {"start", "divide", "merge", "complete"})
 
+    def test_phase_strip_is_below_arrays_but_above_merge_tree(self):
+        merge = self.modules["mezcla"]
+        for view in ("cajas", "barras"):
+            with self.subTest(algorithm="mezcla", view=view):
+                state = merge.create_state(size=4, values=[38, 27, 43, 3], view=view)
+                html = merge.render_state_html(state, include_styles=False)
+                self.assertLess(html.index("sort-array-line"), html.index('<div class="sort-phase-strip'))
+                self.assertIn("sort-phase-strip-below", html)
+
+        tree_state = merge.create_state(size=4, values=[38, 27, 43, 3], view="arbol")
+        tree_html = merge.render_state_html(tree_state, include_styles=False)
+        self.assertLess(tree_html.index('<div class="sort-phase-strip'), tree_html.index("sort-array-line"))
+        self.assertIn("sort-phase-strip-above", tree_html)
+
+        radix = self.modules["radix"]
+        radix_state = radix.create_state(size=4, values=[170, 45, 75, 90], view="barras")
+        radix_html = radix.render_state_html(radix_state, include_styles=False)
+        array_position = radix_html.index("sort-array-line")
+        phase_position = radix_html.index('<div class="sort-phase-strip')
+        buckets_position = radix_html.index("radix-buckets-panel")
+        self.assertLess(array_position, phase_position)
+        self.assertLess(phase_position, buckets_position)
+        self.assertIn("sort-phase-strip-below", radix_html)
+
     def test_merge_tree_preserves_base_merge_and_hide_behavior(self):
         module = self.modules["mezcla"]
         state = module.create_state(size=8, values=[95, 131, 111, 57, 158, 16, 25, 98], view="arbol")
