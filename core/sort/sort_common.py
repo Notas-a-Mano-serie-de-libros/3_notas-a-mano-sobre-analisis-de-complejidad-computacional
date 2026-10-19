@@ -1681,11 +1681,22 @@ def sort_styles():
         gap: 2px;
         width: 100%;
       }}
-      .sort-array-line-cajas .sort-items.boxes,
-      .sort-array-line-barras .bar-panel,
+      .sort-array-line-cajas .sort-items.boxes {{
+        width: max-content;
+        flex: 0 1 auto;
+        margin-left: 0;
+        margin-right: 0;
+      }}
+      .sort-array-line-barras .bar-panel {{
+        width: min(100%, {SORT_VISUAL_WIDTH}px);
+        flex: 0 1 {SORT_VISUAL_WIDTH}px;
+        margin-left: 0;
+        margin-right: 0;
+      }}
       .sort-array-line-arbol .merge-tree-shell,
       .sort-array-line-arbol .quick-tree-shell {{
         width: fit-content;
+        flex: 0 1 auto;
         margin-left: 0;
         margin-right: 0;
       }}

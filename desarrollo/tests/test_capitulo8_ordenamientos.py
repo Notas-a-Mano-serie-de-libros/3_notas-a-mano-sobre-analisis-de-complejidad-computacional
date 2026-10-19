@@ -540,6 +540,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("contain: layout paint;", bar_html)
         self.assertIn("prefers-reduced-motion: reduce", bar_html)
         self.assertIn(".sort-array-line-cajas .sort-items.boxes", bar_html)
+        self.assertIn("width: max-content;", box_html)
+        self.assertIn(f"flex: 0 1 {self.common.SORT_VISUAL_WIDTH}px;", bar_html)
         self.assertIn("margin-left: 0;", bar_html)
         self.assertIn("color: #111827;", bar_html)
         self.assertIn("text-shadow: none;", bar_html)
