@@ -25,6 +25,7 @@ from common.simulation_views import (
     actions,
     build_simulation_view,
 )
+from common.visual_roles import RESULT_SYMBOL_BASE_CSS, RESULT_SYMBOL_BOX_SIZE, RESULT_SYMBOL_SUCCESS_COLOR
 from common.widget_controls import (
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
@@ -79,8 +80,8 @@ NESTED_LIST_EVENT_KEYS = {"radix_buckets"}
 _SIMULATION_HEIGHT_CACHE = {}
 _SORT_STYLES = None
 SORT_VISUAL_WIDTH = 760
-SORT_RESULT_WIDTH = 36
-SORT_RESULT_HEIGHT = 54
+SORT_RESULT_WIDTH = RESULT_SYMBOL_BOX_SIZE
+SORT_RESULT_HEIGHT = RESULT_SYMBOL_BOX_SIZE
 SORT_BOX_RESULT_OFFSET = 29
 SORT_TREE_RESULT_OFFSET = 28
 SORT_CONTROL_STYLE = {"description_width": "0px"}
@@ -105,6 +106,16 @@ SORT_LEGEND_ITEMS = (
     (ROLE_EXCLUDED, "inactivo"),
 )
 SORT_LEGEND_LABELS_BY_ROLE = dict(SORT_LEGEND_ITEMS)
+SORT_FORMULA_RESERVED_HEIGHTS = {
+    "burbuja": 26,
+    "seleccion": 26,
+    "insercion": 26,
+    "insercion_binaria": 45,
+    "shell": 153,
+    "mezcla": 26,
+    "rapido": 45,
+    "radix": 152,
+}
 SORT_LEGEND_ROLES_BY_ALGORITHM = {
     "burbuja": (ROLE_CURRENT, ROLE_COMPARE, ROLE_BOUNDARY, ROLE_SORTED),
     "seleccion": (ROLE_CURRENT, ROLE_COMPARE, ROLE_BOUNDARY, ROLE_SORTED),
@@ -319,11 +330,10 @@ def displaystyle_formula(formula):
 
 
 def calculate_sort_formula_reserved_height(state):
-    formulas = [state.get("formula", "")]
-    trace = state.get("trace")
-    if trace is not None:
-        formulas.extend(event.get("formula", "") for event in trace)
-    return max(formula_iframe_height(displaystyle_formula(formula)) for formula in formulas)
+    reserved_height = SORT_FORMULA_RESERVED_HEIGHTS.get(state.get("algorithm"))
+    if reserved_height is not None:
+        return reserved_height
+    return formula_iframe_height(displaystyle_formula(state.get("formula", "")))
 
 
 def css_token(value):
@@ -1662,19 +1672,12 @@ def sort_styles():
         contain: layout paint;
       }}
       .sort-result-symbol {{
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 28px;
-        height: 28px;
+        {RESULT_SYMBOL_BASE_CSS}
         font-family: '{FONT_FAMILY}', serif;
-        font-size: 30px;
-        line-height: 1;
-        font-weight: 700;
-        color: #2d7d32;
+        color: {RESULT_SYMBOL_SUCCESS_COLOR};
       }}
       .sort-app-bars .sort-result-symbol {{
-        color: #2e6f34;
+        color: {RESULT_SYMBOL_SUCCESS_COLOR};
         text-shadow: none;
       }}
       @media (max-width: 760px) {{

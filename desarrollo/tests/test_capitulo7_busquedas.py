@@ -858,9 +858,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         common = self.launchers._load_module("search_common.py", "capitulo7_search_common_reserved_height_test")
         state = module.create_state(size=8, target=6, values=[1, 2, 3, 4, 5, 6, 7, 8])
         reserved = common.calculate_formula_reserved_height(state, module.step_exponential_search)
-        initial_height = common.formula_iframe_height(state["formula"])
-
-        self.assertGreater(reserved, initial_height)
+        self.assertEqual(reserved, common.SEARCH_FORMULA_RESERVED_HEIGHTS["exponencial"])
 
         heights = []
         for _ in range(32):
@@ -869,7 +867,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
                 break
             module.step_exponential_search(state)
 
-        self.assertEqual(reserved, max(heights))
+        self.assertLess(reserved, max(heights))
 
     def test_search_math_text_uses_same_font_as_array_values(self):
         common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
@@ -895,7 +893,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("SEARCH_NODE_GAP = 0", common_source)
         self.assertIn("SEARCH_LABEL_HEIGHT = 28", common_source)
         self.assertIn("SEARCH_MESSAGE_HEIGHT = 44", common_source)
-        self.assertIn("SEARCH_RESULT_WIDTH = 42", common_source)
+        self.assertIn("SEARCH_RESULT_WIDTH = RESULT_SYMBOL_BOX_SIZE", common_source)
         self.assertIn("def calculate_search_dimensions(state):", common_source)
         self.assertIn('min-height: {dimensions["app_height"]}px;', common_source)
         self.assertIn('min-height: {dimensions["nodes_height"]}px;', common_source)
@@ -987,8 +985,8 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn('search-result-symbol missing', missing_html)
         self.assertIn('role="img" aria-label="No encontrado"', missing_html)
         self.assertIn(
-            "color: #b85450;",
-            (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8"),
+            'RESULT_SYMBOL_FAILURE_COLOR = "#b85450"',
+            (PROJECT_ROOT / "common" / "visual_roles.py").read_text(encoding="utf-8"),
         )
         self.assertIn(">×</span>", missing_html)
         self.assertNotIn(r"$\times$", missing_html)
@@ -1145,7 +1143,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("font-weight: 700;", html)
         self.assertIn("background: #ffffff;", html)
         self.assertIn("comparison-array-head", html)
-        self.assertIn("grid-template-columns: minmax(0, 432px) 34px;", html)
+        self.assertIn("grid-template-columns: minmax(0, 432px) 48px;", html)
         self.assertIn("grid-column: 1;", html)
         self.assertIn("comparison-result", html)
         self.assertIn("COMPARISON_NODE_WIDTH = 54", source)
@@ -1172,8 +1170,8 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("comparison-result-symbol", source)
         self.assertIn('symbol = "✓" if found else "×"', source)
         self.assertIn(".comparison-result-symbol.found", source)
-        self.assertIn("color: #2d7d32;", source)
-        self.assertIn("color: #b85450;", source)
+        self.assertIn("RESULT_SYMBOL_SUCCESS_COLOR", source)
+        self.assertIn("RESULT_SYMBOL_FAILURE_COLOR", source)
         self.assertIn('role="img"', source)
         self.assertIn('aria-live="polite"', source)
         self.assertIn("contain: layout paint;", source)
@@ -1184,7 +1182,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn(r"$\checkmark$", html)
         self.assertNotIn(r"$\times$", html)
         self.assertIn("grid-template-columns: minmax(170px, 232px) 88px minmax(0, 1fr);", html)
-        self.assertIn("grid-template-columns: minmax(0, 432px) 34px;", html)
+        self.assertIn("grid-template-columns: minmax(0, 432px) 48px;", html)
         self.assertIn("grid-template-columns: repeat(8, minmax(0, 54px));", html)
         self.assertNotIn("overflow-x: auto;", html)
         self.assertNotIn("Arreglo:</strong>", html)

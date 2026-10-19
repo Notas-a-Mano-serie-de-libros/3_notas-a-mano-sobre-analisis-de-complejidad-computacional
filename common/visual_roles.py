@@ -7,6 +7,16 @@ GREEN = ("#e8fce9", "#97d077", "#111111")
 RED = ("#f8cecc", "#b85450", "#111111")
 GRAY = ("#f2f6f7", "#d3d9db", "#8a8f94")
 
+RESULT_SYMBOL_BOX_SIZE = 48
+RESULT_SYMBOL_FONT_SIZE = 48
+RESULT_SYMBOL_SUCCESS_COLOR = "#2d7d32"
+RESULT_SYMBOL_FAILURE_COLOR = "#b85450"
+RESULT_SYMBOL_BASE_CSS = (
+    "display:inline-flex;align-items:center;justify-content:center;"
+    f"min-width:{RESULT_SYMBOL_BOX_SIZE}px;height:{RESULT_SYMBOL_BOX_SIZE}px;"
+    f"font-size:{RESULT_SYMBOL_FONT_SIZE}px;line-height:1;font-weight:700;text-shadow:none;"
+)
+
 SEARCH_ROLE_STYLES = {
     "default": WHITE,
     "target": TARGET,

@@ -34,6 +34,12 @@ from common.simulation_views import (
     actions,
     build_simulation_view,
 )
+from common.visual_roles import (
+    RESULT_SYMBOL_BASE_CSS,
+    RESULT_SYMBOL_BOX_SIZE,
+    RESULT_SYMBOL_FAILURE_COLOR,
+    RESULT_SYMBOL_SUCCESS_COLOR,
+)
 from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
     STANDARD_CONTROL_COLUMN_GAP,
@@ -537,7 +543,7 @@ def render_comparison_styles(array_width):
       }}
       .comparison-array-head {{
         display: grid;
-        grid-template-columns: minmax(0, {array_width}px) 34px;
+        grid-template-columns: minmax(0, {array_width}px) {RESULT_SYMBOL_BOX_SIZE}px;
         column-gap: 4px;
         justify-content: center;
         text-align: left;
@@ -572,7 +578,7 @@ def render_comparison_styles(array_width):
         width: 100%;
         min-width: 0;
         display: grid;
-        grid-template-columns: minmax(0, {array_width}px) 34px;
+        grid-template-columns: minmax(0, {array_width}px) {RESULT_SYMBOL_BOX_SIZE}px;
         justify-content: center;
         align-items: center;
         gap: 4px;
@@ -605,8 +611,8 @@ def render_comparison_styles(array_width):
         padding: 2px 0 6px;
       }}
       .comparison-result {{
-        width: 34px;
-        min-width: 34px;
+        width: {RESULT_SYMBOL_BOX_SIZE}px;
+        min-width: {RESULT_SYMBOL_BOX_SIZE}px;
         height: 58px;
         display: flex;
         align-items: center;
@@ -616,21 +622,14 @@ def render_comparison_styles(array_width):
         color: #111111;
       }}
       .comparison-result-symbol {{
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 28px;
-        height: 28px;
+        {RESULT_SYMBOL_BASE_CSS}
         font-family: '{FONT_FAMILY}', serif;
-        font-size: 28px;
-        line-height: 1;
-        font-weight: 700;
       }}
       .comparison-result-symbol.found {{
-        color: #2d7d32;
+        color: {RESULT_SYMBOL_SUCCESS_COLOR};
       }}
       .comparison-result-symbol.missing {{
-        color: #b85450;
+        color: {RESULT_SYMBOL_FAILURE_COLOR};
       }}
       .comparison-node {{
         width: 100%;

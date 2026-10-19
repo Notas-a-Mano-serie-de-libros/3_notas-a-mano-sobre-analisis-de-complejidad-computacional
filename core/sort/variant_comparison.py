@@ -18,6 +18,7 @@ from sort_common import (
 )
 from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES, SORT_THEME_CSS
 
+from common.visual_roles import RESULT_SYMBOL_BASE_CSS, RESULT_SYMBOL_BOX_SIZE, RESULT_SYMBOL_SUCCESS_COLOR
 from common.widget_controls import bounded_int_control, button_control, compact_labeled_control, dropdown_control
 
 try:
@@ -136,15 +137,15 @@ def render_html(state):
       .variant-bar-role-current,.variant-bar-role-pivot {{ border-color:var(--sort-border);box-shadow:none; }}
       .variant-bar-role-sorted::after {{ content:"✓";position:absolute;top:2px;right:2px;color:#2e7d32;font:700 10px/1 sans-serif; }}
       .variant-bar-role-excluded {{ opacity:var(--sort-muted-opacity); }}
-      .variant-indexes {{ display:flex;justify-content:center;gap:0;padding-top:4px;width:calc(100% - 36px);margin-right:36px; }}
+      .variant-indexes {{ display:flex;justify-content:center;gap:0;padding-top:4px;width:calc(100% - {RESULT_SYMBOL_BOX_SIZE + 4}px);margin-right:{RESULT_SYMBOL_BOX_SIZE + 4}px; }}
       .variant-indexes span {{ flex:1 1 0;min-width:8px;max-width:34px;text-align:center;font-size:14px;color:#111827;text-shadow:none;-webkit-font-smoothing:antialiased; }}
-      .variant-result {{ width:32px;min-width:32px;height:48px;display:flex;align-items:center;justify-content:center;margin-top:81px; }}
-      .variant-result-symbol {{ display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;font-size:30px;line-height:1;font-weight:700;color:#7bdc80;text-shadow:0 1px 2px rgba(0,0,0,.95); }}
+      .variant-result {{ width:{RESULT_SYMBOL_BOX_SIZE}px;min-width:{RESULT_SYMBOL_BOX_SIZE}px;height:48px;display:flex;align-items:center;justify-content:center;margin-top:81px; }}
+      .variant-result-symbol {{ {RESULT_SYMBOL_BASE_CSS}font-family:'{FONT_FAMILY}',serif;color:{RESULT_SYMBOL_SUCCESS_COLOR}; }}
       @media(max-width:760px) {{
         .variant-header {{ display:none; }}
         .variant-row {{ grid-template-columns:1fr;gap:6px; }}
         .variant-name {{ text-align:left; }}
-        .variant-bars {{ width:min(calc(100% - 34px), calc(var(--variant-count) * 28px)); }}
+        .variant-bars {{ width:min(calc(100% - {RESULT_SYMBOL_BOX_SIZE + 2}px), calc(var(--variant-count) * 28px)); }}
         .variant-bar-value,
         .variant-indexes span {{ font-size:12px; }}
       }}

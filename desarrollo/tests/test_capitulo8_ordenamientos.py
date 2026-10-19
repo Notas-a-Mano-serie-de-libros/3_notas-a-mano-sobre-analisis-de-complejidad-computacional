@@ -84,6 +84,41 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             with self.subTest(color=color):
                 self.assertGreaterEqual(contrast_ratio(color), 4.5)
 
+    def test_search_and_sort_result_checks_share_one_visual_contract(self):
+        visual_roles = (PROJECT_ROOT / "common" / "visual_roles.py").read_text(encoding="utf-8")
+        self.assertIn("RESULT_SYMBOL_BOX_SIZE = 48", visual_roles)
+        self.assertIn("RESULT_SYMBOL_FONT_SIZE = 48", visual_roles)
+        self.assertIn('RESULT_SYMBOL_SUCCESS_COLOR = "#2d7d32"', visual_roles)
+
+        result_renderers = (
+            PROJECT_ROOT / "core" / "search" / "search_common.py",
+            PROJECT_ROOT / "core" / "search" / "0_comparacion_busquedas_app.py",
+            DOMAIN_DIR / "sort_common.py",
+            DOMAIN_DIR / "0_comparacion_ordenamientos_app.py",
+            DOMAIN_DIR / "3_ordenamiento_insercion_app.py",
+            DOMAIN_DIR / "4_ordenamiento_shell_app.py",
+            DOMAIN_DIR / "variant_comparison.py",
+        )
+        for path in result_renderers:
+            with self.subTest(path=path.name):
+                source = path.read_text(encoding="utf-8")
+                self.assertIn("RESULT_SYMBOL_BASE_CSS", source)
+                self.assertIn("RESULT_SYMBOL_SUCCESS_COLOR", source)
+                self.assertNotIn("#7bdc80", source)
+
+    def test_formula_reservations_match_measured_mathjax_content(self):
+        expected = {
+            "burbuja": 26,
+            "seleccion": 26,
+            "insercion": 26,
+            "insercion_binaria": 45,
+            "shell": 153,
+            "mezcla": 26,
+            "rapido": 45,
+            "radix": 152,
+        }
+        self.assertEqual(self.common.SORT_FORMULA_RESERVED_HEIGHTS, expected)
+
     def test_first_step_prepares_visible_work_without_finishing(self):
         for name, module in self.modules.items():
             step_name = SORT_MODULES[name][1]
@@ -129,7 +164,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("insertion-comparison-bars-result", html)
         self.assertIn("--insertion-comparison-count:6;", html)
         self.assertIn("margin-top: 81px;", html)
-        self.assertIn("color: #7bdc80;", html)
+        self.assertIn("color: #2d7d32;", html)
         while not module.all_variants_complete(comparison_state):
             module.step_all_variants(comparison_state)
         completed_html = module.render_comparison_html(comparison_state)
@@ -185,7 +220,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("shell-comparison-bars-result", shell_html)
         self.assertIn("--shell-comparison-count:8;", shell_html)
         self.assertIn("margin-top: 81px;", shell_html)
-        self.assertIn("color: #7bdc80;", shell_html)
+        self.assertIn("color: #2d7d32;", shell_html)
         while not module.all_sequences_complete(shell_comparison):
             module.step_all_sequences(shell_comparison)
         completed_shell_html = module.render_gap_comparison_html(shell_comparison)
@@ -442,7 +477,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('class="sort-array-line sort-array-line-cajas"', box_html)
         self.assertIn('class="sort-array-line sort-array-line-barras"', bar_html)
         self.assertIn('class="sort-result" style="margin-top:29px;" aria-live="polite"', box_html)
-        self.assertIn('class="sort-result" style="margin-top:134px;" aria-live="polite"', bar_html)
+        self.assertIn('class="sort-result" style="margin-top:137px;" aria-live="polite"', bar_html)
         self.assertIn("min-height:", bar_html)
         self.assertIn("width: fit-content;", box_html)
         self.assertIn("width: fit-content;", bar_html)
@@ -453,7 +488,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("margin-left: 0;", bar_html)
         self.assertIn("color: #111827;", bar_html)
         self.assertIn("text-shadow: none;", bar_html)
-        self.assertIn("color: #2e6f34;", bar_html)
+        self.assertIn("color: #2d7d32;", bar_html)
         self.assertNotIn("Tipo de orden", box_html)
         self.assertNotIn("Tipo de orden", bar_html)
 
@@ -797,7 +832,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("Hoare", html)
         self.assertIn("Lomuto", html)
         self.assertIn("variant-bars-result", html)
-        self.assertIn("color:#7bdc80", html)
+        self.assertIn("color:#2d7d32", html)
         while not module.variants_complete(state):
             module.step_all_variants(state)
         completed_html = module.render_comparison_html(state)
@@ -1296,7 +1331,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('aria-live="polite"', html)
         self.assertIn("contain: layout paint;", html)
         self.assertIn("prefers-reduced-motion: reduce", html)
-        self.assertIn("color: #7bdc80;", html)
+        self.assertIn("color: #2d7d32;", html)
         self.assertIn("gap: 0;", source)
         self.assertIn("padding-bottom: 0;", source)
         self.assertIn("body_output = widgets.HTML", source)

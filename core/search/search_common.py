@@ -22,6 +22,10 @@ from common.simulation_views import (
     build_simulation_view,
 )
 from common.visual_roles import (
+    RESULT_SYMBOL_BASE_CSS,
+    RESULT_SYMBOL_BOX_SIZE,
+    RESULT_SYMBOL_FAILURE_COLOR,
+    RESULT_SYMBOL_SUCCESS_COLOR,
     SEARCH_EXPONENTIAL_STYLES,
     SEARCH_RANGE_HIGHLIGHT_STYLES,
     SEARCH_ROLE_STYLES,
@@ -63,7 +67,15 @@ SEARCH_NODE_GAP = 0
 SEARCH_LABEL_HEIGHT = 28
 SEARCH_MESSAGE_HEIGHT = 44
 SEARCH_VERTICAL_PADDING = 16
-SEARCH_RESULT_WIDTH = 42
+SEARCH_RESULT_WIDTH = RESULT_SYMBOL_BOX_SIZE
+SEARCH_FORMULA_RESERVED_HEIGHTS = {
+    "secuencial": 26,
+    "binaria": 45,
+    "interpolacion": 45,
+    "saltos": 152,
+    "exponencial": 229,
+    "ternaria": 162,
+}
 _SEARCH_DIMENSION_CACHE = {}
 TARGET_EXISTS = "exists"
 TARGET_MISSING = "missing"
@@ -655,23 +667,16 @@ def _build_search_css() -> str:
     contain: layout paint;
   }}
   .search-result-symbol {{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 28px;
-    height: 28px;
+    {RESULT_SYMBOL_BASE_CSS}
     font-family: '{FONT_FAMILY}', serif;
-    font-size: 30px;
-    line-height: 1;
-    font-weight: 700;
     color: #111111;
     transition: color 100ms ease, transform 100ms ease;
   }}
   .search-result-symbol.found {{
-    color: #2d7d32;
+    color: {RESULT_SYMBOL_SUCCESS_COLOR};
   }}
   .search-result-symbol.missing {{
-    color: #b85450;
+    color: {RESULT_SYMBOL_FAILURE_COLOR};
   }}
   .node-wrap {{
     width: {SEARCH_NODE_WIDTH}px;
@@ -850,7 +855,8 @@ def copy_search_state(state):
 
 def calculate_formula_reserved_height(state, step_search):
     probe = copy_search_state(state)
-    max_height = formula_iframe_height(probe.get("formula", ""))
+    reserved_height = SEARCH_FORMULA_RESERVED_HEIGHTS.get(state.get("algorithm"))
+    max_height = formula_iframe_height(probe.get("formula", "")) if reserved_height is None else reserved_height
     max_steps = min(MAX_FORMULA_PROBE_STEPS, max(16, len(probe.get("arr", [])) * 8 + 16))
     steps = 0
 
@@ -859,7 +865,8 @@ def calculate_formula_reserved_height(state, step_search):
             break
         step_search(probe)
         steps += 1
-        max_height = max(max_height, formula_iframe_height(probe.get("formula", "")))
+        if reserved_height is None:
+            max_height = max(max_height, formula_iframe_height(probe.get("formula", "")))
 
     state["step_total"] = steps
     state.setdefault("step_index", 0)

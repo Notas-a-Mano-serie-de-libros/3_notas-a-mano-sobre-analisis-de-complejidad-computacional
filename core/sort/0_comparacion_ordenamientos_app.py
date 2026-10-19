@@ -20,6 +20,7 @@ from sort_common import (
 )
 from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, ROLE_STYLES, SORT_THEME_CSS
 
+from common.visual_roles import RESULT_SYMBOL_BASE_CSS, RESULT_SYMBOL_BOX_SIZE, RESULT_SYMBOL_SUCCESS_COLOR
 from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
     STANDARD_CONTROL_COLUMN_GAP,
@@ -418,8 +419,8 @@ def render_comparison_styles():
         gap: 0;
         min-height: 20px;
         padding-top: 4px;
-        width: calc(100% - 36px);
-        margin-right: 36px;
+        width: calc(100% - {RESULT_SYMBOL_BOX_SIZE + 4}px);
+        margin-right: {RESULT_SYMBOL_BOX_SIZE + 4}px;
       }}
       .comparison-index {{
         width: auto;
@@ -436,8 +437,8 @@ def render_comparison_styles():
         -webkit-font-smoothing: antialiased;
       }}
       .comparison-result {{
-        width: 32px;
-        min-width: 32px;
+        width: {RESULT_SYMBOL_BOX_SIZE}px;
+        min-width: {RESULT_SYMBOL_BOX_SIZE}px;
         height: 48px;
         display: flex;
         align-items: center;
@@ -445,16 +446,9 @@ def render_comparison_styles():
         margin-top: 81px;
       }}
       .comparison-result-symbol {{
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 28px;
-        height: 28px;
-        font-size: 30px;
-        line-height: 1;
-        font-weight: 700;
-        color: #7bdc80;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+        {RESULT_SYMBOL_BASE_CSS}
+        font-family: '{FONT_FAMILY}', serif;
+        color: {RESULT_SYMBOL_SUCCESS_COLOR};
       }}
       @media (max-width: 760px) {{
         .comparison-header {{
@@ -471,7 +465,7 @@ def render_comparison_styles():
           font-size: 18px;
         }}
         .comparison-bars {{
-          width: min(calc(100% - 34px), calc(var(--comparison-count) * 28px));
+          width: min(calc(100% - {RESULT_SYMBOL_BOX_SIZE + 2}px), calc(var(--comparison-count) * 28px));
         }}
         .comparison-bar-value,
         .comparison-index {{
