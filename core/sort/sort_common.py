@@ -1129,9 +1129,9 @@ def sort_styles():
       .sort-procedure-content .simulation-action-row {{
         position:static!important;
         margin:14px 0 0!important;
-        padding:12px 0 0!important;
-        border-top:1px solid #e5e5e5!important;
-        border-bottom:0!important;
+        padding:0!important;
+        border:0!important;
+        background:transparent!important;
         box-shadow:none!important;
       }}
       .sort-comparison-configuration .simulation-action-row {{

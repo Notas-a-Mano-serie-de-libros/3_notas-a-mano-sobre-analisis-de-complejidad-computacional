@@ -542,6 +542,13 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn(".sort-array-line-cajas .sort-items.boxes", bar_html)
         self.assertIn("width: max-content;", box_html)
         self.assertIn(f"flex: 0 1 {self.common.SORT_VISUAL_WIDTH}px;", bar_html)
+        procedure_action_rule = box_html.split(
+            ".sort-procedure-content .simulation-action-row {", 1
+        )[1].split("}", 1)[0]
+        self.assertIn("padding:0!important;", procedure_action_rule)
+        self.assertIn("border:0!important;", procedure_action_rule)
+        self.assertIn("background:transparent!important;", procedure_action_rule)
+        self.assertIn("box-shadow:none!important;", procedure_action_rule)
         self.assertIn("margin-left: 0;", bar_html)
         self.assertIn("color: #111827;", bar_html)
         self.assertIn("text-shadow: none;", bar_html)
