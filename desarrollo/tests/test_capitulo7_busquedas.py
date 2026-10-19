@@ -784,7 +784,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn('extra_controls={"uniform"', source)
         self.assertNotIn("widgets.Checkbox", source)
 
-    def test_formula_output_reserves_stable_space(self):
+    def test_formula_output_adapts_to_current_content(self):
         common_source = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
         runtime_source = (PROJECT_ROOT / "common" / "animation_runtime.py").read_text(encoding="utf-8")
 
@@ -794,11 +794,12 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn('overflow="visible"', common_source)
         self.assertIn("widget.layout.min_height", runtime_source)
         self.assertIn("formula_iframe_height(formula)", runtime_source)
-        self.assertIn("calculate_formula_reserved_height(state, step_search)", common_source)
-        self.assertIn('state["formula_reserved_height"]', common_source)
-        self.assertIn('state.get("formula_reserved_height")', common_source)
-        self.assertIn("self.max_formula_height", runtime_source)
-        self.assertIn("align-items:flex-end", runtime_source)
+        self.assertNotIn('state["formula_reserved_height"]', common_source)
+        self.assertNotIn('state.get("formula_reserved_height")', common_source)
+        self.assertIn("self.formula_height", runtime_source)
+        self.assertIn("align-items:flex-start", runtime_source)
+        self.assertIn("enableAssistiveMml: false", runtime_source)
+        self.assertNotIn("formula-frame-stack", runtime_source)
         self.assertIn("justify-content:flex-start", runtime_source)
         self.assertIn("text-align:left", runtime_source)
         self.assertNotIn("frameElement.style.height", runtime_source)

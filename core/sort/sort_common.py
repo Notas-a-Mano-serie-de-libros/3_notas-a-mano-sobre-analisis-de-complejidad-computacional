@@ -2146,7 +2146,6 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             radix_number_mode=controls["radix_number_mode"].value,
             radix_base=controls["radix_base"].value,
         )
-        next_state["formula_reserved_height"] = calculate_sort_formula_reserved_height(next_state)
         return next_state
 
     state = build_state(sync_radix_max=True)
@@ -2182,7 +2181,6 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             html_output,
             formula,
             render_state_html(state, include_styles=False),
-            state.get("formula_reserved_height"),
         )
         desk_output.value = render_desk_check(
             pseudocode_algorithm_key(state),

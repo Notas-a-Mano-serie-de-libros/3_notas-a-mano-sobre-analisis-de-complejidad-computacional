@@ -51,8 +51,7 @@ class OutputCache:
         self.formula = object()
         self.html = object()
         self.formula_html = {}
-        self.current_formula_html = ""
-        self.max_formula_height = 0
+        self.formula_height = 0
 
     def render_formula_iframe(self, formula, height, hidden=False):
         key = (formula, height, hidden)
@@ -72,34 +71,17 @@ class OutputCache:
         self.formula_html[key] = html
         return html
 
-    def render_formula_html(self, formula, height):
-        new_html = self.render_formula_iframe(formula, height, hidden=bool(self.current_formula_html))
-        if not self.current_formula_html:
-            self.current_formula_html = new_html
-            return new_html
-
-        html = (
-            '<div class="formula-frame-stack" '
-            f'style="position:relative;width:100%;height:{height}px;overflow:hidden;">'
-            f'{self.current_formula_html}{new_html}</div>'
-        )
-        self.current_formula_html = self.render_formula_iframe(formula, height, hidden=False)
-        return html
-
     def update_formula(self, widget, formula, reserved_height=None):
         if formula == self.formula:
             return False
         height = formula_iframe_height(formula) if formula else 0
-        if reserved_height is None:
-            self.max_formula_height = max(self.max_formula_height, height)
-        else:
-            self.max_formula_height = reserved_height
+        self.formula_height = height if reserved_height is None else reserved_height
         if hasattr(widget, "layout"):
-            widget.layout.min_height = f"{self.max_formula_height}px"
+            widget.layout.min_height = f"{self.formula_height}px"
         if hasattr(widget, "set_formula"):
-            widget.set_formula(formula, self.max_formula_height)
+            widget.set_formula(formula, self.formula_height)
         else:
-            widget.value = self.render_formula_html(formula, self.max_formula_height) if formula else ""
+            widget.value = self.render_formula_iframe(formula, self.formula_height) if formula else ""
         self.formula = formula
         return True
 
@@ -144,7 +126,7 @@ def mathjax_host_srcdoc():
 <style>
 html,body{margin:0;padding:0;background:#ffffff;overflow:hidden;color:#111111;height:100%;}
 body{color:#111;font-size:16px;line-height:1.2;}
-#formula{display:flex;align-items:flex-end;justify-content:flex-start;min-height:100%;text-align:left;}
+#formula{display:flex;align-items:flex-start;justify-content:flex-start;min-height:100%;text-align:left;}
 mjx-container[jax="SVG"]{font-size:100% !important;margin:0 !important;}
 mjx-container[jax="SVG"][display="true"]{text-align:left !important;}
 </style>
@@ -156,13 +138,14 @@ window.MathJax = {
     processEscapes: true
   },
   svg: { fontCache: 'none' },
+  options: { enableAssistiveMml: false, enableMenu: false },
   startup: { typeset: false }
 };
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" integrity="sha256-1CldwzdEg2k1wTmf7s5RWVd7NMXI/7nxxjJM2C4DqII=" crossorigin="anonymous"></script>
 </head>
 <body>
-<div id="formula"></div>
+<div id="formula" role="img" aria-label=""></div>
 <script>
 window.addEventListener('load', function () {
   var renderedFormula = '';
@@ -190,7 +173,9 @@ window.addEventListener('load', function () {
     if (formula === renderedFormula || formula === requestedFormula) return;
     if (!formula) {
       requestId += 1;
-      document.getElementById('formula').replaceChildren();
+      var emptyElement = document.getElementById('formula');
+      emptyElement.replaceChildren();
+      emptyElement.setAttribute('aria-label', '');
       renderedFormula = '';
       requestedFormula = '';
       return;
@@ -199,7 +184,9 @@ window.addEventListener('load', function () {
     var currentRequest = ++requestId;
     MathJax.tex2svgPromise(formula, {display: true}).then(function (node) {
       if (currentRequest !== requestId) return;
-      document.getElementById('formula').replaceChildren(node);
+      var formulaElement = document.getElementById('formula');
+      formulaElement.replaceChildren(node);
+      formulaElement.setAttribute('aria-label', formula);
       renderedFormula = formula;
       requestedFormula = '';
     }).catch(function () {
@@ -250,7 +237,7 @@ def mathjax_srcdoc(formula):
 <style>
 html,body{{margin:0;padding:0;background:#ffffff;overflow:hidden;color:#111111;}}
 body{{color:#111;font-size:16px;line-height:1.2;}}
-#formula{{display:flex;align-items:flex-end;justify-content:flex-start;min-height:100%;visibility:hidden;text-align:left;}}
+#formula{{display:flex;align-items:flex-start;justify-content:flex-start;min-height:100%;visibility:hidden;text-align:left;}}
 body.math-ready #formula{{visibility:visible;}}
 mjx-container[jax="SVG"]{{font-size:100% !important;margin:0 !important;}}
 mjx-container[jax="SVG"][display="true"]{{text-align:left !important;}}
@@ -263,13 +250,14 @@ window.MathJax = {{
     processEscapes: true
   }},
   svg: {{ fontCache: 'none' }},
+  options: {{ enableAssistiveMml: false, enableMenu: false }},
   startup: {{ typeset: false }}
 }};
 </script>
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" integrity="sha256-1CldwzdEg2k1wTmf7s5RWVd7NMXI/7nxxjJM2C4DqII=" crossorigin="anonymous"></script>
 </head>
 <body>
-<div id="formula" style="visibility:hidden">\\[{tex}\\]</div>
+<div id="formula" role="img" aria-label="{tex}" style="visibility:hidden">\\[{tex}\\]</div>
 <script>
 window.addEventListener('load', function () {{
   function reveal() {{

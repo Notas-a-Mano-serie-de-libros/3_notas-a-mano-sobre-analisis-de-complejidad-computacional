@@ -1054,7 +1054,6 @@ def run_search_app(
             )
         target = enforce_target_membership(node_values, target, target_mode_input.value)
         state = create_state(size=len(node_values), target=target, values=node_values, **current_kwargs())
-        state["formula_reserved_height"] = calculate_formula_reserved_height(state, step_search)
         update_target_readout(state["target"])
         return state
 
@@ -1078,7 +1077,6 @@ def run_search_app(
             html_output,
             formula,
             render_html(state),
-            state.get("formula_reserved_height"),
         )
         desk_output.value = render_desk_check(
             state.get("algorithm"),
