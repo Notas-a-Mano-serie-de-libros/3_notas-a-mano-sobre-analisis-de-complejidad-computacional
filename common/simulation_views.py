@@ -37,13 +37,13 @@ ACTION_SPECS = {
     "run": ActionSpec("Ejecutar", "play", "110px"),
     "sort": ActionSpec("Ordenar", "play", "110px"),
     "search": ActionSpec("Buscar", "search", "110px"),
-    "play": ActionSpec("Ejecución automática", "play", "165px"),
-    "step_back": ActionSpec("Paso anterior", "step-backward", "125px"),
-    "step": ActionSpec("Paso siguiente", "step-forward", "125px"),
-    "finish": ActionSpec("Finalizar", "fast-forward", "110px"),
-    "reset": ActionSpec("Generar nuevo arreglo", "refresh", "175px"),
+    "play": ActionSpec("Ejecución automática", "play", "205px"),
+    "step_back": ActionSpec("Paso anterior", "step-backward", "145px"),
+    "step": ActionSpec("Paso siguiente", "step-forward", "145px"),
+    "finish": ActionSpec("Finalizar", "fast-forward", "130px"),
+    "reset": ActionSpec("Generar nuevo arreglo", "refresh", "210px"),
     "restart": ActionSpec("Reiniciar", "refresh", "110px"),
-    "book": ActionSpec("Generar arreglo del libro", "book", "185px"),
+    "book": ActionSpec("Generar arreglo del libro", "book", "230px"),
 }
 ACTION_BY_LABEL = {spec.label: spec for spec in ACTION_SPECS.values()}
 

@@ -72,7 +72,7 @@ from sort_config import (
     VIEW_OPTIONS,
 )
 from sort_messages import start_message
-from sort_tree import flatten_tree, merge_active_ranges, quick_tree, range_key, split_tree, tree_depth, tree_max_depth_for_state
+from sort_tree import flatten_tree, merge_active_ranges, quick_tree, range_key, split_tree, tree_max_depth_for_state
 
 LIST_EVENT_KEYS = {"arr", "roles", "labels", "initial_values"}
 TREE_EVENT_KEYS = {"merge_tree_nodes", "quick_tree_nodes"}
@@ -95,6 +95,8 @@ SORT_BAR_HEIGHT_RANGE = 250
 SORT_DATE_BAR_HEIGHT_RANGE = 180
 MERGE_TREE_ROW_HEIGHT = 156
 QUICK_TREE_ROW_HEIGHT = 156
+TREE_SLOT_WIDTH = 54
+TREE_BLOCK_GAP = 18
 SORT_LEGEND_ITEMS = (
     (ROLE_CURRENT, "actual"),
     (ROLE_COMPARE, "comparación"),
@@ -371,11 +373,51 @@ def render_multi_sort_legend(algorithm_keys):
     return f'<div class="sort-comparison-legend">{"".join(items)}</div>'
 
 
-def node_center(node, slot_width, left_offset=0):
+def tree_node_key(node):
+    return node["depth"], node["start"], node["end"]
+
+
+def packed_tree_layout(nodes, slot_width=TREE_SLOT_WIDTH, block_gap=TREE_BLOCK_GAP):
+    """Distribuye cada fila sin reservar huecos para nodos que aún no son visibles."""
+
+    rows = {}
+    for node in nodes:
+        rows.setdefault(node["depth"], []).append(node)
+    row_widths = {
+        depth: sum(max(slot_width, len(node["values"]) * slot_width) for node in row)
+        + max(0, len(row) - 1) * block_gap
+        for depth, row in rows.items()
+    }
+    tree_width = max(SORT_VISUAL_WIDTH, max(row_widths.values(), default=slot_width))
+    positions = {}
+    for depth, row in rows.items():
+        ordered = sorted(row, key=lambda item: (item["start"], item["end"]))
+        left = (tree_width - row_widths[depth]) / 2
+        for node in ordered:
+            width = max(slot_width, len(node["values"]) * slot_width)
+            positions[tree_node_key(node)] = {
+                "left": left,
+                "width": width,
+                "center": left + width / 2,
+            }
+            left += width + block_gap
+    return tree_width, positions
+
+
+def visible_tree_depth(state):
+    nodes = state.get("merge_tree_nodes") or state.get("quick_tree_nodes") or []
+    if nodes:
+        return max(node["depth"] for node in nodes)
+    return 0
+
+
+def node_center(node, slot_width, left_offset=0, positions=None):
+    if positions is not None and tree_node_key(node) in positions:
+        return positions[tree_node_key(node)]["center"]
     return left_offset + (node["start"] * slot_width) + (max(1, len(node["values"])) * slot_width / 2)
 
 
-def render_tree_connectors(nodes, slot_width, row_height, left_offset=0):
+def render_tree_connectors(nodes, slot_width, row_height, left_offset=0, positions=None):
     if len(nodes) <= 1:
         return ""
     sorted_nodes = sorted(nodes, key=lambda item: (item["depth"], item["start"], item["end"]))
@@ -393,8 +435,8 @@ def render_tree_connectors(nodes, slot_width, row_height, left_offset=0):
         if not candidates:
             continue
         parent = min(candidates, key=lambda item: item["end"] - item["start"])
-        x1 = node_center(parent, slot_width, left_offset)
-        x2 = node_center(child, slot_width, left_offset)
+        x1 = node_center(parent, slot_width, left_offset, positions)
+        x2 = node_center(child, slot_width, left_offset, positions)
         y1 = parent["depth"] * row_height + 94
         y2 = child["depth"] * row_height - 18
         mid_y = (y1 + y2) / 2
@@ -479,7 +521,14 @@ def simulation_min_height(state):
     view = state.get("view", "barras")
     size = len(state.get("initial_values", state["arr"]))
     algorithm = state.get("algorithm")
-    cache_key = (view, algorithm, size, state.get("radix_base", 10)) if algorithm == "radix" else (view, algorithm, size)
+    visible_depth = visible_tree_depth(state) if view == "arbol" else None
+    cache_key = (
+        (view, algorithm, size, visible_depth)
+        if view == "arbol"
+        else (view, algorithm, size, state.get("radix_base", 10))
+        if algorithm == "radix"
+        else (view, algorithm, size)
+    )
     if cache_key in _SIMULATION_HEIGHT_CACHE:
         return _SIMULATION_HEIGHT_CACHE[cache_key]
     message_height = 36
@@ -492,8 +541,10 @@ def simulation_min_height(state):
         height = message_height + phase_height + legend_height + SORT_BAR_AREA_HEIGHT + 24 + 44 + radix_panel_height + vertical_padding
     elif view == "arbol":
         row_height = QUICK_TREE_ROW_HEIGHT if algorithm == "rapido" else MERGE_TREE_ROW_HEIGHT
-        tree_height = (tree_max_depth_for_state(state) + 1) * row_height
-        height = message_height + phase_height + legend_height + tree_height + vertical_padding
+        tree_height = (visible_depth + 1) * row_height
+        tree_shell_padding = 28
+        step_height = 28
+        height = message_height + phase_height + legend_height + step_height + tree_height + tree_shell_padding + vertical_padding
     else:
         rows = max(1, (len(state["arr"]) + 7) // 8)
         height = message_height + phase_height + legend_height + rows * 110 + result_width + vertical_padding
@@ -534,14 +585,18 @@ def tree_item(value, role="default", labels=None, cache=None):
     return html
 
 
-def render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes, inactive_class="", left_offset=0, show_local_indices=False):
-    left_px = left_offset + node["start"] * slot_width
-    width_px = max(slot_width, len(node["values"]) * slot_width)
-    local_indices = "".join(f'<div class="merge-index-cell">{index}</div>' for index in range(len(node["values"])))
+def render_tree_block(cache, block_class, range_class, values_class, node, slot_width, boxes, inactive_class="", left_offset=0, show_local_indices=False, position=None):
+    left_px = position["left"] if position is not None else left_offset + node["start"] * slot_width
+    width_px = position["width"] if position is not None else max(slot_width, len(node["values"]) * slot_width)
+    index_start = 0 if show_local_indices else node["start"]
+    index_class = "merge-index-cell" if show_local_indices else "quick-index-cell"
+    index_row_class = "merge-index-row" if show_local_indices else "quick-index-row"
+    indices = "".join(
+        f'<div class="{index_class}">{index_start + index}</div>'
+        for index in range(len(node["values"]))
+    )
     heading = (
-        f'<div class="merge-index-row" style="--merge-index-count:{len(node["values"])};">{local_indices}</div>'
-        if show_local_indices
-        else f'<div class="{range_class}">[{node["start"]}, {node["end"]}]</div>'
+        f'<div class="{index_row_class}" style="--tree-index-count:{len(node["values"])};">{indices}</div>'
     )
     cache_key = (
         "tree_block",
@@ -555,6 +610,8 @@ def render_tree_block(cache, block_class, range_class, values_class, node, slot_
         inactive_class,
         left_offset,
         show_local_indices,
+        left_px,
+        width_px,
         boxes,
     )
     if cache_key in cache:
@@ -569,48 +626,16 @@ def render_tree_block(cache, block_class, range_class, values_class, node, slot_
     return html
 
 
-def render_quick_aligned_block(cache, node, slot_width, total, boxes, inactive_class="", left_offset=0):
-    tree_width = total * slot_width
-    index_cells = "".join(
-        f'<div class="quick-index-cell" style="grid-column:{index + 1};">{index}</div>'
-        for index in range(node["start"], node["end"] + 1)
-    )
-    item_cells = "".join(
-        f'<div class="quick-value-cell{" quick-value-cell-first" if index == 0 else ""}" style="grid-column:{node["start"] + index + 1};">{item}</div>'
-        for index, item in enumerate(boxes)
-    )
-    cache_key = (
-        "quick_aligned_block",
-        node["start"],
-        node["end"],
-        tree_width,
-        index_cells,
-        inactive_class,
-        left_offset,
-        tuple(boxes),
-    )
-    if cache_key in cache:
-        return cache[cache_key]
-    html = f"""
-            <div class="quick-block quick-block-aligned{inactive_class}" style="left:{left_offset}px; width:{tree_width}px; grid-template-columns:repeat({total}, {slot_width}px);">
-              <div class="quick-index-row" style="grid-template-columns:repeat({total}, {slot_width}px);">
-                {index_cells}
-              </div>
-              <div class="quick-values quick-values-aligned" style="grid-template-columns:repeat({total}, {slot_width}px);">
-                {item_cells}
-              </div>
-            </div>
-            """
-    cache[cache_key] = html
-    return html
-
-
 def tree_cache(state):
     return state.setdefault("_tree_html_cache", {})
 
 
-def cached_tree_node_boxes(cache, node):
-    return "".join(tree_box(value, node["roles"][index], cache=cache) for index, value in enumerate(node["values"]))
+def cached_tree_node_items(cache, node):
+    labels = node.get("labels", [[] for _ in node["values"]])
+    return "".join(
+        tree_item(value, node["roles"][index], labels[index], cache=cache)
+        for index, value in enumerate(node["values"])
+    )
 
 
 def cached_quick_node_items(cache, node):
@@ -623,12 +648,10 @@ def render_merge_snapshot_tree(state):
     if not nodes:
         return ""
     cache = tree_cache(state)
-    max_depth = state.get("merge_tree_max_depth", max(node["depth"] for node in nodes))
-    total = max(1, len(state.get("initial_values", state["arr"])))
-    slot_width = 68
+    max_depth = max(node["depth"] for node in nodes)
+    slot_width = TREE_SLOT_WIDTH
     row_height = MERGE_TREE_ROW_HEIGHT
-    tree_width = max(SORT_VISUAL_WIDTH, total * slot_width)
-    left_offset = max(0, (tree_width - total * slot_width) // 2)
+    tree_width, positions = packed_tree_layout(nodes, slot_width)
     tree_height = (max_depth + 1) * row_height
     rows = {}
     for node in nodes:
@@ -639,7 +662,7 @@ def render_merge_snapshot_tree(state):
         row_blocks = ""
         for node in sorted(rows.get(depth, []), key=lambda item: item["start"]):
             inactive_class = "" if node.get("active", True) else " merge-block-inactive"
-            boxes = cached_tree_node_boxes(cache, node)
+            boxes = cached_tree_node_items(cache, node)
             row_blocks += render_tree_block(
                 cache,
                 "merge-block",
@@ -649,11 +672,11 @@ def render_merge_snapshot_tree(state):
                 slot_width,
                 boxes,
                 inactive_class,
-                left_offset,
                 show_local_indices=True,
+                position=positions[tree_node_key(node)],
             )
         html_rows += f'<div class="merge-row-tree">{row_blocks}</div>'
-    connectors = render_tree_connectors(nodes, slot_width, row_height, left_offset)
+    connectors = render_tree_connectors(nodes, slot_width, row_height, positions=positions)
 
     return f"""
     <div class="merge-tree-shell">
@@ -670,12 +693,10 @@ def render_quick_snapshot_tree(state):
     if not nodes:
         return ""
     cache = tree_cache(state)
-    max_depth = state.get("quick_tree_max_depth", max(node["depth"] for node in nodes))
-    total = max(1, len(state.get("initial_values", state["arr"])))
-    slot_width = 54
+    max_depth = max(node["depth"] for node in nodes)
+    slot_width = TREE_SLOT_WIDTH
     row_height = QUICK_TREE_ROW_HEIGHT
-    tree_width = max(SORT_VISUAL_WIDTH, total * slot_width)
-    left_offset = max(0, (tree_width - total * slot_width) // 2)
+    tree_width, positions = packed_tree_layout(nodes, slot_width)
     tree_height = (max_depth + 1) * row_height
     rows = {}
     for node in nodes:
@@ -687,9 +708,20 @@ def render_quick_snapshot_tree(state):
         for node in sorted(rows.get(depth, []), key=lambda item: item["start"]):
             inactive_class = "" if node.get("active", True) else " quick-block-inactive"
             boxes = cached_quick_node_items(cache, node)
-            row_blocks += render_quick_aligned_block(cache, node, slot_width, total, boxes, inactive_class, left_offset)
+            row_blocks += render_tree_block(
+                cache,
+                "quick-block",
+                "quick-range",
+                "quick-values",
+                node,
+                slot_width,
+                "".join(boxes),
+                inactive_class,
+                show_local_indices=False,
+                position=positions[tree_node_key(node)],
+            )
         html_rows += f'<div class="quick-row">{row_blocks}</div>'
-    connectors = render_tree_connectors(nodes, slot_width, row_height, left_offset)
+    connectors = render_tree_connectors(nodes, slot_width, row_height, positions=positions)
 
     return f"""
     <div class="quick-tree-shell">
@@ -780,13 +812,8 @@ def render_tree_html(state):
 
     nodes = flatten_tree(root)
     cache = tree_cache(state)
-    max_depth = tree_depth(root)
-    total = max(1, len(values))
-    slot_width = 74 if algorithm == "rapido" else 68
+    slot_width = TREE_SLOT_WIDTH
     row_height = QUICK_TREE_ROW_HEIGHT if algorithm == "rapido" else MERGE_TREE_ROW_HEIGHT
-    tree_width = max(SORT_VISUAL_WIDTH, total * slot_width)
-    left_offset = max(0, (tree_width - total * slot_width) // 2)
-    tree_height = (max_depth + 1) * row_height
     rows = {}
     visible_nodes = []
     for node in nodes:
@@ -794,6 +821,10 @@ def render_tree_html(state):
             continue
         visible_nodes.append(node)
         rows.setdefault(node["depth"], []).append(node)
+
+    max_depth = max((node["depth"] for node in visible_nodes), default=0)
+    tree_width, positions = packed_tree_layout(visible_nodes, slot_width)
+    tree_height = (max_depth + 1) * row_height
 
     html_rows = ""
     for depth in range(max_depth + 1):
@@ -816,7 +847,7 @@ def render_tree_html(state):
             else:
                 roles = [ROLE_DEFAULT] * len(node["values"])
             node_with_roles = {**node, "roles": roles}
-            boxes = cached_tree_node_boxes(cache, node_with_roles)
+            boxes = cached_tree_node_items(cache, node_with_roles)
             row_blocks += render_tree_block(
                 cache,
                 block_class,
@@ -825,11 +856,11 @@ def render_tree_html(state):
                 node,
                 slot_width,
                 boxes,
-                left_offset=left_offset,
                 show_local_indices=algorithm == "mezcla",
+                position=positions[tree_node_key(node)],
             )
         html_rows += f'<div class="{row_class}">{row_blocks}</div>'
-    connectors = render_tree_connectors(visible_nodes, slot_width, row_height, left_offset)
+    connectors = render_tree_connectors(visible_nodes, slot_width, row_height, positions=positions)
 
     return f"""
     <div class="{shell_class}">
@@ -962,7 +993,7 @@ def sort_styles():
       }}
       .sort-formula-content {{
         box-sizing: border-box !important;
-        padding: 30px 12px 12px !important;
+        padding: 18px 0 4px !important;
       }}
       .sort-formula-content > .widget-html-content {{
         box-sizing: border-box !important;
@@ -1089,6 +1120,18 @@ def sort_styles():
       .sort-simulation-root .simulation-action-row {{gap:0!important}}
       .sort-simulation-root .simulation-action-row > .widget-button {{
         margin:0!important;border-color:#cccccc!important;border-radius:0!important;
+        white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;
+      }}
+      .sort-procedure-content .simulation-action-row {{
+        position:static!important;
+        margin:14px 0 0!important;
+        padding:12px 0 0!important;
+        border-top:1px solid #e5e5e5!important;
+        border-bottom:0!important;
+        box-shadow:none!important;
+      }}
+      .sort-comparison-configuration .simulation-action-row {{
+        margin:16px 0 14px!important;
       }}
       .sort-simulation-root button.sort-tab-button,
       .sort-simulation-root button[class*="-tab-button"] {{
@@ -1135,13 +1178,17 @@ def sort_styles():
         font-size: 22px;
         font-weight: 400;
         text-align: center;
-        height: 32px;
-        line-height: 28px;
+        min-height: 32px;
+        height: auto;
+        line-height: 1.25;
         margin: 2px 0 6px;
+        padding: 2px 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
+        overflow: visible;
+        overflow-wrap: normal;
+        word-break: normal;
         box-sizing: border-box;
       }}
       .sort-message-action {{
@@ -1500,7 +1547,7 @@ def sort_styles():
       }}
       .merge-tree-shell, .quick-tree-shell {{
         width: 100%;
-        overflow-x: hidden;
+        overflow-x: auto;
         padding: 20px 0 8px;
         contain: layout paint;
       }}
@@ -1555,15 +1602,17 @@ def sort_styles():
         color: #444444;
         margin-bottom: 8px;
       }}
-      .merge-index-row {{
+      .merge-index-row,
+      .quick-index-row {{
         display: grid;
-        grid-template-columns: repeat(var(--merge-index-count), 54px);
+        grid-template-columns: repeat(var(--tree-index-count), {TREE_SLOT_WIDTH}px);
         gap: 0;
         justify-content: center;
         min-height: 24px;
         margin-bottom: 8px;
       }}
-      .merge-index-cell {{
+      .merge-index-cell,
+      .quick-index-cell {{
         height: 24px;
         line-height: 24px;
         font-size: 20px;
@@ -1575,37 +1624,13 @@ def sort_styles():
         gap: 0;
         justify-content: center;
       }}
-      .quick-block-aligned {{
-        display: grid;
-      }}
-      .quick-index-row {{
-        grid-column: 1 / -1;
-        display: grid;
-        gap: 0;
-        justify-content: start;
-        min-height: 24px;
-        margin-bottom: 8px;
-      }}
-      .quick-index-cell {{
-        height: 24px;
-        line-height: 24px;
-        font-size: 20px;
-        color: #444444;
-        text-align: center;
-      }}
-      .quick-values-aligned {{
-        grid-column: 1 / -1;
-        display: grid;
-        gap: 0;
-        justify-content: start;
-      }}
       .tree-item {{
-        width: 54px;
+        width: {TREE_SLOT_WIDTH}px;
         text-align: center;
-        flex: 0 0 54px;
+        flex: 0 0 {TREE_SLOT_WIDTH}px;
       }}
       .tree-box {{
-        width: 54px;
+        width: {TREE_SLOT_WIDTH}px;
         height: 50px;
         border: 2px solid #111111;
         border-left-width: 0;
@@ -1627,9 +1652,8 @@ def sort_styles():
           rgba(255, 255, 255, 0.3) 10px
         ) !important;
       }}
-      .merge-values .tree-box:first-child,
-      .quick-values:not(.quick-values-aligned) .tree-item:first-child .tree-box,
-      .quick-value-cell-first .tree-box {{
+      .merge-values .tree-item:first-child .tree-box,
+      .quick-values .tree-item:first-child .tree-box {{
         border-left-width: 2px;
       }}
       .tree-label {{
@@ -1919,13 +1943,25 @@ def sort_controls_grid(groups):
 
 def build_sort_panel(parameters, result, title="Simulación de ordenamiento", procedure=None, desk_check=None, action_row=None, on_tab_change=None):
     result.add_class("sort-result-content")
+    embedded_action_row = action_row
     sections = [
         ViewSection(SECTION_CONFIGURATION, parameters, ("sort-subpanel-content",))
     ]
     if procedure is not None:
-        sections.append(
-            ViewSection(SECTION_PROCEDURE, procedure, ("sort-subpanel-content",))
+        procedure_items = [procedure]
+        if action_row is not None:
+            procedure_items.append(action_row)
+            embedded_action_row = None
+        procedure_content = widgets.VBox(
+            procedure_items,
+            layout=widgets.Layout(width="100%", grid_gap="0px", overflow="visible"),
         )
+        procedure_content.add_class("sort-procedure-content")
+        sections.append(
+            ViewSection(SECTION_PROCEDURE, procedure_content, ("sort-subpanel-content",))
+        )
+    else:
+        parameters.add_class("sort-comparison-configuration")
     if desk_check is not None:
         desk_check.add_class("sort-desk-check-content")
         sections.append(
@@ -1946,7 +1982,7 @@ def build_sort_panel(parameters, result, title="Simulación de ordenamiento", pr
             root_class="sort-simulation-root",
             panel_prefix="sort",
             styles=sort_styles(),
-            action_row=action_row,
+            action_row=embedded_action_row,
             sections=tuple(sections),
         )
     )
@@ -2086,13 +2122,7 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
             }
         )
         second_row.extend([radix_max_group, radix_number_group, radix_base_group])
-    if second_row:
-        control_rows = [
-            controls_grid(first_row, columns=len(first_row)),
-            controls_grid(second_row, columns=len(second_row)),
-        ]
-    else:
-        control_rows = [controls_grid(first_row, columns=len(first_row))]
+    control_rows = [controls_grid(first_row + second_row, columns=len(first_row + second_row))]
     action_row = sort_action_button_row([step_back_button, step_button, auto_button, finish_button, reset_button, book_button])
     layout = widgets.VBox(
         control_rows,
@@ -2210,20 +2240,6 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             total_steps=len(state["trace"]) if state.get("trace") is not None else None,
         )
 
-    initial_defaults = {
-        "view": "barras",
-        "size": default_size_for_view("barras"),
-        "order": False,
-        "pivot": "middle",
-        "partition": "hoare",
-        "gap_sequence": "shell",
-        "radix_max": 999,
-        "radix_data_type": "numero",
-        "radix_number_mode": "positive",
-        "radix_base": 10,
-        "speed": 1.0,
-    }
-
     def sync_execution_buttons():
         complete = state["sorting_complete"]
         controls["step_back"].disabled = state.get("step_index", 0) <= 0
@@ -2330,12 +2346,8 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
 
     def generate_new(*_args):
         nonlocal state, last_active_formula
+        execution_state["run_id"] += 1
         last_active_formula = None
-        control_state["updating"] = True
-        for key, val in initial_defaults.items():
-            if key in controls and hasattr(controls[key], "value"):
-                controls[key].value = val
-        control_state["updating"] = False
         update_radix_control_visibility()
         state = build_state(sync_radix_max=False)
         redraw()
@@ -2369,7 +2381,6 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     controls["radix_base"].observe(reset_algorithm, names="value")
 
     controls_layout.add_class("sort-subpanel-content")
-    formula_output.add_class("sort-subpanel-content")
     formula_output.add_class("sort-formula-content")
     html_output.add_class("sort-subpanel-content")
     html_output.add_class("sort-result-content")

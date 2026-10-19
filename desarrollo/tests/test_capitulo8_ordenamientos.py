@@ -4,6 +4,8 @@ import json
 import sys
 import unittest
 
+import ipywidgets as widgets
+
 from desarrollo.tests.helpers import PROJECT_ROOT, load_module_from_path
 
 DOMAIN_DIR = PROJECT_ROOT / "core" / "sort"
@@ -63,6 +65,12 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                 return
             step(state)
         raise AssertionError("El algoritmo excedió el máximo de pasos")
+
+    @staticmethod
+    def walk_widgets(widget):
+        yield widget
+        for child in getattr(widget, "children", ()):
+            yield from TestCapitulo8Ordenamientos.walk_widgets(child)
 
     def test_algorithms_sort_in_both_directions_and_views(self):
         for name, module in self.modules.items():
@@ -308,6 +316,50 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('"Finalizar"', view_source)
         self.assertIn("def finish_without_animation", source)
 
+    def test_generate_new_preserves_active_view_and_actions_end_procedure(self):
+        captured = []
+        original_display = self.common.display
+        self.common.display = captured.append
+        try:
+            self.common.run_sort_app("mezcla", [38, 27, 43, 3], has_tree=True)
+        finally:
+            self.common.display = original_display
+
+        root = captured[0]
+        widgets_in_view = list(self.walk_widgets(root))
+        view = next(
+            widget
+            for widget in widgets_in_view
+            if isinstance(widget, widgets.Dropdown)
+            and any(value == "arbol" for _label, value in widget.options)
+        )
+        reset = next(
+            widget
+            for widget in widgets_in_view
+            if isinstance(widget, widgets.Button) and widget.description == "Generar nuevo arreglo"
+        )
+        view.value = "arbol"
+        reset.click()
+        self.assertEqual(view.value, "arbol")
+
+        procedure_panel = next(
+            widget
+            for widget in widgets_in_view
+            if isinstance(widget, widgets.VBox)
+            and widget.children
+            and isinstance(widget.children[0], widgets.Button)
+            and widget.children[0].description == "Procedimiento"
+        )
+        procedure_descendants = list(self.walk_widgets(procedure_panel.children[1]))
+        self.assertIn(reset, procedure_descendants)
+        action_row = procedure_panel.children[1].children[-1]
+        self.assertIn(reset, tuple(self.walk_widgets(action_row)))
+
+    def test_sort_controls_share_one_wrapping_grid_without_empty_rows(self):
+        _controls, layout, _actions = self.common.build_controls(has_tree=True, has_pivot=True, has_partition=True)
+        self.assertEqual(len(layout.children), 1)
+        self.assertEqual(len(layout.children[0].children), 6)
+
     def test_buttons_keep_chapter7_color_conventions(self):
         source = (PROJECT_ROOT / "common" / "simulation_views.py").read_text(encoding="utf-8")
 
@@ -505,7 +557,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("merge-row-tree", merge_html)
         self.assertNotIn('<svg class="tree-connectors"', merge_html)
         self.assertIn("merge-index-row", merge_html)
-        self.assertIn('style="--merge-index-count:7;"', merge_html)
+        self.assertIn('style="--tree-index-count:7;"', merge_html)
         self.assertIn('class="merge-index-cell">0</div>', merge_html)
         self.assertIn('class="merge-index-cell">6</div>', merge_html)
         self.assertNotIn("[0, 6]", merge_html)
@@ -514,8 +566,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("quick-row", quick_html)
         self.assertNotIn('<svg class="tree-connectors"', quick_html)
         self.assertIn("quick-index-row", quick_html)
-        self.assertIn('class="quick-index-cell" style="grid-column:1;">0</div>', quick_html)
-        self.assertIn('class="quick-index-cell" style="grid-column:6;">5</div>', quick_html)
+        self.assertIn('style="--tree-index-count:6;"', quick_html)
+        self.assertIn('class="quick-index-cell">0</div>', quick_html)
+        self.assertIn('class="quick-index-cell">5</div>', quick_html)
 
         self.modules["mezcla"].step_merge_sort(merge)
         self.modules["mezcla"].step_merge_sort(merge)
@@ -530,19 +583,19 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         module.step_merge_sort(state)
         module.step_merge_sort(state)
         first_html = module.render_state_html(state)
-        self.assertIn('style="left:108px; width:544px;"', first_html)
-        self.assertIn('style="left:108px; width:272px;"', first_html)
-        self.assertIn('style="left:380px; width:272px;"', first_html)
-        self.assertNotIn('style="left:108px; width:136px;"', first_html)
-        self.assertIn('style="--merge-index-count:8;"', first_html)
-        self.assertIn('style="--merge-index-count:4;"', first_html)
+        self.assertIn('style="left:164.0px; width:432px;"', first_html)
+        self.assertIn('style="left:155.0px; width:216px;"', first_html)
+        self.assertIn('style="left:389.0px; width:216px;"', first_html)
+        self.assertNotIn('style="left:263.0px; width:108px;"', first_html)
+        self.assertIn('style="--tree-index-count:8;"', first_html)
+        self.assertIn('style="--tree-index-count:4;"', first_html)
         self.assertIn("#dae8fc", first_html)
 
         module.step_merge_sort(state)
         second_html = module.render_state_html(state)
-        self.assertIn('style="left:108px; width:136px;"', second_html)
-        self.assertIn('style="left:244px; width:136px;"', second_html)
-        self.assertIn('style="--merge-index-count:2;"', second_html)
+        self.assertIn('style="left:263.0px; width:108px;"', second_html)
+        self.assertIn('style="left:389.0px; width:108px;"', second_html)
+        self.assertIn('style="--tree-index-count:2;"', second_html)
         self.assertIn("#e5e7eb", second_html)
         self.assertIn("color:#6b7280", second_html)
         self.assertIn("#dae8fc", second_html)
@@ -609,13 +662,13 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         for _ in range(5):
             module.step_merge_sort(state)
         base_html = module.render_state_html(state)
-        self.assertIn('style="--merge-index-count:1;"', base_html)
+        self.assertIn('style="--tree-index-count:1;"', base_html)
         self.assertIn("#e8fce9", base_html)
 
         module.step_merge_sort(state)
         module.step_merge_sort(state)
         empty_merge_html = module.render_state_html(state)
-        self.assertIn('style="--merge-index-count:2;"', empty_merge_html)
+        self.assertIn('style="--tree-index-count:2;"', empty_merge_html)
         self.assertIn("tree-box-empty", empty_merge_html)
         self.assertIn("repeating-linear-gradient", empty_merge_html)
         self.assertIn("#fff2cc", empty_merge_html)
@@ -628,7 +681,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         module.step_merge_sort(state)
         module.step_merge_sort(state)
         sorted_parent_html = module.render_state_html(state)
-        self.assertIn('style="--merge-index-count:2;"', sorted_parent_html)
+        self.assertIn('style="--tree-index-count:2;"', sorted_parent_html)
         self.assertIn("#e8fce9", sorted_parent_html)
 
     def test_merge_tree_does_not_update_parent_when_child_finishes(self):
@@ -639,17 +692,21 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertEqual(nodes[(2, 3)]["values"], [57, 111])
         self.assertEqual(nodes[(0, 3)]["values"], [95, 131, 111, 57])
 
-    def test_simulation_height_is_stable_across_merge_tree_steps(self):
+    def test_simulation_height_tracks_visible_merge_tree_rows(self):
         module = self.modules["mezcla"]
         state = module.create_state(size=8, values=[95, 131, 111, 57, 158, 16, 25, 98], view="arbol")
         initial_height = self.common.simulation_min_height(state)
+        heights = [initial_height]
 
-        for _ in range(12):
+        while not state["sorting_complete"]:
             module.step_merge_sort(state)
-            self.assertEqual(self.common.simulation_min_height(state), initial_height)
+            heights.append(self.common.simulation_min_height(state))
             html = module.render_state_html(state)
-            self.assertIn(f"min-height:{initial_height}px", html)
+            self.assertIn(f"min-height:{heights[-1]}px", html)
             self.assertIn("height:auto; overflow:visible;", html)
+
+        self.assertGreater(max(heights), initial_height)
+        self.assertEqual(heights[-1], initial_height)
 
     def test_simulation_height_is_cached_by_view_algorithm_and_size(self):
         module = self.modules["mezcla"]
@@ -660,7 +717,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         second = self.common.simulation_min_height(state)
 
         self.assertEqual(first, second)
-        self.assertIn(("arbol", "mezcla", 8), self.common._SIMULATION_HEIGHT_CACHE)
+        self.assertIn(("arbol", "mezcla", 8, 0), self.common._SIMULATION_HEIGHT_CACHE)
 
     def test_sort_item_html_is_cached_per_state(self):
         module = self.modules["burbuja"]
@@ -686,7 +743,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertGreater(cache_size, 0)
         self.assertEqual(cache_size, len(state["_tree_html_cache"]))
 
-    def test_quick_tree_uses_snapshots_and_stable_height(self):
+    def test_quick_tree_uses_snapshots_and_visible_depth_height(self):
         module = self.modules["rapido"]
         state = module.create_state(size=6, values=[10, 7, 8, 9, 1, 5], view="arbol")
         initial_height = self.common.simulation_min_height(state)
@@ -694,9 +751,11 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         for _ in range(8):
             module.step_quick_sort(state)
             self.assertIn("quick_tree_nodes", state)
-            self.assertEqual(self.common.simulation_min_height(state), initial_height)
+            current_height = self.common.simulation_min_height(state)
+            expected_height = initial_height + self.common.visible_tree_depth(state) * self.common.QUICK_TREE_ROW_HEIGHT
+            self.assertEqual(current_height, expected_height)
             html = module.render_state_html(state)
-            self.assertIn(f"min-height:{initial_height}px", html)
+            self.assertIn(f"min-height:{current_height}px", html)
             self.assertIn("height:auto; overflow:visible;", html)
 
         self.assertTrue(any(role == "pivot" for role in state["roles"]))
@@ -710,7 +769,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn((0, 5), ranges)
         self.assertTrue(any(start > 0 or end < 5 for start, end in ranges))
 
-    def test_quick_tree_aligns_partition_children_to_global_columns(self):
+    def test_quick_tree_packs_partition_children_without_empty_slots(self):
         module = self.modules["rapido"]
         state = module.create_state(size=6, values=[10, 7, 8, 9, 1, 5], view="arbol")
 
@@ -720,14 +779,18 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             module.step_quick_sort(state)
 
         html = module.render_state_html(state, include_styles=False)
-        self.assertIn('grid-template-columns:repeat(6, 54px)', html)
-        self.assertNotIn('quick-range quick-range-aligned', html)
-        self.assertIn('class="quick-index-cell" style="grid-column:1;">0</div>', html)
-        self.assertIn('class="quick-index-cell" style="grid-column:3;">2</div>', html)
-        self.assertIn('class="quick-index-cell" style="grid-column:5;">4</div>', html)
-        self.assertIn('class="quick-index-cell" style="grid-column:6;">5</div>', html)
-        self.assertIn('class="quick-value-cell quick-value-cell-first" style="grid-column:1;"', html)
-        self.assertIn('class="quick-value-cell quick-value-cell-first" style="grid-column:5;"', html)
+        self.assertNotIn("grid-column:", html)
+        self.assertIn('class="quick-index-cell">0</div>', html)
+        self.assertIn('class="quick-index-cell">5</div>', html)
+        _tree_width, positions = self.common.packed_tree_layout(state["quick_tree_nodes"])
+        child_nodes = sorted(
+            (node for node in state["quick_tree_nodes"] if node["depth"] == 1),
+            key=lambda node: node["start"],
+        )
+        if len(child_nodes) > 1:
+            first = positions[self.common.tree_node_key(child_nodes[0])]
+            second = positions[self.common.tree_node_key(child_nodes[1])]
+            self.assertEqual(second["left"] - (first["left"] + first["width"]), self.common.TREE_BLOCK_GAP)
 
     def test_quick_tree_grays_remaining_child_elements_when_complete(self):
         module = self.modules["rapido"]
@@ -958,7 +1021,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         ten_box_html = self.modules["burbuja"].render_state_html(ten_box_state)
         self.assertEqual(ten_box_html.count(".sort-item:first-child .box"), 1)
 
-    def test_tree_view_centers_root_and_keeps_space_between_subarrays(self):
+    def test_tree_view_centers_root_and_uses_only_configured_block_gap(self):
         state = self.modules["mezcla"].create_state(
             size=8,
             values=[95, 131, 111, 57, 158, 16, 25, 98],
@@ -968,9 +1031,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             self.modules["mezcla"].step_merge_sort(state)
         html = self.modules["mezcla"].render_state_html(state)
 
-        self.assertIn('style="left:108px; width:544px;"', html)
-        self.assertIn('style="left:108px; width:272px;"', html)
-        self.assertIn('style="left:380px; width:272px;"', html)
+        self.assertIn('style="left:164.0px; width:432px;"', html)
+        self.assertIn('style="left:155.0px; width:216px;"', html)
+        self.assertIn('style="left:389.0px; width:216px;"', html)
         self.assertIn("gap: 0;", html)
 
     def test_bar_view_keeps_yellow_highlight_roles(self):
