@@ -83,6 +83,14 @@ def shared_ui_styles(root_selector):
   border-color: var(--simulation-focus) !important;
   box-shadow: 0 0 0 1px var(--simulation-focus) !important;
 }}
+{root} button:focus-visible,
+{root} input:focus-visible,
+{root} select:focus-visible,
+{root} [tabindex]:focus-visible {{
+  outline: 3px solid var(--simulation-focus) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}}
 {root} .widget-checkbox input[type="checkbox"] {{
   width: 16px !important;
   min-width: 16px !important;
@@ -215,6 +223,36 @@ def shared_ui_styles(root_selector):
   margin: 0 !important;
   border-color: var(--simulation-panel-border) !important;
 }}
+{root} .simulation-sr-only {{
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}}
+{root} .simulation-text-alternative {{
+  width: min(100%, 760px) !important;
+  margin: 14px auto 0 !important;
+  padding: 8px 10px !important;
+  border: 1px solid var(--simulation-panel-border) !important;
+  background: var(--simulation-muted-surface) !important;
+  color: var(--simulation-text) !important;
+  font: 14px/1.45 sans-serif !important;
+}}
+{root} .simulation-text-alternative summary {{
+  cursor: pointer !important;
+  font-weight: 700 !important;
+}}
+{root} .simulation-text-alternative ol {{ margin: 8px 0 0 22px !important; }}
+@media (forced-colors: active) {{
+  {root} button:focus-visible,
+  {root} input:focus-visible,
+  {root} select:focus-visible {{ outline: 3px solid CanvasText !important; }}
+}}
 </style>
 """
 
@@ -270,6 +308,10 @@ def magnitude_stepper(
         tooltip=f"Aumentar {accessible_name.lower()} un orden de magnitud",
         layout=button_layout,
     )
+    text.tooltip = accessible_name
+    text.tabbable = True
+    previous.tabbable = True
+    following.tabbable = True
     container = widgets.HBox(
         [previous, text, following],
         layout=widgets.Layout(
@@ -322,6 +364,8 @@ def button_control(*, description, button_style, width, disabled=False):
         layout=widgets.Layout(width=width, flex=f"0 0 {width}", height=f"{STANDARD_ACTION_HEIGHT}px"),
     )
     button.add_class("simulation-button")
+    button.tooltip = description
+    button.tabbable = True
     return button
 
 
@@ -396,6 +440,8 @@ def collapsible_panel(title, content, *, prefix, open_by_default=True):
         icon="caret-down" if open_by_default else "caret-right",
         layout=widgets.Layout(width="100%", height="44px"),
     )
+    header.tooltip = f"{'Contraer' if open_by_default else 'Expandir'} la sección {title.rstrip(':')}"
+    header.tabbable = True
     header.add_class(f"{prefix}-subpanel-title")
     content.layout.display = "flex" if open_by_default else "none"
 
@@ -403,6 +449,7 @@ def collapsible_panel(title, content, *, prefix, open_by_default=True):
         expanded = content.layout.display != "none"
         content.layout.display = "none" if expanded else "flex"
         header.icon = "caret-right" if expanded else "caret-down"
+        header.tooltip = f"{'Expandir' if expanded else 'Contraer'} la sección {title.rstrip(':')}"
 
     header.on_click(toggle)
     panel = widgets.VBox(
@@ -442,6 +489,8 @@ def tabbed_panel(tabs, *, prefix, default_index=0, on_tab_change=None):
             ),
         )
         btn.add_class(f"{prefix}-tab-button")
+        btn.tooltip = f"Mostrar la pestaña {title}"
+        btn.tabbable = True
         tab_buttons.append(btn)
 
     def update_tabs():
@@ -451,9 +500,11 @@ def tabbed_panel(tabs, *, prefix, default_index=0, on_tab_change=None):
             if is_active:
                 btn.remove_class(f"{prefix}-tab-inactive")
                 btn.add_class(f"{prefix}-tab-active")
+                btn.tooltip = f"Pestaña activa: {btn.description}"
             else:
                 btn.remove_class(f"{prefix}-tab-active")
                 btn.add_class(f"{prefix}-tab-inactive")
+                btn.tooltip = f"Mostrar la pestaña {btn.description}"
 
     for i, btn in enumerate(tab_buttons):
         def _make_handler(idx):

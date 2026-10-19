@@ -2,6 +2,7 @@
 
 Verifica en 375 px y 1280 px que las páginas clave no tengan scroll
 horizontal, LaTeX sin renderizar, estructura, nombres accesibles y teclado.
+También comprueba el reflujo con ampliaciones del 200 % y 400 %.
 
 Uso: python desarrollo/scripts/smoke_portal_e2e.py --site-dir site
 Requiere: pip install playwright && playwright install chromium
@@ -22,7 +23,9 @@ PAGES = (
     "capitulos/capitulo-2/",
     "capitulos/capitulo-5/ecuacion-caracteristica/",
     "capitulos/capitulo-6/merge-sort/",
+    "capitulos/capitulo-7/2-busqueda-binaria/",
     "capitulos/capitulo-8/",
+    "capitulos/capitulo-8/5-ordenamiento-mezcla/",
 )
 VIEWPORTS = ((375, 800), (1280, 900))
 HEADING_JS = "[...document.querySelectorAll('.md-content h1,.md-content h2,.md-content h3,.md-content h4,.md-content h5,.md-content h6')].map(h=>+h.tagName[1])"
@@ -92,12 +95,13 @@ def main() -> int:
                 for problem in check_page(page, base + path, width):
                     failures.append(f"{path or '/'} @{width}: {problem}")
             page.close()
-        zoom_page = browser.new_page(viewport={"width": 1280, "height": 900})
-        zoom_page.goto(base, wait_until="load")
-        zoom_page.evaluate("document.documentElement.style.zoom='200%'")
-        if zoom_page.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth"):
-            failures.append("/ @zoom-200: scroll horizontal")
-        zoom_page.close()
+        for zoom in (200, 400):
+            zoom_page = browser.new_page(viewport={"width": 1280, "height": 900})
+            zoom_page.goto(base, wait_until="load")
+            zoom_page.evaluate(f"document.documentElement.style.zoom='{zoom}%'")
+            if zoom_page.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth"):
+                failures.append(f"/ @zoom-{zoom}: scroll horizontal")
+            zoom_page.close()
         browser.close()
     server.shutdown()
     for failure in failures:

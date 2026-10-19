@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 7</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-4-busqueda-saltos">
+  <h2 id="guia-4-busqueda-saltos">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Distinguir la fase de saltos de la exploración lineal del bloque.</dd>
+    <dt>Prerrequisitos</dt><dd>Arreglos ordenados, raíz cuadrada y búsqueda secuencial.</dd>
+    <dt>Invariante que debe observar</dt><dd>Los bloques terminados antes de anterior no contienen el objetivo.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úsela en datos ordenados cuando avanzar por bloques sea más conveniente que consultar puntos medios.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítela si los datos no están ordenados o si la búsqueda binaria tiene acceso aleatorio barato.</dd>
+    <dt>Propiedades</dt><dd>Con saltos cercanos a la raíz de n equilibra los saltos y el recorrido final.</dd>
+    <dt>Error frecuente</dt><dd>Contar solo los saltos y omitir el costo de la búsqueda lineal dentro del bloque.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Por qué se elige un salto cercano a √n?</li><li>¿Qué bloque debe inspeccionarse linealmente?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 La búsqueda por saltos avanza en bloques de tamaño \(\sqrt{n}\) hasta encontrar un elemento mayor que el objetivo o alcanzar el final del arreglo. Luego realiza una búsqueda secuencial hacia atrás dentro del bloque acotado. Requiere que el arreglo esté ordenado.
 
 El bloque óptimo de tamaño \(\sqrt{n}\) balancea los saltos hacia adelante con la búsqueda secuencial hacia atrás, produciendo una complejidad de \(O(\sqrt{n})\).

@@ -2547,3 +2547,42 @@ input {
 [data-md-color-scheme="slate"] .self-check-practice__code-box .com,
 [data-md-color-scheme="notas-dark"] .self-check-practice__code-box .com { color: #b0bec5; }
 
+/* Guía pedagógica común para las páginas de algoritmos. */
+.algorithm-learning-guide {
+  background: var(--md-default-bg-color);
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-left: 4px solid var(--md-accent-fg-color);
+  border-radius: 4px;
+  margin: 1rem 0 1.4rem;
+  padding: .8rem 1rem;
+}
+.algorithm-learning-guide h2 {
+  margin: 0 0 .65rem;
+}
+.algorithm-learning-guide h3 {
+  margin: .9rem 0 .35rem;
+}
+.algorithm-learning-guide dl {
+  display: grid;
+  gap: .35rem 1rem;
+  grid-template-columns: minmax(9rem, max-content) minmax(0, 1fr);
+  margin: 0;
+}
+.algorithm-learning-guide dt {
+  font-weight: 700;
+}
+.algorithm-learning-guide dd {
+  margin: 0;
+}
+.algorithm-learning-guide ol {
+  margin-bottom: 0;
+}
+@media screen and (max-width: 44.984375em), (min-resolution: 2dppx) {
+  .algorithm-learning-guide dl {
+    grid-template-columns: 1fr;
+  }
+  .algorithm-learning-guide dd {
+    margin-bottom: .4rem;
+  }
+}
+

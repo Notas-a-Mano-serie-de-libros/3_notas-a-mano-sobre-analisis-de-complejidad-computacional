@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 8</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-5-ordenamiento-mezcla">
+  <h2 id="guia-5-ordenamiento-mezcla">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Distinguir las fases de división y combinación y derivar su costo log-lineal.</dd>
+    <dt>Prerrequisitos</dt><dd>Recursión, subarreglos y combinación de secuencias ordenadas.</dd>
+    <dt>Invariante que debe observar</dt><dd>Durante la combinación, la salida escrita contiene los menores elementos ya procesados en orden.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úselo cuando se requieran estabilidad, rendimiento predecible o procesamiento secuencial de datos.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítelo si la memoria auxiliar es muy limitada y existe una alternativa in situ adecuada.</dd>
+    <dt>Propiedades</dt><dd>Es estable, garantiza tiempo log-lineal y normalmente requiere espacio auxiliar lineal.</dd>
+    <dt>Error frecuente</dt><dd>Confundir la profundidad logarítmica con el trabajo lineal realizado en cada nivel.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Cuándo termina la división?</li><li>¿Qué condición mantiene ordenada la salida durante la combinación?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 El ordenamiento por mezcla (merge sort) divide el arreglo a la mitad de forma recursiva hasta obtener subarreglos de un solo elemento, que por definición están ordenados. Luego combina (mezcla) los subarreglos en orden creciente hasta reconstruir el arreglo completo.
 
 Garantiza \(O(n \cdot \log(n))\) en todos los casos, lo que lo hace predecible y eficiente, aunque requiere \(O(n)\) de memoria auxiliar para la fase de mezcla.

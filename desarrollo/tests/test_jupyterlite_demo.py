@@ -86,7 +86,14 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert "child.getBoundingClientRect().bottom - scrollBounds.top" in extension
     assert "window.parent.postMessage" in extension
     assert "new ResizeObserver(scheduleHeightReport)" in extension
-    assert "new MutationObserver(scheduleHeightReport)" in extension
+    assert "new MutationObserver(() =>" in extension
+    assert "enhanceSimulationAccessibility(panel.content.node)" in extension
+    assert 'setAttribute("aria-expanded"' in extension
+    assert 'setAttribute("aria-controls"' in extension
+    assert 'setAttribute("role", "tablist")' in extension
+    assert 'setAttribute("role", "tabpanel")' in extension
+    assert 'event.key === "ArrowRight"' in extension
+    assert 'event.key === "Home"' in extension
 
 
 def test_chapter2_bootstrap_repairs_only_missing_runtime_files(tmp_path):

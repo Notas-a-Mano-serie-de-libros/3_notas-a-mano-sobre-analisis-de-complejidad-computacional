@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 8</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-7-ordenamiento-radix">
+  <h2 id="guia-7-ordenamiento-radix">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Seguir las fases de distribución y reconstrucción preservando el orden relativo.</dd>
+    <dt>Prerrequisitos</dt><dd>Representación posicional, conteo estable y arreglos auxiliares.</dd>
+    <dt>Invariante que debe observar</dt><dd>Después de la pasada i, los elementos están ordenados por los i dígitos procesados.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úselo con claves de longitud acotada que puedan descomponerse en dígitos o caracteres.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítelo si las claves no admiten una representación adecuada o la memoria auxiliar es restrictiva.</dd>
+    <dt>Propiedades</dt><dd>No compara claves entre sí, necesita una distribución estable y usa espacio auxiliar proporcional a n más la base.</dd>
+    <dt>Error frecuente</dt><dd>Reconstruir los buckets sin estabilidad y destruir el orden obtenido en pasadas anteriores.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Por qué la distribución debe ser estable?</li><li>¿Cómo cambian tiempo y memoria al aumentar la base?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 El ordenamiento radix organiza enteros no negativos procesando sus dígitos de menor a mayor peso. En cada pasada distribuye los elementos en buckets según el dígito actual y luego reconstruye el arreglo conservando el orden relativo dentro de cada bucket.
 
 La versión implementada aquí usa radix LSD en base 10. Su comportamiento depende de la cantidad de elementos `n`, de la cantidad de dígitos `d` del valor máximo y de la base `k` utilizada para los buckets.

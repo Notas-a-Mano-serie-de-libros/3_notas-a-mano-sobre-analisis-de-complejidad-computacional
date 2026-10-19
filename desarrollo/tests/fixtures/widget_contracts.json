@@ -6,5 +6,29 @@
     "following_tooltip": "Aumentar puntos de muestreo un orden de magnitud",
     "placeholder": "Puntos de muestreo",
     "previous_tooltip": "Disminuir puntos de muestreo un orden de magnitud"
+  },
+  "keyboard_and_focus": {
+    "action_tabbable": true,
+    "action_tooltip": "Reproducir todos los pasos automáticamente",
+    "focus_visible_style": true,
+    "forced_colors_style": true,
+    "stepper_buttons_tabbable": true,
+    "stepper_field_tabbable": true
+  },
+  "disclosure_and_tabs": {
+    "active_panel_display": "block",
+    "active_tab_tooltip": "Pestaña activa: Ejecución visual",
+    "disclosure_open": "flex",
+    "disclosure_tooltip": "Contraer la sección Procedimiento",
+    "inactive_panel_display": "none",
+    "inactive_tab_tooltip": "Mostrar la pestaña Prueba de escritorio"
+  },
+  "dynamic_output": {
+    "search_list_semantics": true,
+    "search_live_summary": true,
+    "search_text_alternative": true,
+    "sort_list_semantics": true,
+    "sort_live_summary": true,
+    "sort_text_alternative": true
   }
 }

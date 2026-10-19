@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 8</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-3-ordenamiento-insercion">
+  <h2 id="guia-3-ordenamiento-insercion">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Mantener un prefijo ordenado e insertar cada clave en su posición.</dd>
+    <dt>Prerrequisitos</dt><dd>Arreglos, desplazamientos y comparación de elementos.</dd>
+    <dt>Invariante que debe observar</dt><dd>Antes de cada iteración, el prefijo anterior a i está ordenado.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úselo con entradas pequeñas, casi ordenadas o como caso base de algoritmos híbridos.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítelo como estrategia única para entradas grandes y desordenadas.</dd>
+    <dt>Propiedades</dt><dd>Es estable, in situ y adaptativo; la inserción binaria reduce comparaciones, no desplazamientos.</dd>
+    <dt>Error frecuente</dt><dd>Contar la búsqueda de posición e ignorar el costo de desplazar elementos.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Qué parte permanece ordenada?</li><li>¿Por qué la variante binaria no elimina el peor caso cuadrático?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 El ordenamiento por inserción construye el arreglo ordenado de izquierda a derecha: toma cada elemento y lo inserta en su posición correcta dentro del subarreglo ya ordenado, desplazando los elementos mayores hacia la derecha.
 
 Es muy eficiente para arreglos casi ordenados (\(O(n)\) en el mejor caso) y es el algoritmo preferido para arreglos pequeños dentro de implementaciones híbridas como Timsort.

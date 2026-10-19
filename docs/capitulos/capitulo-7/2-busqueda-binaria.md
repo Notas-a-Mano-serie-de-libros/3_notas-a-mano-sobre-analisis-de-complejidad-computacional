@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 7</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-2-busqueda-binaria">
+  <h2 id="guia-2-busqueda-binaria">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Actualizar correctamente los límites de búsqueda y explicar el crecimiento logarítmico.</dd>
+    <dt>Prerrequisitos</dt><dd>Arreglos ordenados, índices y división entera.</dd>
+    <dt>Invariante que debe observar</dt><dd>Si el objetivo existe, permanece dentro del intervalo cerrado entre a y b.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úsela para consultas repetidas sobre datos ordenados con acceso aleatorio.</dd>
+    <dt>Cuándo evitarlo</dt><dd>No la aplique directamente a datos desordenados ni a estructuras sin acceso eficiente al medio.</dd>
+    <dt>Propiedades</dt><dd>No modifica el arreglo y reduce al menos a la mitad el rango activo en cada iteración.</dd>
+    <dt>Error frecuente</dt><dd>Actualizar a o b con m en vez de m + 1 o m - 1 y dejar el ciclo sin progreso.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Por qué puede descartarse una mitad completa?</li><li>¿Qué condición indica que el objetivo no existe?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 La búsqueda binaria compara el elemento central del arreglo con el objetivo. Si no coincide, descarta la mitad donde el objetivo no puede estar y repite el proceso sobre la mitad restante. Requiere que el arreglo esté ordenado.
 
 Cada comparación reduce el espacio de búsqueda a la mitad, lo que produce una complejidad temporal logarítmica: con un millón de elementos basta con unos 20 pasos.

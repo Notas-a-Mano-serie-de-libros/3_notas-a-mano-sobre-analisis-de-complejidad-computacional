@@ -327,8 +327,13 @@ def message_html(message):
 def node_html(node, role_styles, label_map):
     fill, border, text = resolve_node_style(node, role_styles)
     label = f"<div class='node-label'>{label_html(node['label'], label_map)}</div>" if node["label"] else "<div class='node-label'>&nbsp;</div>"
+    role_text = "sin resaltar" if node["role"] == "default" else SEARCH_LEGEND_LABELS.get(node["role"], node["role"])
+    accessible_label = (
+        f"Posición {node['index']}, valor {node['value']}, "
+        f"estado {role_text}"
+    )
     return f"""
-    <div class="node-wrap">
+    <div class="node-wrap" role="listitem" aria-label="{escape(accessible_label)}">
       <div class="node-index">{node["index"]}</div>
       <div class="node" style="background:{fill}; color:{text};">
         <div class="node-value">{node["value"]}</div>
@@ -795,6 +800,36 @@ def render_search_step_status(state):
     return escape(f"Paso {current} / {total}")
 
 
+def search_accessible_summary(state):
+    """Descripción breve y estable del paso para tecnologías de asistencia."""
+
+    total = state.get("step_total", 0)
+    current = min(state.get("step_index", 0), total) if total else state.get("step_index", 0)
+    message = state.get("general_message") or f"Elemento de interés: {state.get('target')}"
+    outcome = ""
+    if state.get("search_complete"):
+        found = any(node.get("role") == "found" for node in state.get("arr", []))
+        outcome = " Resultado: encontrado." if found else " Resultado: no encontrado."
+    return f"Paso {current}{f' de {total}' if total else ''}. {message}{outcome}"
+
+
+def render_search_text_alternative(state):
+    items = []
+    for node in state.get("arr", []):
+        node_role = node.get("role", "default")
+        role = "sin resaltar" if node_role == "default" else SEARCH_LEGEND_LABELS.get(node_role, node_role)
+        label = f", etiqueta {node['label']}" if node.get("label") else ""
+        items.append(
+            f"<li>Posición {node['index']}: valor {escape(str(node['value']))}; "
+            f"estado {escape(str(role))}{escape(label)}.</li>"
+        )
+    return (
+        '<details class="simulation-text-alternative">'
+        '<summary>Descripción textual del arreglo</summary>'
+        f'<ol>{"".join(items)}</ol></details>'
+    )
+
+
 def render_state_html(state, role_styles, label_map):
     message = message_html(state["general_message"] or f"Elemento de interés: {state['target']}")
     node_cache = state.setdefault("_node_html_cache", {})
@@ -820,15 +855,20 @@ def render_state_html(state, role_styles, label_map):
     status_class = " search-app-found" if found else " search-app-missing"
     complete_class = f" search-app-complete{status_class}" if state.get("search_complete") else ""
     phase_class = f" search-phase-{css_token(state.get('phase'))}"
+    accessible_summary = escape(search_accessible_summary(state))
+    text_alternative = render_search_text_alternative(state)
+    live_mode = "off" if state.get("_auto_running") and not state.get("search_complete") else "polite"
     return (
         f'<div class="search-app{complete_class}{phase_class}" style="min-height: {dimensions["app_height"]}px;">'
+        f'<div class="simulation-sr-only" role="status" aria-live="{live_mode}" aria-atomic="true">{accessible_summary}</div>'
         f"{legend}"
         f'<div class="search-message">{message}</div>'
         f'<div class="search-step-strip" style="width: min(100%, {legend_width}px);">{step_status}</div>'
-        f'<div class="search-array-line">'
-        f'<div class="search-nodes" style="width: min(100%, {dimensions["nodes_width"]}px); min-height: {dimensions["nodes_height"]}px;">{nodes}</div>'
-        f'<div class="search-result" aria-live="polite">{result}</div>'
+        f'<div class="search-array-line" role="group" aria-label="Representación visual del arreglo">'
+        f'<div class="search-nodes" role="list" aria-label="Elementos del arreglo" style="width: min(100%, {dimensions["nodes_width"]}px); min-height: {dimensions["nodes_height"]}px;">{nodes}</div>'
+        f'<div class="search-result">{result}</div>'
         f'</div>'
+        f'{text_alternative}'
         f'</div>'
     )
 
@@ -1208,6 +1248,7 @@ def run_search_app(
             if execution_state["run_id"] != run_id:
                 return
             state = snapshot
+            state["_auto_running"] = True
             step = state.get("step_index", len(desk_rows) + 1)
             desk_rows.append(search_desk_row(state.get("algorithm"), prev, state, step))
             state_history.append(copy_search_state(state))
@@ -1229,6 +1270,7 @@ def run_search_app(
             if execution_state["run_id"] != run_id:
                 return
             state = snapshot
+            state["_auto_running"] = True
             step = state.get("step_index", len(desk_rows) + 1)
             desk_rows.append(search_desk_row(state.get("algorithm"), prev, state, step))
             state_history.append(copy_search_state(state))

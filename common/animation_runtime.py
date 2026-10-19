@@ -63,6 +63,7 @@ class OutputCache:
         position = "position:absolute;top:0;left:0;" if hidden else ""
         html = (
             '<iframe class="formula-mathjax-frame" '
+            'title="Ecuación actual del procedimiento" '
             f'srcdoc="{escape(srcdoc, quote=True)}" '
             f'style="display:block;width:100%;border:0;overflow:hidden;{position}'
             f'height:{height}px;background:transparent;{visibility}" '
@@ -113,6 +114,7 @@ def formula_host_html():
     srcdoc = mathjax_host_srcdoc()
     return (
         '<iframe class="formula-mathjax-frame formula-mathjax-host" '
+        'title="Ecuación actual del procedimiento" '
         f'srcdoc="{escape(srcdoc, quote=True)}" '
         'style="display:block;width:100%;height:100%;border:0;overflow:hidden;'
         'background:transparent" scrolling="no"></iframe>'

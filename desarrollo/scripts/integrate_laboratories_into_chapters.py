@@ -7,6 +7,11 @@ import unicodedata
 from pathlib import Path
 
 try:
+    from desarrollo.scripts.algorithm_learning_guides import render_learning_guide
+except ModuleNotFoundError:
+    from algorithm_learning_guides import render_learning_guide
+
+try:
     from desarrollo.scripts.editorial_math import normalize_math_products
 except ModuleNotFoundError:  # Ejecución directa: python desarrollo/scripts/integrate_....py
     from editorial_math import normalize_math_products
@@ -1532,6 +1537,29 @@ def sync_published_sections() -> None:
         path.write_text(content.rstrip() + "\n", encoding="utf-8")
 
 
+def sync_algorithm_learning_guides() -> None:
+    """Inserta o actualiza las guías sin reconstruir el contenido publicado."""
+
+    pattern = re.compile(
+        r"\n*<!-- algorithm-learning-guide:start -->.*?"
+        r"<!-- algorithm-learning-guide:end -->\n*",
+        flags=re.DOTALL,
+    )
+    for chapter in (7, 8):
+        directory = DOCS / "capitulos" / f"capitulo-{chapter}"
+        for path in sorted(directory.glob("*.md")):
+            guide = render_learning_guide(chapter, path.stem)
+            if not guide:
+                continue
+            source = path.read_text(encoding="utf-8")
+            source = pattern.sub("\n\n", source)
+            kicker = re.search(r'^<span class="chapter-kicker">.+$', source, flags=re.MULTILINE)
+            if not kicker:
+                raise ValueError(f"{path}: no contiene chapter-kicker")
+            updated = source[:kicker.end()] + "\n\n" + guide + source[kicker.end():]
+            path.write_text(updated.rstrip() + "\n", encoding="utf-8")
+
+
 def section_id(slug: str) -> str:
     plain = unicodedata.normalize("NFKD", slug).encode("ascii", "ignore").decode()
     return "seccion-" + re.sub(r"[^a-z0-9]+", "-", plain.lower()).strip("-")
@@ -2020,7 +2048,8 @@ def build_sectioned_chapter(chapter: int) -> None:
             if marker:
                 body = body[:marker.start()].rstrip() + "\n\n" + button + "\n\n" + body[marker.start():]
                 button = ""
-        content = (nested_top, f"# {label}", f'<span class="chapter-kicker">Capítulo {chapter}</span>', body, button, section_navigation(chapter, section_pairs, index), "---", nested_bottom)
+        guide = render_learning_guide(chapter, slug)
+        content = (nested_top, f"# {label}", f'<span class="chapter-kicker">Capítulo {chapter}</span>', guide, body, button, section_navigation(chapter, section_pairs, index), "---", nested_bottom)
         section_content = "\n\n".join(part for part in content if part) + "\n"
         (directory / f"{slug}.md").write_text(
             normalize_math_products(section_content), encoding="utf-8"
@@ -2083,6 +2112,7 @@ if __name__ == "__main__":
         build_chapter(chapter_number)
         build_sectioned_chapter(chapter_number)
     sync_published_sections()
+    sync_algorithm_learning_guides()
     try:
         from desarrollo.scripts.sync_book_code import sync
     except ModuleNotFoundError:

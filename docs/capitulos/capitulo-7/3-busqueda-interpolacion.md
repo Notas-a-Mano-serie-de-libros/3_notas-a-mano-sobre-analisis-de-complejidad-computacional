@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 7</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-3-busqueda-interpolacion">
+  <h2 id="guia-3-busqueda-interpolacion">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Relacionar la estimación de posición con la distribución de los valores.</dd>
+    <dt>Prerrequisitos</dt><dd>Datos numéricos ordenados, búsqueda binaria y proporciones.</dd>
+    <dt>Invariante que debe observar</dt><dd>El objetivo, si existe, permanece dentro del rango cuyos extremos también acotan su valor.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úsela cuando los valores numéricos ordenados se distribuyen de manera aproximadamente uniforme.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítela con datos muy sesgados, repetidos o sin una escala numérica significativa.</dd>
+    <dt>Propiedades</dt><dd>Puede superar a la búsqueda binaria en distribuciones uniformes, pero su peor caso es lineal.</dd>
+    <dt>Error frecuente</dt><dd>Suponer que la fórmula garantiza una buena estimación sin comprobar el denominador y los límites.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Qué ocurre si los extremos tienen el mismo valor?</li><li>¿Cómo afecta una distribución sesgada a p?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 La interpolación lineal es una técnica para estimar el valor \(y\) que corresponde a un punto \(x\) dentro de un intervalo \([x_0, x_1]\), conociendo únicamente los valores de la función en sus extremos: \((x_0,\,y_0)\) y \((x_1,\,y_1)\).
 
 El principio es geométrico: se traza una línea recta entre ambos puntos de referencia y se evalúa esa recta en \(x\). La fórmula que expresa esta idea es:

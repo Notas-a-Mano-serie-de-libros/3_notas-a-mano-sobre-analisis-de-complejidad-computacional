@@ -9,6 +9,58 @@ const WIDGET_NOTEBOOK_PATH =
   /(?:^|\/)simulaciones\/capitulo(?:2|4|5|6|7|8)\/notebooks\//;
 const EMBEDDED_HEIGHT_MESSAGE = "notas-a-mano:jupyterlite-height";
 const installedWidgetKernels = new Set<string>();
+const keyboardEnhancedTabs = new WeakSet<HTMLElement>();
+let accessibleId = 0;
+
+function enhanceSimulationAccessibility(root: HTMLElement): void {
+  root.querySelectorAll<HTMLElement>('[class*="-subpanel-title"]').forEach((button) => {
+    const content = button.nextElementSibling as HTMLElement | null;
+    if (!content) return;
+    if (!content.id) content.id = `simulation-panel-${++accessibleId}`;
+    button.setAttribute("aria-controls", content.id);
+    button.setAttribute("aria-expanded", String(content.style.display !== "none"));
+  });
+
+  root.querySelectorAll<HTMLElement>('[class*="-tab-panel"]').forEach((panel) => {
+    const tabBar = panel.querySelector<HTMLElement>('[class*="-tab-bar"]');
+    const contentBox = panel.querySelector<HTMLElement>('[class*="-tab-content"]');
+    if (!tabBar || !contentBox) return;
+    const tabs = Array.from(tabBar.querySelectorAll<HTMLElement>('[class*="-tab-button"]'));
+    const contents = Array.from(contentBox.children) as HTMLElement[];
+    tabBar.setAttribute("role", "tablist");
+    tabBar.setAttribute("aria-label", "Vistas de la simulación");
+    tabs.forEach((tab, index) => {
+      const content = contents[index];
+      if (!content) return;
+      if (!tab.id) tab.id = `simulation-tab-${++accessibleId}`;
+      if (!content.id) content.id = `simulation-tabpanel-${++accessibleId}`;
+      const active = content.style.display !== "none";
+      tab.setAttribute("role", "tab");
+      tab.setAttribute("aria-controls", content.id);
+      tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
+      content.setAttribute("role", "tabpanel");
+      content.setAttribute("aria-labelledby", tab.id);
+      content.hidden = !active;
+    });
+    if (keyboardEnhancedTabs.has(tabBar)) return;
+    keyboardEnhancedTabs.add(tabBar);
+    tabBar.addEventListener("keydown", (event) => {
+      if (!(event.target instanceof HTMLElement)) return;
+      const index = tabs.indexOf(event.target);
+      if (index < 0) return;
+      let next = index;
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (index + 1) % tabs.length;
+      else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (index - 1 + tabs.length) % tabs.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      tabs[next].focus();
+      tabs[next].click();
+    });
+  });
+}
 
 function prepareEmbeddedHeight(panel: NotebookPanel): () => void {
   if (window.parent === window) return () => undefined;
@@ -24,6 +76,7 @@ function prepareEmbeddedHeight(panel: NotebookPanel): () => void {
   const reportHeight = (): void => {
     animationFrame = 0;
     if (panel.isDisposed) return;
+    enhanceSimulationAccessibility(panel.content.node);
     panel.content.node.classList.remove("jp-mod-scrollPastEnd");
 
     const scrollContainer = panel.content.node.querySelector<HTMLElement>(
@@ -69,7 +122,10 @@ function prepareEmbeddedHeight(panel: NotebookPanel): () => void {
   if (scrollContainer) resizeObserver.observe(scrollContainer);
   if (scrollContent) resizeObserver.observe(scrollContent);
 
-  const mutationObserver = new MutationObserver(scheduleHeightReport);
+  const mutationObserver = new MutationObserver(() => {
+    enhanceSimulationAccessibility(panel.content.node);
+    scheduleHeightReport();
+  });
   mutationObserver.observe(panel.content.node, {
     attributes: true,
     childList: true,

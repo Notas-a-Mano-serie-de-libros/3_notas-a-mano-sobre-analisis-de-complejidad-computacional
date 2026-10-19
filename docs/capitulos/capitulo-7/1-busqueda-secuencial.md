@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 7</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-1-busqueda-secuencial">
+  <h2 id="guia-1-busqueda-secuencial">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Trazar un recorrido lineal y justificar sus costos temporal y espacial.</dd>
+    <dt>Prerrequisitos</dt><dd>Arreglos, índices y comparación de valores; los datos no necesitan estar ordenados.</dd>
+    <dt>Invariante que debe observar</dt><dd>Antes de revisar la posición i, ninguna posición anterior contiene el objetivo.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úsela con colecciones pequeñas, desordenadas o cuando solo se hará una búsqueda.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítela para muchas consultas sobre un conjunto grande que pueda indexarse u ordenarse.</dd>
+    <dt>Propiedades</dt><dd>Funciona sobre datos desordenados, conserva los datos y utiliza espacio auxiliar constante.</dd>
+    <dt>Error frecuente</dt><dd>Confundir la detención temprana de un arreglo ordenado con una mejora del peor caso.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Qué posiciones ya pueden descartarse?</li><li>¿Qué entrada produce el peor caso?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 La búsqueda secuencial (o lineal) recorre el arreglo posición por posición, comparando cada elemento con el objetivo. No requiere que el arreglo esté ordenado; basta con acceder a los elementos en cualquier orden. Si el arreglo está ordenado, la búsqueda puede detenerse anticipadamente al encontrar un elemento mayor que el objetivo, aunque esto no mejora el peor caso.
 
 <!-- book-code:start -->

@@ -894,8 +894,10 @@ def item_html(value, index, role, label, max_value, view, item_width=None, metri
         height = SORT_BAR_MIN_HEIGHT + (metric / max_value) * height_range if max_value else SORT_BAR_MIN_HEIGHT
         width_style = f' style="width:{item_width}px; margin:0;"' if item_width else ""
         display_value = escape(str(value))
+        role_text = "sin resaltar" if role == ROLE_DEFAULT else SORT_LEGEND_LABELS_BY_ROLE.get(role, role)
+        accessible_label = f"Posición {index}, valor {value}, estado {role_text}"
         return f"""
-        <div class="bar-wrap"{width_style}>
+        <div class="bar-wrap" role="listitem" aria-label="{escape(accessible_label)}"{width_style}>
           <div class="bar-area">
             <div class="bar-stack">
               <div class="bar-value">{display_value}</div>
@@ -906,8 +908,10 @@ def item_html(value, index, role, label, max_value, view, item_width=None, metri
           <div class="bar-label">{label_markup}</div>
         </div>
         """
+    role_text = "sin resaltar" if role == ROLE_DEFAULT else SORT_LEGEND_LABELS_BY_ROLE.get(role, role)
+    accessible_label = f"Posición {index}, valor {value}, estado {role_text}"
     return f"""
-    <div class="sort-item box-wrap">
+    <div class="sort-item box-wrap" role="listitem" aria-label="{escape(accessible_label)}">
       <div class="box-index">{index}</div>
       <div class="box" style="background:{fill}; border-color:#111111; color:{text};">
         <div class="box-value">{escape(str(value))}</div>
@@ -1809,8 +1813,8 @@ def render_items_markup(state, view):
 
     if view == "barras":
         date_class = " bar-panel-date" if state.get("algorithm") == "radix" and state.get("radix_data_type") == "fecha" else ""
-        return f'<div class="bar-panel{date_class}"><div class="bar-nodes">{items}</div></div>'
-    return f'<div class="sort-items boxes">{items}</div>'
+        return f'<div class="bar-panel{date_class}"><div class="bar-nodes" role="list" aria-label="Elementos del arreglo">{items}</div></div>'
+    return f'<div class="sort-items boxes" role="list" aria-label="Elementos del arreglo">{items}</div>'
 
 
 def render_radix_buckets(state):
@@ -1859,6 +1863,70 @@ def radix_bucket_label(bucket):
     return str(bucket) if bucket < 10 else chr(ord("A") + bucket - 10)
 
 
+def sort_accessible_summary(state):
+    """Descripción concisa del paso, independiente del color y de la vista."""
+
+    trace = state.get("trace")
+    total = max(0, len(trace) - 1) if trace is not None else 0
+    current = min(state.get("step_index", 0), total) if total else state.get("step_index", 0)
+    phase = state.get("radix_phase") or state.get("merge_tree_phase") or state.get("phase")
+    phase_labels = {
+        "distribution": "distribución",
+        "write": "reconstrucción",
+        "complete": "finalizada",
+        "divide": "división",
+        "merge": "combinación",
+        "start": "inicio",
+        "initial": "inicio",
+    }
+    phase_text = f" Fase {phase_labels.get(phase, phase)}." if phase else ""
+    outcome = " El arreglo está ordenado." if state.get("sorting_complete") else ""
+    return (
+        f"Paso {current}{f' de {total}' if total else ''}.{phase_text} "
+        f"{state.get('message', '')}{outcome}"
+    ).strip()
+
+
+def render_sort_text_alternative(state):
+    items = []
+    for index, value in enumerate(state.get("arr", [])):
+        roles = state.get("roles", [])
+        labels = state.get("labels", [])
+        role = roles[index] if index < len(roles) else ROLE_DEFAULT
+        role_text = "sin resaltar" if role == ROLE_DEFAULT else SORT_LEGEND_LABELS_BY_ROLE.get(role, role)
+        label = labels[index] if index < len(labels) else ""
+        label_text = f", etiqueta {label}" if label else ""
+        items.append(
+            f"<li>Posición {index}: valor {escape(str(value))}; "
+            f"estado {escape(str(role_text))}{escape(label_text)}.</li>"
+        )
+    bucket_items = []
+    for bucket, values in enumerate(state.get("radix_buckets") or []):
+        content = ", ".join(escape(str(value)) for value in values) or "vacío"
+        bucket_items.append(f"<li>Bucket {escape(radix_bucket_label(bucket))}: {content}.</li>")
+    buckets = (
+        '<h4>Contenido de los buckets</h4><ol>' + "".join(bucket_items) + "</ol>"
+        if bucket_items else ""
+    )
+    tree_nodes = state.get("merge_tree_nodes") or state.get("quick_tree_nodes") or []
+    tree_items = []
+    for node in tree_nodes:
+        values = ", ".join(escape(str(value)) for value in node.get("values", []))
+        tree_items.append(
+            f"<li>Nivel {node.get('depth', 0)}, rango {node.get('start', 0)} a "
+            f"{node.get('end', 0)}: {values}.</li>"
+        )
+    tree = (
+        '<h4>Estructura del árbol visible</h4><ol>' + "".join(tree_items) + "</ol>"
+        if tree_items else ""
+    )
+    return (
+        '<details class="simulation-text-alternative">'
+        '<summary>Descripción textual del arreglo</summary>'
+        f'<ol>{"".join(items)}</ol>{tree}{buckets}</details>'
+    )
+
+
 def render_state_html(state, include_styles=True):
     view = state.get("view", "barras")
     app_class = "sort-app sort-app-bars" if view == "barras" else "sort-app"
@@ -1882,19 +1950,24 @@ def render_state_html(state, include_styles=True):
     )
     phase_above = phase_markup if phase_position == "above" else ""
     phase_below = phase_markup if phase_position == "below" else ""
+    accessible_summary = escape(sort_accessible_summary(state))
+    text_alternative = render_sort_text_alternative(state)
+    live_mode = "off" if state.get("_auto_running") and not state.get("sorting_complete") else "polite"
     return f"""
     {styles}
     <div class="{app_class}" style="min-height:{min_height}px; height:auto; overflow:visible;">
+      <div class="simulation-sr-only" role="status" aria-live="{live_mode}" aria-atomic="true">{accessible_summary}</div>
       {legend}
       <div class="sort-message">{message_html(state["message"])}</div>
       {phase_above}
       <div class="sort-step-strip">{step_status}</div>
-      <div class="sort-array-line sort-array-line-{css_token(view)}">
+      <div class="sort-array-line sort-array-line-{css_token(view)}" role="group" aria-label="Representación visual del ordenamiento">
         {items_markup}
-        <div class="sort-result" style="margin-top:{result_offset}px;" aria-live="polite">{result}</div>
+        <div class="sort-result" style="margin-top:{result_offset}px;">{result}</div>
       </div>
       {phase_below}
       {radix_buckets}
+      {text_alternative}
     </div>
     """
 
@@ -2300,6 +2373,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             if execution_state["run_id"] != run_id:
                 return
             state = snapshot
+            state["_auto_running"] = True
             redraw()
             speed = float(controls["speed"].value or 1.0)
             await asyncio.sleep(0.08 / speed)
@@ -2314,6 +2388,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             if execution_state["run_id"] != run_id:
                 return
             state = snapshot
+            state["_auto_running"] = True
             redraw()
             speed = float(controls["speed"].value or 1.0)
             colab_pause(0.08 / speed)

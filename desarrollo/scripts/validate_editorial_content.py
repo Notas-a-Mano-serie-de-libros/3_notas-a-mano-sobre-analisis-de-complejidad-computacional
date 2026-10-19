@@ -16,6 +16,16 @@ ROOT = Path(__file__).resolve().parents[2]
 DOCS = ROOT / "docs"
 FORMULA = re.compile(r"(?:[OΩΘωo]\s*\(|log(?:_\d+)?\s*\(|√|[nkd][²³])")
 COLAB_BUTTON_LABEL = "Abrir en Colab"
+LEARNING_GUIDE_FIELDS = (
+    "Objetivo",
+    "Prerrequisitos",
+    "Invariante que debe observar",
+    "Cuándo usarlo",
+    "Cuándo evitarlo",
+    "Propiedades",
+    "Error frecuente",
+    "Compruebe su comprensión",
+)
 
 
 def main() -> int:
@@ -103,6 +113,28 @@ def main() -> int:
                 f"{path.relative_to(ROOT)}: faltan el título, la tabla o la simulación "
                 "JupyterLite con botón de Colab"
             )
+
+        algorithm_pages = sorted(
+            page for page in (DOCS / "capitulos" / f"capitulo-{chapter}").glob("[1-9]-*.md")
+            if "ejercicios" not in page.stem
+        )
+        expected_count = 6 if chapter == 7 else 7
+        if len(algorithm_pages) != expected_count:
+            errors.append(
+                f"capítulo {chapter}: se esperaban {expected_count} páginas de algoritmos"
+            )
+        for page in algorithm_pages:
+            child = page.read_text(encoding="utf-8")
+            if child.count("<!-- algorithm-learning-guide:start -->") != 1:
+                errors.append(f"{page.relative_to(ROOT)}: falta la guía de aprendizaje única")
+            for field in LEARNING_GUIDE_FIELDS:
+                if field not in child:
+                    errors.append(f"{page.relative_to(ROOT)}: falta el campo pedagógico {field}")
+            guide = child.split("<!-- algorithm-learning-guide:start -->", 1)[-1].split(
+                "<!-- algorithm-learning-guide:end -->", 1
+            )[0]
+            if guide.count("<li>") < 2:
+                errors.append(f"{page.relative_to(ROOT)}: faltan preguntas de autoevaluación")
 
     if errors:
         print("\n".join(errors), file=sys.stderr)

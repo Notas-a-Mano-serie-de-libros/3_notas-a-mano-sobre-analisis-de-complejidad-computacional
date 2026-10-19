@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 8</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-1-ordenamiento-burbuja">
+  <h2 id="guia-1-ordenamiento-burbuja">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Relacionar comparaciones adyacentes, intercambios y crecimiento cuadrático.</dd>
+    <dt>Prerrequisitos</dt><dd>Arreglos, ciclos anidados e intercambio de valores.</dd>
+    <dt>Invariante que debe observar</dt><dd>Al terminar cada pasada, el extremo procesado contiene un elemento en su posición definitiva.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úselo con fines didácticos o en entradas pequeñas y casi ordenadas con detención temprana.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítelo para colecciones grandes o cuando se requiera buen rendimiento general.</dd>
+    <dt>Propiedades</dt><dd>Es estable, in situ y adaptativo cuando detecta una pasada sin intercambios.</dd>
+    <dt>Error frecuente</dt><dd>Analizar solamente la versión sin detención temprana y atribuirle el mismo mejor caso.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Qué elemento queda fijado tras una pasada?</li><li>¿Cuándo puede detenerse anticipadamente?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 El ordenamiento burbuja compara pares de elementos adyacentes e intercambia los que están en orden incorrecto. Repite este proceso hasta que no hay más intercambios. En cada pasada, el elemento mayor no ordenado queda en su posición final.
 
 Es el algoritmo de ordenamiento más intuitivo pero también el menos eficiente en la práctica para arreglos grandes, con complejidad cuadrática en el caso promedio y peor caso.

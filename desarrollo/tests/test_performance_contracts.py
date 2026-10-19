@@ -189,6 +189,7 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertFalse(cache.update_html(widget, "\n  <div>uno</div>\n"))
         self.assertTrue(cache.update_formula(widget, r"x = 1"))
         self.assertIn("formula-mathjax-frame", widget.value)
+        self.assertIn('title="Ecuación actual del procedimiento"', widget.value)
         self.assertIn("srcdoc=", widget.value)
         self.assertIn("tex-svg.js", widget.value)
         self.assertIn("visibility:hidden", widget.value)

@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 7</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-5-busqueda-exponencial">
+  <h2 id="guia-5-busqueda-exponencial">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Construir un intervalo por duplicación y completar la búsqueda de forma binaria.</dd>
+    <dt>Prerrequisitos</dt><dd>Datos ordenados, búsqueda binaria y potencias de dos.</dd>
+    <dt>Invariante que debe observar</dt><dd>Tras la expansión, el objetivo queda acotado entre el último índice válido y el nuevo límite.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úsela cuando se desconoce el tamaño efectivo o el objetivo suele estar cerca del inicio.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítela sobre datos desordenados o cuando una búsqueda binaria directa ya conoce todo el rango.</dd>
+    <dt>Propiedades</dt><dd>Combina una fase exponencial con otra binaria y mantiene costo logarítmico.</dd>
+    <dt>Error frecuente</dt><dd>Usar el índice duplicado sin limitarlo al último índice del arreglo.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Cuándo termina la fase exponencial?</li><li>¿Por qué la segunda fase sigue siendo logarítmica?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 La búsqueda exponencial localiza el rango donde puede estar el objetivo duplicando el índice en cada paso (1, 2, 4, 8, 16, …) hasta encontrar un elemento mayor o igual al objetivo. Luego aplica búsqueda binaria sobre ese rango acotado. Requiere que el arreglo esté ordenado.
 
 Es especialmente eficaz cuando el objetivo está cerca del inicio del arreglo, ya que la fase de duplicación llega rápidamente al rango correcto.

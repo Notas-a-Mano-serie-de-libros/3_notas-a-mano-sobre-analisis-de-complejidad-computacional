@@ -31,19 +31,20 @@ class ActionSpec:
     label: str
     icon: str
     width: str
+    help_text: str
 
 
 ACTION_SPECS = {
-    "run": ActionSpec("Ejecutar", "play", "110px"),
-    "sort": ActionSpec("Ordenar", "play", "110px"),
-    "search": ActionSpec("Buscar", "search", "110px"),
-    "play": ActionSpec("Ejecución automática", "play", "205px"),
-    "step_back": ActionSpec("Paso anterior", "step-backward", "145px"),
-    "step": ActionSpec("Paso siguiente", "step-forward", "145px"),
-    "finish": ActionSpec("Finalizar", "fast-forward", "130px"),
-    "reset": ActionSpec("Generar nuevo arreglo", "refresh", "210px"),
-    "restart": ActionSpec("Reiniciar", "refresh", "110px"),
-    "book": ActionSpec("Generar arreglo del libro", "book", "230px"),
+    "run": ActionSpec("Ejecutar", "play", "110px", "Ejecutar la simulación"),
+    "sort": ActionSpec("Ordenar", "play", "110px", "Iniciar el ordenamiento"),
+    "search": ActionSpec("Buscar", "search", "110px", "Iniciar la búsqueda"),
+    "play": ActionSpec("Ejecución automática", "play", "205px", "Reproducir todos los pasos automáticamente"),
+    "step_back": ActionSpec("Paso anterior", "step-backward", "145px", "Volver al paso anterior"),
+    "step": ActionSpec("Paso siguiente", "step-forward", "145px", "Avanzar un paso"),
+    "finish": ActionSpec("Finalizar", "fast-forward", "130px", "Mostrar directamente el resultado final"),
+    "reset": ActionSpec("Generar nuevo arreglo", "refresh", "210px", "Generar datos nuevos conservando la configuración"),
+    "restart": ActionSpec("Reiniciar", "refresh", "110px", "Volver al estado inicial"),
+    "book": ActionSpec("Generar arreglo del libro", "book", "230px", "Restaurar el ejemplo utilizado en el libro"),
 }
 ACTION_BY_LABEL = {spec.label: spec for spec in ACTION_SPECS.values()}
 
@@ -83,6 +84,8 @@ def action_button(action: str, *, disabled=False, label=None, width=None):
         disabled=disabled,
     )
     button.icon = spec.icon
+    button.tooltip = spec.help_text
+    button.tabbable = True
     button.add_class(f"simulation-action-{action}")
     return button
 
@@ -96,6 +99,8 @@ def actions(buttons: Iterable[widgets.Button]):
         if spec is None:
             continue
         button.icon = spec.icon
+        button.tooltip = spec.help_text
+        button.tabbable = True
         button.layout.width = spec.width
         button.layout.flex = f"0 0 {spec.width}"
     return action_button_row(resolved)

@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 8</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-6-ordenamiento-rapido">
+  <h2 id="guia-6-ordenamiento-rapido">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Trazar una partición y explicar el efecto del pivote sobre la profundidad recursiva.</dd>
+    <dt>Prerrequisitos</dt><dd>Recursión, particiones e intercambio de valores.</dd>
+    <dt>Invariante que debe observar</dt><dd>Tras particionar, cada región cumple la relación definida respecto al pivote.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úselo para ordenamiento interno general cuando importen localidad y buen rendimiento promedio.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítelo sin una estrategia de pivote segura si el peor caso es crítico o se exige estabilidad.</dd>
+    <dt>Propiedades</dt><dd>Suele ser in situ, no estable y rápido en promedio; particiones desequilibradas producen tiempo cuadrático.</dd>
+    <dt>Error frecuente</dt><dd>Suponer que elegir cualquier pivote produce siempre dos mitades equilibradas.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Qué garantiza la partición aunque el pivote no quede centrado?</li><li>¿Qué entradas pueden generar el peor caso?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 El ordenamiento rápido (quicksort) elige un elemento pivote y reorganiza el arreglo para que todos los elementos menores queden a su izquierda y los mayores a su derecha. Luego ordena recursivamente cada partición.
 
 La partición puede realizarse mediante distintos esquemas. **Hoare** usa dos índices que avanzan desde extremos opuestos e intercambia pares ubicados en el lado incorrecto. **Lomuto** recorre el subarreglo en una dirección, mantiene el límite de los elementos que deben quedar antes del pivote y coloca el pivote en su posición definitiva al finalizar la pasada. La selección del pivote también puede variar: inicio, medio, fin, aleatorio, mediana de tres y mediana de medianas. La mediana de tres toma los valores ubicados al inicio, al centro y al final del subarreglo, y usa como pivote el valor central entre esos tres. La mediana de medianas divide el subarreglo en grupos pequeños, calcula la mediana de cada grupo y luego usa la mediana de esas medianas como pivote.

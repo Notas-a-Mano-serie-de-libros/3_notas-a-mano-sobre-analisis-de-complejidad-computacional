@@ -968,7 +968,10 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("search-app-complete search-app-found", found_html)
         self.assertIn('search-result-symbol found', found_html)
         self.assertIn('role="img" aria-label="Encontrado"', found_html)
-        self.assertIn('class="search-result" aria-live="polite"', found_html)
+        self.assertIn('class="simulation-sr-only" role="status" aria-live="polite" aria-atomic="true"', found_html)
+        self.assertIn('class="search-result"', found_html)
+        self.assertIn('class="simulation-text-alternative"', found_html)
+        self.assertIn('role="list" aria-label="Elementos del arreglo"', found_html)
         self.assertIn(">✓</span>", found_html)
         self.assertIn(
             "transition: background-color 100ms ease",

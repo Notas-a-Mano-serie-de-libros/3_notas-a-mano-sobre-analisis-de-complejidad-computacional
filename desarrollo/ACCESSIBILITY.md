@@ -9,7 +9,9 @@
 - nombre accesible de enlaces, botones, campos e iframes visibles;
 - acceso por teclado y foco visible inicial.
 
-`validate_widget_contracts.py` comprueba las ayudas accesibles de los controles compartidos de `ipywidgets`. Estas pruebas son una barrera de regresión, no una certificación WCAG.
+`validate_widget_contracts.py` comprueba las ayudas accesibles de los controles compartidos de `ipywidgets`, el foco visible, el modo de colores forzados, el estado de paneles y pestañas, los resúmenes dinámicos y las alternativas textuales de arreglos. Estas pruebas son una barrera de regresión, no una certificación WCAG.
+
+Las simulaciones publicadas ofrecen una descripción textual desplegable de cada arreglo y un resumen dinámico independiente del color. Durante la ejecución automática se silencian los pasos intermedios y se anuncia el resultado final para no saturar la cola del lector de pantalla. En JupyterLite, la extensión asigna `aria-expanded`, `aria-controls`, `tablist`, `tab` y `tabpanel`, y habilita flechas, Inicio y Fin para navegar entre pestañas.
 
 La integración de Axe o Pa11y debe hacerse con una dependencia fijada y su lock transitivo; no debe descargarse una versión flotante durante CI.
 

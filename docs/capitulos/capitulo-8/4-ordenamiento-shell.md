@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 8</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-4-ordenamiento-shell">
+  <h2 id="guia-4-ordenamiento-shell">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Explicar cómo los saltos reducen desplazamientos antes de la inserción final.</dd>
+    <dt>Prerrequisitos</dt><dd>Ordenamiento por inserción y secuencias decrecientes de saltos.</dd>
+    <dt>Invariante que debe observar</dt><dd>Después de procesar un salto h, cada subsecuencia separada por h queda ordenada.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úselo como alternativa in situ para tamaños medianos cuando una implementación sencilla sea prioritaria.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítelo cuando se necesiten estabilidad o garantías asintóticas independientes de la secuencia de saltos.</dd>
+    <dt>Propiedades</dt><dd>Es in situ, no estable y su complejidad depende de la secuencia de saltos.</dd>
+    <dt>Error frecuente</dt><dd>Asignar una única complejidad a Shell sin indicar qué secuencia de saltos se analiza.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Qué significa que el arreglo esté h-ordenado?</li><li>¿Por qué la última pasada usa h = 1?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 El ordenamiento Shell generaliza la idea del ordenamiento por inserción. En lugar de comparar solo elementos contiguos, primero compara elementos separados por un valor h determinado. Después reduce progresivamente ese valor h hasta llegar a 1, momento en el que realiza una pasada equivalente a inserción sobre un arreglo que ya quedó parcialmente organizado.
 
 La ventaja práctica aparece porque los elementos pueden desplazarse grandes distancias durante las primeras pasadas. Cuando h se vuelve pequeño, el arreglo suele estar mucho más cerca de su posición final y las pasadas restantes requieren menos movimientos.

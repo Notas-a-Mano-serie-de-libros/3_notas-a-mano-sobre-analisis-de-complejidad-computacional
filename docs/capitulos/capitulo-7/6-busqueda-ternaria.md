@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 7</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-6-busqueda-ternaria">
+  <h2 id="guia-6-busqueda-ternaria">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Descartar dos tercios del intervalo mediante dos puntos de comparación.</dd>
+    <dt>Prerrequisitos</dt><dd>Arreglos ordenados, intervalos cerrados y división entera.</dd>
+    <dt>Invariante que debe observar</dt><dd>Si el objetivo existe, se conserva dentro de uno de los tres intervalos delimitados.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úsela con datos ordenados para estudiar estrategias de reducción por tercios.</dd>
+    <dt>Cuándo evitarlo</dt><dd>No asuma que supera a la búsqueda binaria: realiza más comparaciones por iteración.</dd>
+    <dt>Propiedades</dt><dd>No modifica los datos, usa espacio constante iterativamente y tiene costo logarítmico.</dd>
+    <dt>Error frecuente</dt><dd>Crear intervalos solapados o no reducirlos por errores en m₁ y m₂.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Qué comparaciones seleccionan el tercio central?</li><li>¿Por qué más divisiones no implican siempre mayor velocidad?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 La búsqueda ternaria divide el espacio de búsqueda en tres partes iguales calculando dos puntos medios. Compara el objetivo con cada punto medio para descartar un tercio del arreglo en cada iteración. Requiere que el arreglo esté ordenado.
 
 Aunque cada iteración descarta más que la búsqueda binaria (un tercio en vez de la mitad), necesita dos comparaciones por paso, por lo que en la práctica es ligeramente menos eficiente que la búsqueda binaria. En el análisis espacial se toma como referencia la formulación recursiva, donde la pila de llamadas crece con la profundidad de las divisiones.

@@ -4,6 +4,23 @@
 
 <span class="chapter-kicker">Capítulo 8</span>
 
+<!-- algorithm-learning-guide:start -->
+<section class="algorithm-learning-guide" aria-labelledby="guia-2-ordenamiento-seleccion">
+  <h2 id="guia-2-ordenamiento-seleccion">Guía de aprendizaje</h2>
+  <dl>
+    <dt>Objetivo</dt><dd>Seguir la selección del candidato y diferenciar comparaciones de escrituras.</dd>
+    <dt>Prerrequisitos</dt><dd>Arreglos, búsqueda de extremos e intercambio de valores.</dd>
+    <dt>Invariante que debe observar</dt><dd>La zona ya ubicada contiene los elementos extremos en sus posiciones definitivas.</dd>
+    <dt>Cuándo usarlo</dt><dd>Úselo en entradas pequeñas cuando convenga reducir el número de intercambios.</dd>
+    <dt>Cuándo evitarlo</dt><dd>Evítelo si se necesita estabilidad o adaptación a datos casi ordenados.</dd>
+    <dt>Propiedades</dt><dd>Es in situ, normalmente no estable y realiza un número cuadrático de comparaciones.</dd>
+    <dt>Error frecuente</dt><dd>Confundir pocas escrituras con pocas comparaciones.</dd>
+  </dl>
+  <h3>Compruebe su comprensión</h3>
+  <ol><li>¿Qué representa el candidato actual?</li><li>¿Por qué el mejor caso continúa siendo cuadrático?</li></ol>
+</section>
+<!-- algorithm-learning-guide:end -->
+
 El ordenamiento por selección busca el elemento mínimo en el subarreglo no ordenado y lo coloca al inicio de ese subarreglo, expandiendo la parte ordenada en una posición con cada pasada. Siempre realiza el mismo número de comparaciones independientemente del orden inicial.
 
 <!-- book-code:start -->
