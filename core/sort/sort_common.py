@@ -2266,7 +2266,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             state = snapshot
             redraw()
             speed = float(controls["speed"].value or 1.0)
-            await asyncio.sleep(0.08 / speed)
+            await asyncio.sleep(0.45 / speed)
         if execution_state["run_id"] == run_id:
             sync_execution_buttons()
 
@@ -2280,7 +2280,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             state = snapshot
             redraw()
             speed = float(controls["speed"].value or 1.0)
-            colab_pause(0.08 / speed)
+            colab_pause(0.45 / speed)
         if execution_state["run_id"] == run_id:
             sync_execution_buttons()
 

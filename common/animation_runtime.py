@@ -140,18 +140,26 @@ window.MathJax = {{
 <div id="formula" style="visibility:hidden">\\[{tex}\\]</div>
 <script>
 window.addEventListener('load', function () {{
+  function reveal() {{
+    var el = document.getElementById('formula');
+    if (el) {{ el.style.visibility = 'visible'; }}
+    if (window.frameElement) {{
+      window.frameElement.style.visibility = 'visible';
+      var previous = window.frameElement.previousElementSibling;
+      if (previous && previous.classList && previous.classList.contains('formula-mathjax-frame')) {{
+        previous.style.display = 'none';
+      }}
+    }}
+    document.body.classList.add('math-ready');
+  }}
   if (window.MathJax && MathJax.typesetPromise) {{
     MathJax.typesetPromise([document.getElementById('formula')]).then(function () {{
-      document.getElementById('formula').style.visibility = 'visible';
-      if (window.frameElement) {{
-        window.frameElement.style.visibility = 'visible';
-        var previous = window.frameElement.previousElementSibling;
-        if (previous && previous.classList && previous.classList.contains('formula-mathjax-frame')) {{
-          previous.style.display = 'none';
-        }}
-      }}
-      document.body.classList.add('math-ready');
+      reveal();
+    }}).catch(function () {{
+      reveal();
     }});
+  }} else {{
+    setTimeout(reveal, 200);
   }}
 }});
 </script>
