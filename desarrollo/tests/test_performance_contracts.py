@@ -199,6 +199,8 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("math-ready", widget.value)
         self.assertIn("align-items:flex-start", widget.value)
         self.assertIn("enableAssistiveMml: false", widget.value)
+        self.assertIn("mjx-assistive-mml,.MJX_Assistive_MathML", widget.value)
+        self.assertIn("item.remove()", widget.value)
         self.assertIn("justify-content:flex-start", widget.value)
         self.assertIn("text-align:left", widget.value)
         first_height = widget.layout.min_height
@@ -238,6 +240,8 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("align-items:flex-start", source)
         self.assertIn("enableAssistiveMml: false", source)
         self.assertIn("enableMenu: false", source)
+        self.assertEqual(source.count("mjx-assistive-mml,.MJX_Assistive_MathML"), 2)
+        self.assertIn("node.querySelectorAll('mjx-assistive-mml, .MJX_Assistive_MathML')", source)
         self.assertIn("justify-content:flex-start", source)
         self.assertIn("text-align:left", source)
         self.assertIn("widget.layout.min_height", source)

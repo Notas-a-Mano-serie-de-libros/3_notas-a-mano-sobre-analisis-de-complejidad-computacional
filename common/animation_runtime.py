@@ -129,6 +129,7 @@ body{color:#111;font-size:16px;line-height:1.2;}
 #formula{display:flex;align-items:flex-start;justify-content:flex-start;min-height:100%;text-align:left;}
 mjx-container[jax="SVG"]{font-size:100% !important;margin:0 !important;}
 mjx-container[jax="SVG"][display="true"]{text-align:left !important;}
+mjx-assistive-mml,.MJX_Assistive_MathML{display:none !important;}
 </style>
 <script>
 window.MathJax = {
@@ -184,6 +185,9 @@ window.addEventListener('load', function () {
     var currentRequest = ++requestId;
     MathJax.tex2svgPromise(formula, {display: true}).then(function (node) {
       if (currentRequest !== requestId) return;
+      node.querySelectorAll('mjx-assistive-mml, .MJX_Assistive_MathML').forEach(function (item) {
+        item.remove();
+      });
       var formulaElement = document.getElementById('formula');
       formulaElement.replaceChildren(node);
       formulaElement.setAttribute('aria-label', formula);
@@ -241,6 +245,7 @@ body{{color:#111;font-size:16px;line-height:1.2;}}
 body.math-ready #formula{{visibility:visible;}}
 mjx-container[jax="SVG"]{{font-size:100% !important;margin:0 !important;}}
 mjx-container[jax="SVG"][display="true"]{{text-align:left !important;}}
+mjx-assistive-mml,.MJX_Assistive_MathML{{display:none !important;}}
 </style>
 <script>
 window.MathJax = {{
@@ -262,6 +267,11 @@ window.MathJax = {{
 window.addEventListener('load', function () {{
   function reveal() {{
     var el = document.getElementById('formula');
+    if (el) {{
+      el.querySelectorAll('mjx-assistive-mml, .MJX_Assistive_MathML').forEach(function (item) {{
+        item.remove();
+      }});
+    }}
     if (el) {{ el.style.visibility = 'visible'; }}
     if (window.frameElement) {{
       window.frameElement.style.visibility = 'visible';
