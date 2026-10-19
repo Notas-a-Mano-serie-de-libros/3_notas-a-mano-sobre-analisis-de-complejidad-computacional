@@ -8,7 +8,7 @@ from html import escape
 import ipywidgets as widgets
 from IPython.display import display
 
-from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
+from common.animation_runtime import FormulaOutput, OutputCache, formula_iframe_height, pause, set_disabled
 from common.desk_check import (
     pseudocode_algorithm_key,
     render_desk_check,
@@ -1173,16 +1173,19 @@ def sort_styles():
       .sort-phase-write .sort-phase-strip,
       .sort-phase-complete .sort-phase-strip {{
         border-left: 6px solid currentColor;
-        background: rgba(255, 255, 255, 0.08);
+        font-weight: 700;
       }}
       .sort-phase-distribution .sort-phase-strip {{
-        color: #ffd7d4;
+        color: #8f2f2b;
+        background: #fff5f4;
       }}
       .sort-phase-write .sort-phase-strip {{
-        color: #ffe8a8;
+        color: #765600;
+        background: #fff9e6;
       }}
       .sort-phase-complete .sort-phase-strip {{
-        color: #c8f5ca;
+        color: #2e6f34;
+        background: #f1fbf2;
       }}
       .sort-legend {{
         display: flex;
@@ -1242,22 +1245,22 @@ def sort_styles():
         overflow: hidden;
       }}
       .radix-phase-distribution {{
-        border-left-color: #b85450;
+        border-left-color: #8f2f2b;
       }}
       .radix-phase-write {{
-        border-left-color: #d6b656;
+        border-left-color: #765600;
       }}
       .radix-phase-complete {{
-        border-left-color: #97d077;
+        border-left-color: #2e6f34;
       }}
       .radix-bucket-header,
       .radix-bucket-row {{
         display: grid;
         grid-template-columns: 74px minmax(0, 1fr);
-        height: 30px;
         min-height: 30px;
       }}
       .radix-bucket-header {{
+        height: 30px;
         font-weight: 700;
         border-bottom: 2px solid currentColor;
       }}
@@ -1285,16 +1288,15 @@ def sort_styles():
         font-style: italic;
       }}
       .sort-app-bars .radix-bucket-empty {{
-        color: #bdbdbd;
+        color: #6b7280;
       }}
       .radix-bucket-chain {{
         min-width: 0;
-        white-space: nowrap;
-        overflow-x: hidden;
-        overflow-y: hidden;
+        white-space: normal;
+        overflow: visible;
+        overflow-wrap: anywhere;
         scrollbar-width: thin;
         text-align: left;
-        text-overflow: ellipsis;
       }}
       .radix-bucket-chain::-webkit-scrollbar {{
         height: 4px;
@@ -1672,8 +1674,8 @@ def sort_styles():
         color: #2d7d32;
       }}
       .sort-app-bars .sort-result-symbol {{
-        color: #7bdc80;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+        color: #2e6f34;
+        text-shadow: none;
       }}
       @media (max-width: 760px) {{
         :root {{
@@ -1840,7 +1842,7 @@ def render_state_html(state, include_styles=True):
     phase_markup = f'<div class="sort-phase-strip">{phase}</div>' if phase.strip() else ""
     return f"""
     {styles}
-    <div class="{app_class}" style="min-height:{min_height}px; height:{min_height}px; overflow:hidden;">
+    <div class="{app_class}" style="min-height:{min_height}px; height:auto; overflow:visible;">
       {legend}
       <div class="sort-message">{message_html(state["message"])}</div>
       {phase_markup}
@@ -2091,8 +2093,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         has_partition=has_partition,
         has_radix_max=has_radix_max,
     )
-    formula_output = widgets.HTML(
-        value="",
+    formula_output = FormulaOutput(
         layout=widgets.Layout(
             width="100%",
             min_height=FORMULA_OUTPUT_HEIGHT,
@@ -2266,7 +2267,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             state = snapshot
             redraw()
             speed = float(controls["speed"].value or 1.0)
-            await asyncio.sleep(0.45 / speed)
+            await asyncio.sleep(0.08 / speed)
         if execution_state["run_id"] == run_id:
             sync_execution_buttons()
 
@@ -2280,7 +2281,7 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             state = snapshot
             redraw()
             speed = float(controls["speed"].value or 1.0)
-            colab_pause(0.45 / speed)
+            colab_pause(0.08 / speed)
         if execution_state["run_id"] == run_id:
             sync_execution_buttons()
 

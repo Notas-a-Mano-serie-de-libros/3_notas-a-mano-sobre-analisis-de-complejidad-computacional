@@ -30,6 +30,19 @@ SORT_MODULES = {
 }
 
 
+def contrast_ratio(first, second="#ffffff"):
+    def luminance(color):
+        channels = [int(color[index:index + 2], 16) / 255 for index in (1, 3, 5)]
+        linear = [
+            channel / 12.92 if channel <= 0.04045 else ((channel + 0.055) / 1.055) ** 2.4
+            for channel in channels
+        ]
+        return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+    brighter, darker = sorted((luminance(first), luminance(second)), reverse=True)
+    return (brighter + 0.05) / (darker + 0.05)
+
+
 class TestCapitulo8Ordenamientos(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -65,6 +78,11 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                             self.assertEqual(state["arr"], expected)
                             self.assertTrue(state["sorting_complete"])
                             self.assertIn("Finaliza", state["message"])
+
+    def test_radix_status_colors_meet_wcag_aa_on_the_white_panel(self):
+        for color in ("#8f2f2b", "#765600", "#2e6f34", "#6b7280"):
+            with self.subTest(color=color):
+                self.assertGreaterEqual(contrast_ratio(color), 4.5)
 
     def test_first_step_prepares_visible_work_without_finishing(self):
         for name, module in self.modules.items():
@@ -331,10 +349,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         source = (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8")
 
         self.assertIn("formula_output", source)
-        self.assertIn("from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled", source)
+        self.assertIn("from common.animation_runtime import FormulaOutput, OutputCache, formula_iframe_height, pause, set_disabled", source)
         self.assertIn("render_cache = OutputCache()", source)
         self.assertIn('formula = displaystyle_formula(state["formula"])', source)
-        self.assertIn("formula_output = widgets.HTML", source)
+        self.assertIn("formula_output = FormulaOutput", source)
         self.assertNotIn("widgets.HTMLMath", source)
         self.assertIn("render_cache.update_outputs(", source)
         self.assertIn("def calculate_sort_formula_reserved_height(state):", source)
@@ -343,6 +361,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("def build_sort_trace():", source)
         self.assertIn("yield copy_sort_state(probe)", source)
         self.assertIn("for snapshot in build_sort_trace():", source)
+        self.assertIn("await asyncio.sleep(0.08 / speed)", source)
+        self.assertIn("colab_pause(0.08 / speed)", source)
+        self.assertNotIn("0.45 / speed", source)
         self.assertNotIn("async def run_async", source)
         self.assertNotIn("schedule(", source)
         self.assertIn('controls["auto"].on_click(run_auto)', source)
@@ -394,7 +415,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("margin-left: 0;", bar_html)
         self.assertIn("color: #111827;", bar_html)
         self.assertIn("text-shadow: none;", bar_html)
-        self.assertIn("color: #7bdc80;", bar_html)
+        self.assertIn("color: #2e6f34;", bar_html)
         self.assertNotIn("Tipo de orden", box_html)
         self.assertNotIn("Tipo de orden", bar_html)
 
@@ -500,7 +521,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             self.assertEqual(self.common.simulation_min_height(state), initial_height)
             html = module.render_state_html(state)
             self.assertIn(f"min-height:{initial_height}px", html)
-            self.assertIn(f"height:{initial_height}px", html)
+            self.assertIn("height:auto; overflow:visible;", html)
 
     def test_simulation_height_is_cached_by_view_algorithm_and_size(self):
         module = self.modules["mezcla"]
@@ -548,7 +569,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             self.assertEqual(self.common.simulation_min_height(state), initial_height)
             html = module.render_state_html(state)
             self.assertIn(f"min-height:{initial_height}px", html)
-            self.assertIn(f"height:{initial_height}px", html)
+            self.assertIn("height:auto; overflow:visible;", html)
 
         self.assertTrue(any(role == "pivot" for role in state["roles"]))
         self.assertIn("quick-tree-shell", module.render_state_html(state))
@@ -993,9 +1014,15 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('class="radix-bucket-key radix-bucket-heading">Dígito</div>', initial_html)
         self.assertIn('class="radix-bucket-chain radix-bucket-heading">Bucket</div>', initial_html)
         self.assertIn("height: 30px;", initial_html)
-        self.assertIn("white-space: nowrap;", initial_html)
+        self.assertIn("white-space: normal;", initial_html)
+        self.assertIn("overflow-wrap: anywhere;", initial_html)
+        self.assertIn("height:auto; overflow:visible;", initial_html)
         self.assertIn("radix-bucket-empty", initial_html)
         self.assertIn("vacío", initial_html)
+        self.assertIn("color: #8f2f2b;", initial_html)
+        self.assertIn("color: #765600;", initial_html)
+        self.assertIn("color: #2e6f34;", initial_html)
+        self.assertIn("color: #6b7280;", initial_html)
 
         module.step_radix_sort(state)
         self.assertIn(r"p = \operatorname{digitos}(\max(a))", state["formula"])

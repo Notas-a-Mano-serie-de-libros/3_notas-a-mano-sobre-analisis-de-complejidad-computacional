@@ -9,7 +9,7 @@ from html import escape
 import ipywidgets as widgets
 from IPython.display import display
 
-from common.animation_runtime import OutputCache, formula_iframe_height, pause, set_disabled
+from common.animation_runtime import FormulaOutput, OutputCache, formula_iframe_height, pause, set_disabled
 from common.desk_check import render_desk_check, search_desk_row
 from common.simulation_views import (
     SECTION_CONFIGURATION,
@@ -978,8 +978,7 @@ def run_search_app(
     reset_button = controls["reset"]
     book_button = controls["book"]
     speed_input = controls["speed"]
-    formula_output = widgets.HTML(
-        value="",
+    formula_output = FormulaOutput(
         layout=widgets.Layout(
             width="100%",
             min_height="0px",

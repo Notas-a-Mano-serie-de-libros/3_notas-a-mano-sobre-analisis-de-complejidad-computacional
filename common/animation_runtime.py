@@ -4,6 +4,8 @@ import re
 import time
 from html import escape
 
+import ipywidgets as widgets
+
 
 def set_disabled(controls, disabled):
     for control in controls:
@@ -15,6 +17,33 @@ def pause(seconds, colab_output=None):
         colab_output.eval_js(f"new Promise(resolve => setTimeout(resolve, {int(seconds * 1000)}))")
         return
     time.sleep(seconds)
+
+
+class FormulaOutput(widgets.VBox):
+    """Render MathJax in one persistent iframe and update it without blank frames."""
+
+    def __init__(self, *, layout=None):
+        self._frame = widgets.HTML(
+            value=formula_host_html(),
+            layout=widgets.Layout(width="100%", height="100%", margin="0"),
+        )
+        self._signal = widgets.HTML(
+            value='<span class="formula-mathjax-signal" data-formula=""></span>',
+            layout=widgets.Layout(display="none"),
+        )
+        options = {"children": (self._frame, self._signal)}
+        if layout is not None:
+            options["layout"] = layout
+        super().__init__(**options)
+
+    def set_formula(self, formula, height):
+        height = max(0, int(height))
+        self.layout.min_height = f"{height}px"
+        self._frame.layout.height = f"{height}px"
+        self._signal.value = (
+            '<span class="formula-mathjax-signal" '
+            f'data-formula="{escape(formula or "", quote=True)}"></span>'
+        )
 
 
 class OutputCache:
@@ -67,7 +96,10 @@ class OutputCache:
             self.max_formula_height = reserved_height
         if hasattr(widget, "layout"):
             widget.layout.min_height = f"{self.max_formula_height}px"
-        widget.value = self.render_formula_html(formula, self.max_formula_height) if formula else ""
+        if hasattr(widget, "set_formula"):
+            widget.set_formula(formula, self.max_formula_height)
+        else:
+            widget.value = self.render_formula_html(formula, self.max_formula_height) if formula else ""
         self.formula = formula
         return True
 
@@ -85,12 +117,112 @@ class OutputCache:
 
 
 __all__ = [
+    "FormulaOutput",
     "OutputCache",
     "formula_iframe_height",
     "mathjax_srcdoc",
     "pause",
     "set_disabled",
 ]
+
+
+def formula_host_html():
+    srcdoc = mathjax_host_srcdoc()
+    return (
+        '<iframe class="formula-mathjax-frame formula-mathjax-host" '
+        f'srcdoc="{escape(srcdoc, quote=True)}" '
+        'style="display:block;width:100%;height:100%;border:0;overflow:hidden;'
+        'background:transparent" scrolling="no"></iframe>'
+    )
+
+
+def mathjax_host_srcdoc():
+    return """<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+html,body{margin:0;padding:0;background:#ffffff;overflow:hidden;color:#111111;height:100%;}
+body{color:#111;font-size:16px;line-height:1.2;}
+#formula{display:flex;align-items:flex-end;justify-content:flex-start;min-height:100%;text-align:left;}
+mjx-container[jax="SVG"]{font-size:100% !important;margin:0 !important;}
+mjx-container[jax="SVG"][display="true"]{text-align:left !important;}
+</style>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\\\(', '\\\\)']],
+    displayMath: [['\\\\[', '\\\\]']],
+    processEscapes: true
+  },
+  svg: { fontCache: 'none' },
+  startup: { typeset: false }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" integrity="sha256-1CldwzdEg2k1wTmf7s5RWVd7NMXI/7nxxjJM2C4DqII=" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="formula"></div>
+<script>
+window.addEventListener('load', function () {
+  var renderedFormula = '';
+  var requestedFormula = '';
+  var requestId = 0;
+  var observer = null;
+
+  function signalRoot() {
+    try {
+      var node = window.frameElement;
+      while (node && node.parentElement) {
+        node = node.parentElement;
+        if (node.querySelector && node.querySelector('.formula-mathjax-signal')) return node;
+      }
+    } catch (_error) {}
+    return null;
+  }
+
+  function readFormula(root) {
+    var signal = root && root.querySelector('.formula-mathjax-signal');
+    return signal ? (signal.getAttribute('data-formula') || '') : '';
+  }
+
+  function render(formula) {
+    if (formula === renderedFormula || formula === requestedFormula) return;
+    if (!formula) {
+      requestId += 1;
+      document.getElementById('formula').replaceChildren();
+      renderedFormula = '';
+      requestedFormula = '';
+      return;
+    }
+    requestedFormula = formula;
+    var currentRequest = ++requestId;
+    MathJax.tex2svgPromise(formula, {display: true}).then(function (node) {
+      if (currentRequest !== requestId) return;
+      document.getElementById('formula').replaceChildren(node);
+      renderedFormula = formula;
+      requestedFormula = '';
+    }).catch(function () {
+      if (currentRequest === requestId) requestedFormula = '';
+    });
+  }
+
+  function connect() {
+    var root = signalRoot();
+    if (!root || !window.MathJax || !MathJax.tex2svgPromise) {
+      window.setTimeout(connect, 30);
+      return;
+    }
+    render(readFormula(root));
+    observer = new MutationObserver(function () { render(readFormula(root)); });
+    observer.observe(root, {subtree: true, childList: true, attributes: true});
+  }
+
+  connect();
+});
+</script>
+</body>
+</html>"""
 
 
 def formula_iframe_height(formula):

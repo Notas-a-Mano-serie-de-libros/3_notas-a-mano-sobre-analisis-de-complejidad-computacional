@@ -266,6 +266,29 @@ class TestPerformanceContracts(unittest.TestCase):
         self.assertIn("visibility:hidden", second)
         self.assertNotIn("formula-fallback", second)
 
+    def test_formula_output_reuses_one_mathjax_host_across_updates(self):
+        runtime = load_module_from_path(
+            "common_animation_runtime_persistent_host_test",
+            PROJECT_ROOT / "common" / "animation_runtime.py",
+        )
+        output = runtime.FormulaOutput()
+        cache = runtime.OutputCache()
+        host = output.children[0]
+        original_host_html = host.value
+
+        self.assertTrue(cache.update_formula(output, r"x = 1", 90))
+        first_signal = output.children[1].value
+        self.assertTrue(cache.update_formula(output, r"y = \\frac{1}{2}", 90))
+
+        self.assertEqual(host.value, original_host_html)
+        self.assertIn("formula-mathjax-host", host.value)
+        self.assertIn("MutationObserver", host.value)
+        self.assertIn("tex2svgPromise", host.value)
+        self.assertIn("replaceChildren", host.value)
+        self.assertNotEqual(output.children[1].value, first_signal)
+        self.assertIn(r"y = \\frac{1}{2}", output.children[1].value)
+        self.assertEqual(output.layout.min_height, "90px")
+
     def test_visual_contracts_keep_stable_dimensions_and_separated_css(self):
         search_common = (PROJECT_ROOT / "core" / "search" / "search_common.py").read_text(encoding="utf-8")
         sort_common = (PROJECT_ROOT / "core" / "sort" / "sort_common.py").read_text(encoding="utf-8")
