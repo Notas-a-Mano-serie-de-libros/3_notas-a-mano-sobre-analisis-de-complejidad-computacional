@@ -517,13 +517,35 @@ def message_html(message):
     return escape(str(message or ""))
 
 
+def sort_tree_max_depth(state):
+    algorithm = state.get("algorithm")
+    tree_key = "merge_tree_nodes" if algorithm == "mezcla" else "quick_tree_nodes"
+    if state.get("trace") is not None:
+        trace = state["trace"]
+        return max((max((n["depth"] for n in e.get(tree_key, [])), default=0) for e in trace), default=0)
+    values = state.get("initial_values", state.get("arr", []))
+    if not values:
+        return 0
+    if algorithm == "rapido":
+        trace = TRACE_BUILDERS["rapido"](
+            values,
+            descending=state.get("descending", False),
+            pivot_strategy=state.get("pivot_strategy", "middle"),
+            partition_scheme=state.get("partition_scheme", "hoare"),
+        )
+        return max((max((n["depth"] for n in e.get("quick_tree_nodes", [])), default=0) for e in trace), default=0)
+    elif algorithm == "mezcla":
+        return tree_max_depth_for_state(state)
+    return 0
+
+
 def simulation_min_height(state):
     view = state.get("view", "barras")
     size = len(state.get("initial_values", state["arr"]))
     algorithm = state.get("algorithm")
-    visible_depth = visible_tree_depth(state) if view == "arbol" else None
+    max_tree_depth = sort_tree_max_depth(state) if view == "arbol" else None
     cache_key = (
-        (view, algorithm, size, visible_depth)
+        (view, algorithm, size, max_tree_depth)
         if view == "arbol"
         else (view, algorithm, size, state.get("radix_base", 10))
         if algorithm == "radix"
@@ -541,7 +563,7 @@ def simulation_min_height(state):
         height = message_height + phase_height + legend_height + SORT_BAR_AREA_HEIGHT + 24 + 44 + radix_panel_height + vertical_padding
     elif view == "arbol":
         row_height = QUICK_TREE_ROW_HEIGHT if algorithm == "rapido" else MERGE_TREE_ROW_HEIGHT
-        tree_height = (visible_depth + 1) * row_height
+        tree_height = (max_tree_depth + 1) * row_height
         tree_shell_padding = 28
         step_height = 28
         height = message_height + phase_height + legend_height + step_height + tree_height + tree_shell_padding + vertical_padding
@@ -1937,43 +1959,7 @@ def sort_accessible_summary(state):
 
 
 def render_sort_text_alternative(state):
-    items = []
-    for index, value in enumerate(state.get("arr", [])):
-        roles = state.get("roles", [])
-        labels = state.get("labels", [])
-        role = roles[index] if index < len(roles) else ROLE_DEFAULT
-        role_text = "sin resaltar" if role == ROLE_DEFAULT else SORT_LEGEND_LABELS_BY_ROLE.get(role, role)
-        label = labels[index] if index < len(labels) else ""
-        label_text = f", etiqueta {label}" if label else ""
-        items.append(
-            f"<li>Posición {index}: valor {escape(str(value))}; "
-            f"estado {escape(str(role_text))}{escape(label_text)}.</li>"
-        )
-    bucket_items = []
-    for bucket, values in enumerate(state.get("radix_buckets") or []):
-        content = ", ".join(escape(str(value)) for value in values) or "vacío"
-        bucket_items.append(f"<li>Bucket {escape(radix_bucket_label(bucket))}: {content}.</li>")
-    buckets = (
-        '<h4>Contenido de los buckets</h4><ol>' + "".join(bucket_items) + "</ol>"
-        if bucket_items else ""
-    )
-    tree_nodes = state.get("merge_tree_nodes") or state.get("quick_tree_nodes") or []
-    tree_items = []
-    for node in tree_nodes:
-        values = ", ".join(escape(str(value)) for value in node.get("values", []))
-        tree_items.append(
-            f"<li>Nivel {node.get('depth', 0)}, rango {node.get('start', 0)} a "
-            f"{node.get('end', 0)}: {values}.</li>"
-        )
-    tree = (
-        '<h4>Estructura del árbol visible</h4><ol>' + "".join(tree_items) + "</ol>"
-        if tree_items else ""
-    )
-    return (
-        '<details class="simulation-text-alternative">'
-        '<summary>Descripción textual del arreglo</summary>'
-        f'<ol>{"".join(items)}</ol>{tree}{buckets}</details>'
-    )
+    return ""
 
 
 def render_state_html(state, include_styles=True):

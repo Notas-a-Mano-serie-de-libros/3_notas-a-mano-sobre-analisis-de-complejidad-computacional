@@ -531,7 +531,6 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn('class="sort-result" style="margin-top:29px;"', box_html)
         self.assertIn('class="sort-result" style="margin-top:137px;"', bar_html)
         self.assertIn('class="simulation-sr-only" role="status" aria-live="polite" aria-atomic="true"', box_html)
-        self.assertIn('class="simulation-text-alternative"', box_html)
         self.assertIn('role="list" aria-label="Elementos del arreglo"', bar_html)
         self.assertIn("min-height:", bar_html)
         self.assertIn("width: fit-content;", box_html)
@@ -704,21 +703,17 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertEqual(nodes[(2, 3)]["values"], [57, 111])
         self.assertEqual(nodes[(0, 3)]["values"], [95, 131, 111, 57])
 
-    def test_simulation_height_tracks_visible_merge_tree_rows(self):
+    def test_simulation_height_is_stable_across_merge_tree_steps(self):
         module = self.modules["mezcla"]
         state = module.create_state(size=8, values=[95, 131, 111, 57, 158, 16, 25, 98], view="arbol")
         initial_height = self.common.simulation_min_height(state)
-        heights = [initial_height]
 
-        while not state["sorting_complete"]:
+        for _ in range(12):
             module.step_merge_sort(state)
-            heights.append(self.common.simulation_min_height(state))
+            self.assertEqual(self.common.simulation_min_height(state), initial_height)
             html = module.render_state_html(state)
-            self.assertIn(f"min-height:{heights[-1]}px", html)
+            self.assertIn(f"min-height:{initial_height}px", html)
             self.assertIn("height:auto; overflow:visible;", html)
-
-        self.assertGreater(max(heights), initial_height)
-        self.assertEqual(heights[-1], initial_height)
 
     def test_simulation_height_is_cached_by_view_algorithm_and_size(self):
         module = self.modules["mezcla"]
@@ -729,7 +724,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         second = self.common.simulation_min_height(state)
 
         self.assertEqual(first, second)
-        self.assertIn(("arbol", "mezcla", 8, 0), self.common._SIMULATION_HEIGHT_CACHE)
+        self.assertIn(("arbol", "mezcla", 8, 3), self.common._SIMULATION_HEIGHT_CACHE)
 
     def test_sort_item_html_is_cached_per_state(self):
         module = self.modules["burbuja"]
@@ -755,7 +750,7 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertGreater(cache_size, 0)
         self.assertEqual(cache_size, len(state["_tree_html_cache"]))
 
-    def test_quick_tree_uses_snapshots_and_visible_depth_height(self):
+    def test_quick_tree_uses_snapshots_and_stable_height(self):
         module = self.modules["rapido"]
         state = module.create_state(size=6, values=[10, 7, 8, 9, 1, 5], view="arbol")
         initial_height = self.common.simulation_min_height(state)
@@ -763,11 +758,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         for _ in range(8):
             module.step_quick_sort(state)
             self.assertIn("quick_tree_nodes", state)
-            current_height = self.common.simulation_min_height(state)
-            expected_height = initial_height + self.common.visible_tree_depth(state) * self.common.QUICK_TREE_ROW_HEIGHT
-            self.assertEqual(current_height, expected_height)
+            self.assertEqual(self.common.simulation_min_height(state), initial_height)
             html = module.render_state_html(state)
-            self.assertIn(f"min-height:{current_height}px", html)
+            self.assertIn(f"min-height:{initial_height}px", html)
             self.assertIn("height:auto; overflow:visible;", html)
 
         self.assertTrue(any(role == "pivot" for role in state["roles"]))

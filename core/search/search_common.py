@@ -814,20 +814,7 @@ def search_accessible_summary(state):
 
 
 def render_search_text_alternative(state):
-    items = []
-    for node in state.get("arr", []):
-        node_role = node.get("role", "default")
-        role = "sin resaltar" if node_role == "default" else SEARCH_LEGEND_LABELS.get(node_role, node_role)
-        label = f", etiqueta {node['label']}" if node.get("label") else ""
-        items.append(
-            f"<li>Posición {node['index']}: valor {escape(str(node['value']))}; "
-            f"estado {escape(str(role))}{escape(label)}.</li>"
-        )
-    return (
-        '<details class="simulation-text-alternative">'
-        '<summary>Descripción textual del arreglo</summary>'
-        f'<ol>{"".join(items)}</ol></details>'
-    )
+    return ""
 
 
 def render_state_html(state, role_styles, label_map):
