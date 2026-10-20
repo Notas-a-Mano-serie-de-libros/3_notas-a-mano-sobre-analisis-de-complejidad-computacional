@@ -153,3 +153,9 @@ def test_shared_visual_system_defines_all_control_contracts_once():
         '[class*="subpanel-content"]',
     ):
         assert token in controls
+    action_rule = controls.split("{root} .simulation-action-row {{", 1)[1].split("}}", 1)[0]
+    assert "position: static !important" in action_rule
+    assert "background: transparent !important" in action_rule
+    assert "padding: 0 !important" in action_rule
+    assert "box-shadow: none !important" in action_rule
+    assert "position: sticky !important" not in action_rule

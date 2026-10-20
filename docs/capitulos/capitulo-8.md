@@ -82,6 +82,7 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
     src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F0_comparacion_ordenamientos.ipynb"
     title="Simulación interactiva de Comparación de algoritmos de ordenamiento en JupyterLite"
     loading="lazy"
+    scrolling="no"
     allow="clipboard-read; clipboard-write"
   ></iframe>
 

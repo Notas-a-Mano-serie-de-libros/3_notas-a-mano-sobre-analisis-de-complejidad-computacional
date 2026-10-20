@@ -129,20 +129,17 @@ def shared_ui_styles(root_selector):
 {root} .lab-stepper > *,
 {root} .stepper > * {{ margin: 0 !important; }}
 {root} .simulation-action-row {{
-  position: -webkit-sticky !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 100 !important;
-  background: var(--simulation-surface, #ffffff) !important;
+  position: static !important;
+  background: transparent !important;
   width: 100% !important;
   gap: 0 !important;
-  margin: 0 !important;
-  padding: 8px 12px !important;
-  border-bottom: 1px solid var(--simulation-panel-border, #dedede) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  margin: {STANDARD_ACTION_MARGIN_TOP}px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
   justify-content: flex-end !important;
-  flex-wrap: nowrap !important;
-  overflow-x: auto !important;
+  flex-wrap: wrap !important;
+  overflow: visible !important;
   box-sizing: border-box !important;
 }}
 {root} [class*="-tab-bar"] {{

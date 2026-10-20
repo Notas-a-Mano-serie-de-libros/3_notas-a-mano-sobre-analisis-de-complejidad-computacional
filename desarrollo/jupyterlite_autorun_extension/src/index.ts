@@ -12,6 +12,7 @@ const SCIENTIFIC_NOTEBOOK_PATH =
 const EMBEDDED_HEIGHT_MESSAGE = "notas-a-mano:jupyterlite-height";
 const EMBEDDED_READY_MESSAGE = "notas-a-mano:jupyterlite-ready";
 const EMBEDDED_ERROR_MESSAGE = "notas-a-mano:jupyterlite-error";
+const EMBEDDED_LAYOUT_STYLE_ID = "notas-a-mano-embedded-layout";
 const installedWidgetKernels = new Set<string>();
 const keyboardEnhancedTabs = new WeakSet<HTMLElement>();
 let accessibleId = 0;
@@ -73,6 +74,33 @@ function enhanceSimulationAccessibility(root: HTMLElement): void {
 
 function prepareEmbeddedHeight(panel: NotebookPanel): () => void {
   if (window.parent === window) return () => undefined;
+
+  if (!document.getElementById(EMBEDDED_LAYOUT_STYLE_ID)) {
+    const style = document.createElement("style");
+    style.id = EMBEDDED_LAYOUT_STYLE_ID;
+    style.textContent = `
+      html, body { overflow: hidden !important; }
+      .jp-NotebookPanel-notebook .jp-WindowedPanel-outer {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+      }
+      .jp-NotebookPanel-notebook .jp-WindowedPanel-inner,
+      .jp-NotebookPanel-notebook .jp-WindowedPanel-viewport {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: none !important;
+      }
+      .jp-NotebookPanel-notebook .jp-OutputPrompt { display: none !important; }
+      .jp-NotebookPanel-notebook .jp-OutputArea-output {
+        width: 100% !important;
+        max-width: none !important;
+        flex: 1 1 auto !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   // El espacio para desplazar la última celda hasta la parte superior es útil
   // en el editor completo, pero deja un bloque vacío dentro de un iframe que

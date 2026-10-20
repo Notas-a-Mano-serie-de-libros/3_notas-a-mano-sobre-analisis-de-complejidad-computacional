@@ -81,6 +81,7 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
     src="../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F0_comparacion_busquedas.ipynb"
     title="Simulación interactiva de Comparación de algoritmos de búsqueda en JupyterLite"
     loading="lazy"
+    scrolling="no"
     allow="clipboard-read; clipboard-write"
   ></iframe>
 

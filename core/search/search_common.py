@@ -547,6 +547,14 @@ def _build_search_css() -> str:
   .search-simulation-root .simulation-action-row > .widget-button {{
     margin:0!important;border-color:#cccccc!important;border-radius:0!important;
   }}
+  .search-procedure-content .simulation-action-row {{
+    position:static!important;
+    margin:14px 0 0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }}
   .search-simulation-root button.search-tab-button,
   .search-simulation-root button[class*="-tab-button"] {{
     height: 44px !important;
@@ -1335,6 +1343,11 @@ def run_search_app(
         [first_row_box],
         layout=widgets.Layout(width="100%"),
     )
+    procedure_content = widgets.VBox(
+        [formula_output, button_row],
+        layout=widgets.Layout(width="100%", grid_gap="0px", overflow="visible"),
+    )
+    procedure_content.add_class("search-procedure-content")
     formula_output.add_class("search-formula-content")
     html_output.add_class("search-result-content")
     desk_output.add_class("search-desk-check-content")
@@ -1343,10 +1356,9 @@ def run_search_app(
             root_class="search-simulation-root",
             panel_prefix="search",
             styles=_SEARCH_CSS,
-            action_row=button_row,
             sections=(
                 ViewSection(SECTION_CONFIGURATION, parameters_content, ("search-subpanel-content",)),
-                ViewSection(SECTION_PROCEDURE, formula_output, ("search-subpanel-content",)),
+                ViewSection(SECTION_PROCEDURE, procedure_content, ("search-subpanel-content",)),
                 ViewTabs(
                     (
                         ("Ejecución visual", html_output, ("search-subpanel-content", "search-result-content")),

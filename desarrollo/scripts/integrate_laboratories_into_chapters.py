@@ -333,6 +333,7 @@ Ejecuta el laboratorio integrado con **JupyterLite y Pyodide**. También puedes 
     src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2F0_laboratorio_analisis_recursivo.ipynb"
     title="Simulación interactiva del procedimiento de análisis recursivo en JupyterLite"
     loading="lazy"
+    scrolling="no"
     allow="clipboard-read; clipboard-write"
   ></iframe>
 </div>

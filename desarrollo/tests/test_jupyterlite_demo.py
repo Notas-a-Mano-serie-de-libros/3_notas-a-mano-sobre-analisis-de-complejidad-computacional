@@ -84,6 +84,10 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert '"notas-a-mano:jupyterlite-height"' in extension
     assert '".jp-WindowedPanel-outer"' in extension
     assert 'classList.remove("jp-mod-scrollPastEnd")' in extension
+    assert 'style.id = EMBEDDED_LAYOUT_STYLE_ID' in extension
+    assert "padding: 0 !important" in extension
+    assert ".jp-OutputPrompt { display: none !important; }" in extension
+    assert "html, body { overflow: hidden !important; }" in extension
     assert "Array.from(scrollContainer.children).reduce" in extension
     assert "child.getBoundingClientRect().bottom - scrollBounds.top" in extension
     assert "window.parent.postMessage" in extension
@@ -166,6 +170,19 @@ def test_portal_resizes_embedded_jupyterlite_frames_from_trusted_messages():
     assert ".jupyterlite-demo__status" in stylesheet
     assert ".jupyterlite-demo__frame" in stylesheet
     assert "overflow: hidden;" in stylesheet
+
+
+def test_embedded_frames_disable_native_scroll_before_javascript_runs():
+    integration_source = (
+        PROJECT_ROOT / "desarrollo/scripts/integrate_laboratories_into_chapters.py"
+    ).read_text(encoding="utf-8")
+    assert 'scrolling="no"' in integration_source
+
+    for page_path in (PROJECT_ROOT / "docs").rglob("*.md"):
+        page = page_path.read_text(encoding="utf-8")
+        for demo in page.split('class="jupyterlite-demo__frame"')[1:]:
+            iframe = demo.split("></iframe>", 1)[0]
+            assert 'scrolling="no"' in iframe, page_path
 
 
 def test_documentation_dependencies_include_the_jupyter_builder_cli():
