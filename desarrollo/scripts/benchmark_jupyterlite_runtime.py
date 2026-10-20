@@ -18,7 +18,11 @@ except ModuleNotFoundError:
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_NOTEBOOK_READY_MS = 45_000
+MAX_SIMULATION_READY_MS = 120_000
 MAX_REQUESTS = 400
+SIMULATION_NOTEBOOK = Path(
+    "simulaciones/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb"
+)
 
 
 def serve(site_dir: Path):
@@ -64,6 +68,34 @@ def measure(browser, base: str, profile: str, notebook: Path | str) -> dict[str,
     return result
 
 
+def verify_executed_simulation(browser, base: str) -> dict[str, object]:
+    """Comprueba que el notebook se ejecuta y el navegador sigue respondiendo."""
+
+    context = browser.new_context(reduced_motion="reduce")
+    page = context.new_page()
+    failures: list[str] = []
+    page.on("requestfailed", lambda request: failures.append(request.url))
+    url = (
+        f"{base}graficas/notebooks/index.html?path="
+        f"{quote(SIMULATION_NOTEBOOK.as_posix(), safe='')}"
+    )
+    start = time.perf_counter()
+    page.goto(url, wait_until="domcontentloaded", timeout=MAX_NOTEBOOK_READY_MS)
+    simulation = page.locator(".sort-simulation-root")
+    simulation.wait_for(state="visible", timeout=MAX_SIMULATION_READY_MS)
+    # Esta segunda consulta detecta regresiones que dibujan el widget y luego
+    # bloquean el hilo principal mediante observadores DOM recursivos.
+    responsive = simulation.is_visible()
+    ready_ms = round((time.perf_counter() - start) * 1000, 1)
+    context.close()
+    return {
+        "notebook": SIMULATION_NOTEBOOK.as_posix(),
+        "simulation_ready_ms": ready_ms,
+        "responsive": responsive,
+        "failed_requests": failures,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--site-dir", type=Path, default=ROOT / "site/jupyterlite")
@@ -92,14 +124,25 @@ def main() -> int:
                     errors.append(f"{profile}: solicitudes fallidas")
             except Exception as error:  # Playwright proporciona el diagnóstico completo.
                 errors.append(f"{profile}: {error}")
+        try:
+            simulation_smoke = verify_executed_simulation(browser, base)
+            if not simulation_smoke["responsive"]:
+                errors.append("simulación: el navegador dejó de responder")
+            if simulation_smoke["failed_requests"]:
+                errors.append("simulación: solicitudes fallidas")
+        except Exception as error:
+            simulation_smoke = None
+            errors.append(f"simulación: {error}")
         browser.close()
     server.shutdown()
     report = {
         "budgets": {
             "notebook_ready_ms": MAX_NOTEBOOK_READY_MS,
+            "simulation_ready_ms": MAX_SIMULATION_READY_MS,
             "requests": MAX_REQUESTS,
         },
         "profiles": results,
+        "simulation_smoke": simulation_smoke,
         "errors": errors,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

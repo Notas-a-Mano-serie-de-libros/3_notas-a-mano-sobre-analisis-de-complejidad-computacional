@@ -83,7 +83,6 @@ function prepareEmbeddedHeight(panel: NotebookPanel): () => void {
   const reportHeight = (): void => {
     animationFrame = 0;
     if (panel.isDisposed) return;
-    enhanceSimulationAccessibility(panel.content.node);
     panel.content.node.classList.remove("jp-mod-scrollPastEnd");
 
     const scrollContainer = panel.content.node.querySelector<HTMLElement>(
@@ -129,15 +128,23 @@ function prepareEmbeddedHeight(panel: NotebookPanel): () => void {
   if (scrollContainer) resizeObserver.observe(scrollContainer);
   if (scrollContent) resizeObserver.observe(scrollContent);
 
-  const mutationObserver = new MutationObserver(() => {
-    enhanceSimulationAccessibility(panel.content.node);
-    scheduleHeightReport();
-  });
-  mutationObserver.observe(panel.content.node, {
+  const mutationOptions: MutationObserverInit = {
     attributes: true,
     childList: true,
     subtree: true,
+  };
+  const mutationObserver = new MutationObserver(() => {
+    // La mejora de accesibilidad escribe atributos ARIA en el mismo árbol que
+    // observamos. Desconectamos temporalmente el observador para que esas
+    // escrituras no vuelvan a disparar este callback en un bucle infinito que
+    // terminaría bloqueando el hilo principal del navegador.
+    mutationObserver.disconnect();
+    enhanceSimulationAccessibility(panel.content.node);
+    mutationObserver.observe(panel.content.node, mutationOptions);
+    scheduleHeightReport();
   });
+  enhanceSimulationAccessibility(panel.content.node);
+  mutationObserver.observe(panel.content.node, mutationOptions);
   window.addEventListener("resize", scheduleHeightReport);
   panel.disposed.connect(() => {
     if (animationFrame) window.cancelAnimationFrame(animationFrame);

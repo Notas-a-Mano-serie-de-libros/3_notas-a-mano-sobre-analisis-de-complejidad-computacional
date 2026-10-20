@@ -86,6 +86,9 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert "window.parent.postMessage" in extension
     assert "new ResizeObserver(scheduleHeightReport)" in extension
     assert "new MutationObserver(() =>" in extension
+    assert "mutationObserver.disconnect()" in extension
+    assert "mutationObserver.observe(panel.content.node, mutationOptions)" in extension
+    assert extension.count("enhanceSimulationAccessibility(panel.content.node)") == 2
     assert "enhanceSimulationAccessibility(panel.content.node)" in extension
     assert 'setAttribute("aria-expanded"' in extension
     assert 'setAttribute("aria-controls"' in extension
