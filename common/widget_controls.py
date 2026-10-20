@@ -142,6 +142,17 @@ def shared_ui_styles(root_selector):
   overflow: visible !important;
   box-sizing: border-box !important;
 }}
+@media (min-width: 1100px) {{
+  {root} .simulation-action-row {{
+    flex-flow: row nowrap !important;
+  }}
+  {root} .simulation-action-row > .widget-button {{
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: 1 1 0 !important;
+  }}
+}}
 {root} [class*="-tab-bar"] {{
   width: 100% !important;
   margin: 0 !important;

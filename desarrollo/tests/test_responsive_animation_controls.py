@@ -159,3 +159,14 @@ def test_shared_visual_system_defines_all_control_contracts_once():
     assert "padding: 0 !important" in action_rule
     assert "box-shadow: none !important" in action_rule
     assert "position: sticky !important" not in action_rule
+
+
+def test_shared_action_row_keeps_all_buttons_on_one_line_when_space_is_available():
+    controls = source("common/widget_controls.py")
+    wide_rule = controls.split("@media (min-width: 1100px)", 1)[1].split(
+        '{root} [class*="-tab-bar"]', 1
+    )[0]
+
+    assert "flex-flow: row nowrap !important" in wide_rule
+    assert "flex: 1 1 0 !important" in wide_rule
+    assert "min-width: 0 !important" in wide_rule
