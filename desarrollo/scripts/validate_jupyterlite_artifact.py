@@ -7,10 +7,16 @@ import json
 from pathlib import Path
 
 try:
-    from desarrollo.scripts.build_jupyterlite_demo import AUTORUN_EXTENSION_NAME
+    from desarrollo.scripts.build_jupyterlite_demo import (
+        AUTORUN_EXTENSION_NAME,
+        PRELOAD_PACKAGE_OVERRIDES,
+    )
     from desarrollo.scripts.jupyterlite_catalog import PROFILE_CONFIGS
 except ModuleNotFoundError:
-    from build_jupyterlite_demo import AUTORUN_EXTENSION_NAME
+    from build_jupyterlite_demo import (
+        AUTORUN_EXTENSION_NAME,
+        PRELOAD_PACKAGE_OVERRIDES,
+    )
     from jupyterlite_catalog import PROFILE_CONFIGS
 
 
@@ -64,7 +70,10 @@ def validate(site_dir: Path) -> list[str]:
             "@jupyterlite/pyodide-kernel-extension:kernel", {}
         )
         packages = kernel.get("loadPyodideOptions", {}).get("packages")
-        if packages != list(profile_config["packages"]):
+        expected_packages = PRELOAD_PACKAGE_OVERRIDES.get(
+            profile, profile_config["packages"]
+        )
+        if packages != list(expected_packages):
             errors.append(f"{profile}: paquetes Pyodide inesperados: {packages}")
         if not config_data.get("contentsStorageName"):
             errors.append(f"{profile}: falta aislamiento del almacenamiento de notebooks")
