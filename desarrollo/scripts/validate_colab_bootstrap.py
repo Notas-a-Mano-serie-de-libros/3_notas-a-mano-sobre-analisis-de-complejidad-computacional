@@ -2,11 +2,20 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CHAPTERS = ("capitulo7", "capitulo8")
+RUNTIME_REVISION = (
+    PROJECT_ROOT / "desarrollo/scripts/data/runtime_revision.txt"
+).read_text(encoding="utf-8").strip()
+RAW_URL = re.compile(
+    r"https://raw\.githubusercontent\.com/Notas-a-Mano-serie-de-libros/"
+    r"3_notas-a-mano-sobre-analisis-de-complejidad-computacional/"
+    r"([^/\s\"'\\]+)(?:/|\"|'|\\n)"
+)
 
 
 def load_constant(path: Path, name: str):
@@ -70,6 +79,19 @@ def main() -> None:
     errors = []
     for chapter in CHAPTERS:
         errors.extend(validate_chapter(chapter))
+
+    for root_name in ("common", "core", "simulaciones", "desarrollo/scripts"):
+        for path in (PROJECT_ROOT / root_name).rglob("*"):
+            if not path.is_file() or path.suffix not in {".py", ".ipynb"}:
+                continue
+            if {".ipynb_checkpoints", ".virtual_documents"}.intersection(path.parts):
+                continue
+            for revision in RAW_URL.findall(path.read_text(encoding="utf-8")):
+                if revision != RUNTIME_REVISION:
+                    errors.append(
+                        f"{path.relative_to(PROJECT_ROOT)} usa la revisión remota "
+                        f"{revision}; se esperaba {RUNTIME_REVISION}"
+                    )
 
     if errors:
         for error in errors:

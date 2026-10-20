@@ -17,6 +17,10 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parents[2]
+REPOSITORY_PATH = (
+    "/Notas-a-Mano-serie-de-libros/"
+    "3_notas-a-mano-sobre-analisis-de-complejidad-computacional/"
+)
 
 
 def worker(notebook: Path, remote: bool, live: bool = False) -> list[str]:
@@ -38,10 +42,13 @@ def worker(notebook: Path, remote: bool, live: bool = False) -> list[str]:
         if not remote:
             raise RuntimeError(f"El notebook local intentó descargar un recurso: {url}")
         url = url.full_url if hasattr(url, "full_url") else url
-        path = unquote(urlparse(url).path).split("/main/", 1)
-        if len(path) != 2:
+        path = unquote(urlparse(url).path)
+        if REPOSITORY_PATH not in path:
             raise ValueError(f"Descarga externa no inventariada: {url}")
-        return ROOT / path[1]
+        revision_and_path = path.split(REPOSITORY_PATH, 1)[1].split("/", 1)
+        if len(revision_and_path) != 2:
+            raise ValueError(f"Descarga externa sin ruta: {url}")
+        return ROOT / revision_and_path[1]
 
     original_urlopen = urllib.request.urlopen
     if live:
