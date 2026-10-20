@@ -172,6 +172,9 @@ jobs:
         run: |
           mkdir -p artifacts
           python -m pip_audit -r requirements-ci.txt --progress-spinner off --format json --output artifacts/pip-audit.json
+      - name: Audit JupyterLite extension dependencies
+        working-directory: desarrollo/jupyterlite_autorun_extension
+        run: npm audit --omit=dev --audit-level=high
       - name: Scan tracked files for secret formats
         run: python desarrollo/scripts/check_secrets.py
       - name: Upload dependency audit

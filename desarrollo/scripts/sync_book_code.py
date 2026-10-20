@@ -60,7 +60,7 @@ for permutacion in generar_permutaciones(lista):
         '<a href="https://pyodide.org/en/stable/" target="_blank" rel="noopener">Pyodide</a>.</p>'
         '<div class="example-runner-actions"><button type="button" data-run>Ejecutar</button>'
         '<button type="button" data-stop disabled>Detener</button>'
-        '<button type="button" data-reset>Reestablecer</button></div>'
+        '<button type="button" data-reset>Restablecer</button></div>'
         '<p data-status role="status">Listo para ejecutar.</p>'
         '<pre data-output aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre>'
         '</details></div>'

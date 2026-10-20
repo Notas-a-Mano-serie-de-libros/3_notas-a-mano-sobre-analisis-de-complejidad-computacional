@@ -44,6 +44,10 @@ def main() -> int:
 
     for path in DOCS.rglob("*.md"):
         source = path.read_text(encoding="utf-8")
+        if re.search(r"\breestablec", source, flags=re.IGNORECASE):
+            errors.append(
+                f"{path.relative_to(ROOT)}: use 'restablecer', no 'reestablecer'"
+            )
         if "Abrir en Google Colab" in source:
             errors.append(
                 f"{path.relative_to(ROOT)}: usa la etiqueta obsoleta de Colab"

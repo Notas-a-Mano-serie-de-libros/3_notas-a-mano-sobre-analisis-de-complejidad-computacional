@@ -2,9 +2,9 @@
 
 ## Comprobaciones automáticas
 
-`smoke_portal_e2e.py` ejecuta el portal en Chromium con anchos de 375 y 1280 píxeles y con reducción de movimiento activa. Comprueba:
+`smoke_portal_e2e.py` ejecuta una matriz representativa de todos los capítulos en Chromium con anchos de 320, 375 y 1280 píxeles y con reducción de movimiento activa. Comprueba:
 
-- desbordamiento horizontal y zoom al 200 %;
+- desbordamiento horizontal, reflujo a 320 píxeles y zoom al 200 % y 400 %;
 - estructura de encabezados y fórmulas sin procesar;
 - nombre accesible de enlaces, botones, campos e iframes visibles;
 - acceso por teclado y foco visible inicial.

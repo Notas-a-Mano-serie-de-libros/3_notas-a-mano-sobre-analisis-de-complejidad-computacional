@@ -2,7 +2,13 @@
 
 Utiliza esta tabla para localizar en Pages la sección que estás leyendo en el libro. Cada enlace conduce directamente a la explicación, simulación o conjunto de ejercicios correspondiente.
 
-Esta tabla es un mapa editorial mantenido dentro del portal. Su validador comprueba que las rutas, los títulos declarados y la navegación existan; no compara automáticamente el contenido con el manuscrito. El proyecto LaTeX es la fuente canónica y no se modifica durante la construcción de Pages.
+El portal es la edición web oficial de la segunda edición. La presentación cambia para aprovechar navegación, código ejecutable, alternativas textuales y simulaciones, pero las definiciones, argumentos, ejemplos y ejercicios deben conservar su significado. El proyecto LaTeX es la fuente editorial canónica y no se modifica durante la construcción de Pages.
+
+## Criterios de equivalencia
+
+Una sección se considera cubierta cuando la edición web conserva las definiciones y supuestos, el razonamiento matemático, los ejemplos relevantes, el análisis temporal y espacial, los ejercicios en HTML y las referencias del manuscrito. Toda explicación visual debe tener una alternativa textual. Una simulación es material complementario: permite experimentar, pero no reemplaza la explicación ni la demostración.
+
+El validador comprueba todas las páginas de los capítulos, sus títulos, la navegación y que los ejercicios sean autosuficientes en HTML. Una revisión editorial sigue siendo necesaria para comprobar la fidelidad semántica, que no puede establecerse contando palabras o encabezados.
 
 | Sección del libro | Entrada en Pages |
 | --- | --- |
@@ -31,3 +37,5 @@ Esta tabla es un mapa editorial mantenido dentro del portal. Su validador compru
 | 8.2–8.7 · Algoritmos de ordenamiento | [Capítulo 8: Análisis de algoritmos de ordenamiento clásicos](capitulos/capitulo-8.md) |
 | 8.9 · Ejercicios propuestos | [Ejercicios del capítulo 8](capitulos/capitulo-8/ejercicios-propuestos.md) |
 | 9.1–9.2 · Reflexiones finales | [Capítulo 9: Mejorar sin perder el camino](capitulos/capitulo-9.md) |
+
+La [bibliografía de la obra](bibliografia.md) se genera desde el archivo BibTeX canónico. Al modificar el manuscrito deben actualizarse la página correspondiente y, si cambian las referencias, ese archivo fuente; después se ejecuta `make validate`.

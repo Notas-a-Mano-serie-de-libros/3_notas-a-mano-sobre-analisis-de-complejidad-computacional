@@ -1,4 +1,10 @@
 {
+  "coverage": {
+    "roots": ["docs/capitulos"],
+    "patterns": ["capitulo-*.md", "capitulo-*/*.md"],
+    "exclude": ["docs/capitulos/index.md"],
+    "require_navigation": true
+  },
   "pages": [
     {"book_section": "1", "path": "docs/capitulos/capitulo-1.md", "heading": "Capítulo 1 · Introducción"},
     {"book_section": "2", "path": "docs/capitulos/capitulo-2.md", "heading": "Capítulo 2 · Fundamentos del análisis de algoritmos"},

@@ -8,6 +8,20 @@
 
 Una función de complejidad relaciona el tamaño de entrada \(n\) con los recursos consumidos. El tiempo se representa mediante \(T(n)\) y el espacio mediante \(S(n)\). Estas funciones modelan crecimiento: no son segundos o bytes universales, pues la ejecución concreta depende de la máquina, el lenguaje y la implementación.
 
+### Modelo de análisis y supuestos
+
+Antes de calcular una complejidad, declare qué representa la entrada y qué recurso se está midiendo. En este portal se adopta, salvo indicación contraria, un modelo de costo uniforme semejante al modelo RAM: cada operación elemental sobre valores que caben en una palabra de máquina tiene costo constante. Este supuesto permite comparar algoritmos sin depender de una marca de procesador, pero no afirma que todas las operaciones tarden lo mismo en una ejecución real.
+
+- **Tamaño de entrada:** \(n\) debe definirse para cada problema. Puede ser la cantidad de elementos, nodos, bits, dígitos o caracteres; no siempre coincide con el valor numérico recibido.
+- **Operación elemental:** debe indicarse qué operación se contará. Una comparación, una asignación o un acceso a un arreglo pueden ser candidatos, siempre que el criterio se mantenga durante todo el análisis.
+- **Tiempo teórico:** \(T(n)\) cuenta operaciones bajo el modelo escogido. El tiempo de reloj también depende del lenguaje, compilador, memoria caché, sistema operativo y equipo.
+- **Espacio total y auxiliar:** el espacio total incluye la entrada; el auxiliar mide únicamente la memoria adicional utilizada por el algoritmo. En recursión debe contarse también la pila de llamadas.
+- **Tamaño de palabra:** el costo constante solo es razonable mientras los operandos quepan en una palabra. Operaciones con enteros, cadenas o matrices de tamaño creciente requieren contabilizar su propio costo.
+- **Casos de ejecución:** mejor, peor y promedio describen entradas distintas del mismo tamaño. Un caso promedio solo es válido cuando se declara una distribución de probabilidad sobre las entradas.
+- **Correctitud antes que eficiencia:** una función de complejidad es útil únicamente después de establecer que el algoritmo termina y produce el resultado esperado.
+
+El análisis asintótico explica la tendencia cuando \(n\) crece. Para estimar segundos o bytes deben añadirse constantes medibles y explicitarse las unidades, como se hace en los ejercicios del capítulo.
+
 ### 2.1.1 Propiedades básicas
 
 - **Restricción del dominio:** El tamaño de entrada \(n\) es un número natural no negativo; puede representar elementos, bits o nodos.

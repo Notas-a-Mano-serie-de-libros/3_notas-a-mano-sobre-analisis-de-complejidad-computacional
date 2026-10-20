@@ -13,6 +13,7 @@ lint:
 	$(PYTHON) -m ruff check .
 
 validate:
+	$(PYTHON) desarrollo/scripts/build_bibliography_page.py --check
 	$(PYTHON) desarrollo/scripts/validate_book_structure.py
 	$(PYTHON) desarrollo/scripts/validate_page_assets.py
 	$(PYTHON) desarrollo/scripts/validate_external_references.py

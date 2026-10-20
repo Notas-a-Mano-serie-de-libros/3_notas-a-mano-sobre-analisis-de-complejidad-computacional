@@ -24,7 +24,7 @@ Usa el recorrido por capítulos para ubicar conceptos generales y entra en cada 
 
 ## Ejecutar ejemplos en Pages
 
-Abre **Ver código y editar entradas**, elige **Java**, **Python** o **C** y modifica los valores resaltados. El algoritmo permanece en solo lectura. Pulsa **Ejecutar** para ver el resultado, **Detener** para cancelar o **Reestablecer** para recuperar las entradas originales. Cada lenguaje conserva sus entradas al cambiar de selección.
+Abre **Ver código y editar entradas**, elige **Java**, **Python** o **C** y modifica los valores resaltados. El algoritmo permanece en solo lectura. Pulsa **Ejecutar** para ver el resultado, **Detener** para cancelar o **Restablecer** para recuperar las entradas originales. Cada lenguaje conserva sus entradas al cambiar de selección.
 
 La ejecución ocurre en tu navegador: Java utiliza [CheerpJ](https://cheerpj.com/), Python utiliza [Pyodide](https://pyodide.org/) y C se compila a WebAssembly. La primera carga necesita conexión a Internet. En Java y C, la función `main` invoca directamente el algoritmo con los valores editables; en Python, las líneas resaltadas cumplen la misma función.
 

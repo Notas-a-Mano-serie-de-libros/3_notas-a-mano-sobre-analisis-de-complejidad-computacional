@@ -2,7 +2,7 @@
   "name": "@notas-a-mano/jupyterlite-auto-run",
   "version": "1.0.0",
   "description": "Run simulation notebooks when their JupyterLite kernel is ready",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [

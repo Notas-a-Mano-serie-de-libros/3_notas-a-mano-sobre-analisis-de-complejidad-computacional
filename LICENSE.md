@@ -2,11 +2,11 @@
 
 ## Sobre este repositorio
 
-Este repositorio contiene el material complementario (notebooks, scripts, ejemplos de código y recursos pedagógicos) de la obra **Notas a mano sobre análisis de complejidad computacional: Teoría, estructuras y análisis de algoritmos**, escrita por **Carlos Eduardo Orozco Garcés** y publicada en 2025, como parte de la serie de libros **Notas a mano**.
+Este repositorio contiene la edición web y los recursos digitales (notebooks, scripts, ejemplos de código y materiales pedagógicos) de la segunda edición de la obra **Notas a mano sobre análisis de complejidad computacional: Teoría, estructuras y análisis de algoritmos**, escrita por **Carlos Eduardo Orozco Garcés, César Jesús Pardo Calvache y Mauro Callejas Cuervo** y publicada en 2026 como parte de la serie de libros **Notas a mano**.
 
 **El texto del libro y este repositorio de código tienen licencias distintas.** El contenido escrito de la obra (texto, explicaciones narrativas, figuras originales del libro) se distribuye bajo la licencia **Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)**, según se indica en el propio libro. Los notebooks, scripts y ejemplos de código de este repositorio, en cambio, se distribuyen bajo los términos, mucho más permisivos, descritos a continuación.
 
-Copyright (c) 2025 Carlos Eduardo Orozco Garcés.
+Copyright (c) 2026 Carlos Eduardo Orozco Garcés, César Jesús Pardo Calvache y Mauro Callejas Cuervo.
 
 ## Licencia aplicable
 
@@ -14,7 +14,7 @@ Salvo que se indique expresamente lo contrario en un archivo, carpeta o recurso 
 
 **Licencia MIT**
 
-Texto legal oficial: consulta el archivo [`LICENSE.md`](./LICENSE.md) en la raíz de este repositorio.
+Texto legal oficial: consulta [`LICENSE-CODE.md`](./LICENSE-CODE.md). La licencia del contenido educativo se documenta por separado en [`LICENSE-CONTENT.md`](./LICENSE-CONTENT.md).
 
 En resumen, la licencia MIT te permite usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del material, **incluso con fines comerciales**, sin necesidad de pedir autorización previa, con una única condición: conservar el aviso de copyright y el texto de la licencia en las copias o partes sustanciales del material que redistribuyas.
 
@@ -28,13 +28,13 @@ Gracias a la licencia MIT, puedes utilizar el código y los notebooks de este re
 - Redistribuir el código original o modificado, en proyectos propios o de terceros.
 - Incorporar fragmentos de código en trabajos académicos, prácticas, laboratorios, proyectos o software.
 
-La única condición en todos los casos anteriores es conservar el aviso de copyright y el texto de la licencia MIT en las copias que distribuyas (ver [`LICENSE.md`](./LICENSE.md)).
+La única condición en todos los casos anteriores es conservar el aviso de copyright y el texto de la licencia MIT en las copias que distribuyas (ver [`LICENSE-CODE.md`](./LICENSE-CODE.md)).
 
 ## Atribución recomendada (no obligatoria por la licencia del código)
 
 La licencia MIT no exige una cita formal para usar el código, pero se agradece y se recomienda reconocer la fuente cuando reutilices o adaptes notebooks y ejemplos de este repositorio. Una forma sugerida de referencia es:
 
-> Orozco Garcés, Carlos Eduardo. *Notas a mano sobre análisis de complejidad computacional: Teoría, estructuras y análisis de algoritmos*. 2025. Repositorio de código complementario.
+> Orozco Garcés, Carlos Eduardo; Pardo Calvache, César Jesús; Callejas Cuervo, Mauro. *Notas a mano sobre análisis de complejidad computacional: Teoría, estructuras y análisis de algoritmos*. Segunda edición, 2026. Edición web y repositorio de recursos digitales.
 
 ## Código fuente y ejemplos ejecutables
 
@@ -47,7 +47,7 @@ Este repositorio funciona como material de apoyo del libro publicado. La licenci
 - El texto, la redacción, la estructura pedagógica ni las explicaciones del libro (protegidos bajo CC BY-NC-ND 4.0, según se indica en la obra).
 - El título, la serie **Notas a mano**, la marca editorial ni el diseño del libro.
 
-En particular, la licencia MIT del código **no autoriza** publicar una versión sustancialmente equivalente del libro completo, ni presentar el texto de la obra como propio.
+La edición web oficial incluida en este repositorio se publica con autorización de los titulares y puede reproducir el contenido de la obra bajo CC BY-NC-ND 4.0. Esta autorización editorial no convierte el texto en código MIT ni autoriza a terceros a publicar adaptaciones o versiones modificadas del libro.
 
 ## Recursos de terceros
 
@@ -65,7 +65,7 @@ En la medida permitida por la ley aplicable, el autor no será responsable por d
 
 Para usos relacionados con el **texto del libro** (traducciones, redistribución editorial, inclusión en plataformas de pago, adaptaciones del contenido escrito) que no están cubiertos por la licencia MIT de este repositorio, debes solicitar autorización previa al autor, conforme a los términos de la licencia CC BY-NC-ND 4.0 indicada en el libro.
 
-Autor: **Carlos Eduardo Orozco Garcés**
+Autores: **Carlos Eduardo Orozco Garcés, César Jesús Pardo Calvache y Mauro Callejas Cuervo**
 
 Puedes consultar los canales de contacto disponibles en el archivo `README.md` del repositorio.
 

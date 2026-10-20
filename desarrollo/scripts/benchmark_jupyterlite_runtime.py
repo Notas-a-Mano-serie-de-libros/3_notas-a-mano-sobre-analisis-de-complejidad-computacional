@@ -17,9 +17,12 @@ except ModuleNotFoundError:
     from jupyterlite_catalog import PROFILE_CONFIGS
 
 ROOT = Path(__file__).resolve().parents[2]
-MAX_NOTEBOOK_READY_MS = 45_000
-MAX_SIMULATION_READY_MS = 30_000
-MAX_REQUESTS = 400
+# Estos límites protegen la experiencia, no solo evitan un timeout técnico.
+# Se miden sobre archivos locales en Chromium; una regresión que tarde decenas
+# de segundos debe fallar antes de llegar a producción.
+MAX_NOTEBOOK_READY_MS = 15_000
+MAX_SIMULATION_READY_MS = 12_000
+MAX_REQUESTS = 250
 SIMULATION_NOTEBOOK = Path(
     "simulaciones/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb"
 )

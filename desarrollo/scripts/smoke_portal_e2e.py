@@ -20,14 +20,28 @@ from pathlib import Path
 
 PAGES = (
     "",
+    "capitulos/capitulo-1/",
     "capitulos/capitulo-2/",
+    "capitulos/capitulo-2/ejercicios-propuestos/",
+    "capitulos/capitulo-3/",
+    "capitulos/capitulo-3/ejercicios-propuestos/",
+    "capitulos/capitulo-4/",
+    "capitulos/capitulo-4/ejercicios-propuestos/",
+    "capitulos/capitulo-5/",
     "capitulos/capitulo-5/ecuacion-caracteristica/",
+    "capitulos/capitulo-5/ejercicios-propuestos/",
+    "capitulos/capitulo-6/",
     "capitulos/capitulo-6/merge-sort/",
+    "capitulos/capitulo-6/ejercicios-propuestos/",
+    "capitulos/capitulo-7/",
     "capitulos/capitulo-7/2-busqueda-binaria/",
     "capitulos/capitulo-8/",
     "capitulos/capitulo-8/5-ordenamiento-mezcla/",
+    "capitulos/capitulo-9/",
+    "glosario/",
+    "indice-tematico/",
 )
-VIEWPORTS = ((375, 800), (1280, 900))
+VIEWPORTS = ((320, 800), (375, 800), (1280, 900))
 HEADING_JS = "[...document.querySelectorAll('.md-content h1,.md-content h2,.md-content h3,.md-content h4,.md-content h5,.md-content h6')].map(h=>+h.tagName[1])"
 
 

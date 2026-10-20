@@ -234,7 +234,7 @@ def render_runner(listing: dict, executable_only: bool = False, *, include_pseud
         '<p class="runtime-credit" data-runtime-credit="c" hidden>C se ejecuta en tu navegador mediante <a href="https://webassembly.org/" target="_blank" rel="noopener">WebAssembly</a>.</p>'
         f'<div class="example-runner-actions"><button type="button" data-run{pseudocode_disabled}><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg><span>Ejecutar</span></button>'
         '<button type="button" data-stop disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6h12v12H6z"/></svg><span>Detener</span></button>'
-        f'<button type="button" data-reset{pseudocode_disabled}><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg><span>Reestablecer</span></button></div>'
+        f'<button type="button" data-reset{pseudocode_disabled}><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg><span>Restablecer</span></button></div>'
         f'<p data-status{execution_attribute} role="status">Listo para ejecutar.</p>'
         f'<pre data-output{execution_attribute} aria-label="Resultado de la ejecución" tabindex="0">El resultado aparecerá aquí.</pre></details></div>'
     )

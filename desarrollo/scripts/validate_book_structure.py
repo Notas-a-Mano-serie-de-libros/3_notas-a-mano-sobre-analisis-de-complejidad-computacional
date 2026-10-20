@@ -43,6 +43,49 @@ def validate() -> list[str]:
         nav_path = relative.removeprefix("docs/")
         if nav_path not in nav:
             errors.append(f"{relative}: no aparece en la navegación de mkdocs.yml")
+
+    coverage = data.get("coverage", {})
+    excluded = set(coverage.get("exclude", ()))
+    discovered: set[str] = set()
+    for root_name in coverage.get("roots", ()):
+        root = ROOT / root_name
+        for pattern in coverage.get("patterns", ("*.md",)):
+            discovered.update(
+                path.relative_to(ROOT).as_posix()
+                for path in root.glob(pattern)
+                if path.is_file()
+            )
+    discovered.difference_update(excluded)
+
+    if len(discovered) < len(seen_paths):
+        errors.append(
+            "El descubrimiento editorial encontró menos páginas que el manifiesto "
+            f"({len(discovered)} < {len(seen_paths)})"
+        )
+
+    for relative in sorted(discovered):
+        path = ROOT / relative
+        source = path.read_text(encoding="utf-8")
+        match = re.search(r"^# (.+)$", source, flags=re.MULTILINE)
+        heading = match.group(1).strip() if match else ""
+        if not heading:
+            errors.append(f"{relative}: falta el encabezado principal")
+
+        if coverage.get("require_navigation", False):
+            nav_path = relative.removeprefix("docs/")
+            if nav_path not in nav:
+                errors.append(f"{relative}: no aparece en la navegación completa de mkdocs.yml")
+
+        if relative.endswith("/ejercicios-propuestos.md"):
+            body = re.sub(r"<nav.*?</nav>", "", source, flags=re.DOTALL)
+            body = re.sub(r"<div class=\"lab-action\">.*?</div>", "", body, flags=re.DOTALL)
+            words = re.findall(r"\b[\wáéíóúñÁÉÍÓÚÑ]+\b", body)
+            activities = len(re.findall(r"(?m)^\s*\d+\.\s|^##\s", body))
+            if len(words) < 180 or activities < 3:
+                errors.append(
+                    f"{relative}: los ejercicios no son autosuficientes en HTML "
+                    f"({len(words)} palabras, {activities} actividades/secciones)"
+                )
     return errors
 
 
@@ -51,7 +94,7 @@ def main() -> int:
     if errors:
         print("\n".join(errors))
         return 1
-    print("Existencia, títulos y navegación del manifiesto editorial validados.")
+    print("Cobertura completa, títulos, navegación y ejercicios HTML validados.")
     return 0
 
 

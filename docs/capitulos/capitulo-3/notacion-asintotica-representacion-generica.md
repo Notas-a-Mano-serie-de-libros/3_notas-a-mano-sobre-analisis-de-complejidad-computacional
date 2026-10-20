@@ -30,6 +30,38 @@ Este razonamiento produce la jerarquía funcional asintótica:
 
 La jerarquía compara tendencias teóricas y no sustituye el costo exacto de una implementación.
 
+## Ejemplos razonados
+
+Para \(f(n)=7 \cdot n^3+4 \cdot n^2+20\), divida entre \(n^3\):
+
+\[
+\frac{f(n)}{n^3}=7+\frac{4}{n}+\frac{20}{n^3}
+\xrightarrow[n\to\infty]{}7.
+\]
+
+El límite es una constante positiva y finita, por lo que \(f(n)\in\Theta(n^3)\). La constante no tiene que ser uno: basta con que ninguno de los dos términos crezca asintóticamente más rápido que el otro.
+
+Para \(g(n)=2^n+n^5\), compare el término polinómico con el exponencial:
+
+\[
+\lim_{n\to\infty}\frac{n^5}{2^n}=0.
+\]
+
+Así, \(g(n)\in\Theta(2^n)\). Que \(n^5\) pueda ser mayor para ciertos valores pequeños no contradice la conclusión, porque la notación asintótica estudia el comportamiento después de algún umbral.
+
+## Qué no puede concluirse
+
+- El término dominante no entrega el tiempo exacto de ejecución.
+- Dos funciones de la misma familia pueden diferir notablemente para entradas pequeñas.
+- Simplificar una expresión no determina por sí solo si representa mejor, peor o caso promedio.
+- La jerarquía no permite descartar constantes cuando se hace una estimación física en segundos o bytes.
+
+## Compruebe su comprensión
+
+1. Determine el término dominante de \(3 \cdot n^2 \cdot \log(n)+8 \cdot n^2+n\).
+2. Justifique mediante un límite que \(n \cdot \log(n)\in o(n^{3/2})\).
+3. Explique por qué \(1000 \cdot n\) puede superar a \(n^2\) para algunas entradas aunque \(n^2\) tenga mayor crecimiento asintótico.
+
 <nav class="section-return section-step" aria-label="Navegación entre secciones"><a href="../">Capítulo 3</a><a class="section-step__index" href="../">Capítulo 3</a><a class="section-step__next" href="../familias-de-funciones/">3.3 Familias de funciones →</a></nav>
 
 ---
