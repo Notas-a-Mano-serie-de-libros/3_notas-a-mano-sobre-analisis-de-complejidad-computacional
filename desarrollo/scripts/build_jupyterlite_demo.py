@@ -51,6 +51,12 @@ WIDGET_WHEEL_REQUIREMENTS = (
     "ipywidgets==8.1.9",
     "jupyterlab_widgets==3.0.17",
 )
+PRELOAD_PACKAGE_OVERRIDES = {
+    # El perfil agrupa capítulos científicos y ordenamientos interactivos. Las
+    # dependencias pesadas se instalan selectivamente según el notebook para no
+    # penalizar el primer arranque de cada ordenamiento.
+    "graficas": (),
+}
 
 
 def content_storage_name(chapter: int = 3) -> str:
@@ -226,7 +232,10 @@ def build(output_dir: Path, chapter: int = 3) -> None:
         add_autorun_extension(lite_dir)
         config_path = lite_dir / "jupyter-lite.json"
         lite_config = json.loads(config_path.read_text(encoding="utf-8"))
-        configure_pyodide_packages(lite_config, config["packages"])
+        configure_pyodide_packages(
+            lite_config,
+            PRELOAD_PACKAGE_OVERRIDES.get(profile, config["packages"]),
+        )
         lite_config.setdefault("jupyter-config-data", {})["contentsStorageName"] = (
             content_storage_name(chapter)
         )
@@ -277,14 +286,14 @@ def main() -> int:
         "--output-dir",
         type=Path,
         default=DEFAULT_OUTPUT,
-        help="Directorio raíz para los cuatro perfiles JupyterLite.",
+        help="Directorio raíz para los perfiles JupyterLite.",
     )
     parser.add_argument(
         "--chapter",
         type=int,
         choices=(*CHAPTER_CONFIGS, 0),
         default=0,
-        help="Construye el perfil del capítulo indicado; por defecto compila los cuatro perfiles.",
+        help="Construye el perfil del capítulo indicado; por defecto compila todos los perfiles.",
     )
     args = parser.parse_args()
     output_dir = args.output_dir

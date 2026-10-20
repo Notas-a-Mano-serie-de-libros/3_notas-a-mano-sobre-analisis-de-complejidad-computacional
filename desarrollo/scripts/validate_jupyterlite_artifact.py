@@ -118,7 +118,7 @@ def main() -> int:
     total_files = sum(1 for path in site_dir.rglob("*") if path.is_file())
     print(
         f"Artefactos JupyterLite válidos ({total_bytes} bytes y "
-        f"{total_files} archivos en cuatro perfiles)."
+        f"{total_files} archivos en {len(PROFILE_CONFIGS)} perfiles)."
     )
     return 0
 

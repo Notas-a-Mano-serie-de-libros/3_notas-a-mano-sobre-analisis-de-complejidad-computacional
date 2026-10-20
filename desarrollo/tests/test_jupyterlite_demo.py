@@ -14,6 +14,7 @@ from desarrollo.scripts.build_jupyterlite_demo import (
     CONTENT_FILES,
     LITE_DIR,
     NOTEBOOKS,
+    PRELOAD_PACKAGE_OVERRIDES,
     WIDGET_PROFILES,
     WIDGET_WHEEL_REQUIREMENTS,
     chapter_content_files,
@@ -74,6 +75,8 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert "await installWidgetPackage(panel)" in extension
     assert "await piplite.install('ipywidgets==8.1.9')" in extension
     assert '"import ipywidgets"' in extension
+    assert "SCIENTIFIC_NOTEBOOK_PATH.test(panel.context.path)" in extension
+    assert "['ipywidgets==8.1.9', 'matplotlib', 'numpy']" in extension
     assert extension.index("await installWidgetPackage(panel)") < extension.index(
         "NotebookActions.runAll(panel.content, panel.context.sessionContext)"
     )
@@ -178,7 +181,11 @@ def test_documentation_dependencies_include_the_jupyter_builder_cli():
 
 
 def test_widget_profiles_bundle_their_runtime_wheels():
-    assert WIDGET_PROFILES == {"graficas", "algebra-simbolica", "analisis-completo"}
+    assert WIDGET_PROFILES == {
+        "graficas",
+        "algebra-simbolica",
+        "analisis-completo",
+    }
     assert WIDGET_WHEEL_REQUIREMENTS == (
         "comm==0.2.3",
         "ipywidgets==8.1.9",
@@ -250,6 +257,10 @@ def test_kernel_pyodide_precarga_dependencias_del_capitulo():
         "@jupyterlite/pyodide-kernel-extension:kernel"
     ]
     assert settings["loadPyodideOptions"]["packages"] == list(packages)
+
+
+def test_perfil_compartido_instala_dependencias_pesadas_bajo_demanda():
+    assert PRELOAD_PACKAGE_OVERRIDES == {"graficas": ()}
 
 
 def test_chapter_three_avoids_widget_runtime_in_webassembly():

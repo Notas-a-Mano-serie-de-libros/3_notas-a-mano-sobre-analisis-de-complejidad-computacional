@@ -116,12 +116,16 @@ def synchronize(check: bool = False) -> list[Path]:
                 f"jupyterlite/{profile_for_chapter(chapter)}/notebooks/index.html"
                 f"?path={encoded_path}"
             )
+            any_profile_base = (
+                r"jupyterlite/[^/]+/notebooks/index\.html"
+                rf"\?path={re.escape(encoded_path)}"
+            )
             legacy_base = (
                 f"jupyterlite/capitulo-{chapter}/notebooks/index.html"
                 f"?path={encoded_path}"
             )
             updated, replacements = re.subn(
-                rf"(?:{re.escape(current_base)}|{re.escape(legacy_base)})"
+                rf"(?:{re.escape(current_base)}|{re.escape(legacy_base)}|{any_profile_base})"
                 r"(?:&revision=[0-9a-f]+)?",
                 target,
                 updated,

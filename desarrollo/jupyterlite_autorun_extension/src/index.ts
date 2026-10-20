@@ -7,6 +7,8 @@ import {
 
 const WIDGET_NOTEBOOK_PATH =
   /(?:^|\/)simulaciones\/capitulo(?:2|4|5|6|7|8)\/notebooks\//;
+const SCIENTIFIC_NOTEBOOK_PATH =
+  /(?:^|\/)simulaciones\/(?:capitulo(?:2|4|6)\/notebooks\/|capitulo8\/notebooks\/(?:0_comparacion_ordenamientos|ejercicios_propuestos)\.ipynb$)/;
 const EMBEDDED_HEIGHT_MESSAGE = "notas-a-mano:jupyterlite-height";
 const EMBEDDED_READY_MESSAGE = "notas-a-mano:jupyterlite-ready";
 const EMBEDDED_ERROR_MESSAGE = "notas-a-mano:jupyterlite-error";
@@ -173,7 +175,9 @@ async function installWidgetPackage(panel: NotebookPanel): Promise<void> {
     {
       code: [
         "import piplite",
-        "await piplite.install('ipywidgets==8.1.9')",
+        SCIENTIFIC_NOTEBOOK_PATH.test(panel.context.path)
+          ? "await piplite.install(['ipywidgets==8.1.9', 'matplotlib', 'numpy'])"
+          : "await piplite.install('ipywidgets==8.1.9')",
         // Confirm the module is visible in this kernel before the notebook runs.
         "import ipywidgets",
       ].join("\n"),

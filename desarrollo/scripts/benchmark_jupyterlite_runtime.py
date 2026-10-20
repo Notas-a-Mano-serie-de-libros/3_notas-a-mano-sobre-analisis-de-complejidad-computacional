@@ -18,7 +18,7 @@ except ModuleNotFoundError:
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_NOTEBOOK_READY_MS = 45_000
-MAX_SIMULATION_READY_MS = 120_000
+MAX_SIMULATION_READY_MS = 30_000
 MAX_REQUESTS = 400
 SIMULATION_NOTEBOOK = Path(
     "simulaciones/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb"
@@ -74,7 +74,15 @@ def verify_executed_simulation(browser, base: str) -> dict[str, object]:
     context = browser.new_context(reduced_motion="reduce")
     page = context.new_page()
     failures: list[str] = []
+    unexpected_scientific_requests: list[str] = []
     page.on("requestfailed", lambda request: failures.append(request.url))
+
+    def detect_unneeded_scientific_package(response) -> None:
+        filename = response.url.rsplit("/", 1)[-1]
+        if filename.startswith(("matplotlib-", "numpy-")):
+            unexpected_scientific_requests.append(response.url)
+
+    page.on("response", detect_unneeded_scientific_package)
     url = (
         f"{base}graficas/notebooks/index.html?path="
         f"{quote(SIMULATION_NOTEBOOK.as_posix(), safe='')}"
@@ -93,6 +101,7 @@ def verify_executed_simulation(browser, base: str) -> dict[str, object]:
         "simulation_ready_ms": ready_ms,
         "responsive": responsive,
         "failed_requests": failures,
+        "unexpected_scientific_requests": unexpected_scientific_requests,
     }
 
 
@@ -130,6 +139,8 @@ def main() -> int:
                 errors.append("simulación: el navegador dejó de responder")
             if simulation_smoke["failed_requests"]:
                 errors.append("simulación: solicitudes fallidas")
+            if simulation_smoke["unexpected_scientific_requests"]:
+                errors.append("simulación: descargó dependencias científicas innecesarias")
         except Exception as error:
             simulation_smoke = None
             errors.append(f"simulación: {error}")
