@@ -84,7 +84,13 @@ function prepareEmbeddedHeight(panel: NotebookPanel): () => void {
         box-sizing: border-box !important;
         width: 100% !important;
         padding: 0 !important;
-        overflow: hidden !important;
+        overflow: auto !important;
+        scrollbar-width: none !important;
+      }
+      .jp-NotebookPanel-notebook .jp-WindowedPanel-outer::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
       }
       .jp-NotebookPanel-notebook .jp-WindowedPanel-inner,
       .jp-NotebookPanel-notebook .jp-WindowedPanel-viewport {

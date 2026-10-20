@@ -86,6 +86,9 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert 'classList.remove("jp-mod-scrollPastEnd")' in extension
     assert 'style.id = EMBEDDED_LAYOUT_STYLE_ID' in extension
     assert "padding: 0 !important" in extension
+    assert "overflow: auto !important" in extension
+    assert "scrollbar-width: none !important" in extension
+    assert ".jp-WindowedPanel-outer::-webkit-scrollbar" in extension
     assert ".jp-OutputPrompt { display: none !important; }" in extension
     assert "html, body { overflow: hidden !important; }" in extension
     assert "Array.from(scrollContainer.children).reduce" in extension
