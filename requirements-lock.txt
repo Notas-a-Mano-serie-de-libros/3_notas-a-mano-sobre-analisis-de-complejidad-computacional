@@ -1,7 +1,7 @@
 # Restricciones directas compartidas por Python 3.11 y 3.12.
 # Este archivo no sustituye los locks transitivos con hashes pendientes de generar.
 pytest==9.1.1
-numpy==2.4.6
+numpy==2.5.4
 matplotlib==3.11.2
 IPython==9.17.1
 ipywidgets==8.1.9
