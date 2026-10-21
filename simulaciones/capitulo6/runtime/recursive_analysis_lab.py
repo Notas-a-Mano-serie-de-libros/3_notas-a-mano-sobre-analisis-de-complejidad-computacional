@@ -315,7 +315,7 @@ def _execution_height(nodes: list[Node]) -> int:
 
 
 def _inline_math_html(expression: str) -> str:
-    """Presenta fórmulas estables con la tipografía y espaciado matemáticos."""
+    """Compone MathML nativo sin recargar MathJax durante la animación."""
 
     accessible = expression.replace(r"\left", "").replace(r"\right", "")
     accessible = re.sub(r"\s*\\cdot\s*", " por ", accessible)
@@ -324,21 +324,64 @@ def _inline_math_html(expression: str) -> str:
     accessible = accessible.replace("{", "").replace("}", "")
     accessible = " ".join(accessible.split())
 
-    rendered = html.escape(expression)
-    rendered = rendered.replace(r"\left", "").replace(r"\right", "")
-    rendered = re.sub(r"\^\{([^{}]+)\}", r"<sup>\1</sup>", rendered)
-    rendered = re.sub(r"\^([0-9]+)", r"<sup>\1</sup>", rendered)
-    rendered = rendered.replace("{", "").replace("}", "")
-    rendered = re.sub(r"\b([fx])\b", r"<i>\1</i>", rendered)
-    rendered = rendered.replace("=", '<span class="lab-math-relation">=</span>')
-    rendered = re.sub(
-        r"\s*\\cdot\s*",
-        '<span class="lab-math-operator">·</span>',
-        rendered,
-    )
+    normalized = expression.replace(r"\left", "").replace(r"\right", "")
+    normalized = re.sub(r"\s*\\cdot\s*", "·", normalized)
+
+    def sequence(position: int, closing: str | None = None):
+        output = []
+        while position < len(normalized):
+            character = normalized[position]
+            if closing and character == closing:
+                return "".join(output), position + 1
+            if character.isspace():
+                position += 1
+                continue
+            if character == "(":
+                inner, position = sequence(position + 1, ")")
+                atom = (
+                    '<mrow><mo fence="true">(</mo>'
+                    f'{inner}<mo fence="true">)</mo></mrow>'
+                )
+            elif character.isdigit():
+                end = position + 1
+                while end < len(normalized) and normalized[end].isdigit():
+                    end += 1
+                atom = f"<mn>{normalized[position:end]}</mn>"
+                position = end
+            elif character.isalpha():
+                end = position + 1
+                while end < len(normalized) and normalized[end].isalpha():
+                    end += 1
+                atom = f"<mi>{html.escape(normalized[position:end])}</mi>"
+                position = end
+            elif character in "=+-·×":
+                output.append(f"<mo>{html.escape(character)}</mo>")
+                position += 1
+                continue
+            else:
+                output.append(f"<mtext>{html.escape(character)}</mtext>")
+                position += 1
+                continue
+
+            if position < len(normalized) and normalized[position] == "^":
+                position += 1
+                if position < len(normalized) and normalized[position] == "{":
+                    exponent, position = sequence(position + 1, "}")
+                else:
+                    start = position
+                    while position < len(normalized) and normalized[position].isalnum():
+                        position += 1
+                    value = normalized[start:position]
+                    tag = "mn" if value.isdigit() else "mi"
+                    exponent = f"<{tag}>{html.escape(value)}</{tag}>"
+                atom = f"<msup>{atom}<mrow>{exponent}</mrow></msup>"
+            output.append(atom)
+        return "".join(output), position
+
+    rendered, _ = sequence(0)
     return (
-        f'<span class="lab-math-expression" role="math" '
-        f'aria-label="{html.escape(accessible, quote=True)}">{rendered}</span>'
+        '<math class="lab-math-expression" '
+        f'aria-label="{html.escape(accessible, quote=True)}"><mrow>{rendered}</mrow></math>'
     )
 
 
@@ -607,7 +650,7 @@ STYLES = """
 .lab-node.undiscovered{opacity:0;pointer-events:none}.lab-call-stack{display:flex;height:100%;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:14px 18px 0;overflow:auto;background:#fff}
 .lab-call-frame{display:flex;width:min(100%,330px);align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border:1px solid #202124;border-radius:0;background:#f7f7f7;transition:background-color .2s ease,opacity .2s ease,transform .2s ease}
 .lab-call-frame+.lab-call-frame{border-top:0}
-.lab-call-frame b{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-weight:400}.lab-call-frame span{font-size:12px;color:#5f6368!important}.lab-call-frame .lab-math-expression{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:17px;color:#202124!important;white-space:nowrap}.lab-call-frame .lab-math-expression i{font-family:inherit;font-style:italic}.lab-call-frame .lab-math-expression .lab-math-operator,.lab-call-frame .lab-math-expression .lab-math-relation{display:inline-block;margin:0 .22em;font:inherit;color:inherit!important}.lab-call-frame .lab-math-expression sup{font-size:.72em;line-height:0;vertical-align:super}
+.lab-call-frame b{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-weight:400}.lab-call-frame span{font-size:12px;color:#5f6368!important}.lab-call-frame .lab-math-expression{display:inline-block;margin:0;font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:18px;color:#202124!important;white-space:nowrap}.lab-call-frame .lab-math-expression *{color:#202124!important}
 .lab-call-frame.waiting{opacity:.62}.lab-call-frame.current-call{background:#f4e8bd;opacity:1}.lab-call-frame.current-return{background:#e8f5e9;opacity:1}.lab-call-frame.completed{transform:none;opacity:1}
 .lab-completed-row{position:relative;width:min(100%,330px)}.lab-completed-row .lab-call-frame{width:100%}
 .lab-finish-check{position:absolute;left:calc(100% + 8px);top:50%;display:inline-block!important;width:28px;font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32!important;text-align:center;transform:translateY(-50%)}

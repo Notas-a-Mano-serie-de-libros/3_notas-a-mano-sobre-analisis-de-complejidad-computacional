@@ -87,8 +87,8 @@ def test_call_stack_places_original_problem_at_the_base_and_returns_in_reverse()
 
     assert markup.index("f(1)=1") < markup.index("f(2)=2")
     assert markup.index("f(2)=2") < markup.index("f(3)=3")
-    assert '<span class="lab-math-operator">·</span>' in markup
-    assert 'class="lab-math-expression" role="math"' in markup
+    assert "<mo>·</mo>" in markup
+    assert '<math class="lab-math-expression"' in markup
     assert "Caso base · retorna" in markup
     assert "Orden de desapilado" not in markup
 
@@ -98,10 +98,10 @@ def test_inline_equations_keep_math_spacing_exponents_and_accessible_text():
 
     markup = _inline_math_html(r"f(8)=\left(x^{4}\right)^2\cdot x")
 
-    assert '<i>f</i>' in markup
-    assert '<i>x</i><sup>4</sup>' in markup
-    assert ")<sup>2</sup>" in markup
-    assert '<span class="lab-math-operator">·</span><i>x</i>' in markup
+    assert "<mi>f</mi>" in markup
+    assert "<msup><mi>x</mi><mrow><mn>4</mn></mrow></msup>" in markup
+    assert markup.count("<msup>") == 2
+    assert "<mo>·</mo><mi>x</mi>" in markup
     assert 'aria-label="f(8)=(x elevado a 4) elevado a 2 por x"' in markup
 
 
@@ -311,8 +311,8 @@ def test_recursive_transition_receives_child_result_before_parent_returns():
     assert events[resume_step - 1]["kind"] == "return"
     assert events[resume_step + 1]["kind"] == "return"
     assert "f(2)=2" in markup
-    assert '<span class="lab-math-operator">·</span>1' in markup
-    assert '<span class="lab-math-relation">=</span>2' in markup
+    assert "<mo>·</mo><mn>1</mn>" in markup
+    assert "<mo>=</mo><mn>2</mn>" in markup
     assert "Recibe el resultado" in markup
     assert "frame-resume" in markup
 
@@ -341,8 +341,8 @@ def test_final_unwind_shows_completion_check_next_to_result():
     previous_markup = _call_stack_panel("factorial", nodes, events, len(events) - 2)
 
     assert "f(3)=3" in final_markup
-    assert '<span class="lab-math-operator">·</span>2' in final_markup
-    assert '<span class="lab-math-relation">=</span>6' in final_markup
+    assert "<mo>·</mo><mn>2</mn>" in final_markup
+    assert "<mo>=</mo><mn>6</mn>" in final_markup
     assert 'class="lab-finish-check"' in final_markup
     assert "✓" in final_markup
     assert "completed" in final_markup
