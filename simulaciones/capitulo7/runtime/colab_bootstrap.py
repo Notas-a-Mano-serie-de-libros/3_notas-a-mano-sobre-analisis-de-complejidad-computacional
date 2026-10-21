@@ -5,7 +5,7 @@ from pathlib import Path
 
 from IPython.display import clear_output
 
-RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/45315a9f545191ca5c57bd43ebedc867cc573597"
+RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/4b087453c4fd93a11722f649e4f09a601eb58b98"
 REQUIRED_FILES = (
     "common/__init__.py",
     "common/animation_runtime.py",
