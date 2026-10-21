@@ -13,7 +13,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import CLexer, JavaLexer, PythonLexer
 
-from common.simulation_views import standard_view_styles
+from common.simulation_views import action_button, actions, standard_view_styles
 from common.widget_controls import (
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
@@ -315,14 +315,31 @@ def _execution_height(nodes: list[Node]) -> int:
 
 
 def _inline_math_html(expression: str) -> str:
-    """Presenta las expresiones simples de la pila sin recargar MathJax."""
+    """Presenta fórmulas estables con la tipografía y espaciado matemáticos."""
+
+    accessible = expression.replace(r"\left", "").replace(r"\right", "")
+    accessible = re.sub(r"\s*\\cdot\s*", " por ", accessible)
+    accessible = re.sub(r"\^\{([^{}]+)\}", r" elevado a \1", accessible)
+    accessible = re.sub(r"\^([0-9]+)", r" elevado a \1", accessible)
+    accessible = accessible.replace("{", "").replace("}", "")
+    accessible = " ".join(accessible.split())
 
     rendered = html.escape(expression)
     rendered = rendered.replace(r"\left", "").replace(r"\right", "")
-    rendered = rendered.replace(r"\cdot", '<span aria-hidden="true">×</span>')
     rendered = re.sub(r"\^\{([^{}]+)\}", r"<sup>\1</sup>", rendered)
+    rendered = re.sub(r"\^([0-9]+)", r"<sup>\1</sup>", rendered)
     rendered = rendered.replace("{", "").replace("}", "")
-    return f'<span class="lab-math-expression">{rendered}</span>'
+    rendered = re.sub(r"\b([fx])\b", r"<i>\1</i>", rendered)
+    rendered = rendered.replace("=", '<span class="lab-math-relation">=</span>')
+    rendered = re.sub(
+        r"\s*\\cdot\s*",
+        '<span class="lab-math-operator">·</span>',
+        rendered,
+    )
+    return (
+        f'<span class="lab-math-expression" role="math" '
+        f'aria-label="{html.escape(accessible, quote=True)}">{rendered}</span>'
+    )
 
 
 def _call_stack_panel(
@@ -387,35 +404,47 @@ def _call_stack_panel(
     )
 
 
-def _desk_check_table(nodes: list[Node], events: list[dict], step: int) -> str:
-    """Construye una traza acumulada y estable para la prueba de escritorio."""
+def _desk_check_table(
+    algorithm: str, nodes: list[Node], events: list[dict], step: int
+) -> str:
+    """Construye la traza acumulada con el contrato de búsquedas y ordenamientos."""
 
-    labels = {
-        "enter": "Llamada",
-        "line": "Ejecuta línea",
-        "resume": "Recibe resultado",
-        "return": "Retorna",
-    }
     rows = []
-    for index, event in enumerate(events[: step + 1]):
+    first = max(0, step - 39)
+    for index, event in enumerate(events[first : step + 1], start=first):
         node = nodes[event["node"]]
         stack_values = " → ".join(str(nodes[node_id].n) for node_id in event["stack"])
-        current = " current" if index == step else ""
+        result = (
+            str(_node_value(algorithm, node.n))
+            if event["kind"] == "return"
+            else "—"
+        )
         rows.append(
-            f'<tr class="lab-desk-row{current}">'
+            '<tr>'
             f'<td>{index + 1}</td>'
-            f'<td>{labels[event["kind"]]}</td>'
-            f'<td>{node.n}</td>'
             f'<td>{event["line"] + 1}</td>'
-            f'<td>{stack_values}</td>'
+            f'<td class="lab-desk-mono">{node.n}</td>'
+            f'<td class="lab-desk-mono">{stack_values}</td>'
+            f'<td class="lab-desk-mono">{result}</td>'
             "</tr>"
         )
+    note = (
+        f'<p class="lab-desk-note">Se muestran los últimos {len(rows)} pasos.</p>'
+        if first
+        else ""
+    )
+    scroll_trigger = (
+        '<img class="lab-desk-scroll-trigger" '
+        'src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" '
+        'alt="" onload="var w=this.closest(\'.lab-desk-check\')?.querySelector(\'.lab-desk-table-wrap\');'
+        'if(w)w.scrollTop=w.scrollHeight;">'
+    )
     return (
-        '<div class="lab-desk-scroll">'
+        '<div class="lab-desk-check" role="region" aria-label="Prueba de escritorio" aria-live="polite">'
+        '<div class="lab-desk-table-wrap">'
         '<table class="lab-desk-table">'
-        f'<caption>Evento {step + 1} de {len(events)}</caption>'
-        '<thead><tr><th>Paso</th><th>Evento</th><th>n</th><th>Línea</th><th>Pila activa</th></tr></thead>'
-        '<tbody>' + "".join(rows) + "</tbody></table></div>"
+        '<thead><tr><th>Paso</th><th>Línea</th><th>n</th><th>Pila activa</th><th>Resultado</th></tr></thead>'
+        '<tbody>' + "".join(rows) + f"</tbody></table>{scroll_trigger}</div>{note}</div>"
     )
 
 
@@ -562,10 +591,9 @@ STYLES = """
 .lab-controls input[type="number"]{-moz-appearance:textfield!important;appearance:textfield!important}
 .lab-controls input[type="number"]::-webkit-inner-spin-button,.lab-controls input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none!important;margin:0!important}
 .lab-controls .widget-readout{background:#fff!important;color:#333!important;font-family:sans-serif!important}
-.lab-controls button{box-sizing:border-box;width:auto!important;height:38px;min-height:38px;border:1px solid #ccc;border-radius:0;background:#f7f7f7!important;color:#333!important;font-size:14px}.lab-actions>.widget-button{border-color:#ccc!important;border-radius:0!important;margin:0!important}.lab-controls .lab-configuration-summary{height:44px!important;min-height:44px!important}.lab-controls .lab-stepper button{height:32px!important;min-height:32px!important}
-.lab-controls button:hover{background:#eee!important}
+.lab-controls .lab-configuration-summary{height:44px!important;min-height:44px!important}
 .lab-controls input[type="range"]{accent-color:#5f6368}
-.lab-parameter-controls{box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;column-gap:36px!important;row-gap:12px!important;overflow-x:hidden!important}.lab-actions{box-sizing:border-box!important;width:100%!important;margin:16px 0 0!important;padding:0!important;gap:0!important;justify-content:flex-end!important}
+.lab-parameter-controls{box-sizing:border-box!important;width:100%!important;max-width:100%!important;min-width:0!important;column-gap:36px!important;row-gap:12px!important;overflow-x:hidden!important}
 .lab-section{box-sizing:border-box;width:100%;margin:0;border:1px solid #dedede;border-bottom:0;border-radius:0;background:#fff;overflow:hidden}.lab-section:first-child{border-radius:5px 5px 0 0}.lab-section:last-child{border-bottom:1px solid #dedede;border-radius:0 0 5px 5px}
 .lab-section>summary{box-sizing:border-box;width:100%;padding:9px 12px;cursor:pointer;background:#f7f7f7;color:#333;font-size:16px;font-weight:700;line-height:1.45}.lab-section[open]>summary{border-bottom:1px solid #e2e2e2}.lab-section-content{box-sizing:border-box;width:100%;background:#fff}
 .lab-code-summary{position:relative;display:flex!important;height:44px!important;min-height:44px!important;max-height:44px!important;padding-left:32px!important;align-items:center;justify-content:space-between;overflow:hidden}.lab-code-summary::before{position:absolute;left:12px;top:50%;content:"▾";font-size:13px;line-height:1;transform:translateY(-50%)}.lab-code-panel:not([open])>.lab-code-summary::before{content:"▸"}.lab-language-logo{display:block;flex:0 0 26px;width:26px;height:26px;object-fit:contain}
@@ -579,14 +607,14 @@ STYLES = """
 .lab-node.undiscovered{opacity:0;pointer-events:none}.lab-call-stack{display:flex;height:100%;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:14px 18px 0;overflow:auto;background:#fff}
 .lab-call-frame{display:flex;width:min(100%,330px);align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border:1px solid #202124;border-radius:0;background:#f7f7f7;transition:background-color .2s ease,opacity .2s ease,transform .2s ease}
 .lab-call-frame+.lab-call-frame{border-top:0}
-.lab-call-frame b{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-weight:400}.lab-call-frame span{font-size:12px;color:#5f6368!important}.lab-call-frame .lab-math-expression{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:16px;color:#202124!important;white-space:nowrap}.lab-call-frame .lab-math-expression span{font:inherit;color:inherit!important}.lab-call-frame .lab-math-expression sup{font-size:.72em;line-height:0;vertical-align:super}
+.lab-call-frame b{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-weight:400}.lab-call-frame span{font-size:12px;color:#5f6368!important}.lab-call-frame .lab-math-expression{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:17px;color:#202124!important;white-space:nowrap}.lab-call-frame .lab-math-expression i{font-family:inherit;font-style:italic}.lab-call-frame .lab-math-expression .lab-math-operator,.lab-call-frame .lab-math-expression .lab-math-relation{display:inline-block;margin:0 .22em;font:inherit;color:inherit!important}.lab-call-frame .lab-math-expression sup{font-size:.72em;line-height:0;vertical-align:super}
 .lab-call-frame.waiting{opacity:.62}.lab-call-frame.current-call{background:#f4e8bd;opacity:1}.lab-call-frame.current-return{background:#e8f5e9;opacity:1}.lab-call-frame.completed{transform:none;opacity:1}
 .lab-completed-row{position:relative;width:min(100%,330px)}.lab-completed-row .lab-call-frame{width:100%}
 .lab-finish-check{position:absolute;left:calc(100% + 8px);top:50%;display:inline-block!important;width:28px;font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32!important;text-align:center;transform:translateY(-50%)}
 .lab-call-frame.frame-push{animation:lab-frame-push .22s ease-out}.lab-call-frame.frame-resume{animation:lab-frame-resume .24s ease-out}.lab-call-frame.frame-pop{animation:lab-frame-pop .28s ease-in-out}
 @keyframes lab-frame-push{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:translateY(0)}}@keyframes lab-frame-resume{0%{transform:scale(.985)}55%{transform:scale(1.012)}100%{transform:scale(1)}}@keyframes lab-frame-pop{0%{opacity:1;transform:translateY(0)}65%{opacity:1;transform:translateY(-2px)}100%{opacity:.38;transform:translateY(-9px)}}
 .lab-stack-base{width:min(100%,360px);margin-top:5px;padding:6px 10px;border-top:2px solid #202124;text-align:center;color:#5f6368!important;font-size:12px}
-.lab-desk-scroll{width:100%;height:100%;overflow:auto;background:#fff}.lab-desk-table{width:100%;border-collapse:collapse;table-layout:auto;font-size:13px}.lab-desk-table caption{padding:6px 10px;border-bottom:1px solid #dedede;background:#fff;color:#5f6368;text-align:left;font-weight:600}.lab-desk-table th,.lab-desk-table td{padding:6px 8px;border-right:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;text-align:center;white-space:nowrap}.lab-desk-table th:last-child,.lab-desk-table td:last-child{border-right:0}.lab-desk-table th{position:sticky;top:0;z-index:1;background:#f7f7f7;font-weight:700}.lab-desk-row.current td{background:#f4e8bd}.lab-widget-panels{box-sizing:border-box!important;width:100%!important;margin:0!important;gap:0!important;overflow:visible!important}.lab-widget-panel{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;gap:0!important;border:1px solid #dedede!important;background:#fff!important;overflow:hidden!important}.lab-widget-header{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;gap:0!important;border-bottom:1px solid #e2e2e2!important;background:#f7f7f7!important;overflow:hidden!important}.lab-widget-summary{flex:1 1 auto!important;width:auto!important;min-width:0!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;box-shadow:none!important;font-family:sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:24px!important;text-align:left!important}.lab-widget-summary:hover{background:#f7f7f7!important}.lab-widget-logo{position:relative!important;z-index:1!important;flex:0 0 42px!important;width:42px!important;height:44px!important;margin:0!important;padding:9px 12px 9px 4px!important;background:transparent!important;overflow:hidden!important}.lab-widget-logo .widget-html-content{display:flex!important;align-items:center!important;justify-content:flex-end!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;background:transparent!important}.lab-widget-logo .lab-language-logo{margin:0!important;background:transparent!important}.lab-widget-content{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;background:#fff!important;overflow:hidden!important}.lab-widget-overview,.lab-widget-execution{display:flex!important;width:100%!important;min-width:0!important;align-items:flex-start!important;gap:0!important;overflow:hidden!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{flex:0 0 50%!important;width:50%!important;min-width:0!important}.lab-widget-overview>.lab-widget-panel:first-child,.lab-widget-execution>.lab-widget-panel:first-child{border-right:0!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{border-top:0!important}.lab-widget-overview .lab-widget-content,.lab-widget-execution .lab-widget-content{overflow:hidden!important}.lab-widget-panel.lab-collapsed .lab-widget-content{height:0!important;min-height:0!important;max-height:0!important}.lab-widget-panel.lab-collapsed{height:44px!important}
+.lab-desk-check{display:flex;width:100%;height:100%;min-height:0;flex-direction:column;overflow:hidden;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:13px}.lab-desk-table-wrap{position:relative;width:100%;min-height:0;flex:1 1 auto;overflow:auto}.lab-desk-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:13px;line-height:1.45}.lab-desk-table th,.lab-desk-table td{width:1%;padding:5px 10px;border-bottom:1px solid rgba(128,128,128,.25);text-align:center;vertical-align:middle;white-space:nowrap}.lab-desk-table th{position:sticky;top:0;z-index:10;background:rgba(246,245,243,.98);box-shadow:0 1px 0 rgba(128,128,128,.35);font-weight:600}.lab-desk-table tr:last-child td{background:rgba(139,75,50,.10);font-weight:600}.lab-desk-table tbody tr:hover td{background:rgba(139,75,50,.07)!important}.lab-desk-mono{font-family:SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;font-size:12px}.lab-desk-note{flex:0 0 auto;margin:4px 8px;font-size:12px;opacity:.75}.lab-desk-scroll-trigger{display:none}.lab-widget-panels{box-sizing:border-box!important;width:100%!important;margin:0!important;gap:0!important;overflow:visible!important}.lab-widget-panel{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;gap:0!important;border:1px solid #dedede!important;background:#fff!important;overflow:hidden!important}.lab-widget-header{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;gap:0!important;border-bottom:1px solid #e2e2e2!important;background:#f7f7f7!important;overflow:hidden!important}.lab-widget-summary{flex:1 1 auto!important;width:auto!important;min-width:0!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;box-shadow:none!important;font-family:sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:24px!important;text-align:left!important}.lab-widget-summary:hover{background:#f7f7f7!important}.lab-widget-logo{position:relative!important;z-index:1!important;flex:0 0 42px!important;width:42px!important;height:44px!important;margin:0!important;padding:9px 12px 9px 4px!important;background:transparent!important;overflow:hidden!important}.lab-widget-logo .widget-html-content{display:flex!important;align-items:center!important;justify-content:flex-end!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;background:transparent!important}.lab-widget-logo .lab-language-logo{margin:0!important;background:transparent!important}.lab-widget-content{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;background:#fff!important;overflow:hidden!important}.lab-widget-overview,.lab-widget-execution{display:flex!important;width:100%!important;min-width:0!important;align-items:flex-start!important;gap:0!important;overflow:hidden!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{flex:0 0 50%!important;width:50%!important;min-width:0!important}.lab-widget-overview>.lab-widget-panel:first-child,.lab-widget-execution>.lab-widget-panel:first-child{border-right:0!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{border-top:0!important}.lab-widget-overview .lab-widget-content,.lab-widget-execution .lab-widget-content{overflow:hidden!important}.lab-widget-panel.lab-collapsed .lab-widget-content{height:0!important;min-height:0!important;max-height:0!important}.lab-widget-panel.lab-collapsed{height:44px!important}
 @media(max-width:760px){.lab-widget-overview,.lab-widget-execution{display:block!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{width:100%!important;flex:0 0 100%!important}.lab-widget-overview>.lab-widget-panel:first-child,.lab-widget-execution>.lab-widget-panel:first-child{border-right:1px solid #dedede!important}.lab-widget-overview>.lab-widget-panel+.lab-widget-panel,.lab-widget-execution>.lab-widget-panel+.lab-widget-panel{border-top:0!important}}
 </style>
 """
@@ -669,10 +697,10 @@ def run_app():
         layout=widgets.Layout(width="188px", height="32px"),
     )
     size.add_class("lab-field")
-    previous = widgets.Button(description="Anterior", icon="step-backward")
-    following = widgets.Button(description="Siguiente", icon="step-forward")
-    play = widgets.Button(description="Reproducir", icon="play")
-    reset = widgets.Button(description="Reiniciar", icon="refresh")
+    previous = action_button("step_back")
+    following = action_button("step")
+    play = action_button("play")
+    reset = action_button("restart")
     method = widgets.HTML(layout=widgets.Layout(width="100%"))
     code_content = widgets.HTML(layout=widgets.Layout(width="100%"))
     state_content = widgets.HTML(layout=widgets.Layout(width="100%"))
@@ -777,7 +805,9 @@ def run_app():
             _code_panel(algorithm.value, language.value, event["line"]),
         )
         update_content(
-            state_content, "desk", _desk_check_table(nodes, events, step)
+            state_content,
+            "desk",
+            _desk_check_table(algorithm.value, nodes, events, step),
         )
         update_content(
             stack_content,
@@ -841,7 +871,7 @@ def run_app():
             return
         finally:
             state["play_task"] = None
-            play.description = "Reproducir"
+            play.description = "Ejecución automática"
             play.icon = "play"
 
     def play_process_sync():
@@ -852,7 +882,7 @@ def run_app():
                 move_step(1)
         finally:
             state["play_task"] = None
-            play.description = "Reproducir"
+            play.description = "Ejecución automática"
             play.icon = "play"
 
     def toggle_playback(_):
@@ -916,10 +946,7 @@ def run_app():
         ),
     )
     parameter_controls.add_class("lab-parameter-controls")
-    action_controls = widgets.HBox(
-        [previous, following, play, reset],
-        layout=widgets.Layout(grid_gap="0px", margin="16px 0 0 0", justify_content="flex-end"),
-    )
+    action_controls = actions([previous, following, play, reset])
     action_controls.add_class("lab-actions")
     controls = widgets.VBox(
         [parameter_controls, action_controls],

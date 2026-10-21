@@ -87,9 +87,22 @@ def test_call_stack_places_original_problem_at_the_base_and_returns_in_reverse()
 
     assert markup.index("f(1)=1") < markup.index("f(2)=2")
     assert markup.index("f(2)=2") < markup.index("f(3)=3")
-    assert '<span aria-hidden="true">×</span>' in markup
+    assert '<span class="lab-math-operator">·</span>' in markup
+    assert 'class="lab-math-expression" role="math"' in markup
     assert "Caso base · retorna" in markup
     assert "Orden de desapilado" not in markup
+
+
+def test_inline_equations_keep_math_spacing_exponents_and_accessible_text():
+    from simulaciones.capitulo6.runtime.recursive_analysis_lab import _inline_math_html
+
+    markup = _inline_math_html(r"f(8)=\left(x^{4}\right)^2\cdot x")
+
+    assert '<i>f</i>' in markup
+    assert '<i>x</i><sup>4</sup>' in markup
+    assert ")<sup>2</sup>" in markup
+    assert '<span class="lab-math-operator">·</span><i>x</i>' in markup
+    assert 'aria-label="f(8)=(x elevado a 4) elevado a 2 por x"' in markup
 
 
 def test_lab_explains_temporal_and_spatial_recurrences():
@@ -140,7 +153,8 @@ def test_lab_uses_editable_input_right_aligned_actions_and_collapsible_panels():
     assert "lab-analysis-step-title" in SOURCE
     assert "lab-analysis-step-solution" in SOURCE
     assert "disabled=True" in SOURCE
-    assert 'description="Reproducir"' in SOURCE
+    assert 'play = action_button("play")' in SOURCE
+    assert 'action_controls = actions([previous, following, play, reset])' in SOURCE
     assert "async def play_process" in SOURCE
     assert "def play_process_sync():" in SOURCE
     assert "[analysis_controls, input_controls]" in SOURCE
@@ -297,7 +311,8 @@ def test_recursive_transition_receives_child_result_before_parent_returns():
     assert events[resume_step - 1]["kind"] == "return"
     assert events[resume_step + 1]["kind"] == "return"
     assert "f(2)=2" in markup
-    assert '<span aria-hidden="true">×</span> 1=2' in markup
+    assert '<span class="lab-math-operator">·</span>1' in markup
+    assert '<span class="lab-math-relation">=</span>2' in markup
     assert "Recibe el resultado" in markup
     assert "frame-resume" in markup
 
@@ -326,7 +341,8 @@ def test_final_unwind_shows_completion_check_next_to_result():
     previous_markup = _call_stack_panel("factorial", nodes, events, len(events) - 2)
 
     assert "f(3)=3" in final_markup
-    assert '<span aria-hidden="true">×</span> 2=6' in final_markup
+    assert '<span class="lab-math-operator">·</span>2' in final_markup
+    assert '<span class="lab-math-relation">=</span>6' in final_markup
     assert 'class="lab-finish-check"' in final_markup
     assert "✓" in final_markup
     assert "completed" in final_markup
@@ -356,7 +372,7 @@ def test_playback_updates_panel_contents_without_recreating_collapsible_panels()
     )[0]
 
     assert 'update_content(\n            code_content,\n            "code"' in render_source
-    assert 'state_content, "desk", _desk_check_table' in render_source
+    assert '_desk_check_table(algorithm.value, nodes, events, step)' in render_source
     assert 'stack_content,\n            "stack"' in render_source
     assert 'tree_content, "tree"' in render_source
     assert '_mathjax_frame(\n            _call_stack_panel' not in render_source
@@ -380,11 +396,15 @@ def test_desk_check_is_a_table_next_to_the_algorithm():
     from simulaciones.capitulo6.runtime.recursive_analysis_lab import _desk_check_table, build_trace
 
     nodes, events = build_trace("factorial", 3)
-    markup = _desk_check_table(nodes, events, 3)
+    markup = _desk_check_table("factorial", nodes, events, 3)
 
     assert '<table class="lab-desk-table">' in markup
     assert "Pila activa" in markup
-    assert '<tr class="lab-desk-row current">' in markup
+    assert "Resultado" in markup
+    assert "Evento" not in markup
+    assert "<caption>" not in markup
+    assert 'class="lab-desk-scroll-trigger"' in markup
+    assert ".lab-desk-table tr:last-child td" in SOURCE
     assert "3 → 2" in markup
     assert '[code_panel, state_panel]' in SOURCE
     assert 'overview_panels.add_class("lab-widget-overview")' in SOURCE

@@ -33,6 +33,8 @@ def test_interfaz_comparte_paneles_y_medidas_del_capitulo_dos():
     assert ".experimental-stepper > *" in UI_SOURCE
     assert ".experimental-stepper .constant-centered-math" in UI_SOURCE
     assert ".experimental-stepper .constant-centered-input input" in UI_SOURCE
+    assert 'maximum_down.add_class("simulation-stepper-button")' in UI_SOURCE
+    assert 'maximum_up.add_class("simulation-stepper-button")' in UI_SOURCE
     assert "border: 1px solid #ccc !important" in UI_SOURCE
     assert "border-radius: 0 !important" in UI_SOURCE
     assert 'configuration_panel = subpanel("Configuración"' in UI_SOURCE
