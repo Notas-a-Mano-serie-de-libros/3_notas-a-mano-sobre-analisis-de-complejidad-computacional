@@ -155,6 +155,7 @@ def test_lab_uses_editable_input_right_aligned_actions_and_collapsible_panels():
     assert "disabled=True" in SOURCE
     assert 'play = action_button("play")' in SOURCE
     assert 'action_controls = actions([previous, following, play, reset])' in SOURCE
+    assert 'play.description = "Reproducir"' not in SOURCE
     assert "async def play_process" in SOURCE
     assert "def play_process_sync():" in SOURCE
     assert "[analysis_controls, input_controls]" in SOURCE

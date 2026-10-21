@@ -805,7 +805,7 @@ def run_app():
         if task is not None and not task.done():
             task.cancel()
         state["play_task"] = None
-        play.description = "Reproducir"
+        play.description = "Ejecución automática"
         play.icon = "play"
 
     def rebuild(*_):
