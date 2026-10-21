@@ -172,6 +172,10 @@ def shared_ui_styles(root_selector):
   overflow: visible !important;
   box-sizing: border-box !important;
 }}
+{root} .simulation-action-row > .widget-button {{
+  margin: 0 !important;
+  border-radius: 0 !important;
+}}
 @media (min-width: 1100px) {{
   {root} .simulation-action-row {{
     flex-flow: row nowrap !important;
@@ -457,8 +461,12 @@ def compact_labeled_control(
 def action_button_row(buttons, *, justify_content="flex-end"):
     """Fila responsiva común para las acciones de todas las simulaciones."""
 
+    resolved_buttons = list(buttons)
+    for button in resolved_buttons:
+        button.layout.margin = "0"
+
     row = widgets.HBox(
-        list(buttons),
+        resolved_buttons,
         layout=widgets.Layout(
             width="100%",
             grid_gap=f"{STANDARD_ACTION_GAP}px",

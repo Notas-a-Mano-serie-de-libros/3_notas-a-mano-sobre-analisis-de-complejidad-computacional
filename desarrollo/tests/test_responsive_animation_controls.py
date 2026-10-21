@@ -159,6 +159,12 @@ def test_shared_visual_system_defines_all_control_contracts_once():
     assert "padding: 0 !important" in action_rule
     assert "box-shadow: none !important" in action_rule
     assert "position: sticky !important" not in action_rule
+    action_button_rule = controls.split(
+        "{root} .simulation-action-row > .widget-button {{", 1
+    )[1].split("}}", 1)[0]
+    assert "margin: 0 !important" in action_button_rule
+    assert "border-radius: 0 !important" in action_button_rule
+    assert 'button.layout.margin = "0"' in controls
 
 
 def test_shared_action_row_keeps_all_buttons_on_one_line_when_space_is_available():
