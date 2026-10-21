@@ -8,8 +8,8 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-RAW_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/c36234e5cd87dc9ad0bc5a3b3b27937e3dbe9a56/simulaciones/capitulo3/runtime/asymptotic_animation.py"
-REPOSITORY_RAW_ROOT = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/c36234e5cd87dc9ad0bc5a3b3b27937e3dbe9a56/"
+RAW_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/3e74ce864741ce20495b3a4a063610a4be286e68/simulaciones/capitulo3/runtime/asymptotic_animation.py"
+REPOSITORY_RAW_ROOT = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/3e74ce864741ce20495b3a4a063610a4be286e68/"
 
 APP_FUNCTIONS = {
     "comparison": "run_comparison_app",
