@@ -259,12 +259,11 @@ def _tree_svg(nodes: list[Node], events: list[dict], step: int) -> str:
     discovered = {
         event["node"] for event in events[: step + 1] if event["kind"] == "enter"
     }
-    visible = [node for node in nodes if node.id in discovered]
     levels: dict[int, list[Node]] = {}
-    for node in visible:
+    for node in nodes:
         levels.setdefault(node.depth, []).append(node)
     width = 720
-    height = 426
+    height = _execution_height(nodes)
     maximum_depth = max((node.depth for node in nodes), default=0)
     top_padding = 38
     usable_height = height - 2 * top_padding
@@ -279,8 +278,9 @@ def _tree_svg(nodes: list[Node], events: list[dict], step: int) -> str:
             )
     edges = []
     circles = []
-    for node in visible:
-        if node.parent in positions:
+    for node in nodes:
+        is_visible = node.id in discovered
+        if is_visible and node.parent in discovered:
             x1, y1 = positions[node.parent]
             x2, y2 = positions[node.id]
             edges.append(
@@ -290,8 +290,11 @@ def _tree_svg(nodes: list[Node], events: list[dict], step: int) -> str:
             )
         x, y = positions[node.id]
         state = "base" if not node.children else "recursive"
+        visibility = "" if is_visible else " undiscovered"
+        hidden = "" if is_visible else ' aria-hidden="true"'
         circles.append(
-            f'<g class="lab-node {state}"><circle cx="{x:.1f}" cy="{y:.1f}" r="23"/>'
+            f'<g class="lab-node {state}{visibility}"{hidden}>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="23"/>'
             f'<text x="{x:.1f}" y="{y + 5:.1f}">{node.n}</text></g>'
         )
     return (
@@ -302,6 +305,24 @@ def _tree_svg(nodes: list[Node], events: list[dict], step: int) -> str:
         '<path d="M0,0 L8,4 L0,8 Z" class="lab-arrow-head"/></marker></defs>'
         f'{"".join(edges)}{"".join(circles)}</svg></div>'
     )
+
+
+def _execution_height(nodes: list[Node]) -> int:
+    """Reserva una altura estable y proporcional a la profundidad real."""
+
+    maximum_depth = max((node.depth for node in nodes), default=0)
+    return min(426, max(180, 76 + maximum_depth * 82))
+
+
+def _inline_math_html(expression: str) -> str:
+    """Presenta las expresiones simples de la pila sin recargar MathJax."""
+
+    rendered = html.escape(expression)
+    rendered = rendered.replace(r"\left", "").replace(r"\right", "")
+    rendered = rendered.replace(r"\cdot", '<span aria-hidden="true">×</span>')
+    rendered = re.sub(r"\^\{([^{}]+)\}", r"<sup>\1</sup>", rendered)
+    rendered = rendered.replace("{", "").replace("}", "")
+    return f'<span class="lab-math-expression">{rendered}</span>'
 
 
 def _call_stack_panel(
@@ -348,7 +369,7 @@ def _call_stack_panel(
         state_markup = f"<span>{state}</span>" if state else ""
         frame_markup = (
             f'<div class="lab-call-frame{css}">'
-            rf'<b>\({_frame_expression(algorithm, node, nodes, completed)}\)</b>'
+            f'<b>{_inline_math_html(_frame_expression(algorithm, node, nodes, completed))}</b>'
             f'{state_markup}</div>'
         )
         if node_id == current and finished:
@@ -363,6 +384,38 @@ def _call_stack_panel(
         '<div class="lab-call-stack" aria-label="Pila de llamadas">'
         + "".join(frames)
         + '<div class="lab-stack-base">Base de la pila · problema original</div></div>'
+    )
+
+
+def _desk_check_table(nodes: list[Node], events: list[dict], step: int) -> str:
+    """Construye una traza acumulada y estable para la prueba de escritorio."""
+
+    labels = {
+        "enter": "Llamada",
+        "line": "Ejecuta línea",
+        "resume": "Recibe resultado",
+        "return": "Retorna",
+    }
+    rows = []
+    for index, event in enumerate(events[: step + 1]):
+        node = nodes[event["node"]]
+        stack_values = " → ".join(str(nodes[node_id].n) for node_id in event["stack"])
+        current = " current" if index == step else ""
+        rows.append(
+            f'<tr class="lab-desk-row{current}">'
+            f'<td>{index + 1}</td>'
+            f'<td>{labels[event["kind"]]}</td>'
+            f'<td>{node.n}</td>'
+            f'<td>{event["line"] + 1}</td>'
+            f'<td>{stack_values}</td>'
+            "</tr>"
+        )
+    return (
+        '<div class="lab-desk-scroll">'
+        '<table class="lab-desk-table">'
+        f'<caption>Evento {step + 1} de {len(events)}</caption>'
+        '<thead><tr><th>Paso</th><th>Evento</th><th>n</th><th>Línea</th><th>Pila activa</th></tr></thead>'
+        '<tbody>' + "".join(rows) + "</tbody></table></div>"
     )
 
 
@@ -518,27 +571,23 @@ STYLES = """
 .lab-code-summary{position:relative;display:flex!important;height:44px!important;min-height:44px!important;max-height:44px!important;padding-left:32px!important;align-items:center;justify-content:space-between;overflow:hidden}.lab-code-summary::before{position:absolute;left:12px;top:50%;content:"▾";font-size:13px;line-height:1;transform:translateY(-50%)}.lab-code-panel:not([open])>.lab-code-summary::before{content:"▸"}.lab-language-logo{display:block;flex:0 0 26px;width:26px;height:26px;object-fit:contain}
 .lab-analysis-panel{margin:0;border-bottom:1px solid #dedede!important;border-radius:0 0 5px 5px!important}.lab-analysis-steps{padding:10px 18px 14px;font-size:16px;line-height:1.55}.lab-analysis-step{margin:8px 0 14px!important;line-height:1.55}.lab-analysis-step-title{font-weight:700;text-align:left}.lab-analysis-step-solution{width:100%;padding:4px 12px 0;text-align:center}.lab-analysis-result{margin:16px 0 2px!important}.lab-analysis-equation{padding:6px 0 4px;font-size:18px}
 .lab-visual-sections{width:100%;margin:0}.lab-code-panel{border-radius:0!important}.lab-code-panel[open] .lab-code{height:auto;min-height:0}
-.lab-state-panel{border-bottom:0!important;border-radius:0!important}
-.lab-execution-grid{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:0}.lab-execution-grid>.lab-section{border-radius:0}.lab-execution-grid>.lab-section:first-child{border-right:0}.lab-execution-grid>.lab-section[open]{height:470px}.lab-execution-grid>.lab-section:not([open]){height:auto}
 .lab-code{height:auto;min-height:0;padding:0;overflow-x:auto;overflow-y:hidden;background:#fff;font:14px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace}
 .lab-code-line{display:grid;grid-template-columns:42px minmax(max-content,1fr);min-height:28px;white-space:pre-wrap}.lab-line-number{display:flex;align-items:center;justify-content:center;padding:3px 4px;border-right:1px solid #d8d8d8;background:#f2f2f2;color:#666!important;font-weight:700;user-select:none}.lab-line-source{display:block;padding:3px 10px;border-left:3px solid transparent;background:#fff}.lab-code-line.current .lab-line-number{background:#ece8d8;color:#444!important}.lab-code-line.current .lab-line-source{background:#f4e8bd;border-left-color:#a47b20}
 .lab-code .k{color:#005cc5;font-weight:600}.lab-code .kt,.lab-code .nb,.lab-code .bp{color:#005cc5}.lab-code .nf{color:#6f42c1}.lab-code .n{color:#24292e}.lab-code .mi,.lab-code .mf{color:#005a8d}.lab-code .s,.lab-code .s1,.lab-code .s2{color:#22863a}.lab-code .c,.lab-code .c1,.lab-code .cm{color:#6a737d;font-style:italic}.lab-code .o{color:#d73a49}.lab-code .p{color:#24292e}
-.lab-tree-scroll{height:426px;overflow:auto;background:#fff}.lab-tree{display:block;width:100%;height:100%;min-width:520px;background:#fff}
+.lab-tree-scroll{height:100%;overflow:auto;background:#fff}.lab-tree{display:block;width:100%;height:100%;min-width:520px;background:#fff}
 .lab-edge{fill:none;stroke:#202124;stroke-width:1.7}.lab-arrow-head{fill:#202124!important;stroke:none!important}.lab-node circle{fill:#fff;stroke:#202124;stroke-width:1.7}.lab-node text{text-anchor:middle;font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:15px;font-weight:400;fill:#111!important}.lab-node.base circle{fill:#e8f5e9;stroke:#202124}
-.lab-call-stack{display:flex;height:426px;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:14px 18px 0;overflow:auto;background:#fff}
+.lab-node.undiscovered{opacity:0;pointer-events:none}.lab-call-stack{display:flex;height:100%;flex-direction:column;justify-content:flex-end;align-items:center;gap:0;padding:14px 18px 0;overflow:auto;background:#fff}
 .lab-call-frame{display:flex;width:min(100%,330px);align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border:1px solid #202124;border-radius:0;background:#f7f7f7;transition:background-color .2s ease,opacity .2s ease,transform .2s ease}
 .lab-call-frame+.lab-call-frame{border-top:0}
-.lab-call-frame b{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif}.lab-call-frame span{font-size:12px;color:#5f6368!important}
+.lab-call-frame b{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-weight:400}.lab-call-frame span{font-size:12px;color:#5f6368!important}.lab-call-frame .lab-math-expression{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:16px;color:#202124!important;white-space:nowrap}.lab-call-frame .lab-math-expression span{font:inherit;color:inherit!important}.lab-call-frame .lab-math-expression sup{font-size:.72em;line-height:0;vertical-align:super}
 .lab-call-frame.waiting{opacity:.62}.lab-call-frame.current-call{background:#f4e8bd;opacity:1}.lab-call-frame.current-return{background:#e8f5e9;opacity:1}.lab-call-frame.completed{transform:none;opacity:1}
 .lab-completed-row{position:relative;width:min(100%,330px)}.lab-completed-row .lab-call-frame{width:100%}
 .lab-finish-check{position:absolute;left:calc(100% + 8px);top:50%;display:inline-block!important;width:28px;font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32!important;text-align:center;transform:translateY(-50%)}
 .lab-call-frame.frame-push{animation:lab-frame-push .22s ease-out}.lab-call-frame.frame-resume{animation:lab-frame-resume .24s ease-out}.lab-call-frame.frame-pop{animation:lab-frame-pop .28s ease-in-out}
 @keyframes lab-frame-push{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:translateY(0)}}@keyframes lab-frame-resume{0%{transform:scale(.985)}55%{transform:scale(1.012)}100%{transform:scale(1)}}@keyframes lab-frame-pop{0%{opacity:1;transform:translateY(0)}65%{opacity:1;transform:translateY(-2px)}100%{opacity:.38;transform:translateY(-9px)}}
 .lab-stack-base{width:min(100%,360px);margin-top:5px;padding:6px 10px;border-top:2px solid #202124;text-align:center;color:#5f6368!important;font-size:12px}
-.lab-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:0;overflow:hidden}.lab-metric{padding:10px;text-align:center;border-right:1px solid #e2e2e2;background:#fff}.lab-metric:last-child{border-right:0}.lab-metric b{display:block;font-size:18px}
-.lab-widget-panels{box-sizing:border-box!important;width:100%!important;margin:0!important;gap:0!important;overflow:visible!important}.lab-widget-panel{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;gap:0!important;border:1px solid #dedede!important;border-bottom:0!important;background:#fff!important;overflow:hidden!important}.lab-widget-header{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;gap:0!important;border-bottom:1px solid #e2e2e2!important;background:#f7f7f7!important;overflow:hidden!important}.lab-widget-summary{flex:1 1 auto!important;width:auto!important;min-width:0!important;height:44px!important;padding:9px 12px!important;border:0!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;font-size:16px!important;font-weight:700!important;text-align:left!important}.lab-widget-summary:hover{background:#f7f7f7!important}.lab-widget-logo{position:relative!important;z-index:1!important;flex:0 0 42px!important;width:42px!important;height:44px!important;margin:0!important;padding:9px 12px 9px 4px!important;background:transparent!important;overflow:hidden!important}.lab-widget-logo .widget-html-content{display:flex!important;align-items:center!important;justify-content:flex-end!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;background:transparent!important}.lab-widget-logo .lab-language-logo{margin:0!important;background:transparent!important}.lab-widget-content{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;background:#fff!important;overflow:hidden!important}.lab-widget-execution{display:flex!important;width:100%!important;min-width:0!important;gap:0!important;overflow:hidden!important}.lab-widget-execution>.lab-widget-panel{flex:0 0 50%!important;width:50%!important;min-width:0!important;height:470px!important}.lab-widget-execution>.lab-widget-panel:first-child{border-right:0!important}.lab-widget-execution>.lab-widget-panel:last-child{border-bottom:1px solid #dedede!important}.lab-widget-execution .lab-widget-content{height:426px!important;min-height:426px!important;max-height:426px!important;overflow:hidden!important}
-.lab-widget-execution>.lab-widget-panel.lab-collapsed{height:44px!important}
-@media(max-width:760px){.lab-execution-grid{grid-template-columns:1fr}.lab-execution-grid>.lab-section:first-child{border-right:1px solid #dedede}.lab-metrics{grid-template-columns:repeat(2,1fr)}.lab-metric:nth-child(2){border-right:0}.lab-metric:nth-child(-n+2){border-bottom:1px solid #e2e2e2}}
+.lab-desk-scroll{width:100%;height:100%;overflow:auto;background:#fff}.lab-desk-table{width:100%;border-collapse:collapse;table-layout:auto;font-size:13px}.lab-desk-table caption{padding:6px 10px;border-bottom:1px solid #dedede;background:#fff;color:#5f6368;text-align:left;font-weight:600}.lab-desk-table th,.lab-desk-table td{padding:6px 8px;border-right:1px solid #e2e2e2;border-bottom:1px solid #e2e2e2;text-align:center;white-space:nowrap}.lab-desk-table th:last-child,.lab-desk-table td:last-child{border-right:0}.lab-desk-table th{position:sticky;top:0;z-index:1;background:#f7f7f7;font-weight:700}.lab-desk-row.current td{background:#f4e8bd}.lab-widget-panels{box-sizing:border-box!important;width:100%!important;margin:0!important;gap:0!important;overflow:visible!important}.lab-widget-panel{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;gap:0!important;border:1px solid #dedede!important;background:#fff!important;overflow:hidden!important}.lab-widget-header{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;gap:0!important;border-bottom:1px solid #e2e2e2!important;background:#f7f7f7!important;overflow:hidden!important}.lab-widget-summary{flex:1 1 auto!important;width:auto!important;min-width:0!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;box-shadow:none!important;font-family:sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:24px!important;text-align:left!important}.lab-widget-summary:hover{background:#f7f7f7!important}.lab-widget-logo{position:relative!important;z-index:1!important;flex:0 0 42px!important;width:42px!important;height:44px!important;margin:0!important;padding:9px 12px 9px 4px!important;background:transparent!important;overflow:hidden!important}.lab-widget-logo .widget-html-content{display:flex!important;align-items:center!important;justify-content:flex-end!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;background:transparent!important}.lab-widget-logo .lab-language-logo{margin:0!important;background:transparent!important}.lab-widget-content{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;background:#fff!important;overflow:hidden!important}.lab-widget-overview,.lab-widget-execution{display:flex!important;width:100%!important;min-width:0!important;align-items:flex-start!important;gap:0!important;overflow:hidden!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{flex:0 0 50%!important;width:50%!important;min-width:0!important}.lab-widget-overview>.lab-widget-panel:first-child,.lab-widget-execution>.lab-widget-panel:first-child{border-right:0!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{border-top:0!important}.lab-widget-overview .lab-widget-content,.lab-widget-execution .lab-widget-content{overflow:hidden!important}.lab-widget-panel.lab-collapsed .lab-widget-content{height:0!important;min-height:0!important;max-height:0!important}.lab-widget-panel.lab-collapsed{height:44px!important}
+@media(max-width:760px){.lab-widget-overview,.lab-widget-execution{display:block!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{width:100%!important;flex:0 0 100%!important}.lab-widget-overview>.lab-widget-panel:first-child,.lab-widget-execution>.lab-widget-panel:first-child{border-right:1px solid #dedede!important}.lab-widget-overview>.lab-widget-panel+.lab-widget-panel,.lab-widget-execution>.lab-widget-panel+.lab-widget-panel{border-top:0!important}}
 </style>
 """
 
@@ -631,7 +680,10 @@ def run_app():
     tree_content = widgets.HTML(layout=widgets.Layout(width="100%"))
     language_logo = widgets.HTML(layout=widgets.Layout(width="42px", height="44px"))
     language_logo.add_class("lab-widget-logo")
-    state = {"nodes": [], "events": [], "step": 0, "play_task": None}
+    state = {
+        "nodes": [], "events": [], "step": 0, "play_task": None,
+        "render_cache": {},
+    }
 
     def collapsible_panel(title, content, extra=None):
         summary = widgets.Button(
@@ -639,6 +691,7 @@ def run_app():
             layout=widgets.Layout(width="100%", height="44px"),
         )
         summary.add_class("lab-widget-summary")
+        summary.add_class("lab-subpanel-title")
         header_children = [summary] + ([extra] if extra is not None else [])
         header = widgets.HBox(header_children, layout=widgets.Layout(width="100%", grid_gap="0"))
         header.add_class("lab-widget-header")
@@ -662,12 +715,16 @@ def run_app():
     state_panel = collapsible_panel("Prueba de escritorio", state_content)
     stack_panel = collapsible_panel("Pila de recursión", stack_content)
     tree_panel = collapsible_panel("Árbol de recursión", tree_content)
+    overview_panels = widgets.HBox(
+        [code_panel, state_panel], layout=widgets.Layout(width="100%", grid_gap="0")
+    )
+    overview_panels.add_class("lab-widget-overview")
     execution_panels = widgets.HBox(
         [stack_panel, tree_panel], layout=widgets.Layout(width="100%", grid_gap="0")
     )
     execution_panels.add_class("lab-widget-execution")
     visualization = widgets.VBox(
-        [code_panel, state_panel, execution_panels],
+        [overview_panels, execution_panels],
         layout=widgets.Layout(width="100%", grid_gap="0"),
     )
     visualization.add_class("lab-widget-panels")
@@ -689,10 +746,24 @@ def run_app():
         nodes, events = build_trace(algorithm.value, size.value)
         state["nodes"], state["events"] = nodes, events
         state["step"] = 0
+        state["render_cache"].clear()
+        language_logo.value = _language_logo(language.value)
+        overview_height = max(112, len(CODE_SNIPPETS[language.value][algorithm.value]) * 28)
+        execution_height = _execution_height(nodes)
+        code_content.layout.height = f"{overview_height}px"
+        state_content.layout.height = f"{overview_height}px"
+        stack_content.layout.height = f"{execution_height}px"
+        tree_content.layout.height = f"{execution_height}px"
         method.value = _mathjax_frame(
             _method_panel(algorithm.value, data, analysis_type.value), 550
         )
         render()
+
+    def update_content(widget, cache_key, value):
+        if state["render_cache"].get(cache_key) == value:
+            return
+        state["render_cache"][cache_key] = value
+        widget.value = value
 
     def render(*_):
         nodes, events = state["nodes"], state["events"]
@@ -700,23 +771,22 @@ def run_app():
             return
         step = min(state["step"], len(events) - 1)
         event = events[step]
-        entered = sum(item["kind"] == "enter" for item in events[: step + 1])
-        returned = sum(item["kind"] == "return" for item in events[: step + 1])
-        maximum_depth = max(len(item["stack"]) for item in events[: step + 1])
-        language_logo.value = _language_logo(language.value)
-        code_content.value = _code_panel(algorithm.value, language.value, event["line"])
-        state_content.value = (
-            '<div class="lab-section-content lab-metrics">'
-            f'<div class="lab-metric"><b>{step + 1}/{len(events)}</b>Evento</div>'
-            f'<div class="lab-metric"><b>{entered}</b>Llamadas iniciadas</div>'
-            f'<div class="lab-metric"><b>{returned}</b>Llamadas terminadas</div>'
-            f'<div class="lab-metric"><b>{maximum_depth}</b>Profundidad máxima</div>'
-            '</div>'
+        update_content(
+            code_content,
+            "code",
+            _code_panel(algorithm.value, language.value, event["line"]),
         )
-        stack_content.value = _mathjax_frame(
-            _call_stack_panel(algorithm.value, nodes, events, step), 426
+        update_content(
+            state_content, "desk", _desk_check_table(nodes, events, step)
         )
-        tree_content.value = _tree_svg(nodes, events, step)
+        update_content(
+            stack_content,
+            "stack",
+            _call_stack_panel(algorithm.value, nodes, events, step),
+        )
+        update_content(
+            tree_content, "tree", _tree_svg(nodes, events, step)
+        )
 
     def select_algorithm(change):
         if change.get("name") != "value":
@@ -732,13 +802,26 @@ def run_app():
     def select_analysis(change):
         if change.get("name") != "value":
             return
-        method.value = _method_panel(
-            algorithm.value, ALGORITHMS[algorithm.value], change["new"]
+        method.value = _mathjax_frame(
+            _method_panel(
+                algorithm.value, ALGORITHMS[algorithm.value], change["new"]
+            ),
+            550,
         )
-        render()
 
     analysis_type.observe(select_analysis, names="value")
-    language.observe(render, names="value")
+
+    def select_language(change):
+        if change.get("name") != "value":
+            return
+        state["render_cache"].pop("code", None)
+        language_logo.value = _language_logo(change["new"])
+        overview_height = max(112, len(CODE_SNIPPETS[change["new"]][algorithm.value]) * 28)
+        code_content.layout.height = f"{overview_height}px"
+        state_content.layout.height = f"{overview_height}px"
+        render()
+
+    language.observe(select_language, names="value")
 
     def move_step(delta):
         if not state["events"]:

@@ -85,8 +85,9 @@ def test_call_stack_places_original_problem_at_the_base_and_returns_in_reverse()
     )
     markup = _call_stack_panel("factorial", nodes, events, base_return_step)
 
-    assert markup.index("f(1)=1") < markup.index(r"f(2)=2\cdot 1")
-    assert markup.index(r"f(2)=2\cdot 1") < markup.index("f(3)=3")
+    assert markup.index("f(1)=1") < markup.index("f(2)=2")
+    assert markup.index("f(2)=2") < markup.index("f(3)=3")
+    assert '<span aria-hidden="true">×</span>' in markup
     assert "Caso base · retorna" in markup
     assert "Orden de desapilado" not in markup
 
@@ -198,23 +199,24 @@ def test_recursion_tree_uses_the_full_available_vertical_height():
     nodes, events = build_trace("factorial", 4)
     final_markup = _tree_svg(nodes, events, len(events) - 1)
 
-    assert 'viewBox="0 0 720 426"' in final_markup
+    assert 'viewBox="0 0 720 322"' in final_markup
     assert 'cy="38.0"' in final_markup
-    assert 'cy="388.0"' in final_markup
+    assert 'cy="284.0"' in final_markup
     assert ".lab-tree{display:block;width:100%;height:100%;" in SOURCE
 
     initial_markup = _tree_svg(nodes, events, 0)
     assert 'cy="38.0"' in initial_markup
-    assert 'cy="213.0"' not in initial_markup
+    assert 'class="lab-node recursive undiscovered"' in initial_markup
+    assert 'aria-hidden="true"' in initial_markup
 
     second_level_step = next(
         index for index, event in enumerate(events)
         if event["kind"] == "enter" and nodes[event["node"]].depth == 1
     )
     second_level_markup = _tree_svg(nodes, events, second_level_step)
-    assert 'cy="154.7"' in second_level_markup
-    assert 'cy="154.7"' in final_markup
-    assert 'cy="388.0"' not in second_level_markup
+    assert 'cy="120.0"' in second_level_markup
+    assert 'cy="120.0"' in final_markup
+    assert second_level_markup.count('aria-hidden="true"') < initial_markup.count('aria-hidden="true"')
 
 
 def test_execution_state_precedes_stack_and_tree_panels():
@@ -294,7 +296,8 @@ def test_recursive_transition_receives_child_result_before_parent_returns():
 
     assert events[resume_step - 1]["kind"] == "return"
     assert events[resume_step + 1]["kind"] == "return"
-    assert r"f(2)=2\cdot 1=2" in markup
+    assert "f(2)=2" in markup
+    assert '<span aria-hidden="true">×</span> 1=2' in markup
     assert "Recibe el resultado" in markup
     assert "frame-resume" in markup
 
@@ -322,7 +325,8 @@ def test_final_unwind_shows_completion_check_next_to_result():
     final_markup = _call_stack_panel("factorial", nodes, events, len(events) - 1)
     previous_markup = _call_stack_panel("factorial", nodes, events, len(events) - 2)
 
-    assert r"f(3)=3\cdot 2=6" in final_markup
+    assert "f(3)=3" in final_markup
+    assert '<span aria-hidden="true">×</span> 2=6' in final_markup
     assert 'class="lab-finish-check"' in final_markup
     assert "✓" in final_markup
     assert "completed" in final_markup
@@ -351,23 +355,39 @@ def test_playback_updates_panel_contents_without_recreating_collapsible_panels()
         "    def select_algorithm", 1
     )[0]
 
-    assert "code_content.value =" in render_source
-    assert "state_content.value =" in render_source
-    assert "stack_content.value =" in render_source
-    assert "tree_content.value =" in render_source
+    assert 'update_content(\n            code_content,\n            "code"' in render_source
+    assert 'state_content, "desk", _desk_check_table' in render_source
+    assert 'stack_content,\n            "stack"' in render_source
+    assert 'tree_content, "tree"' in render_source
+    assert '_mathjax_frame(\n            _call_stack_panel' not in render_source
     assert "collapsible_panel(" not in render_source
 
 
-def test_widget_panels_preserve_original_fixed_heights_without_outer_scroll():
+def test_widget_panels_use_stable_content_driven_heights_without_outer_scroll():
     assert ".lab-widget-execution>.lab-widget-panel" in SOURCE
-    assert "height:470px!important" in SOURCE
-    assert ".lab-widget-execution .lab-widget-content" in SOURCE
-    assert "height:426px!important;min-height:426px!important;max-height:426px!important" in SOURCE
+    assert "def _execution_height(nodes" in SOURCE
+    assert 'stack_content.layout.height = f"{execution_height}px"' in SOURCE
+    assert 'tree_content.layout.height = f"{execution_height}px"' in SOURCE
+    assert "height:470px!important" not in SOURCE
     assert "min-width:0!important" in SOURCE
     assert "overflow:hidden!important" in SOURCE
     assert '.lab-widget-panel.lab-collapsed{height:44px!important}' in SOURCE
     assert 'panel.add_class("lab-collapsed")' in SOURCE
     assert 'panel.remove_class("lab-collapsed")' in SOURCE
+
+
+def test_desk_check_is_a_table_next_to_the_algorithm():
+    from simulaciones.capitulo6.runtime.recursive_analysis_lab import _desk_check_table, build_trace
+
+    nodes, events = build_trace("factorial", 3)
+    markup = _desk_check_table(nodes, events, 3)
+
+    assert '<table class="lab-desk-table">' in markup
+    assert "Pila activa" in markup
+    assert '<tr class="lab-desk-row current">' in markup
+    assert "3 → 2" in markup
+    assert '[code_panel, state_panel]' in SOURCE
+    assert 'overview_panels.add_class("lab-widget-overview")' in SOURCE
 
 
 def test_all_configuration_field_titles_are_bold():
