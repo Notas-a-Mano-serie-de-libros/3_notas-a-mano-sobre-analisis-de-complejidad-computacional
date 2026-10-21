@@ -206,6 +206,8 @@ def run_app(maximum_n=DEFAULT_MAXIMUM_N, default_max_degree=DEFAULT_MAX_DEGREE):
     )
     degree_down = widgets.Button(description="◀", tooltip="Grado anterior", layout=degree_button_layout)
     degree_up = widgets.Button(description="▶", tooltip="Grado siguiente", layout=degree_button_layout)
+    degree_down.add_class("simulation-stepper-button")
+    degree_up.add_class("simulation-stepper-button")
     degree_stepper = widgets.HBox(
         [degree_down, degree_value, degree_up],
         layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", grid_gap="0px"),

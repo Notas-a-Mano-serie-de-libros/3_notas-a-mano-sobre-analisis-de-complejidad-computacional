@@ -71,6 +71,8 @@ def test_control_visual_tiene_medidas_uniformes_y_etiquetas_accesibles():
     assert control.previous.layout.flex == control.following.layout.flex == "0 0 34px"
     assert control.previous.description == "◀"
     assert control.following.description == "▶"
+    assert "simulation-stepper-button" in control.previous._dom_classes
+    assert "simulation-stepper-button" in control.following._dom_classes
     assert control.previous.icon == control.following.icon == ""
     assert "Disminuir puntos de muestreo" in control.previous.tooltip
     assert "Aumentar puntos de muestreo" in control.following.tooltip

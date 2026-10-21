@@ -365,6 +365,8 @@ def run_app(profile, display_app=True, mode_selector=None):
     )
     maximum_down = widgets.Button(description="◀", tooltip="Potencia anterior", layout=step_button_layout)
     maximum_up = widgets.Button(description="▶", tooltip="Potencia siguiente", layout=step_button_layout)
+    maximum_down.add_class("simulation-stepper-button")
+    maximum_up.add_class("simulation-stepper-button")
     maximum_stepper = widgets.HBox(
         [maximum_down, maximum_value, maximum_up],
         layout=widgets.Layout(width=f"{STEPPER_FIELD_WIDTH}px", align_items="center", grid_gap=f"{STEPPER_GAP}px"),

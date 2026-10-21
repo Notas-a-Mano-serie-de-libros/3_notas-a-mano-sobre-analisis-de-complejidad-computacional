@@ -128,6 +128,36 @@ def shared_ui_styles(root_selector):
 {root} .recursion-stepper > *,
 {root} .lab-stepper > *,
 {root} .stepper > * {{ margin: 0 !important; }}
+{root} .simulation-stepper-button {{
+  box-sizing: border-box !important;
+  height: {STANDARD_CONTROL_HEIGHT}px !important;
+  min-height: {STANDARD_CONTROL_HEIGHT}px !important;
+  max-height: {STANDARD_CONTROL_HEIGHT}px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid var(--simulation-border) !important;
+  border-radius: 0 !important;
+  background: var(--simulation-muted-surface) !important;
+  color: var(--simulation-text) !important;
+  box-shadow: none !important;
+  font-family: sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+}}
+{root} .simulation-stepper-button .widget-button-content {{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font: inherit !important;
+}}
+{root} .simulation-stepper-button:hover {{
+  background: var(--simulation-hover-surface) !important;
+}}
 {root} .simulation-action-row {{
   position: static !important;
   background: transparent !important;
@@ -316,6 +346,8 @@ def magnitude_stepper(
         tooltip=f"Aumentar {accessible_name.lower()} un orden de magnitud",
         layout=button_layout,
     )
+    previous.add_class("simulation-stepper-button")
+    following.add_class("simulation-stepper-button")
     text.tooltip = accessible_name
     text.tabbable = True
     previous.tabbable = True
