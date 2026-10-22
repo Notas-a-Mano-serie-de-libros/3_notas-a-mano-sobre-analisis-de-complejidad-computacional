@@ -20,14 +20,14 @@ Este repositorio reúne las simulaciones interactivas de la segunda edición del
   <tr>
     <td align="center">
       <a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/" target="_blank" rel="noopener noreferrer">
-        <img src="https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/75efcce53ad7e777c4222030349c6fcec779b3c8/assets/qr/pages-inicio.png" width="168" alt="Código QR del complemento digital de la obra">
+        <img src="https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/757ba279bd5d8fc6474a1165c78043dec161188e/assets/qr/pages-inicio.png" width="168" alt="Código QR del complemento digital de la obra">
       </a>
       <br>
       <strong><a href="https://notas-a-mano-serie-de-libros.github.io/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/" target="_blank" rel="noopener noreferrer">Consultar el complemento digital</a></strong>
     </td>
     <td align="center">
       <a href="https://www.amazon.com/dp/B0HJYGTGZM" target="_blank" rel="noopener noreferrer">
-        <img src="https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/75efcce53ad7e777c4222030349c6fcec779b3c8/assets/qr/amazon-libro.png" width="168" alt="Código QR del libro disponible en Amazon">
+        <img src="https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/757ba279bd5d8fc6474a1165c78043dec161188e/assets/qr/amazon-libro.png" width="168" alt="Código QR del libro disponible en Amazon">
       </a>
       <br>
       <strong><a href="https://www.amazon.com/dp/B0HJYGTGZM" target="_blank" rel="noopener noreferrer">Consultar el libro en Amazon</a></strong>
