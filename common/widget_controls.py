@@ -175,17 +175,11 @@ def shared_ui_styles(root_selector):
 {root} .simulation-action-row > .widget-button {{
   margin: 0 !important;
   border-radius: 0 !important;
-}}
-@media (min-width: 768px) {{
-  {root} .simulation-action-row {{
-    flex-flow: row nowrap !important;
-  }}
-  {root} .simulation-action-row > .widget-button {{
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    flex: 1 1 0 !important;
-  }}
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  white-space: normal !important;
 }}
 {root} [class*="-tab-bar"] {{
   width: 100% !important;
@@ -459,11 +453,26 @@ def compact_labeled_control(
 
 
 def action_button_row(buttons, *, justify_content="flex-end"):
-    """Fila responsiva común para las acciones de todas las simulaciones."""
+    """Fila responsiva con acciones uniformes, compactas y alineadas a la derecha."""
 
     resolved_buttons = list(buttons)
+    declared_widths = []
+    for button in resolved_buttons:
+        width = (button.layout.width or "").strip()
+        if width.endswith("px"):
+            try:
+                declared_widths.append(int(float(width[:-2])))
+            except ValueError:
+                pass
+
+    common_width = f"{max(declared_widths)}px" if declared_widths else None
     for button in resolved_buttons:
         button.layout.margin = "0"
+        if common_width is not None:
+            button.layout.width = common_width
+            button.layout.min_width = "0"
+            button.layout.max_width = common_width
+            button.layout.flex = f"0 0 {common_width}"
 
     row = widgets.HBox(
         resolved_buttons,

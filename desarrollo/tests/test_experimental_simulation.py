@@ -16,9 +16,32 @@ from common.widget_controls import (
     STANDARD_CONTROL_ROW_GAP,
     STANDARD_FIELD_WIDTH,
     STANDARD_LABEL_CONTROL_GAP,
+    action_button_row,
+    button_control,
     compact_labeled_control,
     magnitude_stepper,
 )
+
+
+def test_fila_de_acciones_usa_el_ancho_del_boton_mas_largo_sin_expandirse():
+    short = button_control(
+        description="Ejecutar", button_style="", width="110px"
+    )
+    long = button_control(
+        description="Generar arreglo del libro", button_style="", width="230px"
+    )
+
+    row = action_button_row([short, long])
+
+    assert row.layout.justify_content == "flex-end"
+    assert row.layout.flex_flow == "row wrap"
+    assert row.layout.grid_gap == "0px"
+    for button in row.children:
+        assert button.layout.width == "230px"
+        assert button.layout.min_width == "0"
+        assert button.layout.max_width == "230px"
+        assert button.layout.flex == "0 0 230px"
+        assert button.layout.margin == "0"
 
 
 def test_puntos_de_muestreo_predeterminados_son_mil():

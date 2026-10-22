@@ -141,8 +141,25 @@ except ImportError:
         )
 
     def action_button_row(buttons, *, justify_content="flex-end"):
+        resolved_buttons = list(buttons)
+        declared_widths = []
+        for button in resolved_buttons:
+            width = (button.layout.width or "").strip()
+            if width.endswith("px"):
+                try:
+                    declared_widths.append(int(float(width[:-2])))
+                except ValueError:
+                    pass
+        common_width = f"{max(declared_widths)}px" if declared_widths else None
+        for button in resolved_buttons:
+            button.layout.margin = "0"
+            if common_width is not None:
+                button.layout.width = common_width
+                button.layout.min_width = "0"
+                button.layout.max_width = common_width
+                button.layout.flex = f"0 0 {common_width}"
         return widgets.HBox(
-            list(buttons),
+            resolved_buttons,
             layout=widgets.Layout(
                 width="100%", grid_gap="0px", margin="16px 0 0 0",
                 flex_flow="row wrap", justify_content=justify_content, overflow="visible",

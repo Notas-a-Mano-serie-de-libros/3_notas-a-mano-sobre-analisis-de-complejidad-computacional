@@ -167,12 +167,15 @@ def test_shared_visual_system_defines_all_control_contracts_once():
     assert 'button.layout.margin = "0"' in controls
 
 
-def test_shared_action_row_keeps_all_buttons_on_one_line_when_space_is_available():
+def test_shared_action_row_does_not_expand_buttons_to_fill_available_space():
     controls = source("common/widget_controls.py")
-    wide_rule = controls.split("@media (min-width: 768px)", 1)[1].split(
-        '{root} [class*="-tab-bar"]', 1
-    )[0]
+    action_button_rule = controls.split(
+        "{root} .simulation-action-row > .widget-button {{", 1
+    )[1].split("}}", 1)[0]
 
-    assert "flex-flow: row nowrap !important" in wide_rule
-    assert "flex: 1 1 0 !important" in wide_rule
-    assert "min-width: 0 !important" in wide_rule
+    assert "flex-grow: 0 !important" in action_button_rule
+    assert "flex-shrink: 0 !important" in action_button_rule
+    assert "min-width: 0 !important" in action_button_rule
+    assert "max-width: 100% !important" in action_button_rule
+    assert "flex: 1 1 0 !important" not in controls
+    assert 'common_width = f"{max(declared_widths)}px"' in controls

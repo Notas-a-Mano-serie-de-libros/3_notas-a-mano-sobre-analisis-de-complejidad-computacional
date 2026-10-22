@@ -136,7 +136,13 @@ def test_playback_buttons_wrap_without_horizontal_scroll():
     assert "flex-flow:row wrap!important" in playback_rule
     assert "height:auto!important" in playback_rule
     assert "overflow:visible!important" in playback_rule
-    assert 'action_layout = widgets.Layout(width="auto", flex="0 0 auto")' in SOURCE
+    assert 'width="150px", min_width="0", max_width="150px"' in SOURCE
+    assert 'flex="0 0 150px", margin="0"' in SOURCE
+    button_rule = SOURCE.split(".recursion-playback button{", 1)[1].split("}", 1)[0]
+    assert "flex:0 0 150px!important" in button_rule
+    assert "width:150px!important" in button_rule
+    assert "min-width:0!important" in button_rule
+    assert "max-width:100%!important" in button_rule
 
 
 def test_level_table_rows_select_their_tree_nodes():

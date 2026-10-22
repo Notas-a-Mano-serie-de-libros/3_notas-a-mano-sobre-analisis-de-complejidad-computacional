@@ -1077,13 +1077,17 @@ def run_app(builder_only=False):
     )
     update_method_options()
     update_master_flavor_visibility()
+    action_layout = widgets.Layout(
+        width="150px", min_width="0", max_width="150px",
+        flex="0 0 150px", margin="0",
+    )
     builder_resolve = widgets.Button(
         description="Aplicar método", icon="calculator",
-        layout=widgets.Layout(width="auto", flex="0 0 auto"),
+        layout=action_layout,
     )
     builder_reset = widgets.Button(
         description="Restablecer", icon="refresh",
-        layout=widgets.Layout(width="auto", flex="0 0 auto"),
+        layout=action_layout,
     )
     builder_actions = widgets.HBox(
         [builder_resolve, builder_reset],
@@ -1110,7 +1114,6 @@ def run_app(builder_only=False):
     configuration_panel.add_class("recursion-builder-panel")
     configuration_panel.add_class("recursion-tree-widget-panel")
 
-    action_layout = widgets.Layout(width="auto", flex="0 0 auto")
     previous_level = widgets.Button(
         description="Anterior", icon="step-backward", layout=action_layout
     )
@@ -1341,8 +1344,9 @@ def run_app(builder_only=False):
             margin:16px 0 0;border:0;border-radius:0;background:#fff;gap:0!important;
             display:flex!important;flex-flow:row wrap!important;justify-content:flex-end!important;
             align-items:center!important;height:auto!important;overflow:visible!important}
-          .recursion-playback button{box-sizing:border-box!important;flex:0 0 auto!important;
-            width:auto!important;height:38px!important;min-height:38px!important;
+          .recursion-playback button{box-sizing:border-box!important;flex:0 0 150px!important;
+            width:150px!important;min-width:0!important;max-width:100%!important;
+            height:38px!important;min-height:38px!important;margin:0!important;
             border:1px solid #bbb;border-radius:0!important;
             background:#f7f7f7!important;color:#333!important}
           .recursion-info-sections,.recursion-info-sections>.widget-box{
