@@ -82,8 +82,8 @@ _SORT_STYLES = None
 SORT_VISUAL_WIDTH = 760
 SORT_RESULT_WIDTH = RESULT_SYMBOL_BOX_SIZE
 SORT_RESULT_HEIGHT = RESULT_SYMBOL_BOX_SIZE
-SORT_BOX_RESULT_OFFSET = 29
-SORT_TREE_RESULT_OFFSET = 28
+SORT_BOX_RESULT_OFFSET = 36
+SORT_TREE_RESULT_OFFSET = 36
 SORT_CONTROL_STYLE = {"description_width": "0px"}
 SORT_CONTROL_LABEL_WIDTH = 96
 SORT_CONTROL_FIELD_WIDTH = 188
@@ -1738,7 +1738,7 @@ def sort_styles():
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        gap: 2px;
+        gap: 14px;
         width: 100%;
       }}
       .sort-array-line-cajas .sort-items.boxes {{
@@ -1762,11 +1762,11 @@ def sort_styles():
       }}
       .sort-array-line .sort-items,
       .sort-array-line .bar-panel {{
-        max-width: calc(100% - {SORT_RESULT_WIDTH + 2}px);
+        max-width: calc(100% - {SORT_RESULT_WIDTH + 14}px);
       }}
       .sort-array-line .merge-tree-shell,
       .sort-array-line .quick-tree-shell {{
-        max-width: calc(100% - {SORT_RESULT_WIDTH + 2}px);
+        max-width: calc(100% - {SORT_RESULT_WIDTH + 14}px);
       }}
       .sort-result {{
         width: {SORT_RESULT_WIDTH}px;
@@ -2180,7 +2180,7 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
     )
     step_back_button = action_button("step_back")
     step_button = action_button("step")
-    auto_button = action_button("play")
+    auto_button = action_button("sort")
     finish_button = action_button("finish")
     reset_button = action_button("reset")
     book_button = action_button("book")

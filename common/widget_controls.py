@@ -176,7 +176,7 @@ def shared_ui_styles(root_selector):
   margin: 0 !important;
   border-radius: 0 !important;
 }}
-@media (min-width: 1100px) {{
+@media (min-width: 768px) {{
   {root} .simulation-action-row {{
     flex-flow: row nowrap !important;
   }}

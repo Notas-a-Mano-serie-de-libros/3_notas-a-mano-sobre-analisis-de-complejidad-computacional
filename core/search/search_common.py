@@ -662,7 +662,7 @@ def _build_search_css() -> str:
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 14px;
     width: 100%;
   }}
   .search-array-line .search-nodes {{
@@ -673,7 +673,7 @@ def _build_search_css() -> str:
     min-width: {SEARCH_RESULT_WIDTH}px;
     height: 54px;
     align-self: flex-start;
-    margin-top: 38px;
+    margin-top: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -955,7 +955,7 @@ def create_search_controls(default_size=DEFAULT_SIZE, max_size=MAX_SIZE, default
     )
     step_back_button = action_button("step_back")
     step_button = action_button("step")
-    auto_button = action_button("play")
+    auto_button = action_button("search")
     finish_button = action_button("finish")
     reset_button = action_button("reset")
     book_button = action_button("book")

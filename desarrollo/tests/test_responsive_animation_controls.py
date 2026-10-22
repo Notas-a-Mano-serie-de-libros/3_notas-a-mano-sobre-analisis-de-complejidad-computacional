@@ -169,7 +169,7 @@ def test_shared_visual_system_defines_all_control_contracts_once():
 
 def test_shared_action_row_keeps_all_buttons_on_one_line_when_space_is_available():
     controls = source("common/widget_controls.py")
-    wide_rule = controls.split("@media (min-width: 1100px)", 1)[1].split(
+    wide_rule = controls.split("@media (min-width: 768px)", 1)[1].split(
         '{root} [class*="-tab-bar"]', 1
     )[0]
 

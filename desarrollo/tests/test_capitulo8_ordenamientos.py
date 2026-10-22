@@ -94,8 +94,8 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
 
     def test_search_and_sort_result_checks_share_one_visual_contract(self):
         visual_roles = (PROJECT_ROOT / "common" / "visual_roles.py").read_text(encoding="utf-8")
-        self.assertIn("RESULT_SYMBOL_BOX_SIZE = 48", visual_roles)
-        self.assertIn("RESULT_SYMBOL_FONT_SIZE = 48", visual_roles)
+        self.assertIn("RESULT_SYMBOL_BOX_SIZE = 34", visual_roles)
+        self.assertIn("RESULT_SYMBOL_FONT_SIZE = 26", visual_roles)
         self.assertIn('RESULT_SYMBOL_SUCCESS_COLOR = "#2d7d32"', visual_roles)
 
         result_renderers = (
@@ -528,14 +528,14 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("bar-nodes", bar_html)
         self.assertIn('class="sort-array-line sort-array-line-cajas"', box_html)
         self.assertIn('class="sort-array-line sort-array-line-barras"', bar_html)
-        self.assertIn('class="sort-result" style="margin-top:29px;"', box_html)
-        self.assertIn('class="sort-result" style="margin-top:137px;"', bar_html)
+        self.assertIn('class="sort-result" style="margin-top:36px;"', box_html)
+        self.assertIn('class="sort-result" style="margin-top:144px;"', bar_html)
         self.assertIn('class="simulation-sr-only" role="status" aria-live="polite" aria-atomic="true"', box_html)
         self.assertIn('role="list" aria-label="Elementos del arreglo"', bar_html)
         self.assertIn("min-height:", bar_html)
         self.assertIn("width: fit-content;", box_html)
         self.assertIn("width: fit-content;", bar_html)
-        self.assertIn("gap: 2px;", bar_html)
+        self.assertIn("gap: 14px;", bar_html)
         self.assertIn("contain: layout paint;", bar_html)
         self.assertIn("prefers-reduced-motion: reduce", bar_html)
         self.assertIn(".sort-array-line-cajas .sort-items.boxes", bar_html)
