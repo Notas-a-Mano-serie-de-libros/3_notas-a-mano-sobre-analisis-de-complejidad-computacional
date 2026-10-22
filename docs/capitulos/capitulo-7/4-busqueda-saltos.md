@@ -93,11 +93,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo7/notebooks/4_busqueda_saltos.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F4_busqueda_saltos.ipynb&revision=c965c258885c" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F4_busqueda_saltos.ipynb&revision=ae7c53af398a" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F4_busqueda_saltos.ipynb&revision=c965c258885c"
+    src="../../../jupyterlite/analisis-completo/notebooks/index.html?path=simulaciones%2Fcapitulo7%2Fnotebooks%2F4_busqueda_saltos.ipynb&revision=ae7c53af398a"
     title="Simulación interactiva de Búsqueda por saltos en JupyterLite"
     loading="lazy"
     scrolling="no"
