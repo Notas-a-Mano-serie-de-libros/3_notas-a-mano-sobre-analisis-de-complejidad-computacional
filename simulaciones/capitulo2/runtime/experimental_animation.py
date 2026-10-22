@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
+import time
 from dataclasses import dataclass
 from html import escape
 from pathlib import Path
@@ -56,6 +57,8 @@ STATUS_PENDING = "pending"
 STATUS_LOADING = "loading"
 STATUS_COMPLETE = "complete"
 STATUS_SKIPPED = "skipped"
+MIN_TIMING_WINDOW_SECONDS = 0.002
+MAX_TIMING_EXECUTIONS = 10_000_000
 
 
 def style_experiment_axis(ax, mode, title, legend_handles=None):
@@ -126,6 +129,37 @@ def measure_profile_point(profile, n, executions):
     if profile.prepare is not None and profile.measure_prepared is not None:
         return profile.measure_prepared(profile.prepare(n), executions)
     return profile.measure(n, executions)
+
+
+def measure_average_time(
+    run_batch,
+    executions,
+    *,
+    minimum_window=MIN_TIMING_WINDOW_SECONDS,
+    maximum_executions=MAX_TIMING_EXECUTIONS,
+):
+    """Measure one operation without mistaking timer granularity for zero time.
+
+    Browser runtimes can expose a coarser clock than desktop Python. The batch is
+    therefore enlarged until the measured interval spans several clock ticks;
+    the returned value is still the observed duration divided by the actual
+    number of executions.
+    """
+
+    repetitions = max(1, int(executions))
+    maximum_executions = max(repetitions, int(maximum_executions))
+    minimum_window = max(0.0, float(minimum_window))
+
+    while True:
+        start = time.perf_counter()
+        run_batch(repetitions)
+        elapsed = time.perf_counter() - start
+        if elapsed > 0 and (elapsed >= minimum_window or repetitions >= maximum_executions):
+            return elapsed / repetitions
+        if repetitions >= maximum_executions:
+            raise RuntimeError("El reloj no avanzó durante la medición experimental.")
+        growth = 10 if elapsed <= 0 else max(2, int(minimum_window / elapsed) + 1)
+        repetitions = min(maximum_executions, repetitions * growth)
 
 
 def figure_placeholder_html(width=800, aspect_ratio="2/1"):

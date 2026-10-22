@@ -1,8 +1,10 @@
 import json
 import sys
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
+import pytest
 
 CHAPTER_DIR = Path(__file__).parents[2] / "simulaciones" / "capitulo2"
 EXPERIMENT_DIR = CHAPTER_DIR / "runtime"
@@ -30,6 +32,7 @@ from constant_animation import (  # noqa: E402
 from experimental_animation import (  # noqa: E402
     ExperimentProfile,
     effective_max_safe_elements,
+    measure_average_time,
     measure_profile_point,
     profile_warning_html,
 )
@@ -69,7 +72,25 @@ from theoretical_graphs import (  # noqa: E402
 
 def test_medicion_constante_devuelve_un_tiempo_valido():
     elapsed = measure_access(100, 3)
-    assert elapsed >= 0
+    assert elapsed > 0
+
+
+def test_medicion_temporal_amplia_el_lote_si_el_reloj_no_avanza():
+    batches = []
+
+    with patch(
+        "experimental_animation.time.perf_counter",
+        side_effect=[1.0, 1.0, 2.0, 2.004],
+    ):
+        elapsed = measure_average_time(
+            batches.append,
+            2,
+            minimum_window=0.002,
+            maximum_executions=200,
+        )
+
+    assert batches == [2, 20]
+    assert elapsed == pytest.approx(0.004 / 20)
 
 
 def test_medicion_espacial_constante_devuelve_bytes_validos():

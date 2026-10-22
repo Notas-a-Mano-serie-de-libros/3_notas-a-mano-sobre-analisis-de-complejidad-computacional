@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import base64
 import sys
-import time
 import tracemalloc
 from io import BytesIO
 from pathlib import Path
@@ -26,6 +25,7 @@ from simulaciones.capitulo2.runtime.experimental_animation import (
     STATUS_PENDING,
     STATUS_SKIPPED,
     ExperimentProfile,
+    measure_average_time,
     next_order_of_magnitude,
     previous_order_of_magnitude,
     run_selectable_app,
@@ -81,10 +81,12 @@ def prepare_access(n):
 
 def measure_prepared_access(prepared, executions):
     values, index = prepared
-    start = time.perf_counter()
-    for _ in range(executions):
-        _ = values[index]
-    return (time.perf_counter() - start) / executions
+
+    def run_batch(repetitions):
+        for _ in range(repetitions):
+            _ = values[index]
+
+    return measure_average_time(run_batch, executions)
 
 
 def measure_access(n, executions):
