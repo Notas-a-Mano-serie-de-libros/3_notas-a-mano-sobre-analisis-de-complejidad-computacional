@@ -42,6 +42,7 @@ from common.visual_roles import (
 )
 from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
+    SPEED_OPTIONS,
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
     bounded_int_control,
@@ -756,6 +757,12 @@ def run_app():
         description="Posición",
         width="190px",
     )
+    speed_input = dropdown_control(
+        options=SPEED_OPTIONS,
+        value=1.0,
+        description="Velocidad",
+        width="160px",
+    )
     auto_button = button_control(description="Buscar", button_style="success", width="150px")
     finish_button = button_control(description="Finalizar", button_style="info", width="150px", disabled=True)
     reset_button = button_control(description="Generar nuevo arreglo", button_style="warning", width="190px")
@@ -767,6 +774,7 @@ def run_app():
         "target_mode": comparison_labeled_control("Elemento", target_mode_input),
         "target_position": comparison_labeled_control("Posición", target_position_input),
         "target_readout": comparison_labeled_control("Objetivo", target_readout),
+        "speed": comparison_labeled_control("Velocidad", speed_input),
     }
     style_output = widgets.HTML(
         layout=widgets.Layout(width="0", height="0", margin="0", padding="0")
@@ -789,6 +797,7 @@ def run_app():
             control_groups["target_mode"],
             control_groups["target_readout"],
             control_groups["target_position"],
+            control_groups["speed"],
         ]
 
     def update_target_readout(target):
@@ -892,7 +901,7 @@ def run_app():
                 break
             state = snapshot
             redraw()
-            await asyncio.sleep(0.45)
+            await asyncio.sleep(0.45 / float(speed_input.value or 1.0))
         if execution_state["run_id"] == run_id:
             redraw()
             set_idle_buttons()
@@ -909,7 +918,7 @@ def run_app():
                 break
             state = snapshot
             redraw()
-            colab_pause(0.45)
+            colab_pause(0.45 / float(speed_input.value or 1.0))
         if execution_state["run_id"] == run_id:
             redraw()
             set_idle_buttons()

@@ -35,6 +35,7 @@ from common.visual_roles import (
 )
 from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
+    SPEED_OPTIONS,
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
     bounded_int_control,
@@ -960,7 +961,7 @@ def create_search_controls(default_size=DEFAULT_SIZE, max_size=MAX_SIZE, default
     reset_button = action_button("reset")
     book_button = action_button("book")
     speed_input = dropdown_control(
-        options=(("0.5x", 0.5), ("1x", 1.0), ("2x", 2.0)),
+        options=SPEED_OPTIONS,
         value=1.0,
         description="Velocidad",
         width="160px",

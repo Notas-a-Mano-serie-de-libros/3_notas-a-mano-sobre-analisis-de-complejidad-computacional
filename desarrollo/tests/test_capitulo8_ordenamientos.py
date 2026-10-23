@@ -106,6 +106,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             DOMAIN_DIR / "3_ordenamiento_insercion_app.py",
             DOMAIN_DIR / "4_ordenamiento_shell_app.py",
             DOMAIN_DIR / "variant_comparison.py",
+            PROJECT_ROOT / "simulaciones" / "capitulo2" / "runtime" / "experimental_animation.py",
+            PROJECT_ROOT / "simulaciones" / "capitulo4" / "runtime" / "experiment_ui.py",
+            PROJECT_ROOT / "simulaciones" / "capitulo6" / "runtime" / "recursive_analysis_lab.py",
+            PROJECT_ROOT / "common" / "exercise_laboratory.py",
         )
         for path in result_renderers:
             with self.subTest(path=path.name):
@@ -113,6 +117,29 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
                 self.assertIn("RESULT_SYMBOL_BASE_CSS", source)
                 self.assertIn("RESULT_SYMBOL_SUCCESS_COLOR", source)
                 self.assertNotIn("#7bdc80", source)
+
+    def test_search_and_sort_share_extended_speed_options(self):
+        controls = (PROJECT_ROOT / "common" / "widget_controls.py").read_text(encoding="utf-8")
+        self.assertIn('("0.5x", 0.5)', controls)
+        self.assertIn('("5x", 5.0)', controls)
+        self.assertIn('("10x", 10.0)', controls)
+
+        consumers = (
+            PROJECT_ROOT / "core" / "search" / "search_common.py",
+            PROJECT_ROOT / "core" / "search" / "0_comparacion_busquedas_app.py",
+            DOMAIN_DIR / "sort_common.py",
+            DOMAIN_DIR / "0_comparacion_ordenamientos_app.py",
+        )
+        for path in consumers:
+            with self.subTest(path=path.name):
+                source = path.read_text(encoding="utf-8")
+                self.assertIn("SPEED_OPTIONS", source)
+                self.assertIn("Velocidad", source)
+
+        search_comparison = consumers[1].read_text(encoding="utf-8")
+        sort_comparison = consumers[3].read_text(encoding="utf-8")
+        self.assertIn("0.45 / float(speed_input.value or 1.0)", search_comparison)
+        self.assertIn("0.08 / float(speed_dropdown.value or 1.0)", sort_comparison)
 
     def test_formula_reservations_match_measured_mathjax_content(self):
         expected = {

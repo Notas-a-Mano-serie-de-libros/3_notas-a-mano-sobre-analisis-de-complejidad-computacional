@@ -349,7 +349,8 @@ def test_final_unwind_shows_completion_check_next_to_result():
     assert "completed" in final_markup
     assert 'class="lab-completed-row"><div class="lab-call-frame' in final_markup
     assert '</div><span class="lab-finish-check"' in final_markup
-    assert "font-family:serif;font-size:28px" in SOURCE
+    assert "RESULT_SYMBOL_BASE_CSS" in SOURCE
+    assert "RESULT_SYMBOL_SUCCESS_COLOR" in SOURCE
     assert "border-radius:50%" not in SOURCE
     assert ".lab-completed-row{position:relative;width:min(100%,330px)}" in SOURCE
     assert "left:calc(100% + 8px);top:50%" in SOURCE

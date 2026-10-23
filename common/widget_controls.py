@@ -19,6 +19,7 @@ STANDARD_CONTROL_COLUMN_GAP = 36
 STANDARD_ACTION_HEIGHT = 38
 STANDARD_ACTION_GAP = 0
 STANDARD_ACTION_MARGIN_TOP = 16
+SPEED_OPTIONS = (("0.5x", 0.5), ("1x", 1.0), ("2x", 2.0), ("5x", 5.0), ("10x", 10.0))
 
 
 def shared_ui_styles(root_selector):

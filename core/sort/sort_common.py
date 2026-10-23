@@ -27,6 +27,7 @@ from common.simulation_views import (
 )
 from common.visual_roles import RESULT_SYMBOL_BASE_CSS, RESULT_SYMBOL_BOX_SIZE, RESULT_SYMBOL_SUCCESS_COLOR
 from common.widget_controls import (
+    SPEED_OPTIONS,
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
     STANDARD_LABEL_CONTROL_GAP,
@@ -2172,7 +2173,7 @@ def build_controls(has_pivot=False, has_tree=False, has_gap_sequence=False, has_
         description_style=SORT_CONTROL_STYLE,
     )
     speed_dropdown = dropdown_control(
-        options=(("0.5x", 0.5), ("1x", 1.0), ("2x", 2.0)),
+        options=SPEED_OPTIONS,
         value=1.0,
         description="Velocidad",
         width="160px",

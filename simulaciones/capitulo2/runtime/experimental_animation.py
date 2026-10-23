@@ -28,6 +28,7 @@ from common.experimental_simulation import (
     previous_order_of_magnitude,
 )
 from common.simulation_views import standard_view_styles
+from common.visual_roles import RESULT_SYMBOL_BASE_CSS, RESULT_SYMBOL_SUCCESS_COLOR
 from common.widget_controls import (
     STANDARD_CONTROL_ROW_GAP,
     STANDARD_LABEL_CONTROL_GAP,
@@ -191,8 +192,8 @@ th{{font-weight:700;color:#000;background:#fff;border-bottom:1px solid #9e9e9e;}
 td{{color:#000;background:#fff;}}
 tbody tr:nth-child(even) td{{background:#f3f4f6;}}
 .constant-status{{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;vertical-align:middle;}}
-.constant-result-symbol{{font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32;}}
-.constant-result-symbol.found{{color:#2d7d32;}}
+.constant-result-symbol{{{RESULT_SYMBOL_BASE_CSS}font-family:serif;color:{RESULT_SYMBOL_SUCCESS_COLOR};}}
+.constant-result-symbol.found{{color:{RESULT_SYMBOL_SUCCESS_COLOR};}}
 .constant-loading{{width:16px;height:16px;min-width:16px;border:2px solid #bdc1c6;border-top-color:#1a73e8;border-radius:50%;animation:constant-spin .75s linear infinite;box-sizing:border-box;}}
 .constant-status-pending,.constant-status-skipped{{font-size:14px;font-weight:400;color:#5f6368;}}
 @keyframes constant-spin{{to{{transform:rotate(360deg);}}}}
@@ -315,7 +316,7 @@ def results_table_html(sizes, experimental, profile, pending=False, statuses=Non
         ".constant-native-table .constant-equation sup{font-family:inherit;font-size:.72em;line-height:0;vertical-align:super;}"
         ".constant-native-table .constant-times{font-family:inherit;padding:0 .22em;}"
         ".constant-native-table .constant-status{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;vertical-align:middle;}"
-        ".constant-native-table .constant-result-symbol{font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32;}"
+        f".constant-native-table .constant-result-symbol{{{RESULT_SYMBOL_BASE_CSS}font-family:serif;color:{RESULT_SYMBOL_SUCCESS_COLOR};}}"
         ".constant-native-table .constant-loading{width:16px;height:16px;min-width:16px;border:2px solid #bdc1c6;border-top-color:#1a73e8;border-radius:50%;animation:constant-spin .75s linear infinite;box-sizing:border-box;}"
         ".constant-native-table .constant-status-pending,.constant-native-table .constant-status-skipped{font-size:14px;font-weight:400;color:#5f6368 !important;}"
         "@keyframes constant-spin{to{transform:rotate(360deg);}}"

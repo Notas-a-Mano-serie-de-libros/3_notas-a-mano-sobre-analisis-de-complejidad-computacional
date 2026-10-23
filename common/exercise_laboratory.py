@@ -16,6 +16,7 @@ import numpy as np
 from IPython.display import display
 
 from common.simulation_views import standard_view_styles
+from common.visual_roles import RESULT_SYMBOL_BASE_CSS, RESULT_SYMBOL_SUCCESS_COLOR
 from common.widget_controls import (
     STANDARD_CONTROL_ROW_GAP,
     action_button_row,
@@ -29,19 +30,19 @@ from simulaciones.capitulo2.runtime.experimental_animation import run_app as _ch
 
 PROJECTION_LIMIT = 10**6
 
-_TABLE_STYLE = """
+_TABLE_STYLE = f"""
 <style>
-.exercise-table{box-sizing:border-box;display:flex;justify-content:center;width:100%;overflow:hidden;background:#fff!important;color:#000!important;text-align:center;font-size:16px}
-.exercise-table table{display:table;border-collapse:collapse;width:auto;max-width:100%;margin:0 auto;table-layout:auto}
-.exercise-table table,.exercise-table thead,.exercise-table tbody,.exercise-table tr,.exercise-table th,.exercise-table td,.exercise-table span:not(.exercise-result-symbol):not(.exercise-loading),.exercise-table sup{color:#000!important}
-.exercise-table th,.exercise-table td{box-sizing:border-box;height:42px;padding:6px 14px;text-align:center;white-space:nowrap}
-.exercise-table th{font-family:sans-serif;font-weight:700;background:#fff!important;border-bottom:1px solid #9e9e9e}
-.exercise-table tbody tr:nth-child(even) td{background:#f3f4f6!important}
-.exercise-equation{font-family:'STIX Two Math','STIXGeneral','Cambria Math',serif;color:#000!important}
-.exercise-theory-status{font:14px sans-serif;color:#000!important}
-.exercise-result-symbol{font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32!important}
-.exercise-loading{display:inline-block;width:16px;height:16px;border:2px solid #bdc1c6;border-top-color:#1a73e8;border-radius:50%;animation:exercise-spin .75s linear infinite}
-@keyframes exercise-spin{to{transform:rotate(360deg)}}
+.exercise-table{{box-sizing:border-box;display:flex;justify-content:center;width:100%;overflow:hidden;background:#fff!important;color:#000!important;text-align:center;font-size:16px}}
+.exercise-table table{{display:table;border-collapse:collapse;width:auto;max-width:100%;margin:0 auto;table-layout:auto}}
+.exercise-table table,.exercise-table thead,.exercise-table tbody,.exercise-table tr,.exercise-table th,.exercise-table td,.exercise-table span:not(.exercise-result-symbol):not(.exercise-loading),.exercise-table sup{{color:#000!important}}
+.exercise-table th,.exercise-table td{{box-sizing:border-box;height:42px;padding:6px 14px;text-align:center;white-space:nowrap}}
+.exercise-table th{{font-family:sans-serif;font-weight:700;background:#fff!important;border-bottom:1px solid #9e9e9e}}
+.exercise-table tbody tr:nth-child(even) td{{background:#f3f4f6!important}}
+.exercise-equation{{font-family:'STIX Two Math','STIXGeneral','Cambria Math',serif;color:#000!important}}
+.exercise-theory-status{{font:14px sans-serif;color:#000!important}}
+.exercise-result-symbol{{{RESULT_SYMBOL_BASE_CSS}font-family:serif;color:{RESULT_SYMBOL_SUCCESS_COLOR}!important}}
+.exercise-loading{{display:inline-block;width:16px;height:16px;border:2px solid #bdc1c6;border-top-color:#1a73e8;border-radius:50%;animation:exercise-spin .75s linear infinite}}
+@keyframes exercise-spin{{to{{transform:rotate(360deg)}}}}
 </style>
 """
 

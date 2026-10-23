@@ -23,6 +23,7 @@ from sort_config import DEFAULT_BAR_SIZE, FONT_FAMILY, MAX_SIZE, ORDER_OPTIONS, 
 from common.visual_roles import RESULT_SYMBOL_BASE_CSS, RESULT_SYMBOL_BOX_SIZE, RESULT_SYMBOL_SUCCESS_COLOR
 from common.widget_controls import (
     COMPACT_GROUP_WIDTH,
+    SPEED_OPTIONS,
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
     STANDARD_LABEL_CONTROL_GAP,
@@ -558,6 +559,13 @@ def run_app():
         width="210px",
         description_style={},
     )
+    speed_dropdown = dropdown_control(
+        options=SPEED_OPTIONS,
+        value=1.0,
+        description="Velocidad",
+        width="160px",
+        description_style={},
+    )
     algorithm_checks = {}
     for index, (label, value) in enumerate(ALGORITHM_OPTIONS):
         column_width = ALGORITHM_COLUMN_WIDTHS[index % len(ALGORITHM_COLUMN_WIDTHS)]
@@ -616,8 +624,9 @@ def run_app():
     size_group = compact_labeled_control("Tamaño", size_input)
     order_group = compact_labeled_control("Orden", order_dropdown)
     focus_group = compact_labeled_control("Enfoque", focus_dropdown)
+    speed_group = compact_labeled_control("Velocidad", speed_dropdown)
     primary_controls = widgets.VBox(
-        [size_group, order_group, focus_group],
+        [size_group, order_group, focus_group, speed_group],
         layout=widgets.Layout(
             width=f"{COMPACT_GROUP_WIDTH}px", flex="0 0 auto",
             grid_gap=f"{STANDARD_CONTROL_ROW_GAP}px",
@@ -711,7 +720,7 @@ def run_app():
                 break
             state = snapshot
             redraw()
-            await asyncio.sleep(0.08)
+            await asyncio.sleep(0.08 / float(speed_dropdown.value or 1.0))
         if execution_state["run_id"] == run_id:
             redraw()
             set_idle_buttons()
@@ -727,7 +736,7 @@ def run_app():
                 break
             state = snapshot
             redraw()
-            colab_pause()
+            colab_pause(0.08 / float(speed_dropdown.value or 1.0))
         if execution_state["run_id"] == run_id:
             redraw()
             set_idle_buttons()

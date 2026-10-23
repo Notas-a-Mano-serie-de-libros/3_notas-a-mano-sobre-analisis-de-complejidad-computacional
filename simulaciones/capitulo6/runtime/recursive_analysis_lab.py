@@ -14,6 +14,11 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import CLexer, JavaLexer, PythonLexer
 
 from common.simulation_views import action_button, actions, standard_view_styles
+from common.visual_roles import (
+    RESULT_SYMBOL_BASE_CSS,
+    RESULT_SYMBOL_BOX_SIZE,
+    RESULT_SYMBOL_SUCCESS_COLOR,
+)
 from common.widget_controls import (
     STANDARD_CONTROL_COLUMN_GAP,
     STANDARD_CONTROL_ROW_GAP,
@@ -27,6 +32,13 @@ except (ImportError, ModuleNotFoundError):
 
 
 RUNNING_IN_COLAB = _colab_output is not None
+
+_LAB_FINISH_CHECK_CSS = (
+    "position:absolute;left:calc(100% + 8px);top:50%;"
+    f"width:{RESULT_SYMBOL_BOX_SIZE}px;{RESULT_SYMBOL_BASE_CSS}"
+    f"font-family:serif;color:{RESULT_SYMBOL_SUCCESS_COLOR}!important;"
+    "text-align:center;transform:translateY(-50%);"
+)
 
 
 @dataclass
@@ -653,14 +665,14 @@ STYLES = """
 .lab-call-frame b{font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-weight:400}.lab-call-frame span{font-size:12px;color:#5f6368!important}.lab-call-frame .lab-math-expression{display:inline-block;margin:0;font-family:"STIX Two Math","Cambria Math","Times New Roman",serif;font-size:18px;color:#202124!important;white-space:nowrap}.lab-call-frame .lab-math-expression *{color:#202124!important}
 .lab-call-frame.waiting{opacity:.62}.lab-call-frame.current-call{background:#f4e8bd;opacity:1}.lab-call-frame.current-return{background:#e8f5e9;opacity:1}.lab-call-frame.completed{transform:none;opacity:1}
 .lab-completed-row{position:relative;width:min(100%,330px)}.lab-completed-row .lab-call-frame{width:100%}
-.lab-finish-check{position:absolute;left:calc(100% + 8px);top:50%;display:inline-block!important;width:28px;font-family:serif;font-size:28px;line-height:1;font-weight:700;color:#2d7d32!important;text-align:center;transform:translateY(-50%)}
+.lab-finish-check{__LAB_FINISH_CHECK_CSS__}
 .lab-call-frame.frame-push{animation:lab-frame-push .22s ease-out}.lab-call-frame.frame-resume{animation:lab-frame-resume .24s ease-out}.lab-call-frame.frame-pop{animation:lab-frame-pop .28s ease-in-out}
 @keyframes lab-frame-push{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:translateY(0)}}@keyframes lab-frame-resume{0%{transform:scale(.985)}55%{transform:scale(1.012)}100%{transform:scale(1)}}@keyframes lab-frame-pop{0%{opacity:1;transform:translateY(0)}65%{opacity:1;transform:translateY(-2px)}100%{opacity:.38;transform:translateY(-9px)}}
 .lab-stack-base{width:min(100%,360px);margin-top:5px;padding:6px 10px;border-top:2px solid #202124;text-align:center;color:#5f6368!important;font-size:12px}
 .lab-desk-check{display:flex;width:100%;height:100%;min-height:0;flex-direction:column;overflow:hidden;background:#fff;color:#111;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:13px}.lab-desk-table-wrap{position:relative;width:100%;min-height:0;flex:1 1 auto;overflow:auto}.lab-desk-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:13px;line-height:1.45}.lab-desk-table th,.lab-desk-table td{width:1%;padding:5px 10px;border-bottom:1px solid rgba(128,128,128,.25);text-align:center;vertical-align:middle;white-space:nowrap}.lab-desk-table th{position:sticky;top:0;z-index:10;background:rgba(246,245,243,.98);box-shadow:0 1px 0 rgba(128,128,128,.35);font-weight:600}.lab-desk-table tr:last-child td{background:rgba(139,75,50,.10);font-weight:600}.lab-desk-table tbody tr:hover td{background:rgba(139,75,50,.07)!important}.lab-desk-mono{font-family:SFMono-Regular,Consolas,"Liberation Mono",Menlo,monospace;font-size:12px}.lab-desk-note{flex:0 0 auto;margin:4px 8px;font-size:12px;opacity:.75}.lab-desk-scroll-trigger{display:none}.lab-widget-panels{box-sizing:border-box!important;width:100%!important;margin:0!important;gap:0!important;overflow:visible!important}.lab-widget-panel{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;gap:0!important;border:1px solid #dedede!important;background:#fff!important;overflow:hidden!important}.lab-widget-header{box-sizing:border-box!important;width:100%!important;height:44px!important;min-height:44px!important;gap:0!important;border-bottom:1px solid #e2e2e2!important;background:#f7f7f7!important;overflow:hidden!important}.lab-widget-summary{flex:1 1 auto!important;width:auto!important;min-width:0!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:10px 14px!important;border:0!important;border-radius:0!important;background:#f7f7f7!important;color:#333!important;box-shadow:none!important;font-family:sans-serif!important;font-size:16px!important;font-weight:700!important;line-height:24px!important;text-align:left!important}.lab-widget-summary:hover{background:#f7f7f7!important}.lab-widget-logo{position:relative!important;z-index:1!important;flex:0 0 42px!important;width:42px!important;height:44px!important;margin:0!important;padding:9px 12px 9px 4px!important;background:transparent!important;overflow:hidden!important}.lab-widget-logo .widget-html-content{display:flex!important;align-items:center!important;justify-content:flex-end!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;background:transparent!important}.lab-widget-logo .lab-language-logo{margin:0!important;background:transparent!important}.lab-widget-content{box-sizing:border-box!important;width:100%!important;min-width:0!important;margin:0!important;background:#fff!important;overflow:hidden!important}.lab-widget-overview,.lab-widget-execution{display:flex!important;width:100%!important;min-width:0!important;align-items:flex-start!important;gap:0!important;overflow:hidden!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{flex:0 0 50%!important;width:50%!important;min-width:0!important}.lab-widget-overview>.lab-widget-panel:first-child,.lab-widget-execution>.lab-widget-panel:first-child{border-right:0!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{border-top:0!important}.lab-widget-overview .lab-widget-content,.lab-widget-execution .lab-widget-content{overflow:hidden!important}.lab-widget-panel.lab-collapsed .lab-widget-content{height:0!important;min-height:0!important;max-height:0!important}.lab-widget-panel.lab-collapsed{height:44px!important}
 @media(max-width:760px){.lab-widget-overview,.lab-widget-execution{display:block!important}.lab-widget-overview>.lab-widget-panel,.lab-widget-execution>.lab-widget-panel{width:100%!important;flex:0 0 100%!important}.lab-widget-overview>.lab-widget-panel:first-child,.lab-widget-execution>.lab-widget-panel:first-child{border-right:1px solid #dedede!important}.lab-widget-overview>.lab-widget-panel+.lab-widget-panel,.lab-widget-execution>.lab-widget-panel+.lab-widget-panel{border-top:0!important}}
 </style>
-"""
+""".replace("__LAB_FINISH_CHECK_CSS__", _LAB_FINISH_CHECK_CSS)
 
 
 def _mathjax_frame(content: str, height: int) -> str:
@@ -691,7 +703,7 @@ body.math-ready #content{{visibility:visible;}}
 .lab-call-frame span{{font-size:12px;color:#5f6368;}}
 .lab-call-frame.waiting{{opacity:.62;}}.lab-call-frame.current-call{{background:#f4e8bd;opacity:1;}}.lab-call-frame.current-return{{background:#e8f5e9;opacity:1;}}.lab-call-frame.completed{{opacity:1;}}
 .lab-completed-row{{position:relative;width:min(100%,330px);}}.lab-completed-row .lab-call-frame{{width:100%;}}
-.lab-finish-check{{position:absolute;left:calc(100% + 8px);top:50%;width:28px;font-family:serif;font-size:28px;font-weight:700;color:#2d7d32;text-align:center;transform:translateY(-50%);}}
+.lab-finish-check{{{_LAB_FINISH_CHECK_CSS}}}
 .lab-stack-base{{width:min(100%,360px);margin-top:5px;padding:6px 10px;border-top:2px solid #202124;text-align:center;color:#5f6368;font-size:12px;}}
 mjx-container{{color:#333!important;}}
 </style>
