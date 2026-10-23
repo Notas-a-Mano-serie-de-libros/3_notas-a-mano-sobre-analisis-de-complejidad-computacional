@@ -519,11 +519,16 @@ def message_html(message):
 
 
 def sort_tree_max_depth(state):
+    cached_depth = state.get("_render_tree_max_depth")
+    if cached_depth is not None:
+        return int(cached_depth)
     algorithm = state.get("algorithm")
     tree_key = "merge_tree_nodes" if algorithm == "mezcla" else "quick_tree_nodes"
     if state.get("trace") is not None:
         trace = state["trace"]
-        return max((max((n["depth"] for n in e.get(tree_key, [])), default=0) for e in trace), default=0)
+        depth = max((max((n["depth"] for n in e.get(tree_key, [])), default=0) for e in trace), default=0)
+        state["_render_tree_max_depth"] = depth
+        return depth
     values = state.get("initial_values", state.get("arr", []))
     if not values:
         return 0
@@ -534,9 +539,13 @@ def sort_tree_max_depth(state):
             pivot_strategy=state.get("pivot_strategy", "middle"),
             partition_scheme=state.get("partition_scheme", "hoare"),
         )
-        return max((max((n["depth"] for n in e.get("quick_tree_nodes", [])), default=0) for e in trace), default=0)
+        depth = max((max((n["depth"] for n in e.get("quick_tree_nodes", [])), default=0) for e in trace), default=0)
+        state["_render_tree_max_depth"] = depth
+        return depth
     elif algorithm == "mezcla":
-        return tree_max_depth_for_state(state)
+        depth = tree_max_depth_for_state(state)
+        state["_render_tree_max_depth"] = depth
+        return depth
     return 0
 
 
@@ -2342,12 +2351,13 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
             render_state_html(state, include_styles=False),
             state.get("formula_reserved_height"),
         )
-        desk_output.value = render_desk_check(
-            pseudocode_algorithm_key(state),
-            sort_desk_rows(state),
-            descending=state.get("descending", False),
-            total_steps=len(state["trace"]) if state.get("trace") is not None else None,
-        )
+        if desk_output.layout.display != "none":
+            desk_output.value = render_desk_check(
+                pseudocode_algorithm_key(state),
+                sort_desk_rows(state),
+                descending=state.get("descending", False),
+                total_steps=len(state["trace"]) if state.get("trace") is not None else None,
+            )
 
     def sync_execution_buttons():
         complete = state["sorting_complete"]

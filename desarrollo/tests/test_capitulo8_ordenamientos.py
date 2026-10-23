@@ -503,6 +503,19 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
             self.common.displaystyle_formula(r"\begin{array}{l} p = 3 \\[8pt] i = 1 \end{array}"),
         )
 
+    def test_hidden_desk_check_does_not_compete_with_visual_animation(self):
+        source = (DOMAIN_DIR / "sort_common.py").read_text(encoding="utf-8")
+        self.assertIn('if desk_output.layout.display != "none":', source)
+        self.assertNotIn("pending_steps", source)
+        self.assertNotIn("automatic_render_batch_size", source)
+
+    def test_quick_tree_depth_is_computed_once_and_reused_during_each_render(self):
+        state = self.common.create_state("rapido", values=[5, 1, 4, 2, 3], view="arbol")
+        depth = self.common.sort_tree_max_depth(state)
+        state["trace"] = object()
+        self.assertEqual(self.common.sort_tree_max_depth(state), depth)
+        self.assertEqual(state["_render_tree_max_depth"], depth)
+
     def test_every_sort_reuses_one_formula_host_with_stable_reserved_height(self):
         runtime = load_module_from_path(
             "capitulo8_animation_runtime_formula_test",
