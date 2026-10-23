@@ -11,7 +11,7 @@ from pathlib import Path
 
 from IPython.display import clear_output
 
-RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/26d5f462116543d491bcc8b6c8581297e34056b6"
+RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/a04b166393cde2845a4d465d9c19b41c29773410"
 COLAB_PACKAGES = ("ipywidgets==8.1.9",)
 REQUIRED_FILES = (
     "common/__init__.py",

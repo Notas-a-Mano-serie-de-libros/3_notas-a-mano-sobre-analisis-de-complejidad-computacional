@@ -41,7 +41,7 @@ except ModuleNotFoundError:
 from sort_common import generate_values
 
 _DOMAIN = Path(__file__).resolve().parent
-_RAW_DOMAIN_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/26d5f462116543d491bcc8b6c8581297e34056b6/core/sort"
+_RAW_DOMAIN_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/a04b166393cde2845a4d465d9c19b41c29773410/core/sort"
 
 
 def _ensure_sort_metrics():
