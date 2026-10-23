@@ -11,13 +11,14 @@ from pathlib import Path
 
 from IPython.display import clear_output
 
-RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/a04b166393cde2845a4d465d9c19b41c29773410"
+RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/c00a75a05f3a76adbc27277f0baa5d0300bc225e"
 COLAB_PACKAGES = ("ipywidgets==8.1.9",)
 REQUIRED_FILES = (
     "common/__init__.py",
     "common/animation_runtime.py",
     "common/experimental_simulation.py",
     "common/graphics.py",
+    "common/visual_roles.py",
     "common/widget_controls.py",
     "common/remote_fetch.py",
     "common/simulation_views.py",

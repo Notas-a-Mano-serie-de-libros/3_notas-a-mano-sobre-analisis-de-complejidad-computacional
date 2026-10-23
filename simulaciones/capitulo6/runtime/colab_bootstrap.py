@@ -40,6 +40,7 @@ def _download_common_runtime(module_dir, repository_root):
     common_dir = module_dir / "common"
     common_dir.mkdir(parents=True, exist_ok=True)
     _download(repository_root + "common/__init__.py", common_dir / "__init__.py")
+    _download(repository_root + "common/visual_roles.py", common_dir / "visual_roles.py")
     _download(repository_root + "common/widget_controls.py", common_dir / "widget_controls.py")
     _download(repository_root + "common/remote_fetch.py", common_dir / "remote_fetch.py")
     _download(repository_root + "common/simulation_views.py", common_dir / "simulation_views.py")
