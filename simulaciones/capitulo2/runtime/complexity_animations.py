@@ -5,7 +5,6 @@ from __future__ import annotations
 import base64
 import math
 import sys
-import time
 import tracemalloc
 from dataclasses import replace
 from io import BytesIO
@@ -22,6 +21,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from common.graphics import graphics_dir
 from simulaciones.capitulo2.runtime.experimental_animation import (
     ExperimentProfile,
+    measure_average_time,
     results_table_widget,
     run_selectable_app,
     style_experiment_axis,
@@ -196,10 +196,12 @@ def prepare_binary_search(n):
 
 def measure_binary_search(prepared, executions):
     values, target = prepared
-    start = time.perf_counter()
-    for _ in range(executions):
-        binary_search(values, target)
-    return (time.perf_counter() - start) / executions
+
+    def run_batch(repetitions):
+        for _ in range(repetitions):
+            binary_search(values, target)
+
+    return measure_average_time(run_batch, executions)
 
 
 def prepare_linear_search(n):
@@ -208,12 +210,14 @@ def prepare_linear_search(n):
 
 def measure_linear_search(prepared, executions):
     values, target = prepared
-    start = time.perf_counter()
-    for _ in range(executions):
-        for value in values:
-            if value == target:
-                break
-    return (time.perf_counter() - start) / executions
+
+    def run_batch(repetitions):
+        for _ in range(repetitions):
+            for value in values:
+                if value == target:
+                    break
+
+    return measure_average_time(run_batch, executions)
 
 
 def prepare_sort(n):
@@ -222,10 +226,11 @@ def prepare_sort(n):
 
 
 def measure_sort(prepared, executions):
-    start = time.perf_counter()
-    for _ in range(executions):
-        sorted(prepared)
-    return (time.perf_counter() - start) / executions
+    def run_batch(repetitions):
+        for _ in range(repetitions):
+            sorted(prepared)
+
+    return measure_average_time(run_batch, executions)
 
 
 def prepare_matrix_walk(n):
@@ -234,13 +239,15 @@ def prepare_matrix_walk(n):
 
 def measure_matrix_walk(prepared, executions):
     size = prepared.shape[0]
-    start = time.perf_counter()
-    for _ in range(executions):
-        total = 0
-        for row in range(size):
-            for column in range(size):
-                total += prepared[row, column]
-    return (time.perf_counter() - start) / executions
+
+    def run_batch(repetitions):
+        for _ in range(repetitions):
+            total = 0
+            for row in range(size):
+                for column in range(size):
+                    total += int(prepared[row, column])
+
+    return measure_average_time(run_batch, executions)
 
 
 def prepare_matrix_multiply(n):
@@ -250,21 +257,24 @@ def prepare_matrix_multiply(n):
 def measure_matrix_multiply(prepared, executions):
     left, right = prepared
     size = left.shape[0]
-    start = time.perf_counter()
-    for _ in range(executions):
-        result = np.zeros((size, size))
-        for row in range(size):
-            for column in range(size):
-                for inner in range(size):
-                    result[row, column] += left[row, inner] * right[inner, column]
-    return (time.perf_counter() - start) / executions
+
+    def run_batch(repetitions):
+        for _ in range(repetitions):
+            result = np.zeros((size, size))
+            for row in range(size):
+                for column in range(size):
+                    for inner in range(size):
+                        result[row, column] += left[row, inner] * right[inner, column]
+
+    return measure_average_time(run_batch, executions)
 
 
 def measure_fibonacci(n, executions):
-    start = time.perf_counter()
-    for _ in range(executions):
-        fibonacci(n)
-    return (time.perf_counter() - start) / executions
+    def run_batch(repetitions):
+        for _ in range(repetitions):
+            fibonacci(n)
+
+    return measure_average_time(run_batch, executions)
 
 
 def prepare_permutations(n):
@@ -272,10 +282,11 @@ def prepare_permutations(n):
 
 
 def measure_permutations(prepared, executions):
-    start = time.perf_counter()
-    for _ in range(executions):
-        count_permutations(prepared)
-    return (time.perf_counter() - start) / executions
+    def run_batch(repetitions):
+        for _ in range(repetitions):
+            count_permutations(prepared)
+
+    return measure_average_time(run_batch, executions)
 
 
 def measure_memory_operation(operation, prepared, executions):
@@ -316,7 +327,7 @@ def measure_matrix_walk_memory(prepared, executions):
         total = 0
         for row in range(size):
             for column in range(size):
-                total += matrix[row, column]
+                total += int(matrix[row, column])
 
     return measure_memory_operation(walk, prepared, executions)
 

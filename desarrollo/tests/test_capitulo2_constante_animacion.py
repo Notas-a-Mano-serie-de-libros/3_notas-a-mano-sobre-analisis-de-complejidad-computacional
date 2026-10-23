@@ -93,6 +93,24 @@ def test_medicion_temporal_amplia_el_lote_si_el_reloj_no_avanza():
     assert elapsed == pytest.approx(0.004 / 20)
 
 
+@pytest.mark.parametrize(
+    ("profile_name", "n"),
+    (
+        ("logarithmic", 10),
+        ("linear", 10),
+        ("log_linear", 10),
+        ("quadratic", 3),
+        ("cubic", 2),
+        ("exponential", 5),
+        ("factorial", 4),
+    ),
+)
+def test_todas_las_complejidades_temporales_evitan_falsos_ceros(profile_name, n):
+    profile = make_profile(profile_name, mode="time")
+
+    assert measure_profile_point(profile, n, 1) > 0
+
+
 def test_medicion_espacial_constante_devuelve_bytes_validos():
     measured_bytes = measure_access_memory(100, 3)
     assert measured_bytes >= 0
