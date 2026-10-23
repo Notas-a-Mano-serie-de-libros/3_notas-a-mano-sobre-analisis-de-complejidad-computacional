@@ -1,45 +1,16 @@
 {
   "budgets": {
-    "notebook_ready_ms": 45000,
-    "simulation_ready_ms": 30000,
-    "requests": 400
+    "notebook_ready_ms": 15000,
+    "simulation_ready_ms": 12000,
+    "requests": 250
   },
-  "profiles": [
-    {
-      "profile": "graficas",
-      "notebook": "simulaciones/capitulo2/notebooks/1_complejidad_constante.ipynb",
-      "notebook_ready_ms": 1962.4,
-      "requests": 162,
-      "failed_requests": []
-    },
-    {
-      "profile": "graficas-cientificas",
-      "notebook": "simulaciones/capitulo3/notebooks/0_comparacion_notaciones_asintoticas.ipynb",
-      "notebook_ready_ms": 1872.5,
-      "requests": 175,
-      "failed_requests": []
-    },
-    {
-      "profile": "algebra-simbolica",
-      "notebook": "simulaciones/capitulo5/notebooks/0_arboles_recursion.ipynb",
-      "notebook_ready_ms": 1860.3,
-      "requests": 165,
-      "failed_requests": []
-    },
-    {
-      "profile": "analisis-completo",
-      "notebook": "simulaciones/capitulo7/notebooks/0_comparacion_busquedas.ipynb",
-      "notebook_ready_ms": 1858.2,
-      "requests": 201,
-      "failed_requests": []
-    }
-  ],
-  "simulation_smoke": {
-    "notebook": "simulaciones/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb",
-    "simulation_ready_ms": 5444.9,
-    "responsive": true,
-    "failed_requests": [],
-    "unexpected_scientific_requests": []
-  },
-  "errors": []
+  "profiles": [],
+  "simulation_smoke": null,
+  "errors": [
+    "graficas: Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for locator(\".jp-Notebook\") to be visible\n",
+    "graficas-cientificas: Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for locator(\".jp-Notebook\") to be visible\n",
+    "algebra-simbolica: Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for locator(\".jp-Notebook\") to be visible\n",
+    "analisis-completo: Locator.wait_for: Timeout 15000ms exceeded.\nCall log:\n  - waiting for locator(\".jp-Notebook\") to be visible\n",
+    "simulaci\u00f3n: Locator.wait_for: Timeout 12000ms exceeded.\nCall log:\n  - waiting for locator(\".sort-simulation-root\") to be visible\n"
+  ]
 }
