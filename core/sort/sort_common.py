@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import random
 import re
+import time
 from html import escape
 
 import ipywidgets as widgets
@@ -179,6 +180,12 @@ class LazyTrace:
 
 def colab_pause(seconds=0.08):
     pause(seconds, colab_output)
+
+
+def remaining_frame_delay(target_seconds, elapsed_seconds):
+    """Completa la cadencia objetivo sin sumar dos veces el costo de renderizado."""
+
+    return max(0.0, float(target_seconds) - max(0.0, float(elapsed_seconds)))
 
 
 def default_size_for_view(view="barras"):
@@ -2418,11 +2425,14 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         for snapshot in build_sort_trace():
             if execution_state["run_id"] != run_id:
                 return
+            frame_started = time.perf_counter()
             state = snapshot
             state["_auto_running"] = True
             redraw()
             speed = float(controls["speed"].value or 1.0)
-            await asyncio.sleep(0.08 / speed)
+            target_interval = 0.08 / speed
+            elapsed = time.perf_counter() - frame_started
+            await asyncio.sleep(remaining_frame_delay(target_interval, elapsed))
         if execution_state["run_id"] == run_id:
             sync_execution_buttons()
 
@@ -2433,11 +2443,14 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
         for snapshot in build_sort_trace():
             if execution_state["run_id"] != run_id:
                 return
+            frame_started = time.perf_counter()
             state = snapshot
             state["_auto_running"] = True
             redraw()
             speed = float(controls["speed"].value or 1.0)
-            colab_pause(0.08 / speed)
+            target_interval = 0.08 / speed
+            elapsed = time.perf_counter() - frame_started
+            colab_pause(remaining_frame_delay(target_interval, elapsed))
         if execution_state["run_id"] == run_id:
             sync_execution_buttons()
 
@@ -2545,6 +2558,7 @@ __all__ = [
     "displaystyle_formula",
     "generate_radix_values",
     "render_state_html",
+    "remaining_frame_delay",
     "normalized_bar_height",
     "render_multi_sort_legend",
     "run_sort_app",
