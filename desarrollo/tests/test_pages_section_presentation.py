@@ -139,7 +139,7 @@ def test_colab_button_precedes_the_embedded_simulation():
         assert "colab-button" in first_action, path
         assert ">Abrir en Colab</a>" in first_action, path
 
-    assert len(pages_with_colab) == 45
+    assert len(pages_with_colab) == 46
     assert len(algorithm_pages) == 13
 
 

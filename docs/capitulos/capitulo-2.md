@@ -65,14 +65,16 @@ La diferencia entre estas familias puede parecer pequeña cuando el valor de \(n
 <details class="local-execution" markdown="1">
 <summary>Recomendación de ejecución local</summary>
 
-Con el proyecto clonado, abre una terminal, sitúate en la ruta principal, activa el entorno según la [guía de instalación](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional#guía-de-instalación) y ejecuta el notebook con Jupyter:
+Con el proyecto clonado, abra una terminal, sitúese en la ruta principal y active el entorno según la [guía de instalación](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional#guía-de-instalación) y ejecute el notebook con Jupyter:
 
 | Paso | Comando |
 | --- | --- |
 | Ir a la ruta principal del proyecto | `cd 3_notas-a-mano-sobre-analisis-de-complejidad-computacional` |
-| Abrir la comparación de crecimiento | `jupyter lab simulaciones/capitulo2/notebooks/0_comparacion_crecimiento.ipynb` |
+| Abrir Comparación del crecimiento de funciones | `jupyter lab simulaciones/capitulo2/notebooks/0_comparacion_crecimiento.ipynb` |
 
-Jupyter abrirá la simulación; ejecuta todas sus celdas para iniciarla.
+Jupyter abrirá la simulación; ejecute todas sus celdas para iniciarla.
+
+La ejecución local aprovecha los recursos del equipo y evita los límites de sesión de los entornos remotos.
 </details>
 <!-- local-execution:end -->
 
@@ -82,7 +84,7 @@ Jupyter abrirá la simulación; ejecuta todas sus celdas para iniciarla.
 Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador. La primera carga descarga el entorno de Python; las siguientes aperturas reutilizan los recursos almacenados por el navegador.
 
 1. Espera a que el indicador del kernel muestre **Python (Pyodide)**.
-2. La simulación se ejecutará automáticamente cuando el kernel esté listo.
+2. La simulación se ejecuta automáticamente cuando el kernel esté listo.
 3. Configura \(n\), la vista y la velocidad; luego utiliza **Ejecutar** o **Reiniciar**.
 
 <div class="jupyterlite-demo">
@@ -91,11 +93,11 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador. La prim
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo2/notebooks/0_comparacion_crecimiento.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=b9e5fe4e1a93" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=7126f223cfcf" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=b9e5fe4e1a93"
+    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=7126f223cfcf"
     title="Comparación interactiva del crecimiento de funciones en JupyterLite"
     loading="lazy"
     scrolling="no"
