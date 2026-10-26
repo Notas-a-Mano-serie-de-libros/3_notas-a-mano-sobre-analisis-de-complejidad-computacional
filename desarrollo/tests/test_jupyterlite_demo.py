@@ -46,7 +46,7 @@ def test_jupyterlite_demo_sources_and_configuration_exist():
     assert NOTEBOOKS[0] in CONTENT_FILES
     assert all(notebook in CONTENT_FILES for notebook in NOTEBOOKS)
     assert all((PROJECT_ROOT / path).is_file() for path in CONTENT_FILES)
-    assert len(CHAPTER2_NOTEBOOKS) == 9
+    assert len(CHAPTER2_NOTEBOOKS) == 10
     assert all((PROJECT_ROOT / path).is_file() for path in chapter_content_files(2))
     assert all(path in chapter_content_files(2) for path in CHAPTER2_RUNTIME_FILES)
     assert set(CHAPTER_CONFIGS) == set(range(2, 9))

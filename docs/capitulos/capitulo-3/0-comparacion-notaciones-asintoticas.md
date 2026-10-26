@@ -70,11 +70,11 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador: no abre
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/0_comparacion_notaciones_asintoticas.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F0_comparacion_notaciones_asintoticas.ipynb&revision=a125912d31d8" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F0_comparacion_notaciones_asintoticas.ipynb&revision=2c5c54acc04f" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F0_comparacion_notaciones_asintoticas.ipynb&revision=a125912d31d8"
+    src="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F0_comparacion_notaciones_asintoticas.ipynb&revision=2c5c54acc04f"
     title="Comparación interactiva de notaciones asintóticas en JupyterLite"
     loading="lazy"
     scrolling="no"

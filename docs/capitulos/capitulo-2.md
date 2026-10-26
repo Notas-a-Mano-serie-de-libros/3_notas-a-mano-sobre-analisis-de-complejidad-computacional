@@ -57,6 +57,53 @@ La notación \(C(n)\) representa de forma general una función de costo temporal
 </figure>
 </div>
 
+### Simulación · Crecimiento de las funciones
+
+La diferencia entre estas familias puede parecer pequeña cuando el valor de \(n\) es reducido. Elige un valor de hasta \(1000\) y ejecuta la simulación para observar, en escala lineal real, cómo las funciones de crecimiento más rápido dejan atrás a las demás. La vista de gráfica permite estudiar el mismo fenómeno como curvas de crecimiento.
+
+<!-- local-execution:start -->
+<details class="local-execution" markdown="1">
+<summary>Recomendación de ejecución local</summary>
+
+Con el proyecto clonado, abre una terminal, sitúate en la ruta principal, activa el entorno según la [guía de instalación](https://github.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional#guía-de-instalación) y ejecuta el notebook con Jupyter:
+
+| Paso | Comando |
+| --- | --- |
+| Ir a la ruta principal del proyecto | `cd 3_notas-a-mano-sobre-analisis-de-complejidad-computacional` |
+| Abrir la comparación de crecimiento | `jupyter lab simulaciones/capitulo2/notebooks/0_comparacion_crecimiento.ipynb` |
+
+Jupyter abrirá la simulación; ejecuta todas sus celdas para iniciarla.
+</details>
+<!-- local-execution:end -->
+
+<!-- jupyterlite-demo:start -->
+#### Simulación en el navegador
+
+Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador. La primera carga descarga el entorno de Python; las siguientes aperturas reutilizan los recursos almacenados por el navegador.
+
+1. Espera a que el indicador del kernel muestre **Python (Pyodide)**.
+2. La simulación se ejecutará automáticamente cuando el kernel esté listo.
+3. Configura \(n\), la vista y la velocidad; luego utiliza **Ejecutar** o **Reiniciar**.
+
+<div class="jupyterlite-demo">
+  <div class="jupyterlite-demo__toolbar">
+    <span>Simulación interactiva</span>
+  </div>
+  <div class="jupyterlite-demo__actions">
+    <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo2/notebooks/0_comparacion_crecimiento.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
+    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=b9e5fe4e1a93" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+  </div>
+  <iframe
+    class="jupyterlite-demo__frame"
+    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=b9e5fe4e1a93"
+    title="Comparación interactiva del crecimiento de funciones en JupyterLite"
+    loading="lazy"
+    scrolling="no"
+    allow="clipboard-read; clipboard-write"
+  ></iframe>
+</div>
+<!-- jupyterlite-demo:end -->
+
 Cada sección presenta el código del libro y enlaza su simulación. Las instrucciones de uso y la interpretación de los experimentos se encuentran en el notebook asociado.
 
 <section class="chapter-sections" aria-labelledby="chapter-sections-title">

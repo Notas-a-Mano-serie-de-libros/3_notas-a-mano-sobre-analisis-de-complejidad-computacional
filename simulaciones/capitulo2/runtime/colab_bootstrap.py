@@ -11,7 +11,7 @@ from pathlib import Path
 
 from IPython.display import clear_output
 
-RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/8e4db91d4f199230f179a8b9ad49d27e93f26a6d"
+RAW_BASE_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/main"
 COLAB_PACKAGES = ("ipywidgets==8.1.9",)
 REQUIRED_FILES = (
     "common/__init__.py",
@@ -27,11 +27,13 @@ REQUIRED_FILES = (
     "simulaciones/capitulo2/runtime/complexity_animations.py",
     "simulaciones/capitulo2/runtime/theoretical_graphs.py",
     "simulaciones/capitulo2/runtime/polynomial_animation.py",
+    "simulaciones/capitulo2/runtime/growth_comparison.py",
 )
 
 SIMULATION_MODULES = {
     "constant": "simulaciones.capitulo2.runtime.constant_animation",
     "polynomial_general": "simulaciones.capitulo2.runtime.polynomial_animation",
+    "growth_comparison": "simulaciones.capitulo2.runtime.growth_comparison",
     "default": "simulaciones.capitulo2.runtime.complexity_animations",
 }
 
@@ -41,6 +43,7 @@ RELOADABLE_MODULES = (
     "simulaciones.capitulo2.runtime.complexity_animations",
     "simulaciones.capitulo2.runtime.polynomial_animation",
     "simulaciones.capitulo2.runtime.theoretical_graphs",
+    "simulaciones.capitulo2.runtime.growth_comparison",
 )
 
 
@@ -130,7 +133,9 @@ def run_simulation():
     simulation_module = importlib.import_module(module_name)
 
     clear_output(wait=True)
-    if simulation_name == "constant":
+    if simulation_name == "growth_comparison":
+        simulation_module.run_app()
+    elif simulation_name == "constant":
         simulation_module.run_app(mode=globals().get("SIMULATION_MODE", "selectable"))
     elif simulation_name == "polynomial_general":
         simulation_module.run_app()
