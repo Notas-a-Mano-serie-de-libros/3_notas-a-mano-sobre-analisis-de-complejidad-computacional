@@ -350,8 +350,15 @@ def _styles() -> str:
 <style>
 .growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0;gap:12px}.growth-comparison-app .growth-app__controls{display:flex;flex-flow:row wrap;gap:12px 36px;align-items:center;width:100%}.growth-comparison-app .growth-app__function-grid{display:flex;flex-flow:row wrap;gap:4px 20px;width:100%}.growth-comparison-app .growth-app__function-grid .widget-checkbox{width:132px!important;min-width:132px!important;margin:0!important}.growth-comparison-app .growth-app__function-grid .widget-label{font-family:'STIX Two Math','Cambria Math',serif!important;font-weight:500!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__progress{flex:1 1 auto;width:auto!important}.growth-comparison-app .growth-app__progress .progress-bar{background:#a94728!important}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__lanes{display:grid;gap:8px}.growth-comparison-app .growth-app__lane{display:grid;grid-template-columns:110px minmax(150px,1fr) 142px;gap:10px;align-items:center;min-height:31px}.growth-comparison-app .growth-app__formula{color:var(--family-color);font-family:'STIX Two Math','Cambria Math',serif;font-size:16px;font-weight:600;text-align:center}.growth-comparison-app .growth-app__rail{height:28px;position:relative;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),#eee 25%)}.growth-comparison-app .growth-app__rail:before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:#bbb}.growth-comparison-app .growth-app__fill{position:absolute;left:0;top:calc(50% - 3px);height:6px;background:color-mix(in srgb,var(--family-color) 25%,transparent);transition:width .12s linear}.growth-comparison-app .growth-app__dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--family-color);border:2px solid #fff;box-shadow:0 0 0 1px var(--family-color);transform:translate(-50%,-50%);transition:left .12s linear}.growth-comparison-app .growth-app__value{text-align:right;white-space:nowrap;font-family:'STIX Two Math','Cambria Math',serif;font-size:14px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart-title{font-size:14px;font-weight:700;margin-bottom:10px;text-align:center}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:12px sans-serif}.growth-comparison-app .growth-app__legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;margin-top:12px;font:15px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__legend-item{display:inline-flex;align-items:center;gap:6px}.growth-comparison-app .growth-app__legend-item i{width:18px;border-top:3px solid var(--family-color)}
 .growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(330px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 66px minmax(90px,1fr) 104px;gap:7px;align-items:center;height:36px;transition:transform .28s cubic-bezier(.25,.1,.25,1)}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color);transition:width .12s linear}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}
-.growth-comparison-app .growth-app__function-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 14px;width:100%}.growth-comparison-app .growth-app__function-grid .widget-checkbox{width:auto!important;min-width:0!important;margin:0!important}.growth-comparison-app .growth-app__slider-wrap{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:2px}.growth-comparison-app .growth-app__slider-label{font-size:12px;font-weight:600;color:#555}
-@media(max-width:900px){.growth-comparison-app .growth-app__unified{grid-template-columns:1fr}.growth-comparison-app .growth-app__race-view{order:2}.growth-comparison-app .growth-app__function-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__chart svg{min-height:260px}.growth-comparison-app .growth-app__race-row{grid-template-columns:18px 58px minmax(70px,1fr) 82px;gap:5px}.growth-comparison-app .growth-app__race-value{font-size:10px}}
+.growth-comparison-app .growth-app__functions-frame{border:1px solid #767676;background:#fff;padding:6px 12px;border-radius:0;box-sizing:border-box}
+.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:4px;width:100%}
+.growth-comparison-app .growth-app__function-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 16px;width:100%;align-items:center}
+.growth-comparison-app .growth-app__function-row .widget-checkbox{width:100%!important;min-width:0!important;margin:0!important;display:flex!important;align-items:center!important}
+.growth-comparison-app .growth-app__function-row .widget-checkbox input[type="checkbox"]{margin:0 6px 0 0!important;width:16px!important;height:16px!important}
+.growth-comparison-app .growth-app__function-row .widget-label{font-family:'STIX Two Math','Cambria Math','Scheherazade New',serif!important;font-size:14px!important;font-weight:500!important;line-height:1.2!important}
+.growth-comparison-app .growth-app__slider-wrap{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:2px}
+.growth-comparison-app .growth-app__slider-label{font-size:12px;font-weight:600;color:#555}
+@media(max-width:900px){.growth-comparison-app .growth-app__unified{grid-template-columns:1fr}.growth-comparison-app .growth-app__race-view{order:2}.growth-comparison-app .growth-app__function-row{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__chart svg{min-height:260px}.growth-comparison-app .growth-app__race-row{grid-template-columns:18px 58px minmax(70px,1fr) 82px;gap:5px}.growth-comparison-app .growth-app__race-value{font-size:10px}}
 </style>"""
 
 
@@ -368,18 +375,43 @@ def run_app():
         value=DEFAULT_N, min=MIN_N, max=MAX_N, step=1, description="",
         continuous_update=True, readout=False, layout=widgets.Layout(width="100%"),
     )
-    selectors = {
-        key: widgets.Checkbox(value=True, description=text, indent=False)
-        for key, _formula, text, _color in FAMILIES
-    }
+    selectors = {}
+    for key, formula, _text, _color in FAMILIES:
+        cb = widgets.Checkbox(value=True, description=formula, indent=False)
+        if hasattr(cb, "description_allow_html"):
+            cb.description_allow_html = True
+        selectors[key] = cb
     checkbox_list = list(selectors.values())
-    row1 = widgets.HBox(checkbox_list[:4], layout=widgets.Layout(width="100%", justify_content="space-between"))
-    row2 = widgets.HBox(checkbox_list[4:], layout=widgets.Layout(width="100%", justify_content="space-between"))
+    row1 = widgets.HBox(checkbox_list[:4], layout=widgets.Layout(width="100%"))
+    row1.add_class("growth-app__function-row")
+    row2 = widgets.HBox(checkbox_list[4:], layout=widgets.Layout(width="100%"))
+    row2.add_class("growth-app__function-row")
     function_grid = widgets.VBox(
         [row1, row2],
         layout=widgets.Layout(width="100%", grid_gap="4px"),
     )
     function_grid.add_class("growth-app__function-grid")
+    functions_frame = widgets.Box(
+        [function_grid],
+        layout=widgets.Layout(
+            width="100%",
+            border_top="1px solid #767676",
+            border_right="1px solid #767676",
+            border_bottom="1px solid #767676",
+            border_left="1px solid #767676",
+            padding="6px 12px",
+            background_color="#ffffff",
+            overflow="visible",
+        ),
+    )
+    functions_frame.add_class("growth-app__functions-frame")
+    functions_group = compact_labeled_control(
+        "Funciones visibles",
+        functions_frame,
+    )
+    functions_group.layout.margin = "0"
+    functions_group.layout.width = "100%"
+    functions_group.layout.overflow = "visible"
     selection_message = widgets.HTML(value="", layout=widgets.Layout(width="100%"))
     selection_message.add_class("growth-app__selection-message")
     execute_button = button_control(description="Ejecutar", button_style="success", width="128px")
@@ -412,8 +444,7 @@ def run_app():
         [
             controls,
             slider_wrap,
-            widgets.HTML('<span class="growth-app__progress-label">Funciones visibles</span>'),
-            function_grid,
+            functions_group,
             selection_message,
         ],
         layout=widgets.Layout(width="100%", grid_gap="10px"),
