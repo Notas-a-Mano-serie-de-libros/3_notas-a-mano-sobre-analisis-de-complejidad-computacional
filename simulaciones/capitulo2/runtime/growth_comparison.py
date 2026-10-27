@@ -366,7 +366,7 @@ def _render(
       <section class="growth-app__visual" data-growth-app-id="{escape(app_id)}" data-scale="{escape(scale_mode)}"><header class="growth-app__header">
         <div><span>Comparación interactiva</span><h3>¿Cómo se separan las funciones?</h3></div>
         <div class="growth-app__current"><small>Valor actual</small><strong><i>n</i> = {n}</strong></div>
-      </header><div class="growth-app__focus" role="status" hidden></div><div class="growth-app__panel">{visualization}</div>
+      </header><div class="growth-app__panel">{visualization}</div>
       <div class="growth-app__insight" role="status">{_comparison_message(n, logs)}</div>
       <p class="growth-app__note">{scale_note}</p></section>
     """
@@ -380,18 +380,13 @@ def _javascript_app(
     speed: float,
 ) -> str:
     """Runtime visual a 60 FPS; Python conserva cálculo, controles y fallback."""
-    metadata = {
-        key: {"formula": FAMILY_BY_KEY[key][1], "text": FAMILY_BY_KEY[key][2]}
-        for key in selected_keys
-    }
     template = r"""
 (() => {
   const appId = __APP_ID__;
   const target = __TARGET__;
   const duration = __DURATION__;
   const scaleMode = __SCALE__;
-  const metadata = __METADATA__;
-  const keys = Object.keys(metadata);
+  const keys = __KEYS__;
   const registry = window.__growthComparisonApps ||= {};
   registry[appId]?.destroy?.();
 
@@ -405,7 +400,6 @@ def _javascript_app(
     const timeline = root?.querySelector('.growth-app__timeline-input');
     const progressText = root?.querySelector('.growth-app__progress-value');
     const insight = visual.querySelector('.growth-app__insight');
-    const focus = visual.querySelector('.growth-app__focus');
     const currentLabel = visual.querySelector('.growth-app__current strong');
     const curves = new Map(
       [...visual.querySelectorAll('.growth-app__curve')].map((curve) => [curve.dataset.family, curve])
@@ -548,20 +542,6 @@ def _javascript_app(
     let paused = false;
     let frame = 0;
     let started = performance.now();
-    const setHighlight = (key) => {
-      root?.querySelectorAll('[data-family], [class*="growth-family-"]').forEach((node) => {
-        const family = node.dataset?.family || [...node.classList].find((name) => name.startsWith('growth-family-'))?.replace('growth-family-', '');
-        node.classList.toggle('is-muted', Boolean(key) && family !== key);
-        node.classList.toggle('is-highlighted', Boolean(key) && family === key);
-      });
-      if (!focus) return;
-      if (!key) { focus.hidden = true; return; }
-      const n = target * fraction;
-      const logarithm = logValue(key, Math.max(0, Math.round(n)));
-      const magnitude = Number.isFinite(logarithm) ? Math.floor(logarithm / LN10 + 1e-9) : 0;
-      focus.innerHTML = `<strong>${metadata[key].formula}</strong><span>f(n) = ${formattedValue(key, n)}</span><span>Orden de magnitud: 10<sup>${magnitude}</sup></span>`;
-      focus.hidden = false;
-    };
     const render = (nextFraction) => {
       fraction = Math.max(0, Math.min(1, nextFraction));
       const n = target * fraction;
@@ -583,10 +563,6 @@ def _javascript_app(
       });
       updateChart(n, logs, maximum);
       if (insight) insight.innerHTML = messageFor(displayN, logs);
-      if (focus && !focus.hidden) {
-        const highlighted = visual.querySelector('.is-highlighted[data-family]')?.dataset.family;
-        if (highlighted) setHighlight(highlighted);
-      }
     };
     const tick = (now) => {
       if (!visual.isConnected) return;
@@ -606,14 +582,6 @@ def _javascript_app(
       render,
     };
     registry[appId] = app;
-    [...visual.querySelectorAll('.growth-app__race-row, .growth-app__curve')].forEach((node) => {
-      node.addEventListener('mouseenter', () => setHighlight(node.dataset.family));
-      node.addEventListener('mouseleave', () => setHighlight(null));
-    });
-    keys.forEach((key) => root?.querySelectorAll(`.growth-family-${key}`).forEach((node) => {
-      node.addEventListener('mouseenter', () => setHighlight(key));
-      node.addEventListener('mouseleave', () => setHighlight(null));
-    }));
     timeline?.addEventListener('input', (event) => {
       paused = true;
       render(Number(event.target.value) / 1000);
@@ -632,7 +600,7 @@ def _javascript_app(
             str(250.0 if int(target) == MIN_N else max(250.0, BASE_DURATION * 1000 / float(speed))),
         )
         .replace("__SCALE__", json.dumps(scale_mode))
-        .replace("__METADATA__", json.dumps(metadata, ensure_ascii=False))
+        .replace("__KEYS__", json.dumps(selected_keys, ensure_ascii=False))
     )
 
 
@@ -651,8 +619,8 @@ def _styles() -> str:
         shared_ui_styles(".growth-comparison-app")
         + """
 <style>
-.growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.growth-comparison-app .growth-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.growth-comparison-app .growth-app__controls>.widget-box{flex:0 0 292px!important;width:292px!important;min-width:292px!important;max-width:292px!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__timeline{flex:1 1 auto!important;width:auto!important}.growth-comparison-app .growth-app__timeline-input{display:block;width:100%;accent-color:#a94728;cursor:pointer}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__focus{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:12px;padding:8px 12px;background:#f7f7f7;border-left:3px solid #a94728;font:14px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__focus[hidden]{display:none}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:600 15px sans-serif}.growth-comparison-app .is-muted{opacity:.16!important}.growth-comparison-app .is-highlighted{opacity:1!important;filter:drop-shadow(0 0 2px currentColor)}
-.growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 94px minmax(90px,1fr) 104px;column-gap:12px;align-items:center;height:36px;transition:transform .12s linear,opacity .12s linear}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap;padding-right:4px}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color)}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}.growth-comparison-app .growth-app__curve{cursor:pointer;transition:opacity .12s linear}.growth-comparison-app .growth-app__curve-point{pointer-events:none}
+.growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.growth-comparison-app .growth-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.growth-comparison-app .growth-app__controls>.widget-box{flex:0 0 292px!important;width:292px!important;min-width:292px!important;max-width:292px!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__timeline{flex:1 1 auto!important;width:auto!important}.growth-comparison-app .growth-app__timeline-input{display:block;width:100%;accent-color:#a94728;cursor:pointer}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:600 15px sans-serif}
+.growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 94px minmax(90px,1fr) 104px;column-gap:12px;align-items:center;height:36px;transition:transform .12s linear}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap;padding-right:4px}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color)}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}.growth-comparison-app .growth-app__curve-point{pointer-events:none}
 .growth-comparison-app .growth-app__functions-frame{border:1px solid #767676;background:#fff;padding:6px 12px;border-radius:0;box-sizing:border-box}
 .growth-comparison-app .growth-app__functions-group{width:100%!important;min-width:0!important;max-width:none!important;overflow:visible!important;align-items:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label{align-self:stretch!important;height:auto!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label .compact-control-label{display:block!important;width:100%!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.widget-box:last-child{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 520px!important}.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:8px;width:100%}
 .growth-comparison-app .growth-app__function-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 16px;width:100%;align-items:center}

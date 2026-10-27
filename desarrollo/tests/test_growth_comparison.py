@@ -122,13 +122,12 @@ def test_public_limits_and_speeds_match_the_portal_contract():
     assert tuple(label for label, _value in SPEED_OPTIONS) == ("1x", "2x", "5x", "10x")
 
 
-def test_browser_runtime_uses_request_animation_frame_and_interactive_focus():
+def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     source = _javascript_app("test-app", 100, ("linear", "square"), "log", 2.0)
 
     assert "requestAnimationFrame" in source
     assert "togglePause" in source
     assert "growth-app__timeline-input" in source
-    assert "setHighlight" in source
     assert "logGamma" in source
     assert "updateChart(n, logs, maximum)" in source
     assert "curve.setAttribute('points'" in source
@@ -136,6 +135,10 @@ def test_browser_runtime_uses_request_animation_frame_and_interactive_focus():
     assert "growth-app__x-tick" in source
     assert "if (!visual.isConnected) return" in source
     assert 'const scaleMode = "log"' in source
+    assert "setHighlight" not in source
+    assert "mouseenter" not in source
+    assert "growth-app__focus" not in _render(10, ("linear", "square"))
+    assert "is-highlighted" not in _styles()
 
 
 def test_reset_returns_every_n_control_to_zero_and_all_buttons_have_icons():
