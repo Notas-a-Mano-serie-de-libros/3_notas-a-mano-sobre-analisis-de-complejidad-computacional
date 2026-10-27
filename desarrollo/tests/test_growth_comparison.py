@@ -12,9 +12,9 @@ from simulaciones.capitulo2.runtime.growth_comparison import (
     _calc_ratio,
     _exact_value,
     _format_exact_value,
+    _javascript_app,
     _log_value,
     _render,
-    _javascript_app,
     _styles,
 )
 
