@@ -59,6 +59,9 @@ def test_unified_view_labels_axes_and_only_selected_functions():
     assert "<circle" in rendered
     assert "growth-app__bar" in rendered
     assert "growth-app__legend" not in rendered
+    assert "growth-app__range" in rendered
+    assert "growth-app__milestone" in rendered
+    assert "growth-app__summary" in rendered
 
 
 def test_function_selector_uses_formatted_math_labels():
@@ -129,12 +132,17 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     assert "togglePause" in source
     assert "growth-app__timeline-input" in source
     assert "logGamma" in source
-    assert "updateChart(n, logs, maximum)" in source
+    assert "updateChart(n, logs, chartMaximum)" in source
     assert "curve.setAttribute('points'" in source
     assert "growth-app__y-tick" in source
     assert "growth-app__x-tick" in source
     assert "if (!visual.isConnected) return" in source
     assert 'const scaleMode = "log"' in source
+    assert "prefers-reduced-motion" in source
+    assert "milestoneFor" in source
+    assert "updateSummary" in source
+    assert "chartMaximum" in source
+    assert "setPauseVisual" in source
     assert "setHighlight" not in source
     assert "mouseenter" not in source
     assert "growth-app__focus" not in _render(10, ("linear", "square"))
@@ -161,11 +169,15 @@ def test_reset_returns_every_n_control_to_zero_and_all_buttons_have_icons():
 
     buttons = tuple(control for control in controls if isinstance(control, widgets.Button))
     reset_button = next(button for button in buttons if button.description == "Reiniciar")
+    pause_button = next(button for button in buttons if button.description == "Pausar")
     reset_button.click()
 
     assert n_controls
     assert all(control.value == 0 for control in n_controls)
     assert all(button.icon for button in buttons)
+    assert pause_button.disabled
+    assert "growth-app__pause-button" in pause_button._dom_classes
+    assert any("growth-app__n-compound" in control._dom_classes for control in controls)
     assert "justify-content:center" in _styles()
 
 

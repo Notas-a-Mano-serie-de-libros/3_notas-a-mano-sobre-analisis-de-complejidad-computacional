@@ -274,8 +274,17 @@ def _render_chart(current_n: float, selected_keys: tuple[str, ...], scale_mode: 
         for value in ticks
     )
     scale_label = "Escala logarítmica" if scale_mode == "log" else "Escala lineal"
+    maximum_key = max(
+        selected_keys,
+        key=lambda key: _log_value(key, current_n) if _log_value(key, current_n) is not None else -math.inf,
+        default=None,
+    )
+    maximum_label = (
+        _format_exact_value(_exact_value(maximum_key, round(current_n))) if maximum_key else "0"
+    )
     return f"""
       <div class="growth-app__chart" role="img" aria-label="Gráfica de las funciones seleccionadas ({scale_label})">
+        <div class="growth-app__range">Rango visible: 0 ≤ <i>f</i>(<i>n</i>) ≤ {maximum_label}</div>
         <svg viewBox="0 0 {width} {height}" preserveAspectRatio="xMidYMid meet">
           <g class="growth-app__grid">{"".join(grid)}</g>
           <line class="growth-app__axis" x1="{left}" y1="{top}" x2="{left}" y2="{height - bottom}" />
@@ -366,8 +375,9 @@ def _render(
       <section class="growth-app__visual" data-growth-app-id="{escape(app_id)}" data-scale="{escape(scale_mode)}"><header class="growth-app__header">
         <div><span>Comparación interactiva</span><h3>¿Cómo se separan las funciones?</h3></div>
         <div class="growth-app__current"><small>Valor actual</small><strong><i>n</i> = {n}</strong></div>
-      </header><div class="growth-app__panel">{visualization}</div>
+      </header><div class="growth-app__milestone" role="status" hidden></div><div class="growth-app__panel">{visualization}</div>
       <div class="growth-app__insight" role="status">{_comparison_message(n, logs)}</div>
+      <section class="growth-app__summary" aria-live="polite" hidden></section>
       <p class="growth-app__note">{scale_note}</p></section>
     """
 
@@ -384,9 +394,11 @@ def _javascript_app(
 (() => {
   const appId = __APP_ID__;
   const target = __TARGET__;
-  const duration = __DURATION__;
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+  const duration = reduceMotion ? 250 : __DURATION__;
   const scaleMode = __SCALE__;
   const keys = __KEYS__;
+  const formulas = __FORMULAS__;
   const registry = window.__growthComparisonApps ||= {};
   registry[appId]?.destroy?.();
 
@@ -399,7 +411,11 @@ def _javascript_app(
     const root = visual.closest('.growth-comparison-app');
     const timeline = root?.querySelector('.growth-app__timeline-input');
     const progressText = root?.querySelector('.growth-app__progress-value');
+    const pauseButton = root?.querySelector('.growth-app__pause-button');
     const insight = visual.querySelector('.growth-app__insight');
+    const milestone = visual.querySelector('.growth-app__milestone');
+    const summary = visual.querySelector('.growth-app__summary');
+    const rangeLabel = visual.querySelector('.growth-app__range');
     const currentLabel = visual.querySelector('.growth-app__current strong');
     const curves = new Map(
       [...visual.querySelectorAll('.growth-app__curve')].map((curve) => [curve.dataset.family, curve])
@@ -454,6 +470,14 @@ def _javascript_app(
       if (coefficient >= 9.995) { coefficient = 1; exponent += 1; }
       return `${decimal(coefficient)} × 10<tspan dy="-5" font-size="9">${exponent}</tspan><tspan dy="5"></tspan>`;
     };
+    const scientificHtml = (logarithm) => {
+      if (!Number.isFinite(logarithm)) return '0';
+      if (logarithm < Math.log(1e6)) return decimal(Math.exp(logarithm));
+      let exponent = Math.floor(logarithm / LN10 + 1e-9);
+      let coefficient = Math.exp(logarithm - exponent * LN10);
+      if (coefficient >= 9.995) { coefficient = 1; exponent += 1; }
+      return `${decimal(coefficient)} × 10<sup>${exponent}</sup>`;
+    };
     const inverseSoftplus = (value) => {
       if (value <= 0) return -Infinity;
       return value > 36 ? value + Math.log1p(-Math.exp(-value)) : Math.log(Math.expm1(value));
@@ -487,7 +511,7 @@ def _javascript_app(
         return denominator > 0 ? Math.max(0, Math.min(1, softplus(value) / denominator)) : 0;
       }
       const difference = value - maximum;
-      return difference > -745 ? Math.exp(difference) : 0;
+      return difference > -745 ? Math.min(1, Math.exp(difference)) : 0;
     };
     const updateChart = (n, logs, maximum) => {
       const domain = Math.max(1, n);
@@ -521,6 +545,43 @@ def _javascript_app(
           : maximum + Math.log(ratio);
         tick.innerHTML = scientific(tickLog);
       });
+      if (rangeLabel) rangeLabel.innerHTML = `Rango visible: 0 ≤ <i>f</i>(<i>n</i>) ≤ ${scientificHtml(maximum)}`;
+    };
+    const milestoneFor = (n) => {
+      const candidates = [
+        { at: 3, keys: ['linear', 'nlogn'], text: '<i>n</i> · log<sub>2</sub>(<i>n</i>) supera a <i>n</i>.' },
+        { at: 4, keys: ['factorial', 'exponential'], text: '<i>n</i>! supera a 2<sup><i>n</i></sup>.' },
+        { at: 6, keys: ['factorial', 'cube'], text: '<i>n</i>! supera a <i>n</i><sup>3</sup>.' },
+        { at: 10, keys: ['exponential', 'cube'], text: '2<sup><i>n</i></sup> supera a <i>n</i><sup>3</sup>.' },
+      ];
+      return [...candidates].reverse().find((item) => n >= item.at && item.keys.every((key) => keys.includes(key)));
+    };
+    const updateMilestone = (n) => {
+      if (!milestone) return;
+      const item = milestoneFor(n);
+      milestone.hidden = !item;
+      if (item) milestone.innerHTML = `<strong>Hito en <i>n</i> = ${item.at}</strong><span>${item.text}</span>`;
+    };
+    const updateSummary = (logs) => {
+      if (!summary) return;
+      const order = [...keys].sort((a, b) => logs[b] - logs[a]);
+      const rows = order.map((key, index) => {
+        const next = order[index + 1];
+        const gap = next && Number.isFinite(logs[key]) && Number.isFinite(logs[next])
+          ? Math.max(0, (logs[key] - logs[next]) / LN10)
+          : null;
+        const separation = gap === null ? '' : `<span>${decimal(gap, 1)} órdenes sobre la siguiente</span>`;
+        return `<li><strong>${index + 1}. ${formulas[key]}</strong><span>${formattedValue(key, target)}</span>${separation}</li>`;
+      }).join('');
+      summary.innerHTML = `<h4>Resumen en <i>n</i> = ${target}</h4><ol>${rows}</ol>`;
+      summary.hidden = false;
+    };
+    const setPauseVisual = (isPaused, finished = false) => {
+      if (!pauseButton) return;
+      const text = finished ? 'Reproducir de nuevo' : (isPaused ? 'Reanudar' : 'Pausar');
+      pauseButton.innerHTML = `<i class="fa fa-${isPaused ? 'play' : 'pause'}" aria-hidden="true"></i> ${text}`;
+      pauseButton.title = text;
+      pauseButton.setAttribute('aria-label', text);
     };
     const messageFor = (n, logs) => {
       if (!keys.length) return 'Selecciona una o más funciones para comenzar la comparación.';
@@ -542,6 +603,8 @@ def _javascript_app(
     let paused = false;
     let frame = 0;
     let started = performance.now();
+    let chartMaximum = 0;
+    let previousFraction = 0;
     const render = (nextFraction) => {
       fraction = Math.max(0, Math.min(1, nextFraction));
       const n = target * fraction;
@@ -552,6 +615,11 @@ def _javascript_app(
       const logs = Object.fromEntries(keys.map((key) => [key, logValue(key, n)]));
       const finite = Object.values(logs).filter(Number.isFinite);
       const maximum = finite.length ? Math.max(...finite) : 0;
+      const movingBackward = fraction < previousFraction;
+      chartMaximum = movingBackward ? maximum : chartMaximum + (maximum - chartMaximum) * 0.22;
+      if (fraction >= 1) chartMaximum = maximum;
+      if (Math.abs(chartMaximum - maximum) < 1e-6) chartMaximum = maximum;
+      previousFraction = fraction;
       const order = [...keys].sort((a, b) => logs[b] - logs[a]);
       order.forEach((key, rank) => {
         const row = rows.get(key);
@@ -561,23 +629,36 @@ def _javascript_app(
         row.querySelector('.growth-app__bar').style.width = `${ratioFor(logs[key], maximum) * 100}%`;
         row.querySelector('.growth-app__race-value').innerHTML = formattedValue(key, n);
       });
-      updateChart(n, logs, maximum);
+      updateChart(n, logs, chartMaximum);
+      updateMilestone(displayN);
       if (insight) insight.innerHTML = messageFor(displayN, logs);
+      if (summary) summary.hidden = fraction < 1;
+      if (fraction >= 1) updateSummary(logs);
     };
     const tick = (now) => {
       if (!visual.isConnected) return;
       if (!paused) {
         render((now - started) / duration);
-        if (fraction >= 1) return;
+        if (fraction >= 1) {
+          paused = true;
+          setPauseVisual(true, true);
+          return;
+        }
       }
       frame = requestAnimationFrame(tick);
     };
     const app = {
       togglePause() {
+        const replay = paused && fraction >= 1;
+        if (replay) render(0);
         paused = !paused;
-        if (!paused) started = performance.now() - fraction * duration;
+        setPauseVisual(paused);
+        if (!paused) {
+          started = performance.now() - fraction * duration;
+          if (replay) frame = requestAnimationFrame(tick);
+        }
       },
-      reset() { cancelAnimationFrame(frame); paused = true; render(0); },
+      reset() { cancelAnimationFrame(frame); paused = true; render(0); setPauseVisual(true); },
       destroy() { cancelAnimationFrame(frame); },
       render,
     };
@@ -585,8 +666,10 @@ def _javascript_app(
     timeline?.addEventListener('input', (event) => {
       paused = true;
       render(Number(event.target.value) / 1000);
+      setPauseVisual(true);
     });
     render(0);
+    setPauseVisual(false);
     frame = requestAnimationFrame(tick);
   };
   boot();
@@ -601,6 +684,10 @@ def _javascript_app(
         )
         .replace("__SCALE__", json.dumps(scale_mode))
         .replace("__KEYS__", json.dumps(selected_keys, ensure_ascii=False))
+        .replace(
+            "__FORMULAS__",
+            json.dumps({key: FAMILY_BY_KEY[key][1] for key in selected_keys}, ensure_ascii=False),
+        )
     )
 
 
@@ -635,6 +722,9 @@ def _styles() -> str:
 .growth-comparison-app .growth-app__preset-row{display:flex!important;flex-flow:row wrap!important;align-items:center!important;gap:8px!important}.growth-comparison-app .growth-app__scale-help{color:#555;font-size:12px;margin-top:-4px}
 .growth-comparison-app .growth-app__slider-wrap{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:2px}
 .growth-comparison-app .growth-app__slider-label{font-size:12px;font-weight:600;color:#555}
+.growth-comparison-app .growth-app__n-compound{display:flex!important;align-items:center!important;gap:10px!important}.growth-comparison-app .growth-app__n-compound>.widget-int{flex:0 0 88px!important;width:88px!important;min-width:88px!important;max-width:88px!important}
+.growth-comparison-app .growth-app__range{min-height:24px;padding:2px 8px 4px;color:#555;font:12px 'STIX Two Math','Cambria Math',serif;text-align:right}.growth-comparison-app .growth-app__milestone{display:flex;gap:8px 16px;align-items:center;margin-top:12px;padding:9px 12px;border-left:3px solid #1976d2;background:#f3f8fd;font:13px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__milestone[hidden]{display:none}.growth-comparison-app .growth-app__summary{margin-top:16px;padding:12px;border:1px solid #dedede;background:#fff}.growth-comparison-app .growth-app__summary[hidden]{display:none}.growth-comparison-app .growth-app__summary h4{margin:0 0 8px;font-size:15px}.growth-comparison-app .growth-app__summary ol{display:grid;gap:5px;margin:0;padding-left:28px}.growth-comparison-app .growth-app__summary li{display:grid;grid-template-columns:minmax(110px,.8fr) minmax(110px,.8fr) minmax(160px,1.2fr);gap:12px;align-items:center;font:13px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__summary li>span:last-child{color:#666}
+@media(prefers-reduced-motion:reduce){.growth-comparison-app *{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
 @media(max-width:900px){.growth-comparison-app .growth-app__unified{grid-template-columns:1fr}.growth-comparison-app .growth-app__race-view{order:2}.growth-comparison-app .growth-app__function-row{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__chart svg{min-height:260px}.growth-comparison-app .growth-app__race-row{grid-template-columns:18px 58px minmax(70px,1fr) 82px;gap:5px}.growth-comparison-app .growth-app__race-value{font-size:10px}}
 </style>"""
     )
@@ -648,8 +738,8 @@ def run_app():
         min_value=MIN_N,
         max_value=MAX_N,
         step=1,
-        description="n",
-        width="180px",
+        description="",
+        width="88px",
     )
     speed_input = dropdown_control(
         options=SPEED_OPTIONS,
@@ -665,7 +755,7 @@ def run_app():
         description="",
         continuous_update=True,
         readout=False,
-        layout=widgets.Layout(width="100%"),
+        layout=widgets.Layout(width="auto", flex="1 1 auto"),
     )
     selectors = {}
     selector_options = []
@@ -705,7 +795,6 @@ def run_app():
             border_bottom="1px solid #767676",
             border_left="1px solid #767676",
             padding="6px 12px",
-            background_color="#ffffff",
             overflow="visible",
         ),
     )
@@ -721,9 +810,10 @@ def run_app():
     selection_message = widgets.HTML(value="", layout=widgets.Layout(width="100%"))
     selection_message.add_class("growth-app__selection-message")
     execute_button = button_control(description="Ejecutar", button_style="success", width="128px")
-    pause_button = button_control(description="Pausar/Reanudar", button_style="", width="158px")
+    pause_button = button_control(description="Pausar", button_style="", width="158px", disabled=True)
     reset_button = button_control(description="Reiniciar", button_style="warning", width="128px")
     execute_button.icon, pause_button.icon, reset_button.icon = "play", "pause", "refresh"
+    pause_button.add_class("growth-app__pause-button")
     scale_input = dropdown_control(
         options=(("Lineal", "linear"), ("Logarítmica", "log")),
         value="linear",
@@ -732,7 +822,6 @@ def run_app():
     )
     controls = widgets.Box(
         [
-            compact_labeled_control("n final", n_input),
             compact_labeled_control("Escala", scale_input),
             compact_labeled_control("Velocidad", speed_input),
         ],
@@ -746,10 +835,15 @@ def run_app():
         ),
     )
     controls.add_class("growth-app__controls")
+    n_compound = widgets.HBox(
+        [n_slider, n_input],
+        layout=widgets.Layout(width="100%", align_items="center", grid_gap="10px"),
+    )
+    n_compound.add_class("growth-app__n-compound")
     slider_wrap = widgets.VBox(
         [
-            widgets.HTML('<label class="growth-app__slider-label">Valor final de <i>n</i> (0 – 1 000):</label>'),
-            n_slider,
+            widgets.HTML('<label class="growth-app__slider-label">Valor final de <i>n</i> (0 – 1 000)</label>'),
+            n_compound,
         ],
         layout=widgets.Layout(width="100%", grid_gap="2px"),
     )
@@ -819,6 +913,9 @@ def run_app():
             display(Javascript(source))
 
     def redraw():
+        pause_button.disabled = True
+        pause_button.description = "Pausar"
+        pause_button.icon = "pause"
         state["render_revision"] += 1
         revision = state["render_revision"]
         output.value = _render(
@@ -891,6 +988,9 @@ def run_app():
             return
         target, speed = int(n_input.value), float(speed_input.value)
         sync_n(target)
+        pause_button.disabled = False
+        pause_button.description = "Pausar"
+        pause_button.icon = "pause"
         output.value = _render(target, keys, str(scale_input.value), app_id=app_id)
         send_javascript(
             _javascript_app(app_id, target, keys, str(scale_input.value), speed)
