@@ -11,6 +11,7 @@ from simulaciones.capitulo2.runtime.growth_comparison import (
     BASE_DURATION,
     FAMILIES,
     MAX_N,
+    MIN_TARGET_N,
     SPEED_OPTIONS,
     _calc_ratio,
     _exact_value,
@@ -121,6 +122,7 @@ def test_bar_positions_use_continuous_n_while_labels_stay_exact():
 
 def test_public_limits_and_speeds_match_the_portal_contract():
     assert MAX_N == 1_000
+    assert MIN_TARGET_N == 1
     assert BASE_DURATION == 20.0
     assert tuple(label for label, _value in SPEED_OPTIONS) == ("1x", "2x", "5x", "10x")
 
@@ -130,6 +132,8 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
 
     assert "requestAnimationFrame" in source
     assert "togglePause" in source
+    assert "finish()" in source
+    assert "render(1)" in source
     assert "growth-app__timeline-input" in source
     assert "logGamma" in source
     assert "updateChart(n, logs, chartMaximum)" in source
@@ -149,7 +153,7 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     assert "is-highlighted" not in _styles()
 
 
-def test_reset_returns_every_n_control_to_zero_and_all_buttons_have_icons():
+def test_target_controls_reject_zero_and_reset_to_one_while_visual_starts_at_zero():
     root = run_app()
 
     def descendants(widget):
@@ -170,12 +174,15 @@ def test_reset_returns_every_n_control_to_zero_and_all_buttons_have_icons():
     buttons = tuple(control for control in controls if isinstance(control, widgets.Button))
     reset_button = next(button for button in buttons if button.description == "Reiniciar")
     pause_button = next(button for button in buttons if button.description == "Pausar")
+    finish_button = next(button for button in buttons if button.description == "Finalizar")
     reset_button.click()
 
     assert n_controls
-    assert all(control.value == 0 for control in n_controls)
+    assert all(control.min == MIN_TARGET_N for control in n_controls)
+    assert all(control.value == MIN_TARGET_N for control in n_controls)
     assert all(button.icon for button in buttons)
     assert pause_button.disabled
+    assert finish_button.disabled
     assert "growth-app__pause-button" in pause_button._dom_classes
     assert any("growth-app__n-compound" in control._dom_classes for control in controls)
     assert "justify-content:center" in _styles()

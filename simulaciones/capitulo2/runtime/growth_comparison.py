@@ -20,7 +20,7 @@ from common.widget_controls import (
     shared_ui_styles,
 )
 
-MIN_N, MAX_N, DEFAULT_N = 0, 1_000, 100
+MIN_N, MIN_TARGET_N, MAX_N, DEFAULT_N = 0, 1, 1_000, 100
 SPEED_OPTIONS = (("1x", 1.0), ("2x", 2.0), ("5x", 5.0), ("10x", 10.0))
 BASE_DURATION, LN_10 = 20.0, math.log(10)
 PRESETS = (
@@ -658,6 +658,11 @@ def _javascript_app(
           if (replay) frame = requestAnimationFrame(tick);
         }
       },
+      finish() {
+        paused = true;
+        render(1);
+        setPauseVisual(true, true);
+      },
       reset() { cancelAnimationFrame(frame); paused = true; render(0); setPauseVisual(true); },
       destroy() { cancelAnimationFrame(frame); },
       render,
@@ -680,7 +685,7 @@ def _javascript_app(
         .replace("__TARGET__", str(int(target)))
         .replace(
             "__DURATION__",
-            str(250.0 if int(target) == MIN_N else max(250.0, BASE_DURATION * 1000 / float(speed))),
+            str(max(250.0, BASE_DURATION * 1000 / float(speed))),
         )
         .replace("__SCALE__", json.dumps(scale_mode))
         .replace("__KEYS__", json.dumps(selected_keys, ensure_ascii=False))
@@ -735,7 +740,7 @@ def run_app():
     app_id = f"growth-{uuid.uuid4().hex}"
     n_input = bounded_int_control(
         value=DEFAULT_N,
-        min_value=MIN_N,
+        min_value=MIN_TARGET_N,
         max_value=MAX_N,
         step=1,
         description="",
@@ -749,7 +754,7 @@ def run_app():
     )
     n_slider = widgets.IntSlider(
         value=DEFAULT_N,
-        min=MIN_N,
+        min=MIN_TARGET_N,
         max=MAX_N,
         step=1,
         description="",
@@ -811,8 +816,14 @@ def run_app():
     selection_message.add_class("growth-app__selection-message")
     execute_button = button_control(description="Ejecutar", button_style="success", width="128px")
     pause_button = button_control(description="Pausar", button_style="", width="158px", disabled=True)
+    finish_button = button_control(description="Finalizar", button_style="", width="128px", disabled=True)
     reset_button = button_control(description="Reiniciar", button_style="warning", width="128px")
-    execute_button.icon, pause_button.icon, reset_button.icon = "play", "pause", "refresh"
+    execute_button.icon, pause_button.icon, finish_button.icon, reset_button.icon = (
+        "play",
+        "pause",
+        "fast-forward",
+        "refresh",
+    )
     pause_button.add_class("growth-app__pause-button")
     scale_input = dropdown_control(
         options=(("Lineal", "linear"), ("Logarítmica", "log")),
@@ -842,7 +853,7 @@ def run_app():
     n_compound.add_class("growth-app__n-compound")
     slider_wrap = widgets.VBox(
         [
-            widgets.HTML('<label class="growth-app__slider-label">Valor final de <i>n</i> (0 – 1 000)</label>'),
+            widgets.HTML('<label class="growth-app__slider-label">Valor final de <i>n</i> (1 – 1 000)</label>'),
             n_compound,
         ],
         layout=widgets.Layout(width="100%", grid_gap="2px"),
@@ -914,6 +925,7 @@ def run_app():
 
     def redraw():
         pause_button.disabled = True
+        finish_button.disabled = True
         pause_button.description = "Pausar"
         pause_button.icon = "pause"
         state["render_revision"] += 1
@@ -935,14 +947,14 @@ def run_app():
     def sync_n(value):
         state["syncing"] = True
         try:
-            n_input.value = n_slider.value = max(MIN_N, min(MAX_N, int(value)))
+            n_input.value = n_slider.value = max(MIN_TARGET_N, min(MAX_N, int(value)))
         finally:
             state["syncing"] = False
 
     def on_n_change(change):
         if state["syncing"] or change.get("name") != "value":
             return
-        value = max(MIN_N, min(MAX_N, int(change["new"])))
+        value = max(MIN_TARGET_N, min(MAX_N, int(change["new"])))
         sync_n(value)
         send_javascript(_javascript_command(app_id, "destroy"))
         redraw()
@@ -978,7 +990,7 @@ def run_app():
 
     def reset_all(*_args):
         send_javascript(_javascript_command(app_id, "destroy"))
-        sync_n(MIN_N)
+        sync_n(MIN_TARGET_N)
         redraw()
 
     def execute(*_args):
@@ -989,6 +1001,7 @@ def run_app():
         target, speed = int(n_input.value), float(speed_input.value)
         sync_n(target)
         pause_button.disabled = False
+        finish_button.disabled = False
         pause_button.description = "Pausar"
         pause_button.icon = "pause"
         output.value = _render(target, keys, str(scale_input.value), app_id=app_id)
@@ -998,6 +1011,9 @@ def run_app():
 
     def toggle_pause(*_args):
         send_javascript(_javascript_command(app_id, "togglePause"))
+
+    def finish(*_args):
+        send_javascript(_javascript_command(app_id, "finish"))
 
     def on_preset_change(change):
         if state["selection_syncing"] or change.get("name") != "value":
@@ -1014,6 +1030,7 @@ def run_app():
         selector.observe(on_function_change, names="value")
     execute_button.on_click(execute)
     pause_button.on_click(toggle_pause)
+    finish_button.on_click(finish)
     reset_button.on_click(reset_all)
     select_all_button.on_click(lambda *_args: apply_selection(PRESET_KEYS["all"], "all"))
     clear_button.on_click(lambda *_args: apply_selection((), "custom"))
@@ -1022,7 +1039,7 @@ def run_app():
             widgets.HTML(value=_styles(), layout=widgets.Layout(width="0", height="0", margin="0")),
             configuration_panel,
             progress_wrap,
-            action_button_row([execute_button, pause_button, reset_button]),
+            action_button_row([execute_button, pause_button, finish_button, reset_button]),
             output,
             javascript_output,
         ],
@@ -1034,4 +1051,13 @@ def run_app():
     return root
 
 
-__all__ = ["FAMILIES", "MAX_N", "PRESETS", "SPEED_OPTIONS", "_exact_value", "_render", "run_app"]
+__all__ = [
+    "FAMILIES",
+    "MIN_TARGET_N",
+    "MAX_N",
+    "PRESETS",
+    "SPEED_OPTIONS",
+    "_exact_value",
+    "_render",
+    "run_app",
+]
