@@ -17,6 +17,37 @@ const installedWidgetKernels = new Set<string>();
 const keyboardEnhancedTabs = new WeakSet<HTMLElement>();
 let accessibleId = 0;
 
+async function refreshPublishedNotebook(panel: NotebookPanel): Promise<void> {
+  const parameters = new URLSearchParams(window.location.search);
+  const revision = parameters.get("revision");
+  if (!revision) return;
+
+  const encodedPath = panel.context.path
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  const publishedUrl = new URL(`../files/${encodedPath}`, window.location.href);
+  const response = await fetch(publishedUrl, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(
+      `No fue posible cargar la revisión ${revision} de ${panel.context.path}.`,
+    );
+  }
+
+  const notebook = await response.json();
+  if (!notebook || !Array.isArray(notebook.cells)) {
+    throw new Error(`El contenido publicado de ${panel.context.path} no es un notebook válido.`);
+  }
+
+  // JupyterLite conserva documentos abiertos en IndexedDB. La URL publicada
+  // es la fuente de verdad: se sustituye siempre la copia persistida antes de
+  // ejecutar, incluso si una carga anterior alcanzó a guardar la revisión en
+  // localStorage pero no llegó a actualizar el widget visible.
+  panel.context.model.fromJSON(notebook);
+  await panel.context.save();
+  await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+}
+
 function reportEmbeddedState(type: string, detail = ""): void {
   if (window.parent === window) return;
   window.parent.postMessage({ type, detail }, window.location.origin);
@@ -248,6 +279,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
       void (async () => {
         await panel.context.ready;
+        await refreshPublishedNotebook(panel);
         await panel.context.sessionContext.ready;
         if (panel.isDisposed) return;
         // Un reinicio crea un kernel nuevo sin ipywidgets: se reinstala antes de

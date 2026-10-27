@@ -1,10 +1,14 @@
+import json
 import math
+from pathlib import Path
 
 from simulaciones.capitulo2.runtime.growth_comparison import (
     MAX_N,
     SPEED_OPTIONS,
+    _calc_ratio,
     _exact_value,
     _format_exact_value,
+    _log_value,
     _render,
 )
 
@@ -20,6 +24,15 @@ def test_exact_values_at_ten():
     assert _exact_value("factorial", 10) == 3_628_800
 
 
+def test_exact_values_at_zero_follow_the_visualization_convention():
+    assert _exact_value("constant", 0) == 1
+    assert _exact_value("log", 0) == 0
+    assert _exact_value("linear", 0) == 0
+    assert _exact_value("nlogn", 0) == 0
+    assert _exact_value("exponential", 0) == 1
+    assert _exact_value("factorial", 0) == 1
+
+
 def test_large_values_keep_their_real_order_of_magnitude():
     assert _format_exact_value(_exact_value("exponential", 1_000), html=False).endswith("10^301")
     assert _format_exact_value(_exact_value("factorial", 1_000), html=False).endswith("10^2567")
@@ -27,7 +40,7 @@ def test_large_values_keep_their_real_order_of_magnitude():
 
 def test_unified_view_labels_axes_and_only_selected_functions():
     rendered = _render(10, ("linear", "nlogn"))
-    assert "Costo C(n)" in rendered
+    assert ">f(n)</text>" in rendered
     assert "Tamaño de entrada n" in rendered
     assert "Crecimiento de las curvas" in rendered
     assert "Carrera de crecimiento" in rendered
@@ -46,11 +59,33 @@ def test_scale_mode_selection_linear_and_log():
     assert linear != log
 
 
+def test_log_scale_uses_log1p_and_preserves_positive_unit_values():
+    keys = ("constant", "log", "linear", "nlogn", "square", "cube", "exponential", "factorial")
+    logs = {key: _log_value(key, 5) for key in keys}
+    log_maximum = max(value for value in logs.values() if value is not None)
+    ratios = {key: _calc_ratio(key, 5, "log", log_maximum) for key in keys}
+    assert ratios["constant"] > 0
+    assert ratios["cube"] == 1
+    assert ratios["factorial"] < ratios["cube"]
+    assert ratios["exponential"] > ratios["square"]
+
+
 def test_chart_at_one_and_single_zero_function_is_valid():
     rendered = _render(1, ("log",))
     assert "log₂(n)" in rendered
+    assert ">0</text>" in rendered
     assert ">1</text>" in rendered
-    assert ">2</text>" in rendered
+
+
+def test_render_starts_at_zero_and_uses_dense_curves():
+    rendered = _render(0, ("constant", "linear"))
+    assert "<i>n</i> = 0" in rendered
+    assert "Tamaño de entrada n" in rendered
+    assert ">f(n)</text>" in rendered
+
+    later = _render(5, ("linear",))
+    points = later.split('<polyline points="', 1)[1].split('"', 1)[0].split()
+    assert len(points) == 181
 
 
 def test_bar_positions_use_continuous_n_while_labels_stay_exact():
@@ -64,3 +99,15 @@ def test_bar_positions_use_continuous_n_while_labels_stay_exact():
 def test_public_limits_and_speeds_match_the_portal_contract():
     assert MAX_N == 1_000
     assert tuple(label for label, _value in SPEED_OPTIONS) == ("1x", "2x", "5x", "10x")
+
+
+def test_jupyterlite_executes_the_versioned_runtime_embedded_in_the_notebook():
+    notebook_path = (
+        Path(__file__).parents[2]
+        / "simulaciones/capitulo2/notebooks/0_comparacion_crecimiento.ipynb"
+    )
+    notebook = json.loads(notebook_path.read_text(encoding="utf-8"))
+    source = "".join(notebook["cells"][-1]["source"])
+
+    assert 'or sys.platform == "emscripten"' in source
+    assert "gzip.decompress(base64.b64decode(_runtime_payload))" in source

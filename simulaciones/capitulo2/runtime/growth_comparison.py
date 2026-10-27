@@ -21,9 +21,9 @@ from common.widget_controls import (
     shared_ui_styles,
 )
 
-MIN_N, MAX_N, DEFAULT_N = 1, 1_000, 100
+MIN_N, MAX_N, DEFAULT_N = 0, 1_000, 100
 SPEED_OPTIONS = (("1x", 1.0), ("2x", 2.0), ("5x", 5.0), ("10x", 10.0))
-FRAME_INTERVAL, BASE_DURATION, LN_10 = 1 / 30, 10.0, math.log(10)
+FRAME_INTERVAL, BASE_DURATION, LN_10 = 1 / 45, 10.0, math.log(10)
 FAMILIES = (
     ("constant", "1", "1", "#607d8b"),
     ("log", "log<sub>2</sub>(<i>n</i>)", "log₂(n)", "#00838f"),
@@ -42,9 +42,9 @@ def _exact_value(key: str, n: int) -> int | float:
     n = max(MIN_N, int(n))
     functions = {
         "constant": lambda: 1,
-        "log": lambda: math.log2(n),
+        "log": lambda: math.log2(n) if n > 0 else 0,
         "linear": lambda: n,
-        "nlogn": lambda: n * math.log2(n),
+        "nlogn": lambda: n * math.log2(n) if n > 0 else 0,
         "square": lambda: n**2,
         "cube": lambda: n**3,
         "exponential": lambda: 2**n,
@@ -58,21 +58,21 @@ def _exact_value(key: str, n: int) -> int | float:
 
 def _log_value(key: str, n: float) -> float | None:
     """Devuelve ln(f(n)); None representa el valor cero."""
-    n = max(float(n), 1.0)
-    log_n = math.log(n)
+    n = max(float(n), 0.0)
     if key == "constant":
         return 0.0
     if key in {"log", "nlogn"}:
-        log_2_n = math.log2(n)
-        if log_2_n <= 0:
+        if n <= 1:
             return None
+        log_n = math.log(n)
+        log_2_n = math.log2(n)
         return math.log(log_2_n) + (log_n if key == "nlogn" else 0)
     if key == "linear":
-        return log_n
+        return math.log(n) if n > 0 else None
     if key == "square":
-        return 2 * log_n
+        return 2 * math.log(n) if n > 0 else None
     if key == "cube":
-        return 3 * log_n
+        return 3 * math.log(n) if n > 0 else None
     if key == "exponential":
         return n * math.log(2)
     if key == "factorial":
@@ -162,21 +162,41 @@ def _calc_ratio(key: str, n_val: float, scale_mode: str, log_maximum: float) -> 
     if log_v is None:
         return 0.0
     if scale_mode == "log":
-        if log_maximum <= 0:
+        numerator = _log1p_from_log(log_v)
+        denominator = _log1p_from_log(log_maximum)
+        if denominator <= 0:
             return 0.0
-        return min(1.0, max(0.0, max(0.0, log_v) / log_maximum))
+        return min(1.0, max(0.0, numerator / denominator))
     diff = log_v - log_maximum
     return math.exp(diff) if diff > -745 else 0.0
+
+
+def _log1p_from_log(log_value: float) -> float:
+    """Calcula ln(1 + exp(log_value)) sin desbordamiento."""
+    if log_value > 36:
+        return log_value + math.log1p(math.exp(-log_value))
+    return math.log1p(math.exp(log_value))
+
+
+def _log_expm1(value: float) -> float | None:
+    """Calcula ln(exp(value) - 1); None representa exactamente cero."""
+    if value <= 0:
+        return None
+    if value > 36:
+        return value + math.log1p(-math.exp(-value))
+    return math.log(math.expm1(value))
 
 
 def _svg_polyline(key: str, x_max: float, log_maximum: float, scale_mode: str, width: int, height: int) -> str:
     left, right, top, bottom = 100, 20, 24, 52
     plot_width, plot_height = width - left - right, height - top - bottom
-    sample_count = max(2, min(100, int(x_max) + 1))
+    # Un muestreo fijo y denso evita que las curvas de valores pequeños se vean
+    # como una sucesión de segmentos rectos durante la animación.
+    sample_count = 181 if x_max > 0 else 2
     points = []
     for index in range(sample_count):
-        x_value = 1 + (x_max - 1) * index / (sample_count - 1)
-        x = left + (x_value - 1) / max(1.0, x_max - 1) * plot_width
+        x_value = x_max * index / (sample_count - 1)
+        x = left + x_value / max(1.0, x_max) * plot_width
         y = top + (1 - _calc_ratio(key, x_value, scale_mode, log_maximum)) * plot_height
         points.append(f"{x:.2f},{y:.2f}")
     return " ".join(points)
@@ -186,25 +206,17 @@ def _render_chart(current_n: float, selected_keys: tuple[str, ...], scale_mode: 
     width, height = 650, 410
     left, right, top, bottom = 100, 20, 24, 52
     plot_width, plot_height = width - left - right, height - top - bottom
-    x_max = max(2, current_n)
+    x_max = max(1.0, current_n)
     final_logs = [_log_value(key, current_n) for key in selected_keys]
     log_maximum = max((value for value in final_logs if value is not None), default=0.0)
     grid = []
     if scale_mode == "log":
-        max_exp = max(1.0, log_maximum / math.log(10))
-        if max_exp <= 5.0:
-            exps = list(range(0, int(round(max_exp)) + 1))
-            ticks_data = [
-                (e / max_exp, f'10<tspan dy="-5" font-size="9">{e}</tspan><tspan dy="5"></tspan>' if e > 0 else "1")
-                for e in exps
-            ]
-        else:
-            ticks_data = []
-            for i in range(5):
-                ratio = i / 4
-                e = round(ratio * max_exp)
-                label = f'10<tspan dy="-5" font-size="9">{e}</tspan><tspan dy="5"></tspan>' if e > 0 else "1"
-                ticks_data.append((ratio, label))
+        transformed_maximum = _log1p_from_log(log_maximum)
+        ticks_data = []
+        for i in range(5):
+            ratio = i / 4
+            label = _format_log_axis(_log_expm1(ratio * transformed_maximum))
+            ticks_data.append((ratio, label))
     else:
         ticks_data = []
         for i in range(5):
@@ -220,48 +232,40 @@ def _render_chart(current_n: float, selected_keys: tuple[str, ...], scale_mode: 
                 coef = round(math.exp(diff - exp * LN_10), 2)
                 if coef >= 9.995:
                     coef, exp = 1.0, exp + 1
-                coef_str = (
-                    str(int(round(coef)))
-                    if abs(coef - round(coef)) < 1e-9
-                    else f"{coef:.2f}".rstrip("0").rstrip(".").replace(".", ",")
-                )
+                coef_str = str(int(round(coef))) if abs(coef - round(coef)) < 1e-9 else f"{coef:.2f}".rstrip("0").rstrip(".").replace(".", ",")
                 label = f'{coef_str} × 10<tspan dy="-5" font-size="9">{exp}</tspan><tspan dy="5"></tspan>'
             ticks_data.append((ratio, label))
 
     for ratio, label in ticks_data:
         y = top + (1 - ratio) * plot_height
         grid.append(
-            f'<line x1="{left}" y1="{y:.2f}" x2="{width-right}" y2="{y:.2f}" />'
-            f'<text x="{left-12}" y="{y+4:.2f}" text-anchor="end">{label}</text>'
+            f'<line x1="{left}" y1="{y:.2f}" x2="{width - right}" y2="{y:.2f}" /><text x="{left - 12}" y="{y + 4:.2f}" text-anchor="end">{label}</text>'
         )
 
     lines = []
     for key in selected_keys:
         _, _, text, color = FAMILY_BY_KEY[key]
-        point_x = left + (current_n - 1) / max(1.0, x_max - 1) * plot_width
+        point_x = left + current_n / max(1.0, x_max) * plot_width
         point_y = top + (1 - _calc_ratio(key, current_n, scale_mode, log_maximum)) * plot_height
         lines.append(
-            f'<polyline points="{_svg_polyline(key, x_max, log_maximum, scale_mode, width, height)}" '
+            f'<polyline points="{_svg_polyline(key, max(0.0, current_n), log_maximum, scale_mode, width, height)}" '
             f'fill="none" stroke="{color}" stroke-width="2.5" vector-effect="non-scaling-stroke">'
             f'<title>{escape(text)}</title></polyline><circle cx="{point_x:.2f}" cy="{point_y:.2f}" '
             f'r="4" fill="{color}"><title>{escape(text)}</title></circle>'
         )
-    candidates = (1, max(1, round((x_max + 1) / 2)), max(1, round(current_n)))
+    candidates = (0, max(1, round(x_max / 2)), max(1, round(x_max)))
     ticks = list(dict.fromkeys(candidates))
-    x_labels = "".join(
-        f'<text x="{left + (value-1)/max(1, x_max-1)*plot_width:.2f}" '
-        f'y="{height-30}" text-anchor="middle">{value}</text>' for value in ticks
-    )
+    x_labels = "".join(f'<text x="{left + value / max(1, x_max) * plot_width:.2f}" y="{height - 30}" text-anchor="middle">{value}</text>' for value in ticks)
     scale_label = "Escala logarítmica" if scale_mode == "log" else "Escala lineal"
     return f"""
       <div class="growth-app__chart" role="img" aria-label="Gráfica de las funciones seleccionadas ({scale_label})">
         <svg viewBox="0 0 {width} {height}" preserveAspectRatio="xMidYMid meet">
-          <g class="growth-app__grid">{''.join(grid)}</g>
-          <line class="growth-app__axis" x1="{left}" y1="{top}" x2="{left}" y2="{height-bottom}" />
-          <line class="growth-app__axis" x1="{left}" y1="{height-bottom}" x2="{width-right}" y2="{height-bottom}" />
-          {''.join(lines)}<g class="growth-app__x-labels">{x_labels}</g>
-          <text class="growth-app__axis-name" x="{left + plot_width/2:.2f}" y="{height-8}" text-anchor="middle">Tamaño de entrada n</text>
-          <text class="growth-app__axis-name" transform="translate(18 {top + plot_height/2:.2f}) rotate(-90)" text-anchor="middle">Costo C(n)</text>
+          <g class="growth-app__grid">{"".join(grid)}</g>
+          <line class="growth-app__axis" x1="{left}" y1="{top}" x2="{left}" y2="{height - bottom}" />
+          <line class="growth-app__axis" x1="{left}" y1="{height - bottom}" x2="{width - right}" y2="{height - bottom}" />
+          {"".join(lines)}<g class="growth-app__x-labels">{x_labels}</g>
+          <text class="growth-app__axis-name" x="{left + plot_width / 2:.2f}" y="{height - 8}" text-anchor="middle">Tamaño de entrada n</text>
+          <text class="growth-app__axis-name" transform="translate(22 {top + plot_height / 2:.2f}) rotate(-90)" text-anchor="middle">f(n)</text>
         </svg>
       </div>
     """
@@ -297,7 +301,7 @@ def _render_race(current_n: float, display_n: int, selected_keys: tuple[str, ...
         )
     return (
         f'<div class="growth-app__race" role="img" aria-label="Carrera de barras de las funciones seleccionadas" style="height:{total_height}px;">'
-        f'{"".join(rows)}</div>'
+        f"{''.join(rows)}</div>"
     )
 
 
@@ -331,9 +335,9 @@ def _render(current_n: float, selected_keys: tuple[str, ...] | None = None, scal
     visualization = (
         '<div class="growth-app__unified">'
         '<section class="growth-app__view"><h4>Crecimiento de las curvas</h4>'
-        f'{_render_chart(current_n, selected_keys, scale_mode)}</section>'
+        f"{_render_chart(current_n, selected_keys, scale_mode)}</section>"
         '<section class="growth-app__view growth-app__race-view"><h4>Carrera de crecimiento</h4>'
-        f'{_render_race(current_n, n, selected_keys, scale_mode)}</section></div>'
+        f"{_render_race(current_n, n, selected_keys, scale_mode)}</section></div>"
     )
     return f"""
       <section class="growth-app__visual"><header class="growth-app__header">
@@ -346,40 +350,57 @@ def _render(current_n: float, selected_keys: tuple[str, ...] | None = None, scal
 
 
 def _styles() -> str:
-    return shared_ui_styles(".growth-comparison-app") + """
+    return (
+        shared_ui_styles(".growth-comparison-app")
+        + """
 <style>
-.growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0;gap:12px}.growth-comparison-app .growth-app__controls{display:flex;flex-flow:row wrap;gap:12px 36px;align-items:center;width:100%}.growth-comparison-app .growth-app__function-grid{display:flex;flex-flow:row wrap;gap:4px 20px;width:100%}.growth-comparison-app .growth-app__function-grid .widget-checkbox{width:132px!important;min-width:132px!important;margin:0!important}.growth-comparison-app .growth-app__function-grid .widget-label{font-family:'STIX Two Math','Cambria Math',serif!important;font-weight:500!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__progress{flex:1 1 auto;width:auto!important}.growth-comparison-app .growth-app__progress .progress-bar{background:#a94728!important}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__lanes{display:grid;gap:8px}.growth-comparison-app .growth-app__lane{display:grid;grid-template-columns:110px minmax(150px,1fr) 142px;gap:10px;align-items:center;min-height:31px}.growth-comparison-app .growth-app__formula{color:var(--family-color);font-family:'STIX Two Math','Cambria Math',serif;font-size:16px;font-weight:600;text-align:center}.growth-comparison-app .growth-app__rail{height:28px;position:relative;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),#eee 25%)}.growth-comparison-app .growth-app__rail:before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:#bbb}.growth-comparison-app .growth-app__fill{position:absolute;left:0;top:calc(50% - 3px);height:6px;background:color-mix(in srgb,var(--family-color) 25%,transparent);transition:width .12s linear}.growth-comparison-app .growth-app__dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--family-color);border:2px solid #fff;box-shadow:0 0 0 1px var(--family-color);transform:translate(-50%,-50%);transition:left .12s linear}.growth-comparison-app .growth-app__value{text-align:right;white-space:nowrap;font-family:'STIX Two Math','Cambria Math',serif;font-size:14px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart-title{font-size:14px;font-weight:700;margin-bottom:10px;text-align:center}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:12px sans-serif}.growth-comparison-app .growth-app__legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;margin-top:12px;font:15px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__legend-item{display:inline-flex;align-items:center;gap:6px}.growth-comparison-app .growth-app__legend-item i{width:18px;border-top:3px solid var(--family-color)}
-.growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(330px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 66px minmax(90px,1fr) 104px;gap:7px;align-items:center;height:36px;transition:transform .28s cubic-bezier(.25,.1,.25,1)}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color);transition:width .12s linear}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}
+.growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.growth-comparison-app .growth-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.growth-comparison-app .growth-app__controls>.widget-box{flex:0 0 292px!important;width:292px!important;min-width:292px!important;max-width:292px!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__progress{flex:1 1 auto;width:auto!important}.growth-comparison-app .growth-app__progress .progress-bar{background:#a94728!important}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__lanes{display:grid;gap:8px}.growth-comparison-app .growth-app__lane{display:grid;grid-template-columns:110px minmax(150px,1fr) 142px;gap:10px;align-items:center;min-height:31px}.growth-comparison-app .growth-app__formula{color:var(--family-color);font-family:'STIX Two Math','Cambria Math',serif;font-size:16px;font-weight:600;text-align:center}.growth-comparison-app .growth-app__rail{height:28px;position:relative;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),#eee 25%)}.growth-comparison-app .growth-app__rail:before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:#bbb}.growth-comparison-app .growth-app__fill{position:absolute;left:0;top:calc(50% - 3px);height:6px;background:color-mix(in srgb,var(--family-color) 25%,transparent);transition:width .08s linear}.growth-comparison-app .growth-app__dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--family-color);border:2px solid #fff;box-shadow:0 0 0 1px var(--family-color);transform:translate(-50%,-50%);transition:left .08s linear}.growth-comparison-app .growth-app__value{text-align:right;white-space:nowrap;font-family:'STIX Two Math','Cambria Math',serif;font-size:14px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart-title{font-size:14px;font-weight:700;margin-bottom:10px;text-align:center}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:600 15px sans-serif}.growth-comparison-app .growth-app__legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;margin-top:12px;font:15px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__legend-item{display:inline-flex;align-items:center;gap:6px}.growth-comparison-app .growth-app__legend-item i{width:18px;border-top:3px solid var(--family-color)}
+.growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 94px minmax(90px,1fr) 104px;column-gap:12px;align-items:center;height:36px;transition:transform .18s linear}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap;padding-right:4px}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color);transition:width .08s linear}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}
 .growth-comparison-app .growth-app__functions-frame{border:1px solid #767676;background:#fff;padding:6px 12px;border-radius:0;box-sizing:border-box}
-.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:4px;width:100%}
+.growth-comparison-app .growth-app__functions-group{width:100%!important;min-width:0!important;max-width:none!important;overflow:visible!important}.growth-comparison-app .growth-app__functions-group>.widget-box:last-child{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 520px!important}.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:8px;width:100%}
 .growth-comparison-app .growth-app__function-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 16px;width:100%;align-items:center}
-.growth-comparison-app .growth-app__function-row .widget-checkbox{width:100%!important;min-width:0!important;margin:0!important;display:flex!important;align-items:center!important}
+.growth-comparison-app .growth-app__function-row .widget-checkbox{width:100%!important;min-width:0!important;margin:0!important;display:flex!important;align-items:center!important;overflow:visible!important}
 .growth-comparison-app .growth-app__function-row .widget-checkbox input[type="checkbox"]{margin:0 6px 0 0!important;width:16px!important;height:16px!important}
-.growth-comparison-app .growth-app__function-row .widget-label{font-family:'STIX Two Math','Cambria Math','Scheherazade New',serif!important;font-size:14px!important;font-weight:500!important;line-height:1.2!important}
+.growth-comparison-app .growth-app__function-row .widget-label{font-family:'STIX Two Math','Cambria Math','Scheherazade New',serif!important;font-size:15px!important;font-weight:500!important;line-height:1.2!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap!important}
 .growth-comparison-app .growth-app__slider-wrap{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:2px}
 .growth-comparison-app .growth-app__slider-label{font-size:12px;font-weight:600;color:#555}
 @media(max-width:900px){.growth-comparison-app .growth-app__unified{grid-template-columns:1fr}.growth-comparison-app .growth-app__race-view{order:2}.growth-comparison-app .growth-app__function-row{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__chart svg{min-height:260px}.growth-comparison-app .growth-app__race-row{grid-template-columns:18px 58px minmax(70px,1fr) 82px;gap:5px}.growth-comparison-app .growth-app__race-value{font-size:10px}}
 </style>"""
+    )
 
 
 def run_app():
     """Muestra la simulación con el contrato visual común del portal."""
     n_input = bounded_int_control(
-        value=DEFAULT_N, min_value=MIN_N, max_value=MAX_N, step=1,
-        description="n", width="180px",
+        value=DEFAULT_N,
+        min_value=MIN_N,
+        max_value=MAX_N,
+        step=1,
+        description="n",
+        width="180px",
     )
     speed_input = dropdown_control(
-        options=SPEED_OPTIONS, value=1.0, description="Velocidad", width="160px",
+        options=SPEED_OPTIONS,
+        value=1.0,
+        description="Velocidad",
+        width="160px",
     )
     n_slider = widgets.IntSlider(
-        value=DEFAULT_N, min=MIN_N, max=MAX_N, step=1, description="",
-        continuous_update=True, readout=False, layout=widgets.Layout(width="100%"),
+        value=DEFAULT_N,
+        min=MIN_N,
+        max=MAX_N,
+        step=1,
+        description="",
+        continuous_update=True,
+        readout=False,
+        layout=widgets.Layout(width="100%"),
     )
     selectors = {}
-    for key, formula, _text, _color in FAMILIES:
-        cb = widgets.Checkbox(value=True, description=formula, indent=False)
-        if hasattr(cb, "description_allow_html"):
-            cb.description_allow_html = True
+    for key, _formula, text, _color in FAMILIES:
+        # Las descripciones de Checkbox no interpretan HTML de forma uniforme
+        # entre Jupyter local, Colab y JupyterLite. El texto Unicode conserva la
+        # notación matemática y evita que la etiqueta se reduzca a puntos suspensivos.
+        cb = widgets.Checkbox(value=True, description=text, indent=False)
         selectors[key] = cb
     checkbox_list = list(selectors.values())
     row1 = widgets.HBox(checkbox_list[:4], layout=widgets.Layout(width="100%"))
@@ -409,6 +430,7 @@ def run_app():
         "Funciones visibles",
         functions_frame,
     )
+    functions_group.add_class("growth-app__functions-group")
     functions_group.layout.margin = "0"
     functions_group.layout.width = "100%"
     functions_group.layout.overflow = "visible"
@@ -423,18 +445,25 @@ def run_app():
         description="Escala",
         width="160px",
     )
-    controls = widgets.VBox(
+    controls = widgets.Box(
         [
             compact_labeled_control("n", n_input),
             compact_labeled_control("Escala", scale_input),
             compact_labeled_control("Velocidad", speed_input),
         ],
-        layout=widgets.Layout(width="100%", grid_gap="8px"),
+        layout=widgets.Layout(
+            width="100%",
+            display="flex",
+            flex_flow="row wrap",
+            grid_gap="12px 36px",
+            align_items="center",
+            overflow="visible",
+        ),
     )
     controls.add_class("growth-app__controls")
     slider_wrap = widgets.VBox(
         [
-            widgets.HTML('<label class="growth-app__slider-label">Deslizar valor de <i>n</i> manualmente (1 – 1 000):</label>'),
+            widgets.HTML('<label class="growth-app__slider-label">Deslizar valor de <i>n</i> manualmente (0 – 1 000):</label>'),
             n_slider,
         ],
         layout=widgets.Layout(width="100%", grid_gap="2px"),
@@ -447,24 +476,31 @@ def run_app():
             functions_group,
             selection_message,
         ],
-        layout=widgets.Layout(width="100%", grid_gap="10px"),
+        layout=widgets.Layout(width="100%", grid_gap="12px"),
     )
     configuration_content.add_class("growth-app__configuration")
     configuration_panel = collapsible_panel(
-        "Configuración", configuration_content, prefix="growth-app", open_by_default=True,
+        "Configuración",
+        configuration_content,
+        prefix="growth-app",
+        open_by_default=True,
     )
     progress = widgets.FloatProgress(
-        value=100, min=0, max=100, description="", layout=widgets.Layout(width="100%", height="18px"),
+        value=0,
+        min=0,
+        max=100,
+        description="",
+        layout=widgets.Layout(width="100%", height="18px"),
     )
     progress.add_class("growth-app__progress")
-    progress_value = widgets.HTML('<span class="growth-app__progress-value">100 %</span>')
+    progress_value = widgets.HTML('<span class="growth-app__progress-value">0 %</span>')
     progress_wrap = widgets.HBox(
         [widgets.HTML('<span class="growth-app__progress-label">Progreso</span>'), progress, progress_value],
         layout=widgets.Layout(width="100%", align_items="center", grid_gap="10px"),
     )
     progress_wrap.add_class("growth-app__progress-wrap")
     output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0"))
-    state = {"run_id": 0, "running": False, "current": float(DEFAULT_N), "syncing": False}
+    state = {"run_id": 0, "running": False, "current": float(MIN_N), "syncing": False}
 
     def selected_keys():
         return tuple(key for key, selector in selectors.items() if selector.value)
