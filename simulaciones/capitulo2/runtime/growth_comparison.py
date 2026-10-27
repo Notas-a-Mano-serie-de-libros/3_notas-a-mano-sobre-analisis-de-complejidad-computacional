@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-import asyncio
+import json
 import math
-import time
+import uuid
 from html import escape
 
 import ipywidgets as widgets
-from IPython.display import display
+from IPython.display import Javascript, clear_output, display
 
-from common.animation_runtime import pause
 from common.widget_controls import (
     action_button_row,
     bounded_int_control,
@@ -23,7 +22,14 @@ from common.widget_controls import (
 
 MIN_N, MAX_N, DEFAULT_N = 0, 1_000, 100
 SPEED_OPTIONS = (("1x", 1.0), ("2x", 2.0), ("5x", 5.0), ("10x", 10.0))
-FRAME_INTERVAL, BASE_DURATION, LN_10 = 1 / 45, 10.0, math.log(10)
+BASE_DURATION, LN_10 = 10.0, math.log(10)
+PRESETS = (
+    ("Personalizada", "custom"),
+    ("Crecimiento moderado", "moderate"),
+    ("Polinomiales", "polynomial"),
+    ("Crecimiento rápido", "fast"),
+    ("Todas", "all"),
+)
 FAMILIES = (
     ("constant", "1", "1", "#607d8b"),
     ("log", "log<sub>2</sub>(<i>n</i>)", "log₂(n)", "#00838f"),
@@ -35,6 +41,12 @@ FAMILIES = (
     ("factorial", "<i>n</i>!", "n!", "#6a1b9a"),
 )
 FAMILY_BY_KEY = {family[0]: family for family in FAMILIES}
+PRESET_KEYS = {
+    "moderate": ("constant", "log", "linear", "nlogn"),
+    "polynomial": ("linear", "square", "cube"),
+    "fast": ("square", "cube", "exponential", "factorial"),
+    "all": tuple(FAMILY_BY_KEY),
+}
 
 
 def _exact_value(key: str, n: int) -> int | float:
@@ -248,9 +260,9 @@ def _render_chart(current_n: float, selected_keys: tuple[str, ...], scale_mode: 
         point_x = left + current_n / max(1.0, x_max) * plot_width
         point_y = top + (1 - _calc_ratio(key, current_n, scale_mode, log_maximum)) * plot_height
         lines.append(
-            f'<polyline points="{_svg_polyline(key, max(0.0, current_n), log_maximum, scale_mode, width, height)}" '
+            f'<polyline class="growth-app__curve" data-family="{key}" points="{_svg_polyline(key, max(0.0, current_n), log_maximum, scale_mode, width, height)}" '
             f'fill="none" stroke="{color}" stroke-width="2.5" vector-effect="non-scaling-stroke">'
-            f'<title>{escape(text)}</title></polyline><circle cx="{point_x:.2f}" cy="{point_y:.2f}" '
+            f'<title>{escape(text)}</title></polyline><circle class="growth-app__curve-point" data-family="{key}" cx="{point_x:.2f}" cy="{point_y:.2f}" '
             f'r="4" fill="{color}"><title>{escape(text)}</title></circle>'
         )
     candidates = (0, max(1, round(x_max / 2)), max(1, round(x_max)))
@@ -291,7 +303,7 @@ def _render_race(current_n: float, display_n: int, selected_keys: tuple[str, ...
         width = _calc_ratio(key, current_n, scale_mode, log_maximum) * 100
         top_offset = rank * row_height
         rows.append(
-            f'<div class="growth-app__race-row" style="--family-color:{color}; transform: translateY({top_offset}px);">'
+            f'<div class="growth-app__race-row" data-family="{key}" style="--family-color:{color}; transform: translateY({top_offset}px);">'
             f'<span class="growth-app__rank">{rank + 1}</span>'
             f'<span class="growth-app__race-formula">{formula}</span>'
             '<span class="growth-app__bar-track" aria-hidden="true">'
@@ -322,7 +334,13 @@ def _comparison_message(n: int, logs: dict[str, float | None]) -> str:
     return "Las funciones seleccionadas se comparan sin comprimir sus diferencias de magnitud."
 
 
-def _render(current_n: float, selected_keys: tuple[str, ...] | None = None, scale_mode: str = "linear") -> str:
+def _render(
+    current_n: float,
+    selected_keys: tuple[str, ...] | None = None,
+    scale_mode: str = "linear",
+    *,
+    app_id: str = "",
+) -> str:
     if selected_keys is None:
         selected_keys = tuple(family[0] for family in FAMILIES)
     n = max(MIN_N, min(MAX_N, int(round(current_n))))
@@ -340,13 +358,247 @@ def _render(current_n: float, selected_keys: tuple[str, ...] | None = None, scal
         f"{_render_race(current_n, n, selected_keys, scale_mode)}</section></div>"
     )
     return f"""
-      <section class="growth-app__visual"><header class="growth-app__header">
+      <section class="growth-app__visual" data-growth-app-id="{escape(app_id)}" data-scale="{escape(scale_mode)}"><header class="growth-app__header">
         <div><span>Comparación interactiva</span><h3>¿Cómo se separan las funciones?</h3></div>
-        <div class="growth-app__current"><small>Tamaño de entrada</small><strong><i>n</i> = {n}</strong></div>
-      </header><div class="growth-app__panel">{visualization}</div>
+        <div class="growth-app__current"><small>Valor actual</small><strong><i>n</i> = {n}</strong></div>
+      </header><div class="growth-app__focus" role="status" hidden></div><div class="growth-app__panel">{visualization}</div>
       <div class="growth-app__insight" role="status">{_comparison_message(n, logs)}</div>
       <p class="growth-app__note">{scale_note}</p></section>
     """
+
+
+def _javascript_app(
+    app_id: str,
+    target: int,
+    selected_keys: tuple[str, ...],
+    scale_mode: str,
+    speed: float,
+) -> str:
+    """Runtime visual a 60 FPS; Python conserva cálculo, controles y fallback."""
+    metadata = {
+        key: {"formula": FAMILY_BY_KEY[key][1], "text": FAMILY_BY_KEY[key][2]}
+        for key in selected_keys
+    }
+    template = r"""
+(() => {
+  const appId = __APP_ID__;
+  const target = __TARGET__;
+  const duration = __DURATION__;
+  const scaleMode = __SCALE__;
+  const metadata = __METADATA__;
+  const keys = Object.keys(metadata);
+  const registry = window.__growthComparisonApps ||= {};
+  registry[appId]?.destroy?.();
+
+  const boot = (attempt = 0) => {
+    const visual = document.querySelector(`[data-growth-app-id="${appId}"]`);
+    if (!visual) {
+      if (attempt < 120) requestAnimationFrame(() => boot(attempt + 1));
+      return;
+    }
+    const root = visual.closest('.growth-comparison-app');
+    const timeline = root?.querySelector('.growth-app__timeline-input');
+    const progressText = root?.querySelector('.growth-app__progress-value');
+    const insight = visual.querySelector('.growth-app__insight');
+    const focus = visual.querySelector('.growth-app__focus');
+    const currentLabel = visual.querySelector('.growth-app__current strong');
+    const curves = new Map();
+    visual.querySelectorAll('.growth-app__curve').forEach((curve) => {
+      const length = curve.getTotalLength();
+      curve.style.strokeDasharray = `${length}`;
+      curves.set(curve.dataset.family, { curve, length });
+    });
+    const points = new Map(
+      [...visual.querySelectorAll('.growth-app__curve-point')].map((node) => [node.dataset.family, node])
+    );
+    const rows = new Map(
+      [...visual.querySelectorAll('.growth-app__race-row')].map((node) => [node.dataset.family, node])
+    );
+    const LN10 = Math.log(10);
+    const lanczos = [
+      0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+      771.32342877765313, -176.61502916214059, 12.507343278686905,
+      -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7
+    ];
+    const logGamma = (z) => {
+      if (z < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * z)) - logGamma(1 - z);
+      z -= 1;
+      let x = lanczos[0];
+      for (let i = 1; i < lanczos.length; i += 1) x += lanczos[i] / (z + i);
+      const t = z + lanczos.length - 1.5;
+      return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+    };
+    const logValue = (key, n) => {
+      n = Math.max(0, n);
+      if (key === 'constant') return 0;
+      if (key === 'log' || key === 'nlogn') {
+        if (n <= 1) return -Infinity;
+        const logarithm = Math.log2(n);
+        return Math.log(logarithm) + (key === 'nlogn' ? Math.log(n) : 0);
+      }
+      if (key === 'linear') return n > 0 ? Math.log(n) : -Infinity;
+      if (key === 'square') return n > 0 ? 2 * Math.log(n) : -Infinity;
+      if (key === 'cube') return n > 0 ? 3 * Math.log(n) : -Infinity;
+      if (key === 'exponential') return n * Math.log(2);
+      if (key === 'factorial') return logGamma(n + 1);
+      return -Infinity;
+    };
+    const softplus = (value) => value > 36 ? value + Math.log1p(Math.exp(-value)) : Math.log1p(Math.exp(value));
+    const decimal = (value, digits = 2) => {
+      if (Math.abs(value - Math.round(value)) < 1e-9) return String(Math.round(value));
+      return value.toFixed(digits).replace(/0+$/, '').replace(/\.$/, '').replace('.', ',');
+    };
+    const formattedValue = (key, n) => {
+      const rounded = Math.max(0, Math.round(n));
+      let value;
+      if (key === 'constant') value = 1;
+      else if (key === 'log') value = rounded > 0 ? Math.log2(rounded) : 0;
+      else if (key === 'linear') value = rounded;
+      else if (key === 'nlogn') value = rounded > 0 ? rounded * Math.log2(rounded) : 0;
+      else if (key === 'square') value = rounded ** 2;
+      else if (key === 'cube') value = rounded ** 3;
+      else if (key === 'exponential' && rounded < 53) value = 2 ** rounded;
+      else if (key === 'factorial' && rounded <= 18) {
+        value = 1;
+        for (let i = 2; i <= rounded; i += 1) value *= i;
+      }
+      if (Number.isFinite(value) && Math.abs(value) < 1e6) return decimal(value);
+      const logarithm = logValue(key, rounded);
+      if (!Number.isFinite(logarithm)) return '0';
+      let exponent = Math.floor(logarithm / LN10 + 1e-9);
+      let coefficient = Math.exp(logarithm - exponent * LN10);
+      if (coefficient >= 9.995) { coefficient = 1; exponent += 1; }
+      return `${decimal(coefficient)} × 10<sup>${exponent}</sup>`;
+    };
+    const ratioFor = (value, maximum) => {
+      if (!Number.isFinite(value)) return 0;
+      if (scaleMode === 'log') {
+        const denominator = softplus(maximum);
+        return denominator > 0 ? Math.max(0, Math.min(1, softplus(value) / denominator)) : 0;
+      }
+      const difference = value - maximum;
+      return difference > -745 ? Math.exp(difference) : 0;
+    };
+    const messageFor = (n, logs) => {
+      if (!keys.length) return 'Selecciona una o más funciones para comenzar la comparación.';
+      if (n <= 2) return 'Al comienzo, varias funciones todavía tienen valores iguales o cercanos.';
+      if (n <= 5) return 'Las funciones polinomiales empiezan a separarse de las funciones lineal y logarítmica.';
+      if (n <= 10) return `2<sup><i>n</i></sup> ya es aproximadamente ${decimal((2 ** Math.round(n)) / Math.max(1, Math.round(n)))} veces mayor que <i>n</i>.`;
+      const factorial = logs.factorial;
+      const exponential = logs.exponential;
+      if (Number.isFinite(factorial) && Number.isFinite(exponential) && factorial > exponential) {
+        const difference = factorial - exponential;
+        const exponent = Math.floor(difference / LN10 + 1e-9);
+        const coefficient = Math.exp(difference - exponent * LN10);
+        return `<i>n</i>! es aproximadamente ${decimal(coefficient)} × 10<sup>${exponent}</sup> veces mayor que 2<sup><i>n</i></sup>.`;
+      }
+      return 'Las funciones seleccionadas se comparan con sus valores reales; solo cambia la representación visual de la escala.';
+    };
+
+    let fraction = 0;
+    let paused = false;
+    let frame = 0;
+    let started = performance.now();
+    const setHighlight = (key) => {
+      root?.querySelectorAll('[data-family], [class*="growth-family-"]').forEach((node) => {
+        const family = node.dataset?.family || [...node.classList].find((name) => name.startsWith('growth-family-'))?.replace('growth-family-', '');
+        node.classList.toggle('is-muted', Boolean(key) && family !== key);
+        node.classList.toggle('is-highlighted', Boolean(key) && family === key);
+      });
+      if (!focus) return;
+      if (!key) { focus.hidden = true; return; }
+      const n = target * fraction;
+      const logarithm = logValue(key, Math.max(0, Math.round(n)));
+      const magnitude = Number.isFinite(logarithm) ? Math.floor(logarithm / LN10 + 1e-9) : 0;
+      focus.innerHTML = `<strong>${metadata[key].formula}</strong><span>f(n) = ${formattedValue(key, n)}</span><span>Orden de magnitud: 10<sup>${magnitude}</sup></span>`;
+      focus.hidden = false;
+    };
+    const render = (nextFraction) => {
+      fraction = Math.max(0, Math.min(1, nextFraction));
+      const n = target * fraction;
+      const displayN = Math.max(0, Math.round(n));
+      if (currentLabel) currentLabel.innerHTML = `<i>n</i> = ${displayN}`;
+      if (timeline) timeline.value = String(Math.round(fraction * 1000));
+      if (progressText) progressText.textContent = `${Math.round(fraction * 100)} %`;
+      const logs = Object.fromEntries(keys.map((key) => [key, logValue(key, n)]));
+      const finite = Object.values(logs).filter(Number.isFinite);
+      const maximum = finite.length ? Math.max(...finite) : 0;
+      const order = [...keys].sort((a, b) => logs[b] - logs[a]);
+      order.forEach((key, rank) => {
+        const row = rows.get(key);
+        if (!row) return;
+        row.style.transform = `translateY(${rank * 42}px)`;
+        row.querySelector('.growth-app__rank').textContent = String(rank + 1);
+        row.querySelector('.growth-app__bar').style.width = `${ratioFor(logs[key], maximum) * 100}%`;
+        row.querySelector('.growth-app__race-value').innerHTML = formattedValue(key, n);
+      });
+      curves.forEach(({ curve, length }, key) => {
+        curve.style.strokeDashoffset = `${length * (1 - fraction)}`;
+        const position = curve.getPointAtLength(length * fraction);
+        const point = points.get(key);
+        if (point) { point.setAttribute('cx', position.x); point.setAttribute('cy', position.y); }
+      });
+      if (insight) insight.innerHTML = messageFor(displayN, logs);
+      if (focus && !focus.hidden) {
+        const highlighted = visual.querySelector('.is-highlighted[data-family]')?.dataset.family;
+        if (highlighted) setHighlight(highlighted);
+      }
+    };
+    const tick = (now) => {
+      if (!paused) {
+        render((now - started) / duration);
+        if (fraction >= 1) return;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    const app = {
+      togglePause() {
+        paused = !paused;
+        if (!paused) started = performance.now() - fraction * duration;
+      },
+      reset() { cancelAnimationFrame(frame); paused = true; render(0); },
+      destroy() { cancelAnimationFrame(frame); },
+      render,
+    };
+    registry[appId] = app;
+    [...visual.querySelectorAll('.growth-app__race-row, .growth-app__curve')].forEach((node) => {
+      node.addEventListener('mouseenter', () => setHighlight(node.dataset.family));
+      node.addEventListener('mouseleave', () => setHighlight(null));
+    });
+    keys.forEach((key) => root?.querySelectorAll(`.growth-family-${key}`).forEach((node) => {
+      node.addEventListener('mouseenter', () => setHighlight(key));
+      node.addEventListener('mouseleave', () => setHighlight(null));
+    }));
+    timeline?.addEventListener('input', (event) => {
+      paused = true;
+      render(Number(event.target.value) / 1000);
+    });
+    render(0);
+    frame = requestAnimationFrame(tick);
+  };
+  boot();
+})();
+"""
+    return (
+        template.replace("__APP_ID__", json.dumps(app_id))
+        .replace("__TARGET__", str(int(target)))
+        .replace(
+            "__DURATION__",
+            str(250.0 if int(target) == MIN_N else max(250.0, BASE_DURATION * 1000 / float(speed))),
+        )
+        .replace("__SCALE__", json.dumps(scale_mode))
+        .replace("__METADATA__", json.dumps(metadata, ensure_ascii=False))
+    )
+
+
+def _javascript_command(app_id: str, command: str) -> str:
+    return (
+        "window.__growthComparisonApps?.["
+        + json.dumps(app_id)
+        + "]?."
+        + command
+        + "?.();"
+    )
 
 
 def _styles() -> str:
@@ -354,8 +606,8 @@ def _styles() -> str:
         shared_ui_styles(".growth-comparison-app")
         + """
 <style>
-.growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.growth-comparison-app .growth-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.growth-comparison-app .growth-app__controls>.widget-box{flex:0 0 292px!important;width:292px!important;min-width:292px!important;max-width:292px!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__progress{flex:1 1 auto;width:auto!important}.growth-comparison-app .growth-app__progress .progress-bar{background:#a94728!important}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__lanes{display:grid;gap:8px}.growth-comparison-app .growth-app__lane{display:grid;grid-template-columns:110px minmax(150px,1fr) 142px;gap:10px;align-items:center;min-height:31px}.growth-comparison-app .growth-app__formula{color:var(--family-color);font-family:'STIX Two Math','Cambria Math',serif;font-size:16px;font-weight:600;text-align:center}.growth-comparison-app .growth-app__rail{height:28px;position:relative;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),#eee 25%)}.growth-comparison-app .growth-app__rail:before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:#bbb}.growth-comparison-app .growth-app__fill{position:absolute;left:0;top:calc(50% - 3px);height:6px;background:color-mix(in srgb,var(--family-color) 25%,transparent);transition:width .08s linear}.growth-comparison-app .growth-app__dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--family-color);border:2px solid #fff;box-shadow:0 0 0 1px var(--family-color);transform:translate(-50%,-50%);transition:left .08s linear}.growth-comparison-app .growth-app__value{text-align:right;white-space:nowrap;font-family:'STIX Two Math','Cambria Math',serif;font-size:14px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart-title{font-size:14px;font-weight:700;margin-bottom:10px;text-align:center}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:600 15px sans-serif}.growth-comparison-app .growth-app__legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;margin-top:12px;font:15px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__legend-item{display:inline-flex;align-items:center;gap:6px}.growth-comparison-app .growth-app__legend-item i{width:18px;border-top:3px solid var(--family-color)}
-.growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 94px minmax(90px,1fr) 104px;column-gap:12px;align-items:center;height:36px;transition:transform .18s linear}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap;padding-right:4px}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color);transition:width .08s linear}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}
+.growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.growth-comparison-app .growth-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.growth-comparison-app .growth-app__controls>.widget-box{flex:0 0 292px!important;width:292px!important;min-width:292px!important;max-width:292px!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__timeline{flex:1 1 auto!important;width:auto!important}.growth-comparison-app .growth-app__timeline-input{display:block;width:100%;accent-color:#a94728;cursor:pointer}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__focus{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:12px;padding:8px 12px;background:#f7f7f7;border-left:3px solid #a94728;font:14px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__focus[hidden]{display:none}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:600 15px sans-serif}.growth-comparison-app .is-muted{opacity:.16!important}.growth-comparison-app .is-highlighted{opacity:1!important;filter:drop-shadow(0 0 2px currentColor)}
+.growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 94px minmax(90px,1fr) 104px;column-gap:12px;align-items:center;height:36px;transition:transform .12s linear,opacity .12s linear}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap;padding-right:4px}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color)}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}.growth-comparison-app .growth-app__curve{cursor:pointer;transition:opacity .12s linear}.growth-comparison-app .growth-app__curve-point{pointer-events:none}
 .growth-comparison-app .growth-app__functions-frame{border:1px solid #767676;background:#fff;padding:6px 12px;border-radius:0;box-sizing:border-box}
 .growth-comparison-app .growth-app__functions-group{width:100%!important;min-width:0!important;max-width:none!important;overflow:visible!important}.growth-comparison-app .growth-app__functions-group>.widget-box:last-child{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 520px!important}.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:8px;width:100%}
 .growth-comparison-app .growth-app__function-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 16px;width:100%;align-items:center}
@@ -366,6 +618,8 @@ def _styles() -> str:
 .growth-comparison-app .growth-app__function-formula{flex:1 1 auto!important;width:auto!important;min-width:0!important;margin:0!important;overflow:visible!important}
 .growth-comparison-app .growth-app__function-formula .widget-html-content{font:600 17px/1.25 'STIX Two Math','Cambria Math','Scheherazade New',serif!important;color:#292929!important;white-space:nowrap!important;overflow:visible!important}
 .growth-comparison-app .growth-app__function-formula i{font-style:italic}.growth-comparison-app .growth-app__function-formula sub,.growth-comparison-app .growth-app__function-formula sup{font-size:.72em;line-height:0}
+.growth-comparison-app .growth-family-constant input{accent-color:#607d8b}.growth-comparison-app .growth-family-log input{accent-color:#00838f}.growth-comparison-app .growth-family-linear input{accent-color:#2e7d32}.growth-comparison-app .growth-family-nlogn input{accent-color:#558b2f}.growth-comparison-app .growth-family-square input{accent-color:#ef6c00}.growth-comparison-app .growth-family-cube input{accent-color:#d84315}.growth-comparison-app .growth-family-exponential input{accent-color:#ad1457}.growth-comparison-app .growth-family-factorial input{accent-color:#6a1b9a}
+.growth-comparison-app .growth-app__preset-row{display:flex!important;flex-flow:row wrap!important;align-items:center!important;gap:8px!important}.growth-comparison-app .growth-app__scale-help{color:#555;font-size:12px;margin-top:-4px}
 .growth-comparison-app .growth-app__slider-wrap{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:2px}
 .growth-comparison-app .growth-app__slider-label{font-size:12px;font-weight:600;color:#555}
 @media(max-width:900px){.growth-comparison-app .growth-app__unified{grid-template-columns:1fr}.growth-comparison-app .growth-app__race-view{order:2}.growth-comparison-app .growth-app__function-row{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__chart svg{min-height:260px}.growth-comparison-app .growth-app__race-row{grid-template-columns:18px 58px minmax(70px,1fr) 82px;gap:5px}.growth-comparison-app .growth-app__race-value{font-size:10px}}
@@ -375,6 +629,7 @@ def _styles() -> str:
 
 def run_app():
     """Muestra la simulación con el contrato visual común del portal."""
+    app_id = f"growth-{uuid.uuid4().hex}"
     n_input = bounded_int_control(
         value=DEFAULT_N,
         min_value=MIN_N,
@@ -401,20 +656,23 @@ def run_app():
     )
     selectors = {}
     selector_options = []
-    for key, formula, text, _color in FAMILIES:
+    for key, formula, text, color in FAMILIES:
         # Checkbox conserva una descripción accesible de texto plano, mientras
         # la fórmula visible usa HTML para representar variables, subíndices y
         # superíndices de forma idéntica en local, Colab y JupyterLite.
         cb = widgets.Checkbox(value=True, description=text, indent=False)
         cb.add_class("growth-app__function-checkbox")
         selectors[key] = cb
-        formula_widget = widgets.HTML(value=f'<span aria-hidden="true">{formula}</span>')
+        formula_widget = widgets.HTML(
+            value=f'<span aria-hidden="true" style="color:{color}">{formula}</span>'
+        )
         formula_widget.add_class("growth-app__function-formula")
         option = widgets.HBox(
             [cb, formula_widget],
             layout=widgets.Layout(width="100%", align_items="center", grid_gap="8px", overflow="visible"),
         )
         option.add_class("growth-app__function-option")
+        option.add_class(f"growth-family-{key}")
         selector_options.append(option)
     row1 = widgets.HBox(selector_options[:4], layout=widgets.Layout(width="100%"))
     row1.add_class("growth-app__function-row")
@@ -450,8 +708,9 @@ def run_app():
     selection_message = widgets.HTML(value="", layout=widgets.Layout(width="100%"))
     selection_message.add_class("growth-app__selection-message")
     execute_button = button_control(description="Ejecutar", button_style="success", width="128px")
+    pause_button = button_control(description="Pausar/Reanudar", button_style="", width="158px")
     reset_button = button_control(description="Reiniciar", button_style="warning", width="128px")
-    execute_button.icon, reset_button.icon = "play", "refresh"
+    execute_button.icon, pause_button.icon, reset_button.icon = "play", "pause", "refresh"
     scale_input = dropdown_control(
         options=(("Lineal", "linear"), ("Logarítmica", "log")),
         value="linear",
@@ -460,7 +719,7 @@ def run_app():
     )
     controls = widgets.Box(
         [
-            compact_labeled_control("n", n_input),
+            compact_labeled_control("n final", n_input),
             compact_labeled_control("Escala", scale_input),
             compact_labeled_control("Velocidad", speed_input),
         ],
@@ -476,16 +735,38 @@ def run_app():
     controls.add_class("growth-app__controls")
     slider_wrap = widgets.VBox(
         [
-            widgets.HTML('<label class="growth-app__slider-label">Deslizar valor de <i>n</i> manualmente (0 – 1 000):</label>'),
+            widgets.HTML('<label class="growth-app__slider-label">Valor final de <i>n</i> (0 – 1 000):</label>'),
             n_slider,
         ],
         layout=widgets.Layout(width="100%", grid_gap="2px"),
     )
     slider_wrap.add_class("growth-app__slider-wrap")
+    preset_input = dropdown_control(
+        options=PRESETS,
+        value="custom",
+        description="Combinación",
+        width="220px",
+    )
+    select_all_button = button_control(description="Seleccionar todas", button_style="", width="156px")
+    clear_button = button_control(description="Limpiar selección", button_style="", width="156px")
+    preset_row = widgets.HBox(
+        [
+            compact_labeled_control("Combinación", preset_input),
+            select_all_button,
+            clear_button,
+        ],
+        layout=widgets.Layout(width="100%", flex_flow="row wrap", align_items="center", grid_gap="8px"),
+    )
+    preset_row.add_class("growth-app__preset-row")
+    scale_help = widgets.HTML(
+        '<p class="growth-app__scale-help"><strong>La escala solo cambia la representación visual;</strong> los valores calculados permanecen iguales.</p>'
+    )
     configuration_content = widgets.VBox(
         [
             controls,
+            scale_help,
             slider_wrap,
+            preset_row,
             functions_group,
             selection_message,
         ],
@@ -498,33 +779,40 @@ def run_app():
         prefix="growth-app",
         open_by_default=True,
     )
-    progress = widgets.FloatProgress(
-        value=0,
-        min=0,
-        max=100,
-        description="",
-        layout=widgets.Layout(width="100%", height="18px"),
+    timeline = widgets.HTML(
+        '<input class="growth-app__timeline-input" type="range" min="0" max="1000" value="0" step="1" aria-label="Progreso de la simulación">',
+        layout=widgets.Layout(width="100%"),
     )
-    progress.add_class("growth-app__progress")
+    timeline.add_class("growth-app__timeline")
     progress_value = widgets.HTML('<span class="growth-app__progress-value">0 %</span>')
     progress_wrap = widgets.HBox(
-        [widgets.HTML('<span class="growth-app__progress-label">Progreso</span>'), progress, progress_value],
+        [widgets.HTML('<span class="growth-app__progress-label">Progreso</span>'), timeline, progress_value],
         layout=widgets.Layout(width="100%", align_items="center", grid_gap="10px"),
     )
     progress_wrap.add_class("growth-app__progress-wrap")
     output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0"))
-    state = {"run_id": 0, "running": False, "current": float(MIN_N), "syncing": False}
+    javascript_output = widgets.Output(
+        layout=widgets.Layout(width="0", height="0", margin="0", padding="0", overflow="hidden")
+    )
+    state = {"syncing": False, "selection_syncing": False}
 
     def selected_keys():
         return tuple(key for key, selector in selectors.items() if selector.value)
 
-    def redraw():
-        output.value = _render(state["current"], selected_keys(), str(scale_input.value))
+    def send_javascript(source):
+        with javascript_output:
+            clear_output(wait=True)
+            display(Javascript(source))
 
-    def set_progress(value):
-        bounded = max(0.0, min(100.0, float(value)))
-        progress.value = bounded
-        progress_value.value = f'<span class="growth-app__progress-value">{bounded:.0f} %</span>'
+    def redraw():
+        output.value = _render(
+            MIN_N,
+            selected_keys(),
+            str(scale_input.value),
+            app_id=app_id,
+        )
+        timeline.value = '<input class="growth-app__timeline-input" type="range" min="0" max="1000" value="0" step="1" aria-label="Progreso de la simulación">'
+        progress_value.value = '<span class="growth-app__progress-value">0 %</span>'
 
     def sync_n(value):
         state["syncing"] = True
@@ -533,105 +821,84 @@ def run_app():
         finally:
             state["syncing"] = False
 
-    def set_idle():
-        state["running"] = False
-        execute_button.disabled = n_input.disabled = n_slider.disabled = False
-
-    def cancel_run():
-        state["run_id"] += 1
-        set_idle()
-
     def on_n_change(change):
         if state["syncing"] or change.get("name") != "value":
             return
-        cancel_run()
         value = max(MIN_N, min(MAX_N, int(change["new"])))
         sync_n(value)
-        state["current"] = float(value)
-        set_progress(100)
+        send_javascript(_javascript_command(app_id, "destroy"))
         redraw()
 
     def on_function_change(change):
-        if change.get("name") != "value":
+        if state["selection_syncing"] or change.get("name") != "value":
             return
-        if not selected_keys():
-            change["owner"].value = True
-            selection_message.value = "Selecciona al menos una función."
-            return
-        selection_message.value = ""
+        state["selection_syncing"] = True
+        try:
+            preset_input.value = "custom"
+        finally:
+            state["selection_syncing"] = False
+        selection_message.value = "" if selected_keys() else "Selecciona una o más funciones para ejecutar."
+        send_javascript(_javascript_command(app_id, "destroy"))
+        redraw()
+
+    def apply_selection(keys, preset="custom"):
+        state["selection_syncing"] = True
+        try:
+            selected = set(keys)
+            for key, selector in selectors.items():
+                selector.value = key in selected
+            preset_input.value = preset
+        finally:
+            state["selection_syncing"] = False
+        selection_message.value = "" if keys else "Selecciona una o más funciones para ejecutar."
+        send_javascript(_javascript_command(app_id, "destroy"))
         redraw()
 
     def reset(*_args):
-        cancel_run()
-        state["current"] = float(MIN_N)
-        set_progress(0)
+        send_javascript(_javascript_command(app_id, "destroy"))
         redraw()
-
-    def update_frame(target, fraction):
-        state["current"] = MIN_N + (target - MIN_N) * fraction
-        set_progress(fraction * 100)
-        redraw()
-
-    async def animate_async(run_id, target, speed):
-        started, duration = time.monotonic(), BASE_DURATION / speed
-        while state["run_id"] == run_id:
-            fraction = 1.0 if target == MIN_N else min(1.0, (time.monotonic() - started) / duration)
-            update_frame(target, fraction)
-            if fraction >= 1:
-                break
-            await asyncio.sleep(FRAME_INTERVAL)
-        if state["run_id"] == run_id:
-            update_frame(target, 1)
-            set_idle()
-
-    def animate_sync(run_id, target, speed, colab_output):
-        started, duration = time.monotonic(), BASE_DURATION / speed
-        while state["run_id"] == run_id:
-            fraction = 1.0 if target == MIN_N else min(1.0, (time.monotonic() - started) / duration)
-            update_frame(target, fraction)
-            if fraction >= 1:
-                break
-            pause(FRAME_INTERVAL, colab_output)
-        if state["run_id"] == run_id:
-            update_frame(target, 1)
-            set_idle()
 
     def execute(*_args):
-        if state["running"]:
+        keys = selected_keys()
+        if not keys:
+            selection_message.value = "Selecciona una o más funciones para ejecutar."
             return
         target, speed = int(n_input.value), float(speed_input.value)
         sync_n(target)
-        state["run_id"] += 1
-        run_id = state["run_id"]
-        state["running"] = True
-        execute_button.disabled = n_input.disabled = n_slider.disabled = True
-        update_frame(target, 0)
-        try:
-            from google.colab import output as colab_output
-        except ImportError:
-            colab_output = None
-        if colab_output is not None:
-            animate_sync(run_id, target, speed, colab_output)
-        else:
-            try:
-                asyncio.get_running_loop().create_task(animate_async(run_id, target, speed))
-            except RuntimeError:
-                asyncio.run(animate_async(run_id, target, speed))
+        output.value = _render(target, keys, str(scale_input.value), app_id=app_id)
+        send_javascript(
+            _javascript_app(app_id, target, keys, str(scale_input.value), speed)
+        )
+
+    def toggle_pause(*_args):
+        send_javascript(_javascript_command(app_id, "togglePause"))
+
+    def on_preset_change(change):
+        if state["selection_syncing"] or change.get("name") != "value":
+            return
+        preset = str(change["new"])
+        if preset != "custom":
+            apply_selection(PRESET_KEYS[preset], preset)
 
     n_input.observe(on_n_change, names="value")
     n_slider.observe(on_n_change, names="value")
-    scale_input.observe(lambda change: redraw() if change.get("name") == "value" else None, names="value")
+    scale_input.observe(lambda change: reset() if change.get("name") == "value" else None, names="value")
+    preset_input.observe(on_preset_change, names="value")
     for selector in selectors.values():
         selector.observe(on_function_change, names="value")
     execute_button.on_click(execute)
+    pause_button.on_click(toggle_pause)
     reset_button.on_click(reset)
+    select_all_button.on_click(lambda *_args: apply_selection(PRESET_KEYS["all"], "all"))
+    clear_button.on_click(lambda *_args: apply_selection((), "custom"))
     root = widgets.VBox(
         [
             widgets.HTML(value=_styles(), layout=widgets.Layout(width="0", height="0", margin="0")),
             configuration_panel,
             progress_wrap,
-            action_button_row([execute_button, reset_button]),
+            action_button_row([execute_button, pause_button, reset_button]),
             output,
+            javascript_output,
         ],
         layout=widgets.Layout(width="100%", grid_gap="0", overflow="visible"),
     )
@@ -641,4 +908,4 @@ def run_app():
     return root
 
 
-__all__ = ["FAMILIES", "MAX_N", "SPEED_OPTIONS", "_exact_value", "_render", "run_app"]
+__all__ = ["FAMILIES", "MAX_N", "PRESETS", "SPEED_OPTIONS", "_exact_value", "_render", "run_app"]

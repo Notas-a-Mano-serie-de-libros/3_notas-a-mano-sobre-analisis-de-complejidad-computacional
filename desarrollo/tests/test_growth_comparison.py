@@ -11,6 +11,7 @@ from simulaciones.capitulo2.runtime.growth_comparison import (
     _format_exact_value,
     _log_value,
     _render,
+    _javascript_app,
     _styles,
 )
 
@@ -96,7 +97,7 @@ def test_render_starts_at_zero_and_uses_dense_curves():
     assert ">f(n)</text>" in rendered
 
     later = _render(5, ("linear",))
-    points = later.split('<polyline points="', 1)[1].split('"', 1)[0].split()
+    points = later.split('points="', 1)[1].split('"', 1)[0].split()
     assert len(points) == 181
 
 
@@ -111,6 +112,17 @@ def test_bar_positions_use_continuous_n_while_labels_stay_exact():
 def test_public_limits_and_speeds_match_the_portal_contract():
     assert MAX_N == 1_000
     assert tuple(label for label, _value in SPEED_OPTIONS) == ("1x", "2x", "5x", "10x")
+
+
+def test_browser_runtime_uses_request_animation_frame_and_interactive_focus():
+    source = _javascript_app("test-app", 100, ("linear", "square"), "log", 2.0)
+
+    assert "requestAnimationFrame" in source
+    assert "togglePause" in source
+    assert "growth-app__timeline-input" in source
+    assert "setHighlight" in source
+    assert "logGamma" in source
+    assert 'const scaleMode = "log"' in source
 
 
 def test_jupyterlite_executes_the_versioned_runtime_embedded_in_the_notebook():

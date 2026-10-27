@@ -46,11 +46,11 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador: no abre
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo2/notebooks/3_complejidad_lineal.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F3_complejidad_lineal.ipynb&revision=7d5c00b11173" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F3_complejidad_lineal.ipynb&revision=4bf2d02b77a8" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F3_complejidad_lineal.ipynb&revision=7d5c00b11173"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F3_complejidad_lineal.ipynb&revision=4bf2d02b77a8"
     title="Simulación interactiva de complejidad lineal en JupyterLite"
     loading="lazy"
     scrolling="no"
