@@ -5,7 +5,10 @@ import json
 import math
 from pathlib import Path
 
+import ipywidgets as widgets
+
 from simulaciones.capitulo2.runtime.growth_comparison import (
+    BASE_DURATION,
     FAMILIES,
     MAX_N,
     SPEED_OPTIONS,
@@ -16,6 +19,7 @@ from simulaciones.capitulo2.runtime.growth_comparison import (
     _log_value,
     _render,
     _styles,
+    run_app,
 )
 
 
@@ -114,6 +118,7 @@ def test_bar_positions_use_continuous_n_while_labels_stay_exact():
 
 def test_public_limits_and_speeds_match_the_portal_contract():
     assert MAX_N == 1_000
+    assert BASE_DURATION == 20.0
     assert tuple(label for label, _value in SPEED_OPTIONS) == ("1x", "2x", "5x", "10x")
 
 
@@ -129,7 +134,36 @@ def test_browser_runtime_uses_request_animation_frame_and_interactive_focus():
     assert "curve.setAttribute('points'" in source
     assert "growth-app__y-tick" in source
     assert "growth-app__x-tick" in source
+    assert "if (!visual.isConnected) return" in source
     assert 'const scaleMode = "log"' in source
+
+
+def test_reset_returns_every_n_control_to_zero_and_all_buttons_have_icons():
+    root = run_app()
+
+    def descendants(widget):
+        yield widget
+        for child in getattr(widget, "children", ()):
+            yield from descendants(child)
+
+    controls = tuple(descendants(root))
+    n_controls = tuple(
+        control
+        for control in controls
+        if isinstance(control, (widgets.BoundedIntText, widgets.IntSlider))
+        and control.max == MAX_N
+    )
+    for control in n_controls:
+        control.value = 250
+
+    buttons = tuple(control for control in controls if isinstance(control, widgets.Button))
+    reset_button = next(button for button in buttons if button.description == "Reiniciar")
+    reset_button.click()
+
+    assert n_controls
+    assert all(control.value == 0 for control in n_controls)
+    assert all(button.icon for button in buttons)
+    assert "justify-content:center" in _styles()
 
 
 def test_jupyterlite_executes_the_versioned_runtime_embedded_in_the_notebook():

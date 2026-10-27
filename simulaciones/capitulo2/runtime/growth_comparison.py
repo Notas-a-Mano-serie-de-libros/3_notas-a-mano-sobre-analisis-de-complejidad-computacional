@@ -22,7 +22,7 @@ from common.widget_controls import (
 
 MIN_N, MAX_N, DEFAULT_N = 0, 1_000, 100
 SPEED_OPTIONS = (("1x", 1.0), ("2x", 2.0), ("5x", 5.0), ("10x", 10.0))
-BASE_DURATION, LN_10 = 10.0, math.log(10)
+BASE_DURATION, LN_10 = 20.0, math.log(10)
 PRESETS = (
     ("Personalizada", "custom"),
     ("Crecimiento moderado", "moderate"),
@@ -589,6 +589,7 @@ def _javascript_app(
       }
     };
     const tick = (now) => {
+      if (!visual.isConnected) return;
       if (!paused) {
         render((now - started) / duration);
         if (fraction >= 1) return;
@@ -653,7 +654,7 @@ def _styles() -> str:
 .growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.growth-comparison-app .growth-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.growth-comparison-app .growth-app__controls>.widget-box{flex:0 0 292px!important;width:292px!important;min-width:292px!important;max-width:292px!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__timeline{flex:1 1 auto!important;width:auto!important}.growth-comparison-app .growth-app__timeline-input{display:block;width:100%;accent-color:#a94728;cursor:pointer}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__focus{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:12px;padding:8px 12px;background:#f7f7f7;border-left:3px solid #a94728;font:14px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__focus[hidden]{display:none}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:600 15px sans-serif}.growth-comparison-app .is-muted{opacity:.16!important}.growth-comparison-app .is-highlighted{opacity:1!important;filter:drop-shadow(0 0 2px currentColor)}
 .growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 94px minmax(90px,1fr) 104px;column-gap:12px;align-items:center;height:36px;transition:transform .12s linear,opacity .12s linear}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap;padding-right:4px}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color)}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}.growth-comparison-app .growth-app__curve{cursor:pointer;transition:opacity .12s linear}.growth-comparison-app .growth-app__curve-point{pointer-events:none}
 .growth-comparison-app .growth-app__functions-frame{border:1px solid #767676;background:#fff;padding:6px 12px;border-radius:0;box-sizing:border-box}
-.growth-comparison-app .growth-app__functions-group{width:100%!important;min-width:0!important;max-width:none!important;overflow:visible!important}.growth-comparison-app .growth-app__functions-group>.widget-box:last-child{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 520px!important}.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:8px;width:100%}
+.growth-comparison-app .growth-app__functions-group{width:100%!important;min-width:0!important;max-width:none!important;overflow:visible!important;align-items:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label{align-self:stretch!important;height:auto!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label .compact-control-label{display:block!important;width:100%!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.widget-box:last-child{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 520px!important}.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:8px;width:100%}
 .growth-comparison-app .growth-app__function-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 16px;width:100%;align-items:center}
 .growth-comparison-app .growth-app__function-option{display:flex!important;align-items:center!important;gap:8px!important;width:100%!important;min-width:0!important;overflow:visible!important}
 .growth-comparison-app .growth-app__function-checkbox{flex:0 0 18px!important;width:18px!important;min-width:18px!important;margin:0!important;overflow:visible!important}
@@ -793,6 +794,7 @@ def run_app():
     )
     select_all_button = button_control(description="Seleccionar todas", button_style="", width="156px")
     clear_button = button_control(description="Limpiar selección", button_style="", width="156px")
+    select_all_button.icon, clear_button.icon = "check-square-o", "eraser"
     preset_row = widgets.HBox(
         [
             compact_labeled_control("Combinación", preset_input),
@@ -838,7 +840,7 @@ def run_app():
     javascript_output = widgets.Output(
         layout=widgets.Layout(width="0", height="0", margin="0", padding="0", overflow="hidden")
     )
-    state = {"syncing": False, "selection_syncing": False}
+    state = {"syncing": False, "selection_syncing": False, "render_revision": 0}
 
     def selected_keys():
         return tuple(key for key, selector in selectors.items() if selector.value)
@@ -849,14 +851,21 @@ def run_app():
             display(Javascript(source))
 
     def redraw():
+        state["render_revision"] += 1
+        revision = state["render_revision"]
         output.value = _render(
             MIN_N,
             selected_keys(),
             str(scale_input.value),
             app_id=app_id,
         )
-        timeline.value = '<input class="growth-app__timeline-input" type="range" min="0" max="1000" value="0" step="1" aria-label="Progreso de la simulación">'
-        progress_value.value = '<span class="growth-app__progress-value">0 %</span>'
+        timeline.value = (
+            '<input class="growth-app__timeline-input" type="range" min="0" max="1000" value="0" step="1" '
+            f'aria-label="Progreso de la simulación" data-render-revision="{revision}">'
+        )
+        progress_value.value = (
+            f'<span class="growth-app__progress-value" data-render-revision="{revision}">0 %</span>'
+        )
 
     def sync_n(value):
         state["syncing"] = True
@@ -898,8 +907,13 @@ def run_app():
         send_javascript(_javascript_command(app_id, "destroy"))
         redraw()
 
-    def reset(*_args):
+    def reset_view(*_args):
         send_javascript(_javascript_command(app_id, "destroy"))
+        redraw()
+
+    def reset_all(*_args):
+        send_javascript(_javascript_command(app_id, "destroy"))
+        sync_n(MIN_N)
         redraw()
 
     def execute(*_args):
@@ -926,13 +940,13 @@ def run_app():
 
     n_input.observe(on_n_change, names="value")
     n_slider.observe(on_n_change, names="value")
-    scale_input.observe(lambda change: reset() if change.get("name") == "value" else None, names="value")
+    scale_input.observe(lambda change: reset_view() if change.get("name") == "value" else None, names="value")
     preset_input.observe(on_preset_change, names="value")
     for selector in selectors.values():
         selector.observe(on_function_change, names="value")
     execute_button.on_click(execute)
     pause_button.on_click(toggle_pause)
-    reset_button.on_click(reset)
+    reset_button.on_click(reset_all)
     select_all_button.on_click(lambda *_args: apply_selection(PRESET_KEYS["all"], "all"))
     clear_button.on_click(lambda *_args: apply_selection((), "custom"))
     root = widgets.VBox(
