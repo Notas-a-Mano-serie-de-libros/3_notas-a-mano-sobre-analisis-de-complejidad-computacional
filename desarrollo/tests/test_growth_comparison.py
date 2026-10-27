@@ -1,3 +1,6 @@
+import ast
+import base64
+import gzip
 import json
 import math
 from pathlib import Path
@@ -122,6 +125,10 @@ def test_browser_runtime_uses_request_animation_frame_and_interactive_focus():
     assert "growth-app__timeline-input" in source
     assert "setHighlight" in source
     assert "logGamma" in source
+    assert "updateChart(n, logs, maximum)" in source
+    assert "curve.setAttribute('points'" in source
+    assert "growth-app__y-tick" in source
+    assert "growth-app__x-tick" in source
     assert 'const scaleMode = "log"' in source
 
 
@@ -135,3 +142,8 @@ def test_jupyterlite_executes_the_versioned_runtime_embedded_in_the_notebook():
 
     assert 'or sys.platform == "emscripten"' in source
     assert "gzip.decompress(base64.b64decode(_runtime_payload))" in source
+    payload_line = next(line for line in source.splitlines() if line.strip().startswith("_runtime_payload ="))
+    payload = ast.literal_eval(payload_line.split("=", 1)[1].strip())
+    embedded_runtime = gzip.decompress(base64.b64decode(payload))
+    runtime_path = notebook_path.parents[1] / "runtime/growth_comparison.py"
+    assert embedded_runtime == runtime_path.read_bytes()

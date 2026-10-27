@@ -251,7 +251,8 @@ def _render_chart(current_n: float, selected_keys: tuple[str, ...], scale_mode: 
     for ratio, label in ticks_data:
         y = top + (1 - ratio) * plot_height
         grid.append(
-            f'<line x1="{left}" y1="{y:.2f}" x2="{width - right}" y2="{y:.2f}" /><text x="{left - 12}" y="{y + 4:.2f}" text-anchor="end">{label}</text>'
+            f'<line x1="{left}" y1="{y:.2f}" x2="{width - right}" y2="{y:.2f}" />'
+            f'<text class="growth-app__y-tick" data-ratio="{ratio:.2f}" x="{left - 12}" y="{y + 4:.2f}" text-anchor="end">{label}</text>'
         )
 
     lines = []
@@ -267,7 +268,11 @@ def _render_chart(current_n: float, selected_keys: tuple[str, ...], scale_mode: 
         )
     candidates = (0, max(1, round(x_max / 2)), max(1, round(x_max)))
     ticks = list(dict.fromkeys(candidates))
-    x_labels = "".join(f'<text x="{left + value / max(1, x_max) * plot_width:.2f}" y="{height - 30}" text-anchor="middle">{value}</text>' for value in ticks)
+    x_labels = "".join(
+        f'<text class="growth-app__x-tick" data-ratio="{value / max(1, x_max):.2f}" '
+        f'x="{left + value / max(1, x_max) * plot_width:.2f}" y="{height - 30}" text-anchor="middle">{value}</text>'
+        for value in ticks
+    )
     scale_label = "Escala logarítmica" if scale_mode == "log" else "Escala lineal"
     return f"""
       <div class="growth-app__chart" role="img" aria-label="Gráfica de las funciones seleccionadas ({scale_label})">
@@ -402,15 +407,14 @@ def _javascript_app(
     const insight = visual.querySelector('.growth-app__insight');
     const focus = visual.querySelector('.growth-app__focus');
     const currentLabel = visual.querySelector('.growth-app__current strong');
-    const curves = new Map();
-    visual.querySelectorAll('.growth-app__curve').forEach((curve) => {
-      const length = curve.getTotalLength();
-      curve.style.strokeDasharray = `${length}`;
-      curves.set(curve.dataset.family, { curve, length });
-    });
+    const curves = new Map(
+      [...visual.querySelectorAll('.growth-app__curve')].map((curve) => [curve.dataset.family, curve])
+    );
     const points = new Map(
       [...visual.querySelectorAll('.growth-app__curve-point')].map((node) => [node.dataset.family, node])
     );
+    const xTicks = [...visual.querySelectorAll('.growth-app__x-tick')];
+    const yTicks = [...visual.querySelectorAll('.growth-app__y-tick')];
     const rows = new Map(
       [...visual.querySelectorAll('.growth-app__race-row')].map((node) => [node.dataset.family, node])
     );
@@ -448,6 +452,18 @@ def _javascript_app(
       if (Math.abs(value - Math.round(value)) < 1e-9) return String(Math.round(value));
       return value.toFixed(digits).replace(/0+$/, '').replace(/\.$/, '').replace('.', ',');
     };
+    const scientific = (logarithm) => {
+      if (!Number.isFinite(logarithm)) return '0';
+      if (logarithm < Math.log(1e6)) return decimal(Math.exp(logarithm));
+      let exponent = Math.floor(logarithm / LN10 + 1e-9);
+      let coefficient = Math.exp(logarithm - exponent * LN10);
+      if (coefficient >= 9.995) { coefficient = 1; exponent += 1; }
+      return `${decimal(coefficient)} × 10<tspan dy="-5" font-size="9">${exponent}</tspan><tspan dy="5"></tspan>`;
+    };
+    const inverseSoftplus = (value) => {
+      if (value <= 0) return -Infinity;
+      return value > 36 ? value + Math.log1p(-Math.exp(-value)) : Math.log(Math.expm1(value));
+    };
     const formattedValue = (key, n) => {
       const rounded = Math.max(0, Math.round(n));
       let value;
@@ -478,6 +494,39 @@ def _javascript_app(
       }
       const difference = value - maximum;
       return difference > -745 ? Math.exp(difference) : 0;
+    };
+    const updateChart = (n, logs, maximum) => {
+      const domain = Math.max(1, n);
+      const left = 100, top = 24, plotWidth = 530, plotHeight = 334;
+      const samples = 181;
+      curves.forEach((curve, key) => {
+        const coordinates = [];
+        for (let index = 0; index < samples; index += 1) {
+          const xValue = domain * index / (samples - 1);
+          const x = left + index / (samples - 1) * plotWidth;
+          const y = top + (1 - ratioFor(logValue(key, xValue), maximum)) * plotHeight;
+          coordinates.push(`${x.toFixed(2)},${y.toFixed(2)}`);
+        }
+        curve.setAttribute('points', coordinates.join(' '));
+        const point = points.get(key);
+        if (point) {
+          point.setAttribute('cx', String(left + plotWidth));
+          point.setAttribute('cy', String(top + (1 - ratioFor(logs[key], maximum)) * plotHeight));
+        }
+      });
+      xTicks.forEach((tick) => {
+        const ratio = Number(tick.dataset.ratio);
+        tick.textContent = decimal(domain * ratio, domain < 10 ? 1 : 0);
+      });
+      const transformedMaximum = softplus(maximum);
+      yTicks.forEach((tick) => {
+        const ratio = Number(tick.dataset.ratio);
+        if (ratio === 0) { tick.textContent = '0'; return; }
+        const tickLog = scaleMode === 'log'
+          ? inverseSoftplus(transformedMaximum * ratio)
+          : maximum + Math.log(ratio);
+        tick.innerHTML = scientific(tickLog);
+      });
     };
     const messageFor = (n, logs) => {
       if (!keys.length) return 'Selecciona una o más funciones para comenzar la comparación.';
@@ -532,12 +581,7 @@ def _javascript_app(
         row.querySelector('.growth-app__bar').style.width = `${ratioFor(logs[key], maximum) * 100}%`;
         row.querySelector('.growth-app__race-value').innerHTML = formattedValue(key, n);
       });
-      curves.forEach(({ curve, length }, key) => {
-        curve.style.strokeDashoffset = `${length * (1 - fraction)}`;
-        const position = curve.getPointAtLength(length * fraction);
-        const point = points.get(key);
-        if (point) { point.setAttribute('cx', position.x); point.setAttribute('cy', position.y); }
-      });
+      updateChart(n, logs, maximum);
       if (insight) insight.innerHTML = messageFor(displayN, logs);
       if (focus && !focus.hidden) {
         const highlighted = visual.querySelector('.is-highlighted[data-family]')?.dataset.family;
