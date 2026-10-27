@@ -35,6 +35,15 @@ def test_unified_view_labels_axes_and_only_selected_functions():
     assert "n!" not in rendered
     assert "<circle" in rendered
     assert "growth-app__bar" in rendered
+    assert "growth-app__legend" not in rendered
+
+
+def test_scale_mode_selection_linear_and_log():
+    linear = _render(10, ("linear", "square"), scale_mode="linear")
+    log = _render(10, ("linear", "square"), scale_mode="log")
+    assert "Escala lineal" in linear
+    assert "Escala logarítmica" in log
+    assert linear != log
 
 
 def test_chart_at_one_and_single_zero_function_is_valid():

@@ -89,11 +89,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo8/notebooks/3_ordenamiento_insercion.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F3_ordenamiento_insercion.ipynb&revision=8a8d58eb9bc8" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F3_ordenamiento_insercion.ipynb&revision=d78afb9ecd72" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F3_ordenamiento_insercion.ipynb&revision=8a8d58eb9bc8"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F3_ordenamiento_insercion.ipynb&revision=d78afb9ecd72"
     title="Simulación interactiva de Ordenamiento por inserción en JupyterLite"
     loading="lazy"
     scrolling="no"
