@@ -59,7 +59,7 @@ La notación \(C(n)\) representa de forma general una función de costo temporal
 
 ### Simulación · Crecimiento de las funciones
 
-La diferencia entre estas familias puede parecer pequeña cuando el valor de \(n\) es reducido. Elige un valor de hasta \(1000\) y ejecuta la simulación para observar, en escala lineal real, cómo las funciones de crecimiento más rápido dejan atrás a las demás. La vista de gráfica permite estudiar el mismo fenómeno como curvas de crecimiento.
+La diferencia entre estas familias puede parecer pequeña cuando el valor de \(n\) es reducido. Elige un valor de hasta \(1000\) y ejecuta la simulación para observar, en escala lineal real, cómo las funciones de crecimiento más rápido dejan atrás a las demás. La gráfica y la carrera de barras se actualizan simultáneamente para mostrar el mismo proceso desde dos perspectivas.
 
 <!-- local-execution:start -->
 <details class="local-execution" markdown="1">
@@ -85,7 +85,7 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador. La prim
 
 1. Espera a que el indicador del kernel muestre **Python (Pyodide)**.
 2. La simulación se ejecuta automáticamente cuando el kernel esté listo.
-3. Configura \(n\), la vista y la velocidad; luego utiliza **Ejecutar** o **Reiniciar**.
+3. Configura \(n\), la velocidad y las funciones visibles; luego utiliza **Ejecutar** o **Reiniciar**.
 
 <div class="jupyterlite-demo">
   <div class="jupyterlite-demo__toolbar">
@@ -93,11 +93,11 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador. La prim
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo2/notebooks/0_comparacion_crecimiento.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=9b88b4371b34" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=8a8d58eb9bc8" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=9b88b4371b34"
+    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=8a8d58eb9bc8"
     title="Comparación interactiva del crecimiento de funciones en JupyterLite"
     loading="lazy"
     scrolling="no"

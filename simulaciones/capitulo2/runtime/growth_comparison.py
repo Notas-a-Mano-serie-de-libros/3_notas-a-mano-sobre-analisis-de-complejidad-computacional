@@ -23,8 +23,7 @@ from common.widget_controls import (
 
 MIN_N, MAX_N, DEFAULT_N = 1, 1_000, 100
 SPEED_OPTIONS = (("1x", 1.0), ("2x", 2.0), ("5x", 5.0), ("10x", 10.0))
-VIEW_OPTIONS = (("Comparación proporcional", "comparison"), ("Gráfica", "chart"))
-FRAME_INTERVAL, BASE_DURATION, LN_10 = 1 / 24, 10.0, math.log(10)
+FRAME_INTERVAL, BASE_DURATION, LN_10 = 1 / 30, 10.0, math.log(10)
 FAMILIES = (
     ("constant", "1", "1", "#607d8b"),
     ("log", "log<sub>2</sub>(<i>n</i>)", "log₂(n)", "#00838f"),
@@ -128,9 +127,9 @@ def _format_log_axis(log_value: float | None) -> str:
 
 
 def _svg_polyline(key: str, x_max: float, log_maximum: float, width: int, height: int) -> str:
-    left, right, top, bottom = 96, 22, 24, 54
+    left, right, top, bottom = 90, 18, 22, 48
     plot_width, plot_height = width - left - right, height - top - bottom
-    sample_count = max(2, min(220, int(x_max) + 1))
+    sample_count = max(2, min(100, int(x_max) + 1))
     points = []
     for index in range(sample_count):
         x_value = 1 + (x_max - 1) * index / (sample_count - 1)
@@ -140,9 +139,9 @@ def _svg_polyline(key: str, x_max: float, log_maximum: float, width: int, height
     return " ".join(points)
 
 
-def _render_chart(current_n: int, selected_keys: tuple[str, ...]) -> str:
-    width, height = 860, 400
-    left, right, top, bottom = 96, 22, 24, 54
+def _render_chart(current_n: float, selected_keys: tuple[str, ...]) -> str:
+    width, height = 650, 400
+    left, right, top, bottom = 90, 18, 22, 48
     plot_width, plot_height = width - left - right, height - top - bottom
     x_max = max(2, current_n)
     final_logs = [_log_value(key, current_n) for key in selected_keys]
@@ -159,16 +158,15 @@ def _render_chart(current_n: int, selected_keys: tuple[str, ...]) -> str:
     lines = []
     for key in selected_keys:
         _, _, text, color = FAMILY_BY_KEY[key]
-        point_x = left + (current_n - 1) / max(1, x_max - 1) * plot_width
+        point_x = left + (current_n - 1) / max(1.0, x_max - 1) * plot_width
         point_y = top + (1 - _ratio(_log_value(key, current_n), log_maximum)) * plot_height
         lines.append(
             f'<polyline points="{_svg_polyline(key, x_max, log_maximum, width, height)}" '
             f'fill="none" stroke="{color}" stroke-width="2.5" vector-effect="non-scaling-stroke">'
             f'<title>{escape(text)}</title></polyline><circle cx="{point_x:.2f}" cy="{point_y:.2f}" '
-            f'r="4" fill="{color}"><title>{escape(text)} = '
-            f'{escape(_format_exact_value(_exact_value(key, current_n), html=False))}</title></circle>'
+            f'r="4" fill="{color}"><title>{escape(text)}</title></circle>'
         )
-    candidates = (1, max(1, round((x_max + 1) / 2)), x_max)
+    candidates = (1, max(1, round((x_max + 1) / 2)), max(1, round(current_n)))
     ticks = list(dict.fromkeys(candidates))
     x_labels = "".join(
         f'<text x="{left + (value-1)/max(1, x_max-1)*plot_width:.2f}" '
@@ -179,18 +177,47 @@ def _render_chart(current_n: int, selected_keys: tuple[str, ...]) -> str:
         f'<span>{escape(FAMILY_BY_KEY[key][2])}</span></span>' for key in selected_keys
     )
     return f"""
-      <div class="growth-app__chart-title">Valor de C(n) — escala lineal real</div>
       <div class="growth-app__chart" role="img" aria-label="Gráfica lineal de las funciones seleccionadas">
         <svg viewBox="0 0 {width} {height}" preserveAspectRatio="xMidYMid meet">
           <g class="growth-app__grid">{''.join(grid)}</g>
           <line class="growth-app__axis" x1="{left}" y1="{top}" x2="{left}" y2="{height-bottom}" />
           <line class="growth-app__axis" x1="{left}" y1="{height-bottom}" x2="{width-right}" y2="{height-bottom}" />
           {''.join(lines)}<g class="growth-app__x-labels">{x_labels}</g>
-          <text class="growth-app__axis-name" x="{left + plot_width/2:.2f}" y="{height-5}" text-anchor="middle">Tamaño de entrada n</text>
+          <text class="growth-app__axis-name" x="{left + plot_width/2:.2f}" y="{height-4}" text-anchor="middle">Tamaño de entrada n</text>
           <text class="growth-app__axis-name" transform="translate(18 {top + plot_height/2:.2f}) rotate(-90)" text-anchor="middle">Costo C(n)</text>
         </svg>
       </div><div class="growth-app__legend" aria-label="Leyenda">{legend}</div>
     """
+
+
+def _render_race(current_n: float, display_n: int, selected_keys: tuple[str, ...]) -> str:
+    """Crea una carrera de barras ordenada por el valor actual de cada función."""
+    visual_logs = {key: _log_value(key, current_n) for key in selected_keys}
+    log_maximum = max((value for value in visual_logs.values() if value is not None), default=0.0)
+    order = sorted(
+        selected_keys,
+        key=lambda key: visual_logs[key] if visual_logs[key] is not None else -math.inf,
+        reverse=True,
+    )
+    rows = []
+    for rank, key in enumerate(order, start=1):
+        _, formula, text, color = FAMILY_BY_KEY[key]
+        exact_value = _exact_value(key, display_n)
+        width = _ratio(visual_logs[key], log_maximum) * 100
+        rows.append(
+            f'<div class="growth-app__race-row" style="--family-color:{color}">'
+            f'<span class="growth-app__rank">{rank}</span>'
+            f'<span class="growth-app__race-formula">{formula}</span>'
+            '<span class="growth-app__bar-track" aria-hidden="true">'
+            f'<span class="growth-app__bar" style="width:{width:.12g}%"></span></span>'
+            f'<output class="growth-app__race-value">{_format_exact_value(exact_value)}</output>'
+            "</div>"
+        )
+    return (
+        '<div class="growth-app__race" role="img" '
+        'aria-label="Carrera de barras de las funciones seleccionadas">'
+        f'{"".join(rows)}</div>'
+    )
 
 
 def _comparison_message(n: int, logs: dict[str, float | None]) -> str:
@@ -210,28 +237,17 @@ def _comparison_message(n: int, logs: dict[str, float | None]) -> str:
     return "Las funciones seleccionadas se comparan sin comprimir sus diferencias de magnitud."
 
 
-def _render(current_n: float, view: str, selected_keys: tuple[str, ...] | None = None) -> str:
+def _render(current_n: float, selected_keys: tuple[str, ...] | None = None) -> str:
     if selected_keys is None:
         selected_keys = tuple(family[0] for family in FAMILIES)
     n = max(MIN_N, min(MAX_N, int(round(current_n))))
-    logs = {key: _log_value(key, n) for key in selected_keys}
-    log_maximum = max((value for value in logs.values() if value is not None), default=0.0)
-    rows = []
-    for key in selected_keys:
-        _, formula, text, color = FAMILY_BY_KEY[key]
-        value = _exact_value(key, n)
-        position = _ratio(logs[key], log_maximum) * 100
-        rows.append(
-            f'<div class="growth-app__lane" style="--family-color:{color}" '
-            f'aria-label="{escape(text)}: {escape(_format_exact_value(value, html=False))}">'
-            f'<span class="growth-app__formula">{formula}</span><span class="growth-app__rail" aria-hidden="true">'
-            f'<span class="growth-app__fill" style="width:{position:.12g}%"></span>'
-            f'<span class="growth-app__dot" style="left:clamp(.42rem,{position:.12g}%,calc(100% - .42rem))"></span>'
-            f'</span><output class="growth-app__value">{_format_exact_value(value)}</output></div>'
-        )
+    logs = {key: _log_value(key, current_n) for key in selected_keys}
     visualization = (
-        f'<div class="growth-app__lanes">{"".join(rows)}</div>'
-        if view == "comparison" else _render_chart(n, selected_keys)
+        '<div class="growth-app__unified">'
+        '<section class="growth-app__view"><h4>Crecimiento de las curvas</h4>'
+        f'{_render_chart(current_n, selected_keys)}</section>'
+        '<section class="growth-app__view growth-app__race-view"><h4>Carrera de crecimiento</h4>'
+        f'{_render_race(current_n, n, selected_keys)}</section></div>'
     )
     return f"""
       <section class="growth-app__visual"><header class="growth-app__header">
@@ -247,7 +263,8 @@ def _styles() -> str:
     return shared_ui_styles(".growth-comparison-app") + """
 <style>
 .growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0;gap:12px}.growth-comparison-app .growth-app__controls{display:flex;flex-flow:row wrap;gap:12px 36px;align-items:center;width:100%}.growth-comparison-app .growth-app__function-grid{display:flex;flex-flow:row wrap;gap:4px 20px;width:100%}.growth-comparison-app .growth-app__function-grid .widget-checkbox{width:132px!important;min-width:132px!important;margin:0!important}.growth-comparison-app .growth-app__function-grid .widget-label{font-family:'STIX Two Math','Cambria Math',serif!important;font-weight:500!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__progress{flex:1 1 auto;width:auto!important}.growth-comparison-app .growth-app__progress .progress-bar{background:#a94728!important}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__lanes{display:grid;gap:8px}.growth-comparison-app .growth-app__lane{display:grid;grid-template-columns:110px minmax(150px,1fr) 142px;gap:10px;align-items:center;min-height:31px}.growth-comparison-app .growth-app__formula{color:var(--family-color);font-family:'STIX Two Math','Cambria Math',serif;font-size:16px;font-weight:600;text-align:center}.growth-comparison-app .growth-app__rail{height:28px;position:relative;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(25% - 1px),#eee 25%)}.growth-comparison-app .growth-app__rail:before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:#bbb}.growth-comparison-app .growth-app__fill{position:absolute;left:0;top:calc(50% - 3px);height:6px;background:color-mix(in srgb,var(--family-color) 25%,transparent);transition:width .12s linear}.growth-comparison-app .growth-app__dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--family-color);border:2px solid #fff;box-shadow:0 0 0 1px var(--family-color);transform:translate(-50%,-50%);transition:left .12s linear}.growth-comparison-app .growth-app__value{text-align:right;white-space:nowrap;font-family:'STIX Two Math','Cambria Math',serif;font-size:14px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart-title{font-size:14px;font-weight:700;margin-bottom:10px;text-align:center}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:12px sans-serif}.growth-comparison-app .growth-app__legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 18px;margin-top:12px;font:15px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__legend-item{display:inline-flex;align-items:center;gap:6px}.growth-comparison-app .growth-app__legend-item i{width:18px;border-top:3px solid var(--family-color)}
-@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__lane{grid-template-columns:62px minmax(90px,1fr) 90px;gap:5px}.growth-comparison-app .growth-app__value{font-size:11px}.growth-comparison-app .growth-app__chart svg{min-height:260px}}
+.growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(330px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{display:grid;gap:8px}.growth-comparison-app .growth-app__race-row{display:grid;grid-template-columns:20px 66px minmax(90px,1fr) 104px;gap:7px;align-items:center;min-height:35px}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color);transition:width .08s linear}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}
+@media(max-width:900px){.growth-comparison-app .growth-app__unified{grid-template-columns:1fr}.growth-comparison-app .growth-app__race-view{order:2}}@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__chart svg{min-height:260px}.growth-comparison-app .growth-app__race-row{grid-template-columns:18px 58px minmax(70px,1fr) 82px;gap:5px}.growth-comparison-app .growth-app__race-value{font-size:10px}}
 </style>"""
 
 
@@ -256,9 +273,6 @@ def run_app():
     n_input = bounded_int_control(
         value=DEFAULT_N, min_value=MIN_N, max_value=MAX_N, step=1,
         description="n", width="180px",
-    )
-    view_input = dropdown_control(
-        options=VIEW_OPTIONS, value="comparison", description="Vista", width="250px",
     )
     speed_input = dropdown_control(
         options=SPEED_OPTIONS, value=1.0, description="Velocidad", width="160px",
@@ -284,7 +298,6 @@ def run_app():
     controls = widgets.Box(
         [
             compact_labeled_control("n objetivo", n_input),
-            compact_labeled_control("Vista", view_input, field_width=250, group_width=350),
             compact_labeled_control("Velocidad", speed_input),
         ],
         layout=widgets.Layout(width="100%", display="flex", flex_flow="row wrap"),
@@ -321,7 +334,7 @@ def run_app():
         return tuple(key for key, selector in selectors.items() if selector.value)
 
     def redraw():
-        output.value = _render(state["current"], str(view_input.value), selected_keys())
+        output.value = _render(state["current"], selected_keys())
 
     def set_progress(value):
         bounded = max(0.0, min(100.0, float(value)))
@@ -422,7 +435,6 @@ def run_app():
 
     n_input.observe(on_n_change, names="value")
     n_slider.observe(on_n_change, names="value")
-    view_input.observe(lambda change: redraw() if change.get("name") == "value" else None, names="value")
     for selector in selectors.values():
         selector.observe(on_function_change, names="value")
     execute_button.on_click(execute)
