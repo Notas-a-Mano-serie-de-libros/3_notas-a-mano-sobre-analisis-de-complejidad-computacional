@@ -359,9 +359,13 @@ def _styles() -> str:
 .growth-comparison-app .growth-app__functions-frame{border:1px solid #767676;background:#fff;padding:6px 12px;border-radius:0;box-sizing:border-box}
 .growth-comparison-app .growth-app__functions-group{width:100%!important;min-width:0!important;max-width:none!important;overflow:visible!important}.growth-comparison-app .growth-app__functions-group>.widget-box:last-child{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 520px!important}.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:8px;width:100%}
 .growth-comparison-app .growth-app__function-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 16px;width:100%;align-items:center}
-.growth-comparison-app .growth-app__function-row .widget-checkbox{width:100%!important;min-width:0!important;margin:0!important;display:flex!important;align-items:center!important;overflow:visible!important}
-.growth-comparison-app .growth-app__function-row .widget-checkbox input[type="checkbox"]{margin:0 6px 0 0!important;width:16px!important;height:16px!important}
-.growth-comparison-app .growth-app__function-row .widget-label{font-family:'STIX Two Math','Cambria Math','Scheherazade New',serif!important;font-size:15px!important;font-weight:500!important;line-height:1.2!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap!important}
+.growth-comparison-app .growth-app__function-option{display:flex!important;align-items:center!important;gap:8px!important;width:100%!important;min-width:0!important;overflow:visible!important}
+.growth-comparison-app .growth-app__function-checkbox{flex:0 0 18px!important;width:18px!important;min-width:18px!important;margin:0!important;overflow:visible!important}
+.growth-comparison-app .growth-app__function-checkbox input[type="checkbox"]{margin:0!important;width:16px!important;height:16px!important}
+.growth-comparison-app .growth-app__function-checkbox .widget-label{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.growth-comparison-app .growth-app__function-formula{flex:1 1 auto!important;width:auto!important;min-width:0!important;margin:0!important;overflow:visible!important}
+.growth-comparison-app .growth-app__function-formula .widget-html-content{font:600 17px/1.25 'STIX Two Math','Cambria Math','Scheherazade New',serif!important;color:#292929!important;white-space:nowrap!important;overflow:visible!important}
+.growth-comparison-app .growth-app__function-formula i{font-style:italic}.growth-comparison-app .growth-app__function-formula sub,.growth-comparison-app .growth-app__function-formula sup{font-size:.72em;line-height:0}
 .growth-comparison-app .growth-app__slider-wrap{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:2px}
 .growth-comparison-app .growth-app__slider-label{font-size:12px;font-weight:600;color:#555}
 @media(max-width:900px){.growth-comparison-app .growth-app__unified{grid-template-columns:1fr}.growth-comparison-app .growth-app__race-view{order:2}.growth-comparison-app .growth-app__function-row{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__chart svg{min-height:260px}.growth-comparison-app .growth-app__race-row{grid-template-columns:18px 58px minmax(70px,1fr) 82px;gap:5px}.growth-comparison-app .growth-app__race-value{font-size:10px}}
@@ -396,16 +400,25 @@ def run_app():
         layout=widgets.Layout(width="100%"),
     )
     selectors = {}
-    for key, _formula, text, _color in FAMILIES:
-        # Las descripciones de Checkbox no interpretan HTML de forma uniforme
-        # entre Jupyter local, Colab y JupyterLite. El texto Unicode conserva la
-        # notación matemática y evita que la etiqueta se reduzca a puntos suspensivos.
+    selector_options = []
+    for key, formula, text, _color in FAMILIES:
+        # Checkbox conserva una descripción accesible de texto plano, mientras
+        # la fórmula visible usa HTML para representar variables, subíndices y
+        # superíndices de forma idéntica en local, Colab y JupyterLite.
         cb = widgets.Checkbox(value=True, description=text, indent=False)
+        cb.add_class("growth-app__function-checkbox")
         selectors[key] = cb
-    checkbox_list = list(selectors.values())
-    row1 = widgets.HBox(checkbox_list[:4], layout=widgets.Layout(width="100%"))
+        formula_widget = widgets.HTML(value=f'<span aria-hidden="true">{formula}</span>')
+        formula_widget.add_class("growth-app__function-formula")
+        option = widgets.HBox(
+            [cb, formula_widget],
+            layout=widgets.Layout(width="100%", align_items="center", grid_gap="8px", overflow="visible"),
+        )
+        option.add_class("growth-app__function-option")
+        selector_options.append(option)
+    row1 = widgets.HBox(selector_options[:4], layout=widgets.Layout(width="100%"))
     row1.add_class("growth-app__function-row")
-    row2 = widgets.HBox(checkbox_list[4:], layout=widgets.Layout(width="100%"))
+    row2 = widgets.HBox(selector_options[4:], layout=widgets.Layout(width="100%"))
     row2.add_class("growth-app__function-row")
     function_grid = widgets.VBox(
         [row1, row2],

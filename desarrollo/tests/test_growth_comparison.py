@@ -3,6 +3,7 @@ import math
 from pathlib import Path
 
 from simulaciones.capitulo2.runtime.growth_comparison import (
+    FAMILIES,
     MAX_N,
     SPEED_OPTIONS,
     _calc_ratio,
@@ -10,6 +11,7 @@ from simulaciones.capitulo2.runtime.growth_comparison import (
     _format_exact_value,
     _log_value,
     _render,
+    _styles,
 )
 
 
@@ -49,6 +51,16 @@ def test_unified_view_labels_axes_and_only_selected_functions():
     assert "<circle" in rendered
     assert "growth-app__bar" in rendered
     assert "growth-app__legend" not in rendered
+
+
+def test_function_selector_uses_formatted_math_labels():
+    formulas = {key: formula for key, formula, _text, _color in FAMILIES}
+
+    assert formulas["log"] == "log<sub>2</sub>(<i>n</i>)"
+    assert formulas["nlogn"] == "<i>n</i> &middot; log<sub>2</sub>(<i>n</i>)"
+    assert formulas["square"] == "<i>n</i><sup>2</sup>"
+    assert formulas["exponential"] == "2<sup><i>n</i></sup>"
+    assert "growth-app__function-formula" in _styles()
 
 
 def test_scale_mode_selection_linear_and_log():
