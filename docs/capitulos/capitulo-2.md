@@ -94,11 +94,11 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador. La prim
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo2/notebooks/0_comparacion_crecimiento.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=a86a3cc3714f" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=ebe331a9765e" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=a86a3cc3714f"
+    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F0_comparacion_crecimiento.ipynb&revision=ebe331a9765e"
     title="Comparación interactiva del crecimiento de funciones en JupyterLite"
     loading="lazy"
     scrolling="no"
@@ -112,11 +112,10 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador. La prim
 El orden asintótico describe cómo crece el costo, pero no lo expresa todavía en una unidad concreta. Para obtener una estimación teórica comparable, el libro adopta una referencia canónica para el tiempo y otra para el espacio. La siguiente simulación aplica estas referencias a cada orden de magnitud de \(n\) y conserva \(c=1\) como valor inicial de la función constante.
 
 \[
-t \approx T_0 \cdot T(n), \qquad T_0 = 10^{-6}\,\text{s} = 1\,\mu\text{s}
-\]
-
-\[
-s \approx S_0 \cdot S(n), \qquad S_0 = 1\,\text{byte}
+\begin{aligned}
+t &\approx T_0 \cdot T(n), & T_0 &= 10^{-6}\,[\text{s}] = 1\,[\mu\text{s}], \\
+s &\approx S_0 \cdot S(n), & S_0 &= 1\,[\text{byte}].
+\end{aligned}
 \]
 
 <!-- jupyterlite-demo:start -->
@@ -126,8 +125,9 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador. La prim
 
 1. Espera a que el indicador del kernel muestre **Python (Pyodide)**.
 2. La simulación se ejecuta automáticamente cuando el kernel esté listo.
-3. Elige complejidad **temporal** o **espacial**, ajusta \(c\), el orden máximo y la velocidad, y pulsa **Reproducir**.
+3. Elige complejidad **temporal** o **espacial**, la escala **lineal** o **logarítmica**, ajusta \(c\), el orden máximo y la velocidad, y pulsa **Reproducir**.
 4. Observa simultáneamente las curvas y la carrera de crecimiento: la tabla incorpora una nueva fila solamente cuando \(n\) alcanza \(10^0,10^1,\ldots\), hasta el orden seleccionado.
+5. Selecciona cualquier fila de la tabla para volver a mostrar la gráfica exactamente en ese orden de magnitud.
 
 <div class="jupyterlite-demo">
   <div class="jupyterlite-demo__toolbar">
@@ -135,11 +135,11 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador. La prim
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo2/notebooks/10_calculo_complejidad_canonica.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F10_calculo_complejidad_canonica.ipynb&revision=a86a3cc3714f" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F10_calculo_complejidad_canonica.ipynb&revision=ebe331a9765e" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F10_calculo_complejidad_canonica.ipynb&revision=a86a3cc3714f"
+    src="../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo2%2Fnotebooks%2F10_calculo_complejidad_canonica.ipynb&revision=ebe331a9765e"
     title="Cálculo canónico de complejidad teórica en JupyterLite"
     loading="lazy"
     scrolling="no"

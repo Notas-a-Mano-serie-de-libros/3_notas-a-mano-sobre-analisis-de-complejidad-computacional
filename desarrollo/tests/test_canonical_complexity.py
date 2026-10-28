@@ -11,6 +11,7 @@ from simulaciones.capitulo2.runtime.canonical_complexity import (
     DEFAULT_CONSTANT,
     FAMILIES,
     MAX_ORDER,
+    SCALE_OPTIONS,
     SPEED_OPTIONS,
     _javascript_app,
     _render_simulation,
@@ -84,6 +85,7 @@ def test_simulation_contains_chart_axes_race_and_incremental_table():
     assert "Cantidad de datos" in simulation
     assert 'data-canonical-table-body' in simulation
     assert '<tbody data-canonical-table-body></tbody>' in simulation
+    assert "Longitudes representadas en la misma escala de la gráfica" in simulation
     for key, formula in FAMILIES:
         assert f'data-canonical-curve="{key}"' in simulation
         assert formula in simulation
@@ -96,10 +98,14 @@ def test_animation_is_continuous_and_table_advances_only_at_powers_of_ten():
     assert "Math.floor(orderProgress" in source
     assert "updateTable(milestone)" in source
     assert "10 ** order" in source
-    assert "visibleMax = scale.top" in source
-    assert "niceStep" in source
+    assert "visibleMax = desiredMaximum" in source
+    assert "maximum + Math.max(0.5" in source
+    assert "config.scale === 'log'" in source
     assert "raceRows" in source
     assert "prefers-reduced-motion" in source
+    assert "data-canonical-order" in source
+    assert "keepTable: true" in source
+    assert "is-selected" in source
 
 
 def test_widget_uses_standard_controls_icons_and_defaults():
@@ -114,6 +120,7 @@ def test_widget_uses_standard_controls_icons_and_defaults():
     dropdowns = tuple(control for control in controls if isinstance(control, widgets.Dropdown))
     dropdown = next(control for control in dropdowns if control.value == "temporal")
     speed = next(control for control in dropdowns if control.value == 1.0)
+    scale = next(control for control in dropdowns if control.value == "log")
     constant = next(control for control in controls if isinstance(control, widgets.BoundedFloatText))
     order = next(control for control in controls if isinstance(control, widgets.BoundedIntText))
     buttons = tuple(control for control in controls if isinstance(control, widgets.Button))
@@ -122,6 +129,7 @@ def test_widget_uses_standard_controls_icons_and_defaults():
     assert constant.value == DEFAULT_CONSTANT
     assert order.value == MAX_ORDER
     assert tuple(speed.options) == SPEED_OPTIONS
+    assert tuple(scale.options) == SCALE_OPTIONS
     assert all(button.icon for button in buttons)
     assert {button.description for button in buttons} >= {"Reproducir", "Pausar", "Finalizar", "Reiniciar"}
 
@@ -129,7 +137,7 @@ def test_widget_uses_standard_controls_icons_and_defaults():
     execute = next(button for button in buttons if button.description == "Reproducir")
     execute.click()
     html_outputs = tuple(control.value for control in controls if isinstance(control, widgets.HTML))
-    assert any("Referencia espacial" in value and "1 byte" in value for value in html_outputs)
+    assert any("Referencia espacial" in value and "1 [byte]" in value for value in html_outputs)
     assert any("Complejidad espacial teórica" in value and "data-canonical-table-body" in value for value in html_outputs)
 
 
@@ -159,10 +167,11 @@ def test_chapter_introduces_the_canonical_references_before_the_new_simulation()
 
     assert heading in page
     paragraph = "conserva \\(c=1\\) como valor inicial de la función constante."
-    temporal = r"t \approx T_0 \cdot T(n), \qquad T_0 = 10^{-6}\,\text{s} = 1\,\mu\text{s}"
-    spatial = r"s \approx S_0 \cdot S(n), \qquad S_0 = 1\,\text{byte}"
+    temporal = r"t &\approx T_0 \cdot T(n), & T_0 &= 10^{-6}\,[\text{s}] = 1\,[\mu\text{s}]"
+    spatial = r"s &\approx S_0 \cdot S(n), & S_0 &= 1\,[\text{byte}]"
     assert temporal in page
     assert spatial in page
+    assert r"\begin{aligned}" in page
     assert page.index(paragraph) < page.index(temporal) < page.index(spatial)
     assert page.index(notebook, page.index(heading)) > page.index(heading)
     assert page.count("<!-- jupyterlite-demo:start -->") == 2

@@ -73,6 +73,8 @@ def test_function_selector_uses_formatted_math_labels():
     assert formulas["square"] == "<i>n</i><sup>2</sup>"
     assert formulas["exponential"] == "2<sup><i>n</i></sup>"
     assert "growth-app__function-formula" in _styles()
+    assert "grid-template-columns:24px minmax(0,1fr) 24px" in _styles()
+    assert "growth-app__function-spacer" in _styles()
 
 
 def test_scale_mode_selection_linear_and_log():

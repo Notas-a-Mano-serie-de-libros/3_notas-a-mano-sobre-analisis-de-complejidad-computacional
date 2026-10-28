@@ -25,6 +25,7 @@ TEMPORAL_FACTOR = 1e-6
 SPATIAL_FACTOR = 1.0
 BASE_SECONDS_PER_ORDER = 2.8
 SPEED_OPTIONS = (("1x", 1.0), ("2x", 2.0), ("5x", 5.0), ("10x", 10.0))
+SCALE_OPTIONS = (("Logarítmica", "log"), ("Lineal", "linear"))
 FAMILIES = (
     ("constant", "<i>c</i>"),
     ("log", "log<sub>2</sub>(<i>n</i>)"),
@@ -112,13 +113,17 @@ def _reference_html(complexity_type: str) -> str:
     if complexity_type == "temporal":
         return (
             '<div class="canonical-app__reference"><strong>Referencia temporal</strong>'
-            '<span><i>t</i> &asymp; <i>T</i><sub>0</sub> &middot; <i>T</i>(<i>n</i>), '
-            '<i>T</i><sub>0</sub> = 10<sup>&minus;6</sup> s = 1 &micro;s</span></div>'
+            '<span class="canonical-app__equation"><span><i>t</i></span><span>&asymp;</span>'
+            '<span><i>T</i><sub>0</sub> &middot; <i>T</i>(<i>n</i>)</span></span>'
+            '<span class="canonical-app__equation"><span><i>T</i><sub>0</sub></span><span>=</span>'
+            '<span>10<sup>&minus;6</sup> [s] = 1 [&micro;s]</span></span></div>'
         )
     return (
         '<div class="canonical-app__reference"><strong>Referencia espacial</strong>'
-        '<span><i>s</i> &asymp; <i>S</i><sub>0</sub> &middot; <i>S</i>(<i>n</i>), '
-        '<i>S</i><sub>0</sub> = 1 byte</span></div>'
+        '<span class="canonical-app__equation"><span><i>s</i></span><span>&asymp;</span>'
+        '<span><i>S</i><sub>0</sub> &middot; <i>S</i>(<i>n</i>)</span></span>'
+        '<span class="canonical-app__equation"><span><i>S</i><sub>0</sub></span><span>=</span>'
+        '<span>1 [byte]</span></span></div>'
     )
 
 
@@ -136,9 +141,9 @@ def _render_table(
     temporal = complexity_type == "temporal"
     symbol, unit = ("t", "s") if temporal else ("s", "bytes")
     base = (
-        '<i>T</i><sub>0</sub> = 10<sup>&minus;6</sup> s'
+        '<i>T</i><sub>0</sub> = 10<sup>&minus;6</sup> [s]'
         if temporal
-        else '<i>S</i><sub>0</sub> = 1 byte'
+        else '<i>S</i><sub>0</sub> = 1 [byte]'
     )
     headers = "".join(f'<th scope="col">{formula}</th>' for _key, formula in FAMILIES)
     rows = []
@@ -164,7 +169,7 @@ def _render_table(
             <tbody>{''.join(rows)}</tbody>
           </table>
         </div>
-        <p class="canonical-app__footnote">Los valores se muestran en {unit}; las cantidades extremas se conservan mediante notación científica.</p>
+        <p class="canonical-app__footnote">Los valores se muestran en [{unit}]; las cantidades extremas se conservan mediante notación científica.</p>
       </section>
     """
 
@@ -174,6 +179,7 @@ def _render_simulation(
     constant: float = DEFAULT_CONSTANT,
     max_order: int = MAX_ORDER,
     app_id: str = "canonical-preview",
+    scale_mode: str = "log",
 ) -> str:
     """Construye la gráfica animable y la tabla incremental de hitos."""
 
@@ -183,13 +189,15 @@ def _render_simulation(
         raise ValueError(f"El orden máximo debe estar entre 1 y {MAX_ORDER}")
     if constant < 0:
         raise ValueError("c no puede ser negativo")
+    if scale_mode not in {"log", "linear"}:
+        raise ValueError(f"Escala desconocida: {scale_mode}")
     temporal = complexity_type == "temporal"
     title = "temporal" if temporal else "espacial"
     y_label = "t [s]" if temporal else "s [bytes]"
     base = (
-        '<i>T</i><sub>0</sub> = 10<sup>&minus;6</sup> s'
+        '<i>T</i><sub>0</sub> = 10<sup>&minus;6</sup> [s]'
         if temporal
-        else '<i>S</i><sub>0</sub> = 1 byte'
+        else '<i>S</i><sub>0</sub> = 1 [byte]'
     )
     plot_left, plot_right = 148, 720
     plot_width = plot_right - plot_left
@@ -236,7 +244,7 @@ def _render_simulation(
           </section>
           <section class="canonical-app__view canonical-app__race-view"><h4>Carrera de crecimiento</h4>
             <div class="canonical-app__race" aria-label="Clasificación de funciones por resultado">{race_rows}</div>
-            <p>Longitudes representadas en la misma escala logarítmica de la gráfica.</p>
+            <p>Longitudes representadas en la misma escala de la gráfica.</p>
           </section>
         </div>
         <div class="canonical-app__milestone" data-canonical-status>La tabla registrará cada potencia de 10 alcanzada.</div>
@@ -260,6 +268,7 @@ def _javascript_app(
     constant: float,
     max_order: int,
     speed: float,
+    scale_mode: str = "log",
     *,
     autoplay: bool = True,
 ) -> str:
@@ -272,6 +281,7 @@ def _javascript_app(
             "constant": constant,
             "maxOrder": max_order,
             "speed": speed,
+            "scale": scale_mode,
             "baseSecondsPerOrder": BASE_SECONDS_PER_ORDER,
             "families": [key for key, _formula in FAMILIES],
             "autoplay": autoplay,
@@ -290,6 +300,7 @@ def _javascript_app(
     const status = root.querySelector('[data-canonical-status]');
     const tbody = root.querySelector('[data-canonical-table-body]');
     const grid = root.querySelector('[data-canonical-y-grid]');
+    const pauseButton = root.closest('.canonical-complexity-app')?.querySelector('.canonical-app__pause-button');
     const paths = Object.fromEntries([...root.querySelectorAll('[data-canonical-curve]')].map(el => [el.dataset.canonicalCurve, el]));
     const points = Object.fromEntries([...root.querySelectorAll('[data-canonical-point]')].map(el => [el.dataset.canonicalPoint, el]));
     const raceRows = Object.fromEntries([...root.querySelectorAll('[data-canonical-race-row]')].map(el => [el.dataset.canonicalRaceRow, el]));
@@ -297,7 +308,7 @@ def _javascript_app(
     const factorLog10 = config.type === 'temporal' ? -6 : 0;
     const yFloor = factorLog10 - 2;
     let fraction = 0, startedAt = 0, frame = 0, paused = !config.autoplay, destroyed = false;
-    let lastMilestone = -1, visibleMax = yFloor + 2;
+    let lastMilestone = -1, selectedOrder = null, visibleMax = yFloor + 2;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const duration = reducedMotion ? 250 : config.baseSecondsPerOrder * Math.max(1, config.maxOrder) * 1000 / config.speed;
 
@@ -329,7 +340,8 @@ def _javascript_app(
     const rowHtml = order => {{
       const n = 10 ** order;
       const cells = config.families.map(key => `<td class="canonical-app__number">${{sci(resultLog10(key, n))}}</td>`).join('');
-      return `<tr${{order === lastMilestone ? ' class="is-latest"' : ''}}><th scope="row" class="canonical-app__n">10<sup>${{order}}</sup></th>${{cells}}</tr>`;
+      const classes = [order === lastMilestone ? 'is-latest' : '', order === selectedOrder ? 'is-selected' : ''].filter(Boolean).join(' ');
+      return `<tr data-canonical-order="${{order}}"${{classes ? ` class="${{classes}}"` : ''}}><th scope="row" class="canonical-app__n"><button type="button" class="canonical-app__order-button" data-canonical-order-button="${{order}}" aria-label="Mostrar la gráfica en n igual a 10 elevado a ${{order}}">10<sup>${{order}}</sup></button></th>${{cells}}</tr>`;
     }};
     const updateTable = order => {{
       const milestone = Math.max(0, Math.min(config.maxOrder, order));
@@ -338,46 +350,43 @@ def _javascript_app(
       tbody.innerHTML = Array.from({{length: milestone + 1}}, (_, i) => rowHtml(i)).join('');
       status.innerHTML = `Orden alcanzado: <strong><i>n</i> = 10<sup>${{milestone}}</sup></strong>. La tabla contiene ${{milestone + 1}} ${{milestone === 0 ? 'fila' : 'filas'}}.`;
     }};
-    const niceStep = range => {{
-      const rough = Math.max(1e-12, range / 5);
-      const power = 10 ** Math.floor(Math.log10(rough));
-      const fraction = rough / power;
-      return (fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10) * power;
-    }};
-    const scaleFor = maximum => {{
-      const step = niceStep(Math.max(1, maximum - yFloor));
-      const top = Math.max(yFloor + step, Math.ceil(maximum / step) * step);
-      return {{step, top}};
-    }};
-    const drawGrid = (maxLog, step) => {{
-      const values = [yFloor];
-      let value = Math.ceil((yFloor + 1e-12) / step) * step;
-      for (; value <= maxLog + step * 1e-9; value += step) {{
-        if (value > yFloor + step * 1e-9) values.push(value);
-      }}
-      if (values[values.length - 1] < maxLog - step * 1e-9) values.push(maxLog);
+    const drawGrid = maxLog => {{
       let html = '';
-      for (const tickValue of values) {{
-        const ratio = (tickValue - yFloor) / (maxLog - yFloor), y = 320 - ratio * 296;
-        const roundedExponent = Math.abs(tickValue) < 1e-9 ? 0 : Math.round(tickValue * 100) / 100;
-        const exponent = String(roundedExponent).replace('.', ',');
-        html += `<line x1="148" x2="720" y1="${{y}}" y2="${{y}}"></line><text x="138" y="${{y + 4}}" text-anchor="end">10<tspan baseline-shift="super" font-size="10">${{exponent}}</tspan></text>`;
+      for (let index = 0; index <= 4; index += 1) {{
+        const ratio = index / 4, y = 320 - ratio * 296;
+        let label = '0';
+        if (config.scale === 'log') {{
+          const tickValue = yFloor + ratio * (maxLog - yFloor);
+          const rounded = Math.abs(tickValue) < 1e-9 ? 0 : Math.round(tickValue * 100) / 100;
+          label = `10<tspan baseline-shift="super" font-size="10">${{String(rounded).replace('.', ',')}}</tspan>`;
+        }} else if (ratio > 0) {{
+          label = sci(maxLog + Math.log10(ratio));
+        }}
+        html += `<line x1="148" x2="720" y1="${{y}}" y2="${{y}}"></line><text x="138" y="${{y + 4}}" text-anchor="end">${{label}}</text>`;
       }}
       grid.innerHTML = html;
     }};
     const drawChart = orderProgress => {{
-      const samples = Math.max(2, Math.ceil(orderProgress * 26) + 1);
+      const samples = 181;
       const logs = [];
       for (let i = 0; i < samples; i++) {{
-        const order = samples === 1 ? 0 : orderProgress * i / (samples - 1), n = 10 ** order;
+        const order = orderProgress * i / (samples - 1), n = 10 ** order;
         for (const key of config.families) {{ const value = resultLog10(key, n); if (value !== null && Number.isFinite(value)) logs.push(value); }}
       }}
-      const target = Math.max(yFloor + 2, ...logs);
-      const scale = scaleFor(target);
-      visibleMax = scale.top;
-      drawGrid(visibleMax, scale.step);
+      const maximum = Math.max(factorLog10, ...logs);
+      const desiredMaximum = config.scale === 'log'
+        ? maximum + Math.max(0.5, (maximum - yFloor) * 0.12)
+        : maximum + Math.log10(1.18);
+      visibleMax = desiredMaximum;
+      drawGrid(visibleMax);
       const x = order => 148 + 572 * order / config.maxOrder;
-      const y = value => 320 - 296 * Math.max(0, Math.min(1, (value - yFloor) / (visibleMax - yFloor)));
+      const ratioFor = value => {{
+        if (value === null || !Number.isFinite(value)) return 0;
+        return config.scale === 'log'
+          ? Math.max(0, Math.min(1, (value - yFloor) / (visibleMax - yFloor)))
+          : Math.max(0, Math.min(1, 10 ** (value - visibleMax)));
+      }};
+      const y = value => 320 - 296 * ratioFor(value);
       for (const key of config.families) {{
         const segments = []; let endpoint = null;
         for (let i = 0; i < samples; i++) {{
@@ -395,35 +404,56 @@ def _javascript_app(
       order.forEach((key, rank) => {{
         const row = raceRows[key]; if (!row) return;
         const value = values[key];
-        const ratio = value === null ? 0 : Math.max(0, Math.min(1, (value - yFloor) / (visibleMax - yFloor)));
+        const ratio = ratioFor(value);
         row.style.transform = `translateY(${{rank * 42}}px)`;
         row.querySelector('.canonical-app__rank').textContent = String(rank + 1);
         row.querySelector('.canonical-app__race-bar').style.width = `${{ratio * 100}}%`;
         row.querySelector('.canonical-app__race-value').innerHTML = sci(value);
       }});
     }};
-    const render = value => {{
+    const setPauseVisual = isPaused => {{
+      if (!pauseButton) return;
+      const text = isPaused ? 'Reproducir' : 'Pausar';
+      pauseButton.innerHTML = `<i class="fa fa-${{isPaused ? 'play' : 'pause'}}" aria-hidden="true"></i> ${{text}}`;
+      pauseButton.title = text;
+      pauseButton.setAttribute('aria-label', text);
+    }};
+    const render = (value, options = {{}}) => {{
       fraction = Math.max(0, Math.min(1, value));
       const orderProgress = config.maxOrder * fraction;
       const milestone = Math.min(config.maxOrder, Math.floor(orderProgress + 1e-9));
       const exact = Math.abs(orderProgress - Math.round(orderProgress)) < 0.002;
       current.innerHTML = exact ? `<i>n</i> = 10<sup>${{Math.round(orderProgress)}}</sup>` : `<i>n</i> &asymp; 10<sup>${{orderProgress.toFixed(2).replace('.', ',')}}</sup>`;
       drawChart(orderProgress);
-      updateTable(milestone);
+      if (!options.keepTable) {{ selectedOrder = null; updateTable(milestone); }}
     }};
+    tbody.addEventListener('click', event => {{
+      const row = event.target.closest('tr[data-canonical-order]');
+      if (!row) return;
+      const order = Number(row.dataset.canonicalOrder);
+      if (!Number.isFinite(order)) return;
+      paused = true;
+      cancelAnimationFrame(frame);
+      selectedOrder = order;
+      render(order / config.maxOrder, {{keepTable: true}});
+      [...tbody.querySelectorAll('tr[data-canonical-order]')].forEach(item => item.classList.toggle('is-selected', Number(item.dataset.canonicalOrder) === order));
+      status.innerHTML = `Vista seleccionada: <strong><i>n</i> = 10<sup>${{order}}</sup></strong>.`;
+      setPauseVisual(true);
+    }});
     const tick = now => {{
       if (destroyed || paused) return;
       if (!startedAt) startedAt = now - fraction * duration;
       render((now - startedAt) / duration);
-      if (fraction < 1) frame = requestAnimationFrame(tick); else status.innerHTML += ' <strong>Simulación finalizada.</strong>';
+      if (fraction < 1) frame = requestAnimationFrame(tick); else {{ paused = true; setPauseVisual(true); status.innerHTML += ' <strong>Simulación finalizada.</strong>'; }}
     }};
     const api = {{
-      pause() {{ paused = !paused; if (!paused && fraction < 1) {{ startedAt = performance.now() - fraction * duration; frame = requestAnimationFrame(tick); }} return paused; }},
-      finish() {{ paused = true; cancelAnimationFrame(frame); render(1); status.innerHTML += ' <strong>Simulación finalizada.</strong>'; }},
+      pause() {{ paused = !paused; setPauseVisual(paused); if (!paused && fraction < 1) {{ selectedOrder = null; startedAt = performance.now() - fraction * duration; frame = requestAnimationFrame(tick); }} return paused; }},
+      finish() {{ paused = true; cancelAnimationFrame(frame); render(1); setPauseVisual(true); status.innerHTML += ' <strong>Simulación finalizada.</strong>'; }},
       destroy() {{ destroyed = true; cancelAnimationFrame(frame); delete window.__canonicalComplexityApps[config.appId]; }}
     }};
     window.__canonicalComplexityApps[config.appId] = api;
     render(0);
+    setPauseVisual(paused);
     if (config.autoplay) frame = requestAnimationFrame(tick);
   }};
   boot();
@@ -434,7 +464,7 @@ def _javascript_app(
 def _styles() -> str:
     return shared_ui_styles(".canonical-complexity-app") + """
 <style>
-.canonical-complexity-app{width:100%;font-family:sans-serif}.canonical-complexity-app .canonical-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.canonical-complexity-app .canonical-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.canonical-complexity-app .canonical-app__reference{display:flex;flex-flow:row wrap;gap:6px 18px;align-items:baseline;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-family:'STIX Two Math','Cambria Math',serif}.canonical-complexity-app .canonical-app__reference strong{font-family:sans-serif;font-size:13px}.canonical-complexity-app .canonical-app__simulation{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.canonical-complexity-app .canonical-app__simulation-header,.canonical-complexity-app .canonical-app__results header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:14px}.canonical-complexity-app .canonical-app__simulation-header>div>span,.canonical-complexity-app .canonical-app__results header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.canonical-complexity-app h3{font-size:18px;margin:3px 0 0}.canonical-complexity-app .canonical-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right}.canonical-complexity-app .canonical-app__current small{display:block;color:#666;font-size:12px}.canonical-complexity-app .canonical-app__current strong{display:block;font:20px 'STIX Two Math','Cambria Math',serif;margin-top:3px}.canonical-complexity-app .canonical-app__unified{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(360px,.82fr);gap:16px}.canonical-complexity-app .canonical-app__view{border:1px solid #e1e1e1;background:#fff;padding:8px 10px 12px;min-width:0}.canonical-complexity-app .canonical-app__view>h4{text-align:center;margin:4px 0 2px;font-size:15px}.canonical-complexity-app .canonical-app__chart{display:block;width:100%;max-height:430px}.canonical-complexity-app .canonical-app__plot-bg{fill:#fcfcfc;stroke:#ddd}.canonical-complexity-app .canonical-app__axis{stroke:#555;stroke-width:1.3}.canonical-complexity-app .canonical-app__x-tick line{stroke:#555}.canonical-complexity-app .canonical-app__x-tick text,.canonical-complexity-app .canonical-app__y-grid text{fill:#555;font:13px 'STIX Two Math','Cambria Math',serif}.canonical-complexity-app .canonical-app__y-grid line{stroke:#e6e6e6}.canonical-complexity-app .canonical-app__axis-title{fill:#222;font:600 17px 'STIX Two Math','Cambria Math',serif}.canonical-complexity-app .canonical-app__curve{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.canonical-complexity-app .canonical-app__point{stroke:#fff;stroke-width:1}.canonical-complexity-app .canonical-app__race-view{overflow:hidden}.canonical-complexity-app .canonical-app__race{position:relative;height:336px;margin-top:12px}.canonical-complexity-app .canonical-app__race-row{position:absolute;inset:0 0 auto 0;height:36px;display:grid;grid-template-columns:24px 100px minmax(70px,1fr) 104px;gap:8px;align-items:center;transition:transform .18s linear}.canonical-complexity-app .canonical-app__rank{color:#777;font-weight:700;text-align:center}.canonical-complexity-app .canonical-app__race-formula{color:var(--series-color);font:600 16px 'STIX Two Math','Cambria Math',serif;text-align:right;padding-right:4px}.canonical-complexity-app .canonical-app__race-track{height:20px;background:#f4f4f4;border-left:1px solid #ddd;overflow:hidden}.canonical-complexity-app .canonical-app__race-bar{display:block;width:0;height:100%;background:var(--series-color);transition:width .12s linear}.canonical-complexity-app .canonical-app__race-value{text-align:right;font:13px 'STIX Two Math','Cambria Math',serif;white-space:nowrap}.canonical-complexity-app .canonical-app__race-view>p{color:#666;font-size:11px;text-align:center;margin:4px 0 0}.canonical-complexity-app .canonical-app__milestone{margin-top:12px;padding:10px 12px;background:#fbf5f2;border-left:3px solid #a94728;font-size:13px}.canonical-complexity-app .canonical-app__results{margin-top:16px}.canonical-complexity-app .canonical-app__results header p{margin:0;text-align:right;font-family:'STIX Two Math','Cambria Math',serif}.canonical-complexity-app .canonical-app__table-wrap{width:100%;overflow-x:auto}.canonical-complexity-app table{width:100%;min-width:900px;border-collapse:collapse;font:14px 'STIX Two Math','Cambria Math',serif}.canonical-complexity-app caption{text-align:left;font-family:sans-serif;font-size:13px;font-weight:700;padding:0 0 8px}.canonical-complexity-app th,.canonical-complexity-app td{border:1px solid #c8c8c8;padding:8px 10px;text-align:center;white-space:nowrap}.canonical-complexity-app thead th{background:#ededed;font-size:15px}.canonical-complexity-app tbody th{background:#f7f7f7}.canonical-complexity-app tbody tr.is-latest th,.canonical-complexity-app tbody tr.is-latest td{background:#fff5e9}.canonical-complexity-app .canonical-app__number{font-variant-numeric:tabular-nums}.canonical-complexity-app .canonical-app__footnote{color:#666;font-size:12px;margin:10px 0 0}
+.canonical-complexity-app{width:100%;font-family:sans-serif}.canonical-complexity-app .canonical-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.canonical-complexity-app .canonical-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.canonical-complexity-app .canonical-app__reference{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 20px;align-items:baseline;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-family:'STIX Two Math','Cambria Math',serif}.canonical-complexity-app .canonical-app__reference strong{grid-row:1 / span 2;align-self:center;font-family:sans-serif;font-size:13px}.canonical-complexity-app .canonical-app__equation{display:grid;grid-template-columns:42px 20px minmax(0,max-content);align-items:baseline}.canonical-complexity-app .canonical-app__equation>span:first-child{text-align:right}.canonical-complexity-app .canonical-app__equation>span:nth-child(2){text-align:center}.canonical-complexity-app .canonical-app__simulation{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.canonical-complexity-app .canonical-app__simulation-header,.canonical-complexity-app .canonical-app__results header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:14px}.canonical-complexity-app .canonical-app__simulation-header>div>span,.canonical-complexity-app .canonical-app__results header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.canonical-complexity-app h3{font-size:18px;margin:3px 0 0}.canonical-complexity-app .canonical-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right}.canonical-complexity-app .canonical-app__current small{display:block;color:#666;font-size:12px}.canonical-complexity-app .canonical-app__current strong{display:block;font:20px 'STIX Two Math','Cambria Math',serif;margin-top:3px}.canonical-complexity-app .canonical-app__unified{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(360px,.82fr);gap:16px}.canonical-complexity-app .canonical-app__view{border:1px solid #e1e1e1;background:#fff;padding:8px 10px 12px;min-width:0}.canonical-complexity-app .canonical-app__view>h4{text-align:center;margin:4px 0 2px;font-size:15px}.canonical-complexity-app .canonical-app__chart{display:block;width:100%;max-height:430px}.canonical-complexity-app .canonical-app__plot-bg{fill:#fcfcfc;stroke:#ddd}.canonical-complexity-app .canonical-app__axis{stroke:#555;stroke-width:1.3}.canonical-complexity-app .canonical-app__x-tick line{stroke:#555}.canonical-complexity-app .canonical-app__x-tick text,.canonical-complexity-app .canonical-app__y-grid text{fill:#555;font:13px 'STIX Two Math','Cambria Math',serif}.canonical-complexity-app .canonical-app__y-grid line{stroke:#e6e6e6}.canonical-complexity-app .canonical-app__axis-title{fill:#222;font:600 17px 'STIX Two Math','Cambria Math',serif}.canonical-complexity-app .canonical-app__curve{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.canonical-complexity-app .canonical-app__point{stroke:#fff;stroke-width:1}.canonical-complexity-app .canonical-app__race-view{overflow:hidden}.canonical-complexity-app .canonical-app__race{position:relative;height:336px;margin-top:12px}.canonical-complexity-app .canonical-app__race-row{position:absolute;inset:0 0 auto 0;height:36px;display:grid;grid-template-columns:24px 100px minmax(70px,1fr) 104px;gap:8px;align-items:center;transition:transform .18s linear}.canonical-complexity-app .canonical-app__rank{color:#777;font-weight:700;text-align:center}.canonical-complexity-app .canonical-app__race-formula{color:var(--series-color);font:600 16px 'STIX Two Math','Cambria Math',serif;text-align:right;padding-right:4px}.canonical-complexity-app .canonical-app__race-track{height:20px;background:#f4f4f4;border-left:1px solid #ddd;overflow:hidden}.canonical-complexity-app .canonical-app__race-bar{display:block;width:0;height:100%;background:var(--series-color);transition:width .12s linear}.canonical-complexity-app .canonical-app__race-value{text-align:right;font:13px 'STIX Two Math','Cambria Math',serif;white-space:nowrap}.canonical-complexity-app .canonical-app__race-view>p{color:#666;font-size:11px;text-align:center;margin:4px 0 0}.canonical-complexity-app .canonical-app__milestone{margin-top:12px;padding:10px 12px;background:#fbf5f2;border-left:3px solid #a94728;font-size:13px}.canonical-complexity-app .canonical-app__results{margin-top:16px}.canonical-complexity-app .canonical-app__results header p{margin:0;text-align:right;font-family:'STIX Two Math','Cambria Math',serif}.canonical-complexity-app .canonical-app__table-wrap{width:100%;overflow-x:auto}.canonical-complexity-app table{width:100%;min-width:900px;border-collapse:collapse;font:14px 'STIX Two Math','Cambria Math',serif}.canonical-complexity-app caption{text-align:left;font-family:sans-serif;font-size:13px;font-weight:700;padding:0 0 8px}.canonical-complexity-app th,.canonical-complexity-app td{border:1px solid #c8c8c8;padding:8px 10px;text-align:center;white-space:nowrap}.canonical-complexity-app thead th{background:#ededed;font-size:15px}.canonical-complexity-app tbody th{background:#f7f7f7}.canonical-complexity-app tbody tr.is-latest th,.canonical-complexity-app tbody tr.is-latest td{background:#fff5e9}.canonical-complexity-app tbody tr.is-selected th,.canonical-complexity-app tbody tr.is-selected td{background:#e9f3ff}.canonical-complexity-app .canonical-app__order-button{border:0;background:transparent;color:inherit;font:inherit;padding:2px 8px;min-width:64px}.canonical-complexity-app .canonical-app__order-button:hover,.canonical-complexity-app .canonical-app__order-button:focus{color:#a94728;text-decoration:underline}.canonical-complexity-app .canonical-app__number{font-variant-numeric:tabular-nums}.canonical-complexity-app .canonical-app__footnote{color:#666;font-size:12px;margin:10px 0 0}
 @media (max-width:980px){.canonical-complexity-app .canonical-app__unified{grid-template-columns:1fr}}@media (max-width:700px){.canonical-complexity-app .canonical-app__simulation-header,.canonical-complexity-app .canonical-app__results header{display:block}.canonical-complexity-app .canonical-app__current{text-align:left;margin-top:10px}.canonical-complexity-app .canonical-app__results header p{text-align:left;margin-top:8px}.canonical-complexity-app .canonical-app__race-row{grid-template-columns:20px 88px minmax(60px,1fr) 92px}}
 </style>
 """
@@ -471,11 +501,18 @@ def run_app():
         description="",
         width="188px",
     )
+    scale_input = dropdown_control(
+        options=SCALE_OPTIONS,
+        value="log",
+        description="",
+        width="188px",
+    )
     controls = widgets.Box(
         [
             compact_labeled_control("Tipo", type_input),
             compact_labeled_control("Constante c", constant_input),
             compact_labeled_control("Orden máximo", order_input),
+            compact_labeled_control("Escala", scale_input),
             compact_labeled_control("Velocidad", speed_input),
         ],
         layout=widgets.Layout(
@@ -509,7 +546,7 @@ def run_app():
     pause_button.disabled = finish_button.disabled = True
     app_id = f"canonical-{uuid.uuid4().hex}"
     output = widgets.HTML(
-        value=_render_simulation("temporal", DEFAULT_CONSTANT, MAX_ORDER, app_id),
+        value=_render_simulation("temporal", DEFAULT_CONSTANT, MAX_ORDER, app_id, "log"),
         layout=widgets.Layout(width="100%"),
     )
     javascript_output = widgets.Output(layout=widgets.Layout(width="0", height="0", overflow="hidden"))
@@ -526,6 +563,7 @@ def run_app():
             float(constant_input.value),
             int(order_input.value),
             app_id,
+            str(scale_input.value),
         )
         pause_button.description, pause_button.icon = "Pausar", "pause"
         pause_button.disabled = finish_button.disabled = True
@@ -536,6 +574,7 @@ def run_app():
                 float(constant_input.value),
                 int(order_input.value),
                 float(speed_input.value),
+                str(scale_input.value),
                 autoplay=False,
             )
         )
@@ -546,6 +585,7 @@ def run_app():
             float(constant_input.value),
             int(order_input.value),
             app_id,
+            str(scale_input.value),
         )
         pause_button.description, pause_button.icon = "Pausar", "pause"
         pause_button.disabled = finish_button.disabled = False
@@ -556,6 +596,7 @@ def run_app():
                 float(constant_input.value),
                 int(order_input.value),
                 float(speed_input.value),
+                str(scale_input.value),
             )
         )
 
@@ -563,10 +604,6 @@ def run_app():
         send_javascript(
             f"var paused=window.__canonicalComplexityApps?.[{json.dumps(app_id)}]?.pause?.();"
         )
-        if pause_button.description == "Pausar":
-            pause_button.description, pause_button.icon = "Reproducir", "play"
-        else:
-            pause_button.description, pause_button.icon = "Pausar", "pause"
 
     def finish(*_args):
         send_javascript(
@@ -578,12 +615,14 @@ def run_app():
         type_input.value = "temporal"
         constant_input.value = DEFAULT_CONSTANT
         order_input.value = MAX_ORDER
+        scale_input.value = "log"
         speed_input.value = 1.0
         clear_results()
 
     type_input.observe(lambda change: clear_results() if change.get("name") == "value" else None, names="value")
     constant_input.observe(lambda change: clear_results() if change.get("name") == "value" else None, names="value")
     order_input.observe(lambda change: clear_results() if change.get("name") == "value" else None, names="value")
+    scale_input.observe(lambda change: clear_results() if change.get("name") == "value" else None, names="value")
     speed_input.observe(lambda change: clear_results() if change.get("name") == "value" else None, names="value")
     execute_button.on_click(execute)
     pause_button.on_click(pause)
@@ -600,6 +639,7 @@ def run_app():
         layout=widgets.Layout(width="100%", grid_gap="0", overflow="visible"),
     )
     root.add_class("canonical-complexity-app")
+    pause_button.add_class("canonical-app__pause-button")
     display(root)
     send_javascript(
         _javascript_app(
@@ -608,6 +648,7 @@ def run_app():
             DEFAULT_CONSTANT,
             MAX_ORDER,
             1.0,
+            "log",
             autoplay=False,
         )
     )
@@ -621,6 +662,7 @@ __all__ = [
     "FAMILY_COLORS",
     "MAX_ORDER",
     "SPEED_OPTIONS",
+    "SCALE_OPTIONS",
     "SPATIAL_FACTOR",
     "TEMPORAL_FACTOR",
     "_javascript_app",

@@ -713,12 +713,12 @@ def _styles() -> str:
 .growth-comparison-app .growth-app__functions-frame{border:1px solid #767676;background:#fff;padding:6px 12px;border-radius:0;box-sizing:border-box}
 .growth-comparison-app .growth-app__functions-group{width:100%!important;min-width:0!important;max-width:none!important;overflow:visible!important;align-items:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label{align-self:stretch!important;height:auto!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label .compact-control-label{display:block!important;width:100%!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.widget-box:last-child{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 520px!important}.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:8px;width:100%}
 .growth-comparison-app .growth-app__function-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 16px;width:100%;align-items:center}
-.growth-comparison-app .growth-app__function-option{display:flex!important;align-items:center!important;gap:8px!important;width:100%!important;min-width:0!important;overflow:visible!important}
+.growth-comparison-app .growth-app__function-option{display:grid!important;grid-template-columns:24px minmax(0,1fr) 24px!important;align-items:center!important;gap:8px!important;width:100%!important;min-width:0!important;overflow:visible!important}
 .growth-comparison-app .growth-app__function-checkbox{flex:0 0 18px!important;width:18px!important;min-width:18px!important;margin:0!important;overflow:visible!important}
 .growth-comparison-app .growth-app__function-checkbox input[type="checkbox"]{margin:0!important;width:16px!important;height:16px!important}
 .growth-comparison-app .growth-app__function-checkbox .widget-label{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-.growth-comparison-app .growth-app__function-formula{flex:1 1 auto!important;width:auto!important;min-width:0!important;margin:0!important;overflow:visible!important}
-.growth-comparison-app .growth-app__function-formula .widget-html-content{font:600 17px/1.25 'STIX Two Math','Cambria Math','Scheherazade New',serif!important;color:#292929!important;white-space:nowrap!important;overflow:visible!important}
+.growth-comparison-app .growth-app__function-formula{grid-column:2!important;width:100%!important;min-width:0!important;margin:0!important;overflow:visible!important;text-align:center!important}.growth-comparison-app .growth-app__function-spacer{grid-column:3!important;width:24px!important;min-width:24px!important}
+.growth-comparison-app .growth-app__function-formula .widget-html-content{font:600 17px/1.25 'STIX Two Math','Cambria Math','Scheherazade New',serif!important;color:#292929!important;white-space:nowrap!important;overflow:visible!important;text-align:center!important}
 .growth-comparison-app .growth-app__function-formula i{font-style:italic}.growth-comparison-app .growth-app__function-formula sub,.growth-comparison-app .growth-app__function-formula sup{font-size:.72em;line-height:0}
 .growth-comparison-app .growth-family-constant input{accent-color:#607d8b}.growth-comparison-app .growth-family-log input{accent-color:#00838f}.growth-comparison-app .growth-family-linear input{accent-color:#2e7d32}.growth-comparison-app .growth-family-nlogn input{accent-color:#558b2f}.growth-comparison-app .growth-family-square input{accent-color:#ef6c00}.growth-comparison-app .growth-family-cube input{accent-color:#d84315}.growth-comparison-app .growth-family-exponential input{accent-color:#ad1457}.growth-comparison-app .growth-family-factorial input{accent-color:#6a1b9a}
 .growth-comparison-app .growth-app__preset-row{display:flex!important;flex-flow:row wrap!important;align-items:center!important;gap:8px!important}.growth-comparison-app .growth-app__scale-help{color:#555;font-size:12px;margin-top:-4px}
@@ -762,18 +762,19 @@ def run_app():
     selectors = {}
     selector_options = []
     for key, formula, text, color in FAMILIES:
-        # Checkbox conserva una descripción accesible de texto plano, mientras
-        # la fórmula visible usa HTML para representar variables, subíndices y
-        # superíndices de forma idéntica en local, Colab y JupyterLite.
-        cb = widgets.Checkbox(value=True, description=text, indent=False)
+        # La etiqueta visible usa HTML matemático; el checkbox queda sin una
+        # segunda etiqueta textual para evitar duplicados en JupyterLite.
+        cb = widgets.Checkbox(value=True, description="", indent=False)
         cb.add_class("growth-app__function-checkbox")
         selectors[key] = cb
         formula_widget = widgets.HTML(
-            value=f'<span aria-hidden="true" style="color:{color}">{formula}</span>'
+            value=f'<span style="color:{color}" aria-label="{escape(text)}">{formula}</span>'
         )
         formula_widget.add_class("growth-app__function-formula")
+        spacer = widgets.HTML(value="")
+        spacer.add_class("growth-app__function-spacer")
         option = widgets.HBox(
-            [cb, formula_widget],
+            [cb, formula_widget, spacer],
             layout=widgets.Layout(width="100%", align_items="center", grid_gap="8px", overflow="visible"),
         )
         option.add_class("growth-app__function-option")

@@ -44,11 +44,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo4/notebooks/ejemplo7_(ciclo_sin_dependencia).ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo7_(ciclo_sin_dependencia).ipynb&revision=a86a3cc3714f" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo7_(ciclo_sin_dependencia).ipynb&revision=ebe331a9765e" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo7_(ciclo_sin_dependencia).ipynb&revision=a86a3cc3714f"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo7_(ciclo_sin_dependencia).ipynb&revision=ebe331a9765e"
     title="Simulación interactiva de Ciclo sin dependencia de la entrada en JupyterLite"
     loading="lazy"
     scrolling="no"
