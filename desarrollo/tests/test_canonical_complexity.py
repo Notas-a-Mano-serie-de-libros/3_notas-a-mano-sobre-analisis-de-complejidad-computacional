@@ -73,12 +73,15 @@ def test_table_contains_every_order_function_and_canonical_unit():
         assert formula in temporal
 
 
-def test_simulation_contains_chart_axes_legend_and_incremental_table():
+def test_simulation_contains_chart_axes_race_and_incremental_table():
     simulation = _render_simulation("temporal", max_order=MAX_ORDER, app_id="test-app")
 
     assert 'data-canonical-app="test-app"' in simulation
     assert '<svg class="canonical-app__chart"' in simulation
     assert '>t [s]</text>' in simulation
+    assert "Carrera de crecimiento" in simulation
+    assert "canonical-app__legend" not in simulation
+    assert "Cantidad de datos" in simulation
     assert 'data-canonical-table-body' in simulation
     assert '<tbody data-canonical-table-body></tbody>' in simulation
     for key, formula in FAMILIES:
@@ -93,7 +96,9 @@ def test_animation_is_continuous_and_table_advances_only_at_powers_of_ten():
     assert "Math.floor(orderProgress" in source
     assert "updateTable(milestone)" in source
     assert "10 ** order" in source
-    assert "visibleMax = target" in source
+    assert "visibleMax = scale.top" in source
+    assert "niceStep" in source
+    assert "raceRows" in source
     assert "prefers-reduced-motion" in source
 
 
@@ -118,10 +123,10 @@ def test_widget_uses_standard_controls_icons_and_defaults():
     assert order.value == MAX_ORDER
     assert tuple(speed.options) == SPEED_OPTIONS
     assert all(button.icon for button in buttons)
-    assert {button.description for button in buttons} >= {"Ejecutar", "Pausar", "Finalizar", "Reiniciar"}
+    assert {button.description for button in buttons} >= {"Reproducir", "Pausar", "Finalizar", "Reiniciar"}
 
     dropdown.value = "spatial"
-    execute = next(button for button in buttons if button.description == "Ejecutar")
+    execute = next(button for button in buttons if button.description == "Reproducir")
     execute.click()
     html_outputs = tuple(control.value for control in controls if isinstance(control, widgets.HTML))
     assert any("Referencia espacial" in value and "1 byte" in value for value in html_outputs)

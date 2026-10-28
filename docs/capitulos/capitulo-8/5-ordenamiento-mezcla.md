@@ -79,11 +79,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F5_ordenamiento_mezcla.ipynb&revision=878bd6a637b0" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F5_ordenamiento_mezcla.ipynb&revision=a86a3cc3714f" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F5_ordenamiento_mezcla.ipynb&revision=878bd6a637b0"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo8%2Fnotebooks%2F5_ordenamiento_mezcla.ipynb&revision=a86a3cc3714f"
     title="Simulación interactiva de Ordenamiento por mezcla en JupyterLite"
     loading="lazy"
     scrolling="no"

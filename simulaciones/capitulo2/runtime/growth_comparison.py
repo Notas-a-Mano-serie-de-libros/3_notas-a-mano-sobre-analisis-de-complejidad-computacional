@@ -214,11 +214,16 @@ def _svg_polyline(key: str, x_max: float, log_maximum: float, scale_mode: str, w
     return " ".join(points)
 
 
-def _render_chart(current_n: float, selected_keys: tuple[str, ...], scale_mode: str = "linear") -> str:
+def _render_chart(
+    current_n: float,
+    selected_keys: tuple[str, ...],
+    scale_mode: str = "linear",
+    x_limit: float | None = None,
+) -> str:
     width, height = 650, 410
     left, right, top, bottom = 100, 20, 24, 52
     plot_width, plot_height = width - left - right, height - top - bottom
-    x_max = max(1.0, current_n)
+    x_max = max(1.0, current_n if x_limit is None else x_limit)
     final_logs = [_log_value(key, current_n) for key in selected_keys]
     log_maximum = max((value for value in final_logs if value is not None), default=0.0)
     grid = []
@@ -258,7 +263,7 @@ def _render_chart(current_n: float, selected_keys: tuple[str, ...], scale_mode: 
     lines = []
     for key in selected_keys:
         _, _, text, color = FAMILY_BY_KEY[key]
-        point_x = left + current_n / max(1.0, x_max) * plot_width
+        point_x = left + current_n / x_max * plot_width
         point_y = top + (1 - _calc_ratio(key, current_n, scale_mode, log_maximum)) * plot_height
         lines.append(
             f'<polyline class="growth-app__curve" data-family="{key}" points="{_svg_polyline(key, max(0.0, current_n), log_maximum, scale_mode, width, height)}" '
@@ -354,6 +359,7 @@ def _render(
     scale_mode: str = "linear",
     *,
     app_id: str = "",
+    target_n: int | None = None,
 ) -> str:
     if selected_keys is None:
         selected_keys = tuple(family[0] for family in FAMILIES)
@@ -367,7 +373,7 @@ def _render(
     visualization = (
         '<div class="growth-app__unified">'
         '<section class="growth-app__view"><h4>Crecimiento de las curvas</h4>'
-        f"{_render_chart(current_n, selected_keys, scale_mode)}</section>"
+        f"{_render_chart(current_n, selected_keys, scale_mode, target_n)}</section>"
         '<section class="growth-app__view growth-app__race-view"><h4>Carrera de crecimiento</h4>'
         f"{_render_race(current_n, n, selected_keys, scale_mode)}</section></div>"
     )
@@ -409,8 +415,6 @@ def _javascript_app(
       return;
     }
     const root = visual.closest('.growth-comparison-app');
-    const timeline = root?.querySelector('.growth-app__timeline-input');
-    const progressText = root?.querySelector('.growth-app__progress-value');
     const pauseButton = root?.querySelector('.growth-app__pause-button');
     const insight = visual.querySelector('.growth-app__insight');
     const milestone = visual.querySelector('.growth-app__milestone');
@@ -514,21 +518,21 @@ def _javascript_app(
       return difference > -745 ? Math.min(1, Math.exp(difference)) : 0;
     };
     const updateChart = (n, logs, maximum) => {
-      const domain = Math.max(1, n);
+      const domain = Math.max(1, target);
       const left = 100, top = 24, plotWidth = 530, plotHeight = 334;
       const samples = 181;
       curves.forEach((curve, key) => {
         const coordinates = [];
         for (let index = 0; index < samples; index += 1) {
-          const xValue = domain * index / (samples - 1);
-          const x = left + index / (samples - 1) * plotWidth;
+          const xValue = n * index / (samples - 1);
+          const x = left + xValue / domain * plotWidth;
           const y = top + (1 - ratioFor(logValue(key, xValue), maximum)) * plotHeight;
           coordinates.push(`${x.toFixed(2)},${y.toFixed(2)}`);
         }
         curve.setAttribute('points', coordinates.join(' '));
         const point = points.get(key);
         if (point) {
-          point.setAttribute('cx', String(left + plotWidth));
+          point.setAttribute('cx', String(left + n / domain * plotWidth));
           point.setAttribute('cy', String(top + (1 - ratioFor(logs[key], maximum)) * plotHeight));
         }
       });
@@ -578,7 +582,7 @@ def _javascript_app(
     };
     const setPauseVisual = (isPaused, finished = false) => {
       if (!pauseButton) return;
-      const text = finished ? 'Reproducir de nuevo' : (isPaused ? 'Reanudar' : 'Pausar');
+      const text = isPaused || finished ? 'Reproducir' : 'Pausar';
       pauseButton.innerHTML = `<i class="fa fa-${isPaused ? 'play' : 'pause'}" aria-hidden="true"></i> ${text}`;
       pauseButton.title = text;
       pauseButton.setAttribute('aria-label', text);
@@ -610,8 +614,6 @@ def _javascript_app(
       const n = target * fraction;
       const displayN = Math.max(0, Math.round(n));
       if (currentLabel) currentLabel.innerHTML = `<i>n</i> = ${displayN}`;
-      if (timeline) timeline.value = String(Math.round(fraction * 1000));
-      if (progressText) progressText.textContent = `${Math.round(fraction * 100)} %`;
       const logs = Object.fromEntries(keys.map((key) => [key, logValue(key, n)]));
       const finite = Object.values(logs).filter(Number.isFinite);
       const maximum = finite.length ? Math.max(...finite) : 0;
@@ -668,11 +670,6 @@ def _javascript_app(
       render,
     };
     registry[appId] = app;
-    timeline?.addEventListener('input', (event) => {
-      paused = true;
-      render(Number(event.target.value) / 1000);
-      setPauseVisual(true);
-    });
     render(0);
     setPauseVisual(false);
     frame = requestAnimationFrame(tick);
@@ -711,7 +708,7 @@ def _styles() -> str:
         shared_ui_styles(".growth-comparison-app")
         + """
 <style>
-.growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.growth-comparison-app .growth-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.growth-comparison-app .growth-app__controls>.widget-box{flex:0 0 292px!important;width:292px!important;min-width:292px!important;max-width:292px!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__progress-wrap{margin-top:12px}.growth-comparison-app .growth-app__timeline{flex:1 1 auto!important;width:auto!important}.growth-comparison-app .growth-app__timeline-input{display:block;width:100%;accent-color:#a94728;cursor:pointer}.growth-comparison-app .growth-app__progress-label{font-size:13px;font-weight:700}.growth-comparison-app .growth-app__progress-value{font-variant-numeric:tabular-nums;text-align:right;width:46px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:600 15px sans-serif}
+.growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.growth-comparison-app .growth-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.growth-comparison-app .growth-app__controls>.widget-box{flex:0 0 292px!important;width:292px!important;min-width:292px!important;max-width:292px!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:600 15px sans-serif}
 .growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 94px minmax(90px,1fr) 104px;column-gap:12px;align-items:center;height:36px;transition:transform .12s linear}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap;padding-right:4px}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color)}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}.growth-comparison-app .growth-app__curve-point{pointer-events:none}
 .growth-comparison-app .growth-app__functions-frame{border:1px solid #767676;background:#fff;padding:6px 12px;border-radius:0;box-sizing:border-box}
 .growth-comparison-app .growth-app__functions-group{width:100%!important;min-width:0!important;max-width:none!important;overflow:visible!important;align-items:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label{align-self:stretch!important;height:auto!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label .compact-control-label{display:block!important;width:100%!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.widget-box:last-child{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 520px!important}.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:8px;width:100%}
@@ -814,7 +811,7 @@ def run_app():
     functions_group.layout.overflow = "visible"
     selection_message = widgets.HTML(value="", layout=widgets.Layout(width="100%"))
     selection_message.add_class("growth-app__selection-message")
-    execute_button = button_control(description="Ejecutar", button_style="success", width="128px")
+    execute_button = button_control(description="Reproducir", button_style="success", width="128px")
     pause_button = button_control(description="Pausar", button_style="", width="158px", disabled=True)
     finish_button = button_control(description="Finalizar", button_style="", width="128px", disabled=True)
     reset_button = button_control(description="Reiniciar", button_style="warning", width="128px")
@@ -898,22 +895,11 @@ def run_app():
         prefix="growth-app",
         open_by_default=True,
     )
-    timeline = widgets.HTML(
-        '<input class="growth-app__timeline-input" type="range" min="0" max="1000" value="0" step="1" aria-label="Progreso de la simulación">',
-        layout=widgets.Layout(width="100%"),
-    )
-    timeline.add_class("growth-app__timeline")
-    progress_value = widgets.HTML('<span class="growth-app__progress-value">0 %</span>')
-    progress_wrap = widgets.HBox(
-        [widgets.HTML('<span class="growth-app__progress-label">Progreso</span>'), timeline, progress_value],
-        layout=widgets.Layout(width="100%", align_items="center", grid_gap="10px"),
-    )
-    progress_wrap.add_class("growth-app__progress-wrap")
     output = widgets.HTML(layout=widgets.Layout(width="100%", margin="0"))
     javascript_output = widgets.Output(
         layout=widgets.Layout(width="0", height="0", margin="0", padding="0", overflow="hidden")
     )
-    state = {"syncing": False, "selection_syncing": False, "render_revision": 0}
+    state = {"syncing": False, "selection_syncing": False}
 
     def selected_keys():
         return tuple(key for key, selector in selectors.items() if selector.value)
@@ -928,20 +914,12 @@ def run_app():
         finish_button.disabled = True
         pause_button.description = "Pausar"
         pause_button.icon = "pause"
-        state["render_revision"] += 1
-        revision = state["render_revision"]
         output.value = _render(
             MIN_N,
             selected_keys(),
             str(scale_input.value),
             app_id=app_id,
-        )
-        timeline.value = (
-            '<input class="growth-app__timeline-input" type="range" min="0" max="1000" value="0" step="1" '
-            f'aria-label="Progreso de la simulación" data-render-revision="{revision}">'
-        )
-        progress_value.value = (
-            f'<span class="growth-app__progress-value" data-render-revision="{revision}">0 %</span>'
+            target_n=int(n_input.value),
         )
 
     def sync_n(value):
@@ -990,7 +968,7 @@ def run_app():
 
     def reset_all(*_args):
         send_javascript(_javascript_command(app_id, "destroy"))
-        sync_n(MIN_TARGET_N)
+        sync_n(DEFAULT_N)
         redraw()
 
     def execute(*_args):
@@ -1004,7 +982,13 @@ def run_app():
         finish_button.disabled = False
         pause_button.description = "Pausar"
         pause_button.icon = "pause"
-        output.value = _render(target, keys, str(scale_input.value), app_id=app_id)
+        output.value = _render(
+            target,
+            keys,
+            str(scale_input.value),
+            app_id=app_id,
+            target_n=target,
+        )
         send_javascript(
             _javascript_app(app_id, target, keys, str(scale_input.value), speed)
         )
@@ -1038,7 +1022,6 @@ def run_app():
         [
             widgets.HTML(value=_styles(), layout=widgets.Layout(width="0", height="0", margin="0")),
             configuration_panel,
-            progress_wrap,
             action_button_row([execute_button, pause_button, finish_button, reset_button]),
             output,
             javascript_output,

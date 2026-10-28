@@ -134,7 +134,8 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     assert "togglePause" in source
     assert "finish()" in source
     assert "render(1)" in source
-    assert "growth-app__timeline-input" in source
+    assert "growth-app__timeline-input" not in source
+    assert "const domain = Math.max(1, target)" in source
     assert "logGamma" in source
     assert "updateChart(n, logs, chartMaximum)" in source
     assert "curve.setAttribute('points'" in source
@@ -153,7 +154,7 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     assert "is-highlighted" not in _styles()
 
 
-def test_target_controls_reject_zero_and_reset_to_one_while_visual_starts_at_zero():
+def test_target_controls_reject_zero_and_reset_to_one_hundred_while_visual_starts_at_zero():
     root = run_app()
 
     def descendants(widget):
@@ -179,13 +180,14 @@ def test_target_controls_reject_zero_and_reset_to_one_while_visual_starts_at_zer
 
     assert n_controls
     assert all(control.min == MIN_TARGET_N for control in n_controls)
-    assert all(control.value == MIN_TARGET_N for control in n_controls)
+    assert all(control.value == 100 for control in n_controls)
     assert all(button.icon for button in buttons)
     assert pause_button.disabled
     assert finish_button.disabled
     assert "growth-app__pause-button" in pause_button._dom_classes
     assert any("growth-app__n-compound" in control._dom_classes for control in controls)
     assert "justify-content:center" in _styles()
+    assert any(button.description == "Reproducir" for button in buttons)
 
 
 def test_jupyterlite_executes_the_versioned_runtime_embedded_in_the_notebook():
