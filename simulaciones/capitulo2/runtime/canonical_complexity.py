@@ -411,10 +411,11 @@ def _javascript_app(
         row.querySelector('.canonical-app__race-value').innerHTML = sci(value);
       }});
     }};
-    const setPauseVisual = isPaused => {{
+    const setPauseVisual = (isPaused, finished = false) => {{
       if (!pauseButton) return;
-      const text = isPaused ? 'Reproducir' : 'Pausar';
-      pauseButton.innerHTML = `<i class="fa fa-${{isPaused ? 'play' : 'pause'}}" aria-hidden="true"></i> ${{text}}`;
+      const canContinue = isPaused && !finished;
+      const text = canContinue ? 'Continuar' : 'Pausar';
+      pauseButton.innerHTML = `<i class="fa fa-${{canContinue ? 'play' : 'pause'}}" aria-hidden="true"></i> ${{text}}`;
       pauseButton.title = text;
       pauseButton.setAttribute('aria-label', text);
     }};
@@ -444,16 +445,16 @@ def _javascript_app(
       if (destroyed || paused) return;
       if (!startedAt) startedAt = now - fraction * duration;
       render((now - startedAt) / duration);
-      if (fraction < 1) frame = requestAnimationFrame(tick); else {{ paused = true; setPauseVisual(true); status.innerHTML += ' <strong>Simulación finalizada.</strong>'; }}
+      if (fraction < 1) frame = requestAnimationFrame(tick); else {{ paused = true; setPauseVisual(true, true); status.innerHTML += ' <strong>Simulación finalizada.</strong>'; }}
     }};
     const api = {{
       pause() {{ paused = !paused; setPauseVisual(paused); if (!paused && fraction < 1) {{ selectedOrder = null; startedAt = performance.now() - fraction * duration; frame = requestAnimationFrame(tick); }} return paused; }},
-      finish() {{ paused = true; cancelAnimationFrame(frame); render(1); setPauseVisual(true); status.innerHTML += ' <strong>Simulación finalizada.</strong>'; }},
+      finish() {{ paused = true; cancelAnimationFrame(frame); render(1); setPauseVisual(true, true); status.innerHTML += ' <strong>Simulación finalizada.</strong>'; }},
       destroy() {{ destroyed = true; cancelAnimationFrame(frame); delete window.__canonicalComplexityApps[config.appId]; }}
     }};
     window.__canonicalComplexityApps[config.appId] = api;
     render(0);
-    setPauseVisual(paused);
+    setPauseVisual(false);
     if (config.autoplay) frame = requestAnimationFrame(tick);
   }};
   boot();

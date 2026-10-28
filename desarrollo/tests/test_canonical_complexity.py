@@ -106,6 +106,8 @@ def test_animation_is_continuous_and_table_advances_only_at_powers_of_ten():
     assert "data-canonical-order" in source
     assert "keepTable: true" in source
     assert "is-selected" in source
+    assert "const text = canContinue ? 'Continuar' : 'Pausar'" in source
+    assert "render(0);\n    setPauseVisual(false);" in source
 
 
 def test_widget_uses_standard_controls_icons_and_defaults():
