@@ -12,12 +12,14 @@ from desarrollo.scripts.build_jupyterlite_demo import (
     CHAPTER2_RUNTIME_FILES,
     CHAPTER_CONFIGS,
     CONTENT_FILES,
+    CONTENTS_STORAGE_DRIVERS,
     LITE_DIR,
     NOTEBOOKS,
     PRELOAD_PACKAGE_OVERRIDES,
     WIDGET_PROFILES,
     WIDGET_WHEEL_REQUIREMENTS,
     chapter_content_files,
+    configure_content_storage,
     configure_pyodide_packages,
     content_storage_name,
     prepare_contents,
@@ -283,6 +285,16 @@ def test_kernel_pyodide_precarga_dependencias_del_capitulo():
         "@jupyterlite/pyodide-kernel-extension:kernel"
     ]
     assert settings["loadPyodideOptions"]["packages"] == list(packages)
+
+
+def test_notebook_storage_is_isolated_between_embedded_demos():
+    config = {"jupyter-config-data": {"defaultKernelName": "python"}}
+
+    configure_content_storage(config)
+
+    config_data = config["jupyter-config-data"]
+    assert config_data["enableMemoryStorage"] is True
+    assert config_data["contentsStorageDrivers"] == list(CONTENTS_STORAGE_DRIVERS)
 
 
 def test_perfil_compartido_instala_dependencias_pesadas_bajo_demanda():

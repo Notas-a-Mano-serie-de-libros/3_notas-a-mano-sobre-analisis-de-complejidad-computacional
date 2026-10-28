@@ -57,6 +57,7 @@ PRELOAD_PACKAGE_OVERRIDES = {
     # penalizar el primer arranque de cada ordenamiento.
     "graficas": (),
 }
+CONTENTS_STORAGE_DRIVERS = ("memoryStorageDriver",)
 
 
 def content_storage_name(chapter: int = 3) -> str:
@@ -122,6 +123,14 @@ def configure_pyodide_packages(
     )
     load_options = pyodide_settings.setdefault("loadPyodideOptions", {})
     load_options["packages"] = list(packages)
+
+
+def configure_content_storage(config: dict[str, object]) -> None:
+    """Aísla cada sesión para que varios demos no compitan por IndexedDB."""
+
+    config_data = config.setdefault("jupyter-config-data", {})
+    config_data["enableMemoryStorage"] = True
+    config_data["contentsStorageDrivers"] = list(CONTENTS_STORAGE_DRIVERS)
 
 
 def build_autorun_extension() -> None:
@@ -236,6 +245,7 @@ def build(output_dir: Path, chapter: int = 3) -> None:
             lite_config,
             PRELOAD_PACKAGE_OVERRIDES.get(profile, config["packages"]),
         )
+        configure_content_storage(lite_config)
         lite_config.setdefault("jupyter-config-data", {})["contentsStorageName"] = (
             content_storage_name(chapter)
         )

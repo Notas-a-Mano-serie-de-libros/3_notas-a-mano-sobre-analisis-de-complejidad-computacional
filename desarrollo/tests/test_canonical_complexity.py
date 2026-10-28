@@ -123,7 +123,11 @@ def test_chapter_introduces_the_canonical_references_before_the_new_simulation()
     notebook = "10_calculo_complejidad_canonica.ipynb"
 
     assert heading in page
-    assert r"T_0 = 10^{-6}\,\text{s} = 1\,\mu\text{s}" in page
-    assert r"S_0 = 1\,\text{byte}" in page
+    paragraph = "conserva \\(c=1\\) como valor inicial de la función constante."
+    temporal = r"t \approx T_0 \cdot T(n), \qquad T_0 = 10^{-6}\,\text{s} = 1\,\mu\text{s}"
+    spatial = r"s \approx S_0 \cdot S(n), \qquad S_0 = 1\,\text{byte}"
+    assert temporal in page
+    assert spatial in page
+    assert page.index(paragraph) < page.index(temporal) < page.index(spatial)
     assert page.index(notebook, page.index(heading)) > page.index(heading)
     assert page.count("<!-- jupyterlite-demo:start -->") == 2

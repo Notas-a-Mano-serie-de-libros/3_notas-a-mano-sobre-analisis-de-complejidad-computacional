@@ -9,12 +9,14 @@ from pathlib import Path
 try:
     from desarrollo.scripts.build_jupyterlite_demo import (
         AUTORUN_EXTENSION_NAME,
+        CONTENTS_STORAGE_DRIVERS,
         PRELOAD_PACKAGE_OVERRIDES,
     )
     from desarrollo.scripts.jupyterlite_catalog import PROFILE_CONFIGS
 except ModuleNotFoundError:
     from build_jupyterlite_demo import (
         AUTORUN_EXTENSION_NAME,
+        CONTENTS_STORAGE_DRIVERS,
         PRELOAD_PACKAGE_OVERRIDES,
     )
     from jupyterlite_catalog import PROFILE_CONFIGS
@@ -77,6 +79,10 @@ def validate(site_dir: Path) -> list[str]:
             errors.append(f"{profile}: paquetes Pyodide inesperados: {packages}")
         if not config_data.get("contentsStorageName"):
             errors.append(f"{profile}: falta aislamiento del almacenamiento de notebooks")
+        if config_data.get("enableMemoryStorage") is not True:
+            errors.append(f"{profile}: no está habilitado el almacenamiento temporal")
+        if config_data.get("contentsStorageDrivers") != list(CONTENTS_STORAGE_DRIVERS):
+            errors.append(f"{profile}: el almacenamiento de notebooks no está aislado")
 
         for notebook_path in profile_config["notebooks"]:
             published_path = profile_dir / "files" / notebook_path
