@@ -44,11 +44,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo4/notebooks/ejemplo9_(complejidad_oculta).ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo9_(complejidad_oculta).ipynb&revision=6f479d22f969" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo9_(complejidad_oculta).ipynb&revision=2013de96262d" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo9_(complejidad_oculta).ipynb&revision=6f479d22f969"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo4%2Fnotebooks%2Fejemplo9_(complejidad_oculta).ipynb&revision=2013de96262d"
     title="Simulación interactiva de Complejidad oculta en JupyterLite"
     loading="lazy"
     scrolling="no"

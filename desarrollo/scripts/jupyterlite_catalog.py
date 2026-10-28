@@ -23,6 +23,7 @@ CHAPTER_CONFIGS = {
             "notebooks/8_complejidad_exponencial.ipynb",
             "notebooks/9_complejidad_factorial.ipynb",
             "notebooks/0_comparacion_crecimiento.ipynb",
+            "notebooks/10_calculo_complejidad_canonica.ipynb",
         ),
         "runtime_files": tuple(
             Path(path)
@@ -40,6 +41,7 @@ CHAPTER_CONFIGS = {
                 "simulaciones/capitulo2/runtime/theoretical_graphs.py",
                 "simulaciones/capitulo2/runtime/polynomial_animation.py",
                 "simulaciones/capitulo2/runtime/growth_comparison.py",
+                "simulaciones/capitulo2/runtime/canonical_complexity.py",
                 "simulaciones/capitulo2/runtime/colab_bootstrap.py",
             )
         ),
@@ -296,7 +298,11 @@ CHAPTER_CONFIGS = {
 }
 
 PAGE_NOTEBOOKS = {
-    (2, "__chapter__"): _chapter_paths(2, "notebooks/0_comparacion_crecimiento.ipynb"),
+    (2, "__chapter__"): _chapter_paths(
+        2,
+        "notebooks/0_comparacion_crecimiento.ipynb",
+        "notebooks/10_calculo_complejidad_canonica.ipynb",
+    ),
     (2, "0-complejidad-sublineal"): _chapter_paths(2, "notebooks/2_complejidad_logaritmica.ipynb"),
     (2, "1-complejidad-constante"): _chapter_paths(2, "notebooks/1_complejidad_constante.ipynb"),
     (2, "2-complejidad-logaritmica"): _chapter_paths(2, "notebooks/2_complejidad_logaritmica.ipynb"),

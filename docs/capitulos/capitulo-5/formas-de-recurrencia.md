@@ -144,11 +144,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo5/notebooks/0_arboles_recursion.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/algebra-simbolica/notebooks/index.html?path=simulaciones%2Fcapitulo5%2Fnotebooks%2F0_arboles_recursion.ipynb&revision=d12a32c72ad5" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/algebra-simbolica/notebooks/index.html?path=simulaciones%2Fcapitulo5%2Fnotebooks%2F0_arboles_recursion.ipynb&revision=6b6f837af6be" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/algebra-simbolica/notebooks/index.html?path=simulaciones%2Fcapitulo5%2Fnotebooks%2F0_arboles_recursion.ipynb&revision=d12a32c72ad5"
+    src="../../../jupyterlite/algebra-simbolica/notebooks/index.html?path=simulaciones%2Fcapitulo5%2Fnotebooks%2F0_arboles_recursion.ipynb&revision=6b6f837af6be"
     title="Simulación interactiva de Recurrencias y análisis de complejidad en JupyterLite"
     loading="lazy"
     scrolling="no"

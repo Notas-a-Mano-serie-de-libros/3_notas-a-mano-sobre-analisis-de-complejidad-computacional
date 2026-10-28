@@ -28,12 +28,14 @@ REQUIRED_FILES = (
     "simulaciones/capitulo2/runtime/theoretical_graphs.py",
     "simulaciones/capitulo2/runtime/polynomial_animation.py",
     "simulaciones/capitulo2/runtime/growth_comparison.py",
+    "simulaciones/capitulo2/runtime/canonical_complexity.py",
 )
 
 SIMULATION_MODULES = {
     "constant": "simulaciones.capitulo2.runtime.constant_animation",
     "polynomial_general": "simulaciones.capitulo2.runtime.polynomial_animation",
     "growth_comparison": "simulaciones.capitulo2.runtime.growth_comparison",
+    "canonical_complexity": "simulaciones.capitulo2.runtime.canonical_complexity",
     "default": "simulaciones.capitulo2.runtime.complexity_animations",
 }
 
@@ -44,6 +46,7 @@ RELOADABLE_MODULES = (
     "simulaciones.capitulo2.runtime.polynomial_animation",
     "simulaciones.capitulo2.runtime.theoretical_graphs",
     "simulaciones.capitulo2.runtime.growth_comparison",
+    "simulaciones.capitulo2.runtime.canonical_complexity",
 )
 
 
@@ -133,7 +136,7 @@ def run_simulation():
     simulation_module = importlib.import_module(module_name)
 
     clear_output(wait=True)
-    if simulation_name == "growth_comparison":
+    if simulation_name in {"growth_comparison", "canonical_complexity"}:
         simulation_module.run_app()
     elif simulation_name == "constant":
         simulation_module.run_app(mode=globals().get("SIMULATION_MODE", "selectable"))
