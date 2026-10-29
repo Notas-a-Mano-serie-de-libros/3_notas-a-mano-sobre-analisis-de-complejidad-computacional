@@ -575,10 +575,12 @@ def _javascript_app(
     };
     const setPauseVisual = (isPaused, finished = false) => {
       if (!pauseButton) return;
-      const text = isPaused || finished ? 'Reproducir' : 'Pausar';
-      pauseButton.innerHTML = `<i class="fa fa-${isPaused ? 'play' : 'pause'}" aria-hidden="true"></i> ${text}`;
+      const canContinue = isPaused && !finished;
+      const text = canContinue ? 'Continuar' : 'Pausar';
+      pauseButton.innerHTML = `<i class="fa fa-${canContinue ? 'play' : 'pause'}" aria-hidden="true"></i> ${text}`;
       pauseButton.title = text;
       pauseButton.setAttribute('aria-label', text);
+      if (finished) pauseButton.disabled = true;
     };
     const messageFor = (n, logs) => {
       if (!keys.length) return 'Selecciona una o más funciones para comenzar la comparación.';
@@ -992,6 +994,7 @@ def run_app():
 
     def finish(*_args):
         send_javascript(_javascript_command(app_id, "finish"))
+        pause_button.disabled = finish_button.disabled = True
 
     def on_preset_change(change):
         if state["selection_syncing"] or change.get("name") != "value":

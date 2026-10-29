@@ -104,6 +104,9 @@ def test_animation_is_continuous_and_table_advances_only_at_powers_of_ten():
     assert "raceRows" in source
     assert "prefers-reduced-motion" in source
     assert "data-canonical-order" in source
+    assert 'tabindex="0"' in source
+    assert "data-canonical-order-button" not in source
+    assert "event.key !== 'Enter' && event.key !== ' '" in source
     assert "keepTable: true" in source
     assert "is-selected" in source
     assert "const text = canContinue ? 'Continuar' : 'Pausar'" in source

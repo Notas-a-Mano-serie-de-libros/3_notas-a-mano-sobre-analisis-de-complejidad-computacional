@@ -150,6 +150,7 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     assert "updateSummary" in source
     assert "chartMaximum" in source
     assert "setPauseVisual" in source
+    assert "const text = canContinue ? 'Continuar' : 'Pausar'" in source
     assert "setHighlight" not in source
     assert "mouseenter" not in source
     assert "growth-app__focus" not in _render(10, ("linear", "square"))
