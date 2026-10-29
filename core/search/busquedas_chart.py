@@ -40,7 +40,7 @@ except ModuleNotFoundError:
         })
 
 _DOMAIN = Path(__file__).resolve().parent
-_RAW_DOMAIN_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/c38714ab8680cc09bb3fba5c6480ced68a9ee680/core/search"
+_RAW_DOMAIN_URL = "https://raw.githubusercontent.com/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/7c90791b2cde88b626b796d82f8e3f490681947a/core/search"
 
 
 def _ensure_search_metrics():
