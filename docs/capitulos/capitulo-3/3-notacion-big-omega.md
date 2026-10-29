@@ -56,11 +56,11 @@ Este demo se ejecuta con **JupyterLite y Pyodide** dentro del navegador: no abre
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo3/notebooks/3_notacion_big_omega.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F3_notacion_big_omega.ipynb&revision=21b8d0775614" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F3_notacion_big_omega.ipynb&revision=de9cf5eba6e8" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F3_notacion_big_omega.ipynb&revision=21b8d0775614"
+    src="../../../jupyterlite/graficas-cientificas/notebooks/index.html?path=simulaciones%2Fcapitulo3%2Fnotebooks%2F3_notacion_big_omega.ipynb&revision=de9cf5eba6e8"
     title="Simulación interactiva de notación Big-Ω en JupyterLite"
     loading="lazy"
     scrolling="no"
