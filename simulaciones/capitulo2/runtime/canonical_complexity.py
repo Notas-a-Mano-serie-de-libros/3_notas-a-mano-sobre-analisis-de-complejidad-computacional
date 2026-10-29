@@ -337,6 +337,15 @@ def _javascript_app(
       const decimal = String(coefficient).replace('.', ',');
       return `${{Math.abs(coefficient - 1) < 1e-12 ? '' : `${{decimal}} &middot; `}}10<sup>${{exponent}}</sup>`;
     }};
+    const svgSci = log10 => {{
+      if (log10 === null) return '0';
+      let exponent = Math.floor(log10 + 1e-12), coefficient = Math.pow(10, log10 - exponent);
+      coefficient = Math.round(coefficient * 100) / 100;
+      if (coefficient >= 10) {{ coefficient = 1; exponent += 1; }}
+      const decimal = String(coefficient).replace('.', ',');
+      const prefix = Math.abs(coefficient - 1) < 1e-12 ? '' : `${{decimal}} · `;
+      return `${{prefix}}10<tspan baseline-shift="super" font-size="10">${{exponent}}</tspan>`;
+    }};
     const rowHtml = order => {{
       const n = 10 ** order;
       const cells = config.families.map(key => `<td class="canonical-app__number">${{sci(resultLog10(key, n))}}</td>`).join('');
@@ -360,7 +369,7 @@ def _javascript_app(
           const rounded = Math.abs(tickValue) < 1e-9 ? 0 : Math.round(tickValue * 100) / 100;
           label = `10<tspan baseline-shift="super" font-size="10">${{String(rounded).replace('.', ',')}}</tspan>`;
         }} else if (ratio > 0) {{
-          label = sci(maxLog + Math.log10(ratio));
+          label = svgSci(maxLog + Math.log10(ratio));
         }}
         html += `<line x1="148" x2="720" y1="${{y}}" y2="${{y}}"></line><text x="138" y="${{y + 4}}" text-anchor="end">${{label}}</text>`;
       }}

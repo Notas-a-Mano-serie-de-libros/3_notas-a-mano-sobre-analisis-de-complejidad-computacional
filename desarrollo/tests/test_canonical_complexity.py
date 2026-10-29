@@ -101,6 +101,9 @@ def test_animation_is_continuous_and_table_advances_only_at_powers_of_ten():
     assert "visibleMax = desiredMaximum" in source
     assert "maximum + Math.max(0.5" in source
     assert "config.scale === 'log'" in source
+    assert "const svgSci = log10 =>" in source
+    assert "label = svgSci(maxLog + Math.log10(ratio));" in source
+    assert 'baseline-shift="super"' in source
     assert "raceRows" in source
     assert "prefers-reduced-motion" in source
     assert "data-canonical-order" in source
