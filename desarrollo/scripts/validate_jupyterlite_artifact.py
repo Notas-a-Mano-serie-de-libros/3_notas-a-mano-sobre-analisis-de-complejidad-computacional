@@ -24,7 +24,9 @@ except ModuleNotFoundError:
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SITE = ROOT / "site" / "jupyterlite"
-MAX_ARTIFACT_BYTES = 100 * 1024 * 1024
+# Los cuatro perfiles aíslan dependencias y kernels; el límite cubre el
+# artefacto completo sin ocultar crecimientos accidentales de cada perfil.
+MAX_ARTIFACT_BYTES = 150 * 1024 * 1024
 MAX_ARTIFACT_FILES = 12_000
 
 

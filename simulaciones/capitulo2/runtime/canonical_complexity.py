@@ -418,7 +418,7 @@ def _javascript_app(
       pauseButton.innerHTML = `<i class="fa fa-${{canContinue ? 'play' : 'pause'}}" aria-hidden="true"></i> ${{text}}`;
       pauseButton.title = text;
       pauseButton.setAttribute('aria-label', text);
-      if (finished) pauseButton.disabled = true;
+      pauseButton.disabled = finished;
     }};
     const render = (value, options = {{}}) => {{
       fraction = Math.max(0, Math.min(1, value));
@@ -621,11 +621,6 @@ def run_app():
         pause_button.disabled = finish_button.disabled = True
 
     def reset(*_args):
-        type_input.value = "temporal"
-        constant_input.value = DEFAULT_CONSTANT
-        order_input.value = MAX_ORDER
-        scale_input.value = "log"
-        speed_input.value = 1.0
         clear_results()
 
     type_input.observe(lambda change: clear_results() if change.get("name") == "value" else None, names="value")

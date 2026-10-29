@@ -110,6 +110,7 @@ def test_animation_is_continuous_and_table_advances_only_at_powers_of_ten():
     assert "keepTable: true" in source
     assert "is-selected" in source
     assert "const text = canContinue ? 'Continuar' : 'Pausar'" in source
+    assert "pauseButton.disabled = finished;" in source
     assert "render(0);\n    setPauseVisual(false);" in source
 
 
@@ -139,6 +140,18 @@ def test_widget_uses_standard_controls_icons_and_defaults():
     assert {button.description for button in buttons} >= {"Reproducir", "Pausar", "Finalizar", "Reiniciar"}
 
     dropdown.value = "spatial"
+    constant.value = 3
+    order.value = 5
+    speed.value = 2.0
+    scale.value = "linear"
+    reset = next(button for button in buttons if button.description == "Reiniciar")
+    reset.click()
+    assert dropdown.value == "spatial"
+    assert constant.value == 3
+    assert order.value == 5
+    assert speed.value == 2.0
+    assert scale.value == "linear"
+
     execute = next(button for button in buttons if button.description == "Reproducir")
     execute.click()
     html_outputs = tuple(control.value for control in controls if isinstance(control, widgets.HTML))

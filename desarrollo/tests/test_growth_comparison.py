@@ -157,7 +157,7 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     assert "is-highlighted" not in _styles()
 
 
-def test_target_controls_reject_zero_and_reset_to_one_hundred_while_visual_starts_at_zero():
+def test_reset_preserves_configuration_while_visual_returns_to_zero():
     root = run_app()
 
     def descendants(widget):
@@ -183,7 +183,7 @@ def test_target_controls_reject_zero_and_reset_to_one_hundred_while_visual_start
 
     assert n_controls
     assert all(control.min == MIN_TARGET_N for control in n_controls)
-    assert all(control.value == 100 for control in n_controls)
+    assert all(control.value == 250 for control in n_controls)
     assert all(button.icon for button in buttons)
     assert pause_button.disabled
     assert finish_button.disabled
@@ -191,6 +191,12 @@ def test_target_controls_reject_zero_and_reset_to_one_hundred_while_visual_start
     assert any("growth-app__n-compound" in control._dom_classes for control in controls)
     assert "justify-content:center" in _styles()
     assert any(button.description == "Reproducir" for button in buttons)
+
+
+def test_play_always_enables_pause_until_animation_finishes():
+    source = _javascript_app("test-app", 100, ("linear",), "linear", 1)
+
+    assert "pauseButton.disabled = finished;" in source
 
 
 def test_jupyterlite_executes_the_versioned_runtime_embedded_in_the_notebook():

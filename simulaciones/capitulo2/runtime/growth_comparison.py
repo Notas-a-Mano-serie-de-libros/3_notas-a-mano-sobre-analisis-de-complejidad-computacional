@@ -580,7 +580,7 @@ def _javascript_app(
       pauseButton.innerHTML = `<i class="fa fa-${canContinue ? 'play' : 'pause'}" aria-hidden="true"></i> ${text}`;
       pauseButton.title = text;
       pauseButton.setAttribute('aria-label', text);
-      if (finished) pauseButton.disabled = true;
+      pauseButton.disabled = finished;
     };
     const messageFor = (n, logs) => {
       if (!keys.length) return 'Selecciona una o más funciones para comenzar la comparación.';
@@ -964,7 +964,6 @@ def run_app():
 
     def reset_all(*_args):
         send_javascript(_javascript_command(app_id, "destroy"))
-        sync_n(DEFAULT_N)
         redraw()
 
     def execute(*_args):
