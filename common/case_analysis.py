@@ -39,6 +39,78 @@ CASE_LABELS = {
     "worst": "Peor caso",
 }
 
+CASE_NOTES = {
+    "search": {
+        "secuencial": {
+            "best": "El objetivo está en la primera posición y se encuentra con una sola comparación.",
+            "average": "El objetivo aparece aproximadamente a mitad del arreglo y se revisa cerca de la mitad de los elementos.",
+            "worst": "El objetivo está en la última posición o no existe, por lo que se recorre todo el arreglo.",
+        },
+        "binaria": {
+            "best": "El objetivo coincide con el elemento central en la primera comparación.",
+            "average": "El objetivo se encuentra después de descartar varias mitades del arreglo.",
+            "worst": "El objetivo queda en el nivel más profundo de partición o no existe en el arreglo.",
+        },
+        "interpolacion": {
+            "best": "La primera estimación coincide exactamente con la posición del objetivo.",
+            "average": "Los valores están distribuidos de forma aproximadamente uniforme y las estimaciones se acercan al objetivo.",
+            "worst": "La distribución es muy irregular y las estimaciones avanzan poco en cada paso.",
+        },
+        "saltos": {
+            "best": "El objetivo coincide con el primer elemento que se comprueba.",
+            "average": "Se recorren varios bloques y luego una parte del bloque que contiene el objetivo.",
+            "worst": "El objetivo está al final o no existe, de modo que se recorren todos los saltos y el último bloque.",
+        },
+        "exponencial": {
+            "best": "El objetivo está en la primera posición y se encuentra antes de expandir el rango.",
+            "average": "Se expande el rango varias veces y luego se completa una búsqueda binaria acotada.",
+            "worst": "El objetivo está cerca del final o no existe, por lo que el rango crece hasta su límite.",
+        },
+        "ternaria": {
+            "best": "El objetivo coincide con uno de los puntos de tercio en la primera división.",
+            "average": "El objetivo aparece después de descartar varios tercios del arreglo.",
+            "worst": "El objetivo queda en la división más profunda o no existe en el arreglo.",
+        },
+    },
+    "sort": {
+        "burbuja": {
+            "best": "El arreglo ya está ordenado y la primera pasada termina sin intercambios.",
+            "average": "Los valores están en un orden aleatorio y se requieren varias pasadas e intercambios.",
+            "worst": "El arreglo está en orden inverso y cada pasada desplaza numerosos elementos.",
+        },
+        "seleccion": {
+            "best": "El arreglo ya está ordenado; se mantienen las comparaciones, pero se evitan intercambios innecesarios.",
+            "average": "Los valores están distribuidos aleatoriamente y los candidatos cambian durante cada recorrido.",
+            "worst": "Los valores fuerzan cambios de candidato e intercambios en prácticamente todas las posiciones.",
+        },
+        "insercion": {
+            "best": "El arreglo ya está ordenado y cada elemento se confirma sin desplazamientos.",
+            "average": "Cada elemento debe avanzar una cantidad intermedia de posiciones dentro del prefijo ordenado.",
+            "worst": "El arreglo está en orden inverso y cada elemento debe desplazarse hasta el inicio.",
+        },
+        "shell": {
+            "best": "El arreglo ya está ordenado y las subsecuencias definidas por cada salto requieren pocos movimientos.",
+            "average": "Los valores aleatorios se reorganizan gradualmente con cada tamaño de salto.",
+            "worst": "La disposición de los valores aprovecha poco los saltos y deja muchos movimientos para las últimas pasadas.",
+        },
+        "mezcla": {
+            "best": "El arreglo ya está ordenado, aunque el algoritmo todavía divide y mezcla todos los niveles.",
+            "average": "Los valores están mezclados y se comparan durante cada combinación de subarreglos.",
+            "worst": "Los valores se intercalan de forma que cada mezcla necesita casi todas sus comparaciones.",
+        },
+        "rapido": {
+            "best": "Cada pivote divide el arreglo en dos partes de tamaños similares.",
+            "average": "Los pivotes producen particiones razonablemente equilibradas a lo largo del proceso.",
+            "worst": "Cada pivote resulta ser un extremo y deja una partición vacía y otra casi completa.",
+        },
+        "radix": {
+            "best": "Todos los valores tienen pocos dígitos y requieren el mínimo número de pasadas.",
+            "average": "Los valores tienen una cantidad intermedia de dígitos y se distribuyen entre varios cubos.",
+            "worst": "Los valores alcanzan la mayor cantidad de dígitos y obligan a ejecutar todas las pasadas.",
+        },
+    },
+}
+
 
 def _token(value):
     return re.sub(r"[^a-z0-9_-]+", "-", str(value).lower()).strip("-") or "default"
@@ -145,19 +217,21 @@ def _search_array_html(state, role_styles):
     indexes = "".join(
         f'<span class="case-analysis__index">{index}</span>' for index in range(len(raw_values))
     )
-    boxes = "".join(
-        f'<span class="case-analysis__item" style="background:{role_styles.get(role, role_styles["default"])[0]};'
-        f'border-color:{role_styles.get(role, role_styles["default"])[1]};'
-        f'color:{role_styles.get(role, role_styles["default"])[2]}" role="listitem" '
-        f'aria-label="Posición {index}, valor {escape(str(value))}, estado {escape(str(role))}">'
-        f'{escape(str(value))}</span>'
-        for index, (value, role) in enumerate(zip(raw_values, roles, strict=False))
-    )
+    boxes = []
+    for index, (value, role) in enumerate(zip(raw_values, roles, strict=False)):
+        fill, border, text = role_styles.get(role, role_styles["default"])
+        if role == "target":
+            _default_fill, border, text = role_styles["default"]
+        boxes.append(
+            f'<span class="case-analysis__item" style="background:{fill};border-color:{border};color:{text}" '
+            f'role="listitem" aria-label="Posición {index}, valor {escape(str(value))}, estado {escape(str(role))}">'
+            f'{escape(str(value))}</span>'
+        )
     count = max(1, len(raw_values))
     return (
         f'<div class="case-analysis__array-wrap" style="--case-count:{count}">'
         f'<div class="case-analysis__indexes">{indexes}</div>'
-        f'<div class="case-analysis__array" role="list">{boxes}</div></div>'
+        f'<div class="case-analysis__array" role="list">{"".join(boxes)}</div></div>'
     )
 
 
@@ -186,7 +260,7 @@ def _sort_array_html(state, role_styles):
     )
 
 
-def _result_html(cases, family, role_styles):
+def _result_html(cases, family, algorithm, role_styles):
     rows = []
     for case in CASE_ORDER:
         entry = cases[case]
@@ -208,11 +282,24 @@ def _result_html(cases, family, role_styles):
             f'<span class="case-analysis__result" aria-live="polite">{_result_symbol(state, family)}</span>'
             f'</div></div>'
         )
+    notes = CASE_NOTES.get(family, {}).get(algorithm, {})
+    note_rows = "".join(
+        f'<li><strong>{CASE_LABELS[case]}:</strong> {escape(notes.get(case, ""))}</li>'
+        for case in CASE_ORDER
+        if notes.get(case)
+    )
+    notes_html = (
+        '<aside class="case-analysis__notes" aria-label="Condiciones de los casos">'
+        '<strong class="case-analysis__notes-title">¿Cuándo se cumple cada caso?</strong>'
+        f'<ul>{note_rows}</ul></aside>'
+        if note_rows
+        else ""
+    )
     return (
         '<section class="comparison-app case-analysis" aria-label="Análisis por casos">'
         '<div class="case-analysis__header"><strong>Caso</strong><strong>Objetivo</strong>'
         '<strong>Paso</strong><strong>Arreglo</strong></div>'
-        f'{"".join(rows)}</section>'
+        f'{"".join(rows)}{notes_html}</section>'
     )
 
 
@@ -243,6 +330,10 @@ CASE_ANALYSIS_STYLES = f"""
 .case-analysis-root .case-result-symbol{{{RESULT_SYMBOL_BASE_CSS}}}
 .case-analysis-root .case-result-symbol.found{{color:{RESULT_SYMBOL_SUCCESS_COLOR}}}
 .case-analysis-root .case-result-symbol.missing{{color:{RESULT_SYMBOL_FAILURE_COLOR}}}
+.case-analysis-root .case-analysis__notes{{margin:14px 8px 4px;padding:12px 14px;border-left:4px solid #1976d2;background:#f3f8fd;color:#333;font-family:sans-serif;font-size:14px;line-height:1.45}}
+.case-analysis-root .case-analysis__notes-title{{display:block;margin-bottom:5px;font-size:15px}}
+.case-analysis-root .case-analysis__notes ul{{margin:0;padding-left:20px}}
+.case-analysis-root .case-analysis__notes li+li{{margin-top:3px}}
 .case-analysis-root .case-analysis-controls{{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;padding:12px 14px!important}}
 .case-analysis-root .case-analysis-actions{{margin-top:0!important}}
 .case-analysis-root .widget-button{{white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}}
@@ -333,10 +424,10 @@ def run_case_analysis(
                 }
         animation["running"] = False
         sync_buttons()
-        output.value = _result_html(cases, family, role_styles)
+        output.value = _result_html(cases, family, algorithm, role_styles)
 
     def redraw():
-        output.value = _result_html(cases, family, role_styles)
+        output.value = _result_html(cases, family, algorithm, role_styles)
 
     def finished():
         return all(entry["index"] >= len(entry["trace"]) - 1 for entry in cases.values())

@@ -95,6 +95,9 @@ def test_case_analysis_uses_plural_actions_and_objective_column(monkeypatch):
     assert "Peor caso" in rendered
     assert "Objetivo" in rendered
     assert "Paso" in rendered
+    assert "¿Cuándo se cumple cada caso?" in rendered
+    assert "El objetivo está en la primera posición" in rendered
+    assert "border-color:#111" in rendered
 
 
 def test_case_analysis_renders_standard_completion_symbols():
