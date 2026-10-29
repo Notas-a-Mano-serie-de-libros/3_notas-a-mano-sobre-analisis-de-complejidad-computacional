@@ -43,32 +43,32 @@ CASE_NOTES = {
     "search": {
         "secuencial": {
             "best": "El objetivo está en la primera posición y se encuentra con una sola comparación.",
-            "average": "El objetivo aparece aproximadamente a mitad del arreglo y se revisa cerca de la mitad de los elementos.",
+            "average": "La posición se obtiene del modelo uniforme: todas las posiciones son igual de probables y el costo promedio es la esperanza sobre todas ellas.",
             "worst": "El objetivo está en la última posición o no existe, por lo que se recorre todo el arreglo.",
         },
         "binaria": {
             "best": "El objetivo coincide con el elemento central en la primera comparación.",
-            "average": "El objetivo se encuentra después de descartar varias mitades del arreglo.",
+            "average": "La posición se obtiene del modelo uniforme y el costo promedio combina las comparaciones requeridas en todas las posiciones posibles.",
             "worst": "El objetivo queda en el nivel más profundo de partición o no existe en el arreglo.",
         },
         "interpolacion": {
             "best": "La primera estimación coincide exactamente con la posición del objetivo.",
-            "average": "Los valores están distribuidos de forma aproximadamente uniforme y las estimaciones se acercan al objetivo.",
+            "average": "La entrada sigue la distribución uniforme asumida y el costo promedio se calcula sobre todos los objetivos posibles.",
             "worst": "La distribución es muy irregular y las estimaciones avanzan poco en cada paso.",
         },
         "saltos": {
             "best": "El objetivo coincide con el primer elemento que se comprueba.",
-            "average": "Se recorren varios bloques y luego una parte del bloque que contiene el objetivo.",
+            "average": "Bajo el modelo uniforme, el objetivo puede aparecer en cualquier bloque y el costo esperado considera todas esas posiciones.",
             "worst": "El objetivo está al final o no existe, de modo que se recorren todos los saltos y el último bloque.",
         },
         "exponencial": {
             "best": "El objetivo está en la primera posición y se encuentra antes de expandir el rango.",
-            "average": "Se expande el rango varias veces y luego se completa una búsqueda binaria acotada.",
+            "average": "Bajo el modelo uniforme, el objetivo puede ocupar cualquier posición y el costo esperado combina las expansiones y búsquedas resultantes.",
             "worst": "El objetivo está cerca del final o no existe, por lo que el rango crece hasta su límite.",
         },
         "ternaria": {
             "best": "El objetivo coincide con uno de los puntos de tercio en la primera división.",
-            "average": "El objetivo aparece después de descartar varios tercios del arreglo.",
+            "average": "La posición se obtiene del modelo uniforme y el costo promedio combina las divisiones requeridas en todas las posiciones posibles.",
             "worst": "El objetivo queda en la división más profunda o no existe en el arreglo.",
         },
     },
@@ -137,7 +137,7 @@ def search_case_inputs(algorithm, size, book_array=None):
         worst = list(range(size - 1)) + [max(size**3, size + 1)]
         return {
             "best": (base, base[len(base) // 2]),
-            "average": (average, average[len(average) // 2]),
+            "average": (average, random.choice(average)),
             "worst": (worst, worst[-2]),
         }
 
@@ -145,14 +145,22 @@ def search_case_inputs(algorithm, size, book_array=None):
         "binaria": (size - 1) // 2,
         "ternaria": (size - 1) // 3,
     }
-    average_indices = {
-        "binaria": max(0, (2 * size) // 5),
-        "ternaria": size // 2,
-        "saltos": min(size - 1, max(1, int(size**0.5) + size // 3)),
-        "exponencial": size // 2,
+    book_average_indices = {
+        # Posiciones utilizadas en los ejemplos de caso promedio del libro.
+        "secuencial": 4,
+        "binaria": 1,
+        "interpolacion": 2,
+        "saltos": 2,
+        "exponencial": 3,
+        "ternaria": 5,
     }
     best_index = best_indices.get(algorithm, 0)
-    average_index = average_indices.get(algorithm, size // 2)
+    if book_array is None:
+        # Una realización representativa del modelo uniforme. No se fija la
+        # mitad: ninguna posición es más probable que otra bajo este modelo.
+        average_index = random.randrange(size)
+    else:
+        average_index = min(size - 1, book_average_indices.get(algorithm, 0))
     worst_target = base[-1] + 1
     if algorithm == "interpolacion" and book_array is not None:
         worst_target = base[-2] if len(base) > 1 else base[0]

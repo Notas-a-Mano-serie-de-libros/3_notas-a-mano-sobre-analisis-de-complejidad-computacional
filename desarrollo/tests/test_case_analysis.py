@@ -28,6 +28,17 @@ def test_search_case_inputs_satisfy_best_average_and_worst_conditions():
     assert worst_target == worst_values[-2]
 
 
+def test_average_search_case_samples_the_declared_uniform_model(monkeypatch):
+    monkeypatch.setattr(case_analysis.random, "randrange", lambda size: size - 2)
+    cases = case_analysis.search_case_inputs("secuencial", 8)
+
+    average_values, average_target = cases["average"]
+    assert average_target == average_values[-2]
+    assert "todas las posiciones son igual de probables" in (
+        case_analysis.CASE_NOTES["search"]["secuencial"]["average"]
+    )
+
+
 def test_sort_case_inputs_use_canonical_arrangements_and_book_values():
     bubble = case_analysis.sort_case_inputs("burbuja", 5, [5, 1, 4, 2, 8])
     assert bubble["best"] == [1, 2, 4, 5, 8]
