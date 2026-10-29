@@ -198,6 +198,7 @@ CHAPTER_CONFIGS = {
             for name in (
                 "__init__.py",
                 "animation_runtime.py",
+                "case_analysis.py",
                 "chart_runtime.py",
                 "desk_check.py",
                 "exercise_laboratory.py",
@@ -254,6 +255,7 @@ CHAPTER_CONFIGS = {
             for name in (
                 "__init__.py",
                 "animation_runtime.py",
+                "case_analysis.py",
                 "chart_runtime.py",
                 "desk_check.py",
                 "exercise_laboratory.py",

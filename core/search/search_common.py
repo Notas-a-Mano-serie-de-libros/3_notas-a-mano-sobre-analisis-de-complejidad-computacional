@@ -10,6 +10,7 @@ import ipywidgets as widgets
 from IPython.display import display
 
 from common.animation_runtime import FormulaOutput, OutputCache, formula_iframe_height, pause, set_disabled
+from common.case_analysis import run_case_analysis
 from common.desk_check import render_desk_check, search_desk_row
 from common.simulation_views import (
     SECTION_CONFIGURATION,
@@ -1375,6 +1376,25 @@ def run_search_app(
     state_history.append(copy_search_state(state))
     step_back_button.disabled = True
     redraw()
+
+    def build_case_state(values, target, _case):
+        return create_state(
+            size=len(values),
+            target=target,
+            values=values,
+            **current_kwargs(),
+        )
+
+    run_case_analysis(
+        family="search",
+        algorithm=state.get("algorithm", "secuencial"),
+        build_state=build_case_state,
+        step_state=step_search,
+        copy_state=copy_search_state,
+        default_size=default_size,
+        max_size=max_size,
+        book_array=book_array or [node["value"] for node in state["arr"]],
+    )
 
 
 __all__ = [
