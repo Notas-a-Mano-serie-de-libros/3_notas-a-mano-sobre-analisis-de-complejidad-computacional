@@ -227,11 +227,11 @@ def _search_array_html(state, role_styles):
     )
     boxes = []
     for index, (value, role) in enumerate(zip(raw_values, roles, strict=False)):
-        fill, border, text = role_styles.get(role, role_styles["default"])
+        fill, _border, text = role_styles.get(role, role_styles["default"])
         if role == "target":
-            _default_fill, border, text = role_styles["default"]
+            _default_fill, _default_border, text = role_styles["default"]
         boxes.append(
-            f'<span class="case-analysis__item" style="background:{fill};border-color:{border};color:{text}" '
+            f'<span class="case-analysis__item" style="background:{fill};border-color:#111111;color:{text}" '
             f'role="listitem" aria-label="Posición {index}, valor {escape(str(value))}, estado {escape(str(role))}">'
             f'{escape(str(value))}</span>'
         )
@@ -251,12 +251,12 @@ def _sort_array_html(state, role_styles):
     bars = []
     indexes = []
     for index, (value, role, number) in enumerate(zip(values, roles, numeric, strict=False)):
-        fill, border, text = role_styles.get(role, role_styles["default"])
+        fill, _border, text = role_styles.get(role, role_styles["default"])
         height = 18 + round(142 * number / maximum)
         bars.append(
             '<span class="case-analysis__bar-wrap">'
             f'<span class="case-analysis__bar-value">{escape(str(value))}</span>'
-            f'<span class="case-analysis__bar" style="height:{height}px;background:{fill};border-color:{border};color:{text}"></span>'
+            f'<span class="case-analysis__bar" style="height:{height}px;background:{fill};border-color:#6b7280;color:{text}"></span>'
             '</span>'
         )
         indexes.append(f'<span class="case-analysis__index">{index}</span>')
@@ -326,7 +326,7 @@ CASE_ANALYSIS_STYLES = f"""
 .case-analysis-root .case-analysis__indexes,.case-analysis-root .case-analysis__array{{display:grid;grid-template-columns:repeat(var(--case-count),minmax(0,54px));justify-content:center;width:100%}}
 .case-analysis-root .case-analysis__indexes{{min-height:22px;padding-bottom:3px}}
 .case-analysis-root .case-analysis__index{{text-align:center;font-size:17px;line-height:20px;color:#444}}
-.case-analysis-root .case-analysis__item{{display:flex;height:50px;align-items:center;justify-content:center;border:2px solid #111;border-left-width:0;font-size:25px;box-sizing:border-box}}
+.case-analysis-root .case-analysis__item{{display:flex;height:54px;align-items:center;justify-content:center;border:2px solid #111111;border-left-width:0;font-size:26px;box-sizing:border-box}}
 .case-analysis-root .case-analysis__item:first-child{{border-left-width:2px}}
 .case-analysis-root .case-analysis__bars{{display:flex;align-items:flex-end;justify-content:center;min-height:184px}}
 .case-analysis-root .case-analysis__bar-wrap{{display:flex;flex:1 1 0;max-width:34px;min-width:8px;height:180px;flex-direction:column;justify-content:flex-end;text-align:center}}
