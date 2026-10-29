@@ -148,6 +148,9 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     assert "prefers-reduced-motion" in source
     assert "milestoneFor" in source
     assert "updateSummary" in source
+    assert '<table><thead><tr><th scope="col">Posición</th>' in source
+    assert 'class="growth-app__summary-formula"' in source
+    assert "growth-app__summary-table-wrap" in source
     assert "chartMaximum" in source
     assert "setPauseVisual" in source
     assert "const text = canContinue ? 'Continuar' : 'Pausar'" in source
