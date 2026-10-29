@@ -106,3 +106,77 @@ def run_rapido_pivotes():
 
 def run_radix():
     _run("7_ordenamiento_radix_app.py", "cap8_radix_app")
+
+
+_CASE_SORTS = {
+    "burbuja": "1_ordenamiento_burbuja_app.py",
+    "seleccion": "2_ordenamiento_seleccion_app.py",
+    "insercion": "3_ordenamiento_insercion_app.py",
+    "shell": "4_ordenamiento_shell_app.py",
+    "mezcla": "5_ordenamiento_mezcla_app.py",
+    "rapido": "6_ordenamiento_rapido_app.py",
+    "radix": "7_ordenamiento_radix_app.py",
+}
+
+
+def _run_case_analysis(algorithm):
+    module = _load_module(_CASE_SORTS[algorithm], f"cap8_{algorithm}_cases_app")
+    from sort_common import DEFAULT_BAR_SIZE, MAX_SIZE, ROLE_STYLES, copy_sort_state, create_state, step_sort
+
+    from common.case_analysis import run_case_analysis
+
+    def build_state(values, _target, _case):
+        return create_state(
+            algorithm=algorithm,
+            size=len(values),
+            descending=False,
+            values=values,
+            view="barras",
+            pivot_strategy="end" if algorithm == "rapido" else "middle",
+            partition_scheme="hoare",
+            gap_sequence="shell",
+            radix_max=max((abs(int(value)) for value in values), default=9),
+            radix_data_type="numero",
+            radix_number_mode="positive",
+            radix_base=10,
+        )
+
+    run_case_analysis(
+        family="sort",
+        algorithm=algorithm,
+        build_state=build_state,
+        step_state=step_sort,
+        copy_state=copy_sort_state,
+        default_size=DEFAULT_BAR_SIZE,
+        max_size=MAX_SIZE,
+        book_array=module.BOOK_ARRAY,
+        role_styles=ROLE_STYLES,
+    )
+
+
+def run_burbuja_casos():
+    _run_case_analysis("burbuja")
+
+
+def run_seleccion_casos():
+    _run_case_analysis("seleccion")
+
+
+def run_insercion_casos():
+    _run_case_analysis("insercion")
+
+
+def run_shell_casos():
+    _run_case_analysis("shell")
+
+
+def run_mezcla_casos():
+    _run_case_analysis("mezcla")
+
+
+def run_rapido_casos():
+    _run_case_analysis("rapido")
+
+
+def run_radix_casos():
+    _run_case_analysis("radix")

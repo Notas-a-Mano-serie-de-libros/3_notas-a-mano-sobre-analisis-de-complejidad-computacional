@@ -19,6 +19,12 @@ from common.simulation_views import (
     actions,
     build_simulation_view,
 )
+from common.visual_roles import (
+    RESULT_SYMBOL_BASE_CSS,
+    RESULT_SYMBOL_BOX_SIZE,
+    RESULT_SYMBOL_FAILURE_COLOR,
+    RESULT_SYMBOL_SUCCESS_COLOR,
+)
 from common.widget_controls import (
     SPEED_OPTIONS,
     bounded_int_control,
@@ -116,23 +122,71 @@ def sort_case_inputs(algorithm, size, book_array=None):
     return {"best": best, "average": average, "worst": worst}
 
 
-def _array_html(state, family):
+def _result_symbol(state, family):
+    complete_key = "search_complete" if family == "search" else "sorting_complete"
+    if not state.get(complete_key):
+        return ""
+    if family == "sort":
+        return '<span class="case-result-symbol found" role="img" aria-label="Ordenado" title="Ordenado">✓</span>'
+    found = any(node.get("role") == "found" for node in state.get("arr", []))
+    symbol = "✓" if found else "×"
+    label = "Encontrado" if found else "No encontrado"
+    class_name = "found" if found else "missing"
+    return (
+        f'<span class="case-result-symbol {class_name}" role="img" '
+        f'aria-label="{label}" title="{label}">{symbol}</span>'
+    )
+
+
+def _search_array_html(state, role_styles):
     values = state.get("arr", [])
-    if family == "search":
-        roles = [node.get("role", "default") for node in values]
-        values = [node.get("value") for node in values]
-    else:
-        roles = list(state.get("roles", ["default"] * len(values)))
+    roles = [node.get("role", "default") for node in values]
+    raw_values = [node.get("value") for node in values]
+    indexes = "".join(
+        f'<span class="case-analysis__index">{index}</span>' for index in range(len(raw_values))
+    )
     boxes = "".join(
-        f'<span class="case-analysis__item role-{_token(role)}" role="listitem" '
+        f'<span class="case-analysis__item" style="background:{role_styles.get(role, role_styles["default"])[0]};'
+        f'border-color:{role_styles.get(role, role_styles["default"])[1]};'
+        f'color:{role_styles.get(role, role_styles["default"])[2]}" role="listitem" '
         f'aria-label="Posición {index}, valor {escape(str(value))}, estado {escape(str(role))}">'
         f'{escape(str(value))}</span>'
-        for index, (value, role) in enumerate(zip(values, roles, strict=False))
+        for index, (value, role) in enumerate(zip(raw_values, roles, strict=False))
     )
-    return f'<div class="case-analysis__array" role="list">{boxes}</div>'
+    count = max(1, len(raw_values))
+    return (
+        f'<div class="case-analysis__array-wrap" style="--case-count:{count}">'
+        f'<div class="case-analysis__indexes">{indexes}</div>'
+        f'<div class="case-analysis__array" role="list">{boxes}</div></div>'
+    )
 
 
-def _result_html(cases, family):
+def _sort_array_html(state, role_styles):
+    values = list(state.get("arr", []))
+    roles = list(state.get("roles", ["default"] * len(values)))
+    numeric = [abs(float(value)) for value in values]
+    maximum = max(numeric, default=1.0) or 1.0
+    bars = []
+    indexes = []
+    for index, (value, role, number) in enumerate(zip(values, roles, numeric, strict=False)):
+        fill, border, text = role_styles.get(role, role_styles["default"])
+        height = 18 + round(142 * number / maximum)
+        bars.append(
+            '<span class="case-analysis__bar-wrap">'
+            f'<span class="case-analysis__bar-value">{escape(str(value))}</span>'
+            f'<span class="case-analysis__bar" style="height:{height}px;background:{fill};border-color:{border};color:{text}"></span>'
+            '</span>'
+        )
+        indexes.append(f'<span class="case-analysis__index">{index}</span>')
+    count = max(1, len(values))
+    return (
+        f'<div class="case-analysis__bars-wrap" style="--case-count:{count}">'
+        f'<div class="case-analysis__bars">{"".join(bars)}</div>'
+        f'<div class="case-analysis__indexes">{"".join(indexes)}</div></div>'
+    )
+
+
+def _result_html(cases, family, role_styles):
     rows = []
     for case in CASE_ORDER:
         entry = cases[case]
@@ -140,24 +194,59 @@ def _result_html(cases, family):
         target = entry.get("target", "Orden ascendente")
         step = entry["index"]
         total = max(0, len(entry["trace"]) - 1)
+        visual = (
+            _search_array_html(state, role_styles)
+            if family == "search"
+            else _sort_array_html(state, role_styles)
+        )
         rows.append(
             f'<div class="case-analysis__row case-analysis__row-{case}">'
             f'<strong class="case-analysis__case">{CASE_LABELS[case]}</strong>'
             f'<span class="case-analysis__target">{escape(str(target))}</span>'
             f'<span class="case-analysis__step">{step} / {total}</span>'
-            f'{_array_html(state, family)}</div>'
+            f'<div class="case-analysis__visual">{visual}'
+            f'<span class="case-analysis__result" aria-live="polite">{_result_symbol(state, family)}</span>'
+            f'</div></div>'
         )
     return (
-        '<section class="case-analysis" aria-label="Análisis por casos">'
+        '<section class="comparison-app case-analysis" aria-label="Análisis por casos">'
         '<div class="case-analysis__header"><strong>Caso</strong><strong>Objetivo</strong>'
         '<strong>Paso</strong><strong>Arreglo</strong></div>'
         f'{"".join(rows)}</section>'
     )
 
 
-CASE_ANALYSIS_STYLES = """
+CASE_ANALYSIS_STYLES = f"""
 <style>
-.case-analysis-root{margin-top:22px}.case-analysis-root .case-analysis-title{margin:0;padding:14px 14px 2px;font:700 20px/1.3 sans-serif}.case-analysis-root .case-analysis-subtitle{margin:0;padding:0 14px 10px;color:#666;font:13px/1.4 sans-serif}.case-analysis-root .case-analysis-intro{margin:0;padding:12px 14px;border-left:4px solid #1976d2;background:#f3f8fd;font:14px/1.45 sans-serif}.case-analysis-root .case-analysis{width:100%;overflow-x:auto;font-family:'STIX Two Math','Cambria Math',serif}.case-analysis-root .case-analysis__header,.case-analysis-root .case-analysis__row{display:grid;grid-template-columns:138px 100px 86px minmax(520px,1fr);align-items:center;min-width:844px;border:1px solid #d0d0d0;border-bottom:0}.case-analysis-root .case-analysis__row:last-child{border-bottom:1px solid #d0d0d0}.case-analysis-root .case-analysis__header{background:#ededed;text-align:center;padding:9px 8px}.case-analysis-root .case-analysis__row{min-height:86px;padding:12px 8px;background:#fff}.case-analysis-root .case-analysis__row-average{background:#fafafa}.case-analysis-root .case-analysis__case,.case-analysis-root .case-analysis__target,.case-analysis-root .case-analysis__step{text-align:center}.case-analysis-root .case-analysis__case{font-size:16px}.case-analysis-root .case-analysis__target,.case-analysis-root .case-analysis__step{font-size:14px}.case-analysis-root .case-analysis__array{display:flex;align-items:center;min-height:52px;padding:4px 8px;overflow-x:auto}.case-analysis-root .case-analysis__item{display:flex;flex:0 0 48px;height:48px;align-items:center;justify-content:center;border:2px solid #111;background:#fff;font-size:18px}.case-analysis-root .case-analysis__item+.case-analysis__item{border-left:0}.case-analysis-root .role-current,.case-analysis-root .role-active{background:#dcecff;border-color:#6f99cc}.case-analysis-root .role-probe,.case-analysis-root .role-compare{background:#ffdede;border-color:#c85b5b}.case-analysis-root .role-found,.case-analysis-root .role-sorted{background:#e8f8dc;border-color:#86c96b}.case-analysis-root .role-excluded,.case-analysis-root .role-inactive{background:#eef1f2;border-color:#cfd6d8;color:#777}.case-analysis-root .role-swap,.case-analysis-root .role-write{background:#fff0cf;border-color:#d5ad47}.case-analysis-root .role-pivot,.case-analysis-root .role-boundary{background:#f2e3ff;border-color:#986bc4}.case-analysis-root .case-analysis-controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;padding:12px 14px!important}.case-analysis-root .case-analysis-actions{margin-top:0!important}.case-analysis-root .widget-button{white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}@media(max-width:720px){.case-analysis-root .case-analysis__header,.case-analysis-root .case-analysis__row{grid-template-columns:120px 84px 74px minmax(470px,1fr)}}
+.case-analysis-root{{width:100%;max-width:100%;background:#fff;color:#111}}
+.case-analysis-root .case-analysis{{width:100%;padding:0 8px 12px;overflow-x:auto;font-family:'Scheherazade New','STIX Two Math','Cambria Math',serif;box-sizing:border-box}}
+.case-analysis-root .case-analysis__header,.case-analysis-root .case-analysis__row{{display:grid;grid-template-columns:minmax(130px,190px) 110px 88px minmax(520px,1fr);align-items:center;gap:10px;min-width:900px;background:#fff}}
+.case-analysis-root .case-analysis__header{{padding:10px 8px 12px;font-size:21px;text-align:center}}
+.case-analysis-root .case-analysis__row{{min-height:96px;padding:8px}}
+.case-analysis-root .case-analysis__case,.case-analysis-root .case-analysis__target,.case-analysis-root .case-analysis__step{{text-align:center}}
+.case-analysis-root .case-analysis__case{{font-size:21px;line-height:1.2}}
+.case-analysis-root .case-analysis__target,.case-analysis-root .case-analysis__step{{font-size:19px;color:#444}}
+.case-analysis-root .case-analysis__visual{{display:grid;grid-template-columns:minmax(0,1fr) {RESULT_SYMBOL_BOX_SIZE}px;gap:4px;align-items:center;min-width:0}}
+.case-analysis-root .case-analysis__array-wrap,.case-analysis-root .case-analysis__bars-wrap{{width:100%;min-width:0}}
+.case-analysis-root .case-analysis__indexes,.case-analysis-root .case-analysis__array{{display:grid;grid-template-columns:repeat(var(--case-count),minmax(0,54px));justify-content:center;width:100%}}
+.case-analysis-root .case-analysis__indexes{{min-height:22px;padding-bottom:3px}}
+.case-analysis-root .case-analysis__index{{text-align:center;font-size:17px;line-height:20px;color:#444}}
+.case-analysis-root .case-analysis__item{{display:flex;height:50px;align-items:center;justify-content:center;border:2px solid #111;border-left-width:0;font-size:25px;box-sizing:border-box}}
+.case-analysis-root .case-analysis__item:first-child{{border-left-width:2px}}
+.case-analysis-root .case-analysis__bars{{display:flex;align-items:flex-end;justify-content:center;min-height:184px}}
+.case-analysis-root .case-analysis__bar-wrap{{display:flex;flex:1 1 0;max-width:34px;min-width:8px;height:180px;flex-direction:column;justify-content:flex-end;text-align:center}}
+.case-analysis-root .case-analysis__bar-value{{height:18px;font-size:14px;line-height:16px;overflow:hidden}}
+.case-analysis-root .case-analysis__bar{{display:block;width:100%;border:1px solid #6b7280;box-sizing:border-box}}
+.case-analysis-root .case-analysis__bars-wrap .case-analysis__indexes{{display:flex;justify-content:center}}
+.case-analysis-root .case-analysis__bars-wrap .case-analysis__index{{flex:1 1 0;max-width:34px;min-width:8px}}
+.case-analysis-root .case-analysis__result{{display:flex;width:{RESULT_SYMBOL_BOX_SIZE}px;height:58px;align-items:center;justify-content:center}}
+.case-analysis-root .case-result-symbol{{{RESULT_SYMBOL_BASE_CSS}}}
+.case-analysis-root .case-result-symbol.found{{color:{RESULT_SYMBOL_SUCCESS_COLOR}}}
+.case-analysis-root .case-result-symbol.missing{{color:{RESULT_SYMBOL_FAILURE_COLOR}}}
+.case-analysis-root .case-analysis-controls{{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;padding:12px 14px!important}}
+.case-analysis-root .case-analysis-actions{{margin-top:0!important}}
+.case-analysis-root .widget-button{{white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}}
+@media(max-width:720px){{.case-analysis-root .case-analysis__header,.case-analysis-root .case-analysis__row{{grid-template-columns:130px 96px 74px minmax(520px,1fr)}}}}
 </style>
 """
 
@@ -172,8 +261,9 @@ def run_case_analysis(
     default_size,
     max_size,
     book_array,
+    role_styles,
 ):
-    """Muestra una segunda simulación paralela para los tres casos canónicos."""
+    """Muestra una simulación independiente para los tres casos canónicos."""
     size_input = bounded_int_control(
         value=default_size,
         min_value=2,
@@ -188,17 +278,15 @@ def run_case_analysis(
         description="",
         width="150px",
     )
-    play_button = action_button("play", label="Reproducir", width="130px")
-    pause_button = action_button("play", label="Pausar", width="120px", disabled=True)
-    pause_button.icon = "pause"
+    step_back_button = action_button("step_back", disabled=True)
+    step_button = action_button("step")
+    auto_button = action_button("play")
     finish_button = action_button("finish")
-    restart_button = action_button("restart")
     new_button = action_button("reset", label="Generar nuevos arreglos", width="235px")
     book_button = action_button("book", label="Generar arreglos del libro", width="250px")
     output = widgets.HTML(layout=widgets.Layout(width="100%"))
     animation = {
         "run_id": 0,
-        "paused": False,
         "running": False,
         "book": False,
         "updating": False,
@@ -244,45 +332,50 @@ def run_case_analysis(
                     "state": trace[0], "trace": trace, "index": 0, "target": "Ascendente"
                 }
         animation["running"] = False
-        animation["paused"] = False
-        pause_button.description = "Pausar"
-        pause_button.icon = "pause"
-        pause_button.disabled = True
-        play_button.disabled = False
-        finish_button.disabled = False
-        output.value = _result_html(cases, family)
+        sync_buttons()
+        output.value = _result_html(cases, family, role_styles)
 
     def redraw():
-        output.value = _result_html(cases, family)
+        output.value = _result_html(cases, family, role_styles)
 
     def finished():
         return all(entry["index"] >= len(entry["trace"]) - 1 for entry in cases.values())
 
+    def at_start():
+        return all(entry["index"] == 0 for entry in cases.values())
+
+    def sync_buttons():
+        complete = finished()
+        step_back_button.disabled = at_start() or animation["running"]
+        step_button.disabled = complete or animation["running"]
+        auto_button.disabled = complete or animation["running"]
+        finish_button.disabled = complete
+        new_button.disabled = animation["running"]
+        book_button.disabled = animation["running"]
+
+    def move(delta):
+        for entry in cases.values():
+            last = len(entry["trace"]) - 1
+            entry["index"] = max(0, min(last, entry["index"] + delta))
+            entry["state"] = entry["trace"][entry["index"]]
+        redraw()
+        sync_buttons()
+
     async def animate(run_id):
         animation["running"] = True
-        play_button.disabled = True
-        pause_button.disabled = False
+        sync_buttons()
         while run_id == animation["run_id"] and not finished():
-            if animation["paused"]:
-                await asyncio.sleep(0.05)
-                continue
-            for entry in cases.values():
-                if entry["index"] < len(entry["trace"]) - 1:
-                    entry["index"] += 1
-                    entry["state"] = entry["trace"][entry["index"]]
-            redraw()
+            move(1)
             await asyncio.sleep(0.38 / float(speed_input.value or 1.0))
         if run_id == animation["run_id"]:
             animation["running"] = False
-            pause_button.disabled = True
-            play_button.disabled = finished()
+            sync_buttons()
 
-    def play(*_args):
-        if finished():
-            rebuild(animation["book"])
+    def run_auto(*_args):
+        if finished() or animation["running"]:
+            return
         animation["run_id"] += 1
         run_id = animation["run_id"]
-        animation["paused"] = False
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
@@ -290,12 +383,13 @@ def run_case_analysis(
         else:
             loop.create_task(animate(run_id))
 
-    def toggle_pause(*_args):
-        if not animation["running"]:
-            return
-        animation["paused"] = not animation["paused"]
-        pause_button.description = "Continuar" if animation["paused"] else "Pausar"
-        pause_button.icon = "play" if animation["paused"] else "pause"
+    def step_once(*_args):
+        if not animation["running"] and not finished():
+            move(1)
+
+    def step_back_once(*_args):
+        if not animation["running"] and not at_start():
+            move(-1)
 
     def finish(*_args):
         animation["run_id"] += 1
@@ -304,27 +398,12 @@ def run_case_analysis(
             entry["state"] = entry["trace"][-1]
         redraw()
         animation["running"] = False
-        pause_button.disabled = True
-        play_button.disabled = True
+        sync_buttons()
 
-    def restart(*_args):
-        animation["run_id"] += 1
-        for entry in cases.values():
-            entry["index"] = 0
-            entry["state"] = entry["trace"][0]
-        redraw()
-        animation["running"] = False
-        animation["paused"] = False
-        pause_button.description = "Pausar"
-        pause_button.icon = "pause"
-        pause_button.disabled = True
-        play_button.disabled = False
-        finish_button.disabled = False
-
-    play_button.on_click(play)
-    pause_button.on_click(toggle_pause)
+    step_back_button.on_click(step_back_once)
+    step_button.on_click(step_once)
+    auto_button.on_click(run_auto)
     finish_button.on_click(finish)
-    restart_button.on_click(restart)
     new_button.on_click(lambda *_args: rebuild(False))
     book_button.on_click(lambda *_args: rebuild(True))
     size_input.observe(
@@ -342,24 +421,12 @@ def run_case_analysis(
         layout=widgets.Layout(width="100%", display="flex", flex_flow="row wrap", grid_gap="12px 36px"),
     )
     controls.add_class("case-analysis-controls")
-    configuration = widgets.VBox(
-        [
-            widgets.HTML(
-                '<h3 class="case-analysis-title">Análisis por casos</h3>'
-                '<p class="case-analysis-subtitle">Compara simultáneamente el mejor caso, el caso promedio y el peor caso.</p>'
-            ),
-            controls,
-        ],
-        layout=widgets.Layout(width="100%"),
-    )
+    configuration = widgets.VBox([controls], layout=widgets.Layout(width="100%"))
     button_row = actions(
-        [play_button, pause_button, finish_button, restart_button, new_button, book_button]
+        [step_back_button, step_button, auto_button, finish_button, new_button, book_button]
     )
     button_row.add_class("case-analysis-actions")
-    intro = widgets.HTML(
-        '<p class="case-analysis-intro">Los tres arreglos se ejecutan en paralelo para comparar cómo cambia el número de pasos entre el mejor caso, el caso promedio y el peor caso.</p>'
-    )
-    result = widgets.VBox([intro, output], layout=widgets.Layout(width="100%"))
+    result = widgets.VBox([output], layout=widgets.Layout(width="100%"))
     layout = build_simulation_view(
         SimulationViewSpec(
             root_class="case-analysis-root",

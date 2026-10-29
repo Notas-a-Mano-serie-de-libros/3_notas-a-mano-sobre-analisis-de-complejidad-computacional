@@ -66,6 +66,10 @@ def test_case_analysis_uses_plural_actions_and_objective_column(monkeypatch):
         default_size=5,
         max_size=12,
         book_array=[0, 1, 2, 3, 4],
+        role_styles={
+            "default": ("#fff", "#111", "#111"),
+            "found": ("#e8fce9", "#97d077", "#111"),
+        },
     )
 
     assert captured == [root]
@@ -77,8 +81,10 @@ def test_case_analysis_uses_plural_actions_and_objective_column(monkeypatch):
     }
     assert "Generar nuevos arreglos" in labels
     assert "Generar arreglos del libro" in labels
-    assert "Reproducir" in labels
-    assert "Pausar" in labels
+    assert "Paso anterior" in labels
+    assert "Paso siguiente" in labels
+    assert "Ejecución automática" in labels
+    assert "Finalizar" in labels
     rendered = "".join(
         widget.value
         for widget in descendants
@@ -89,6 +95,22 @@ def test_case_analysis_uses_plural_actions_and_objective_column(monkeypatch):
     assert "Peor caso" in rendered
     assert "Objetivo" in rendered
     assert "Paso" in rendered
+
+
+def test_case_analysis_renders_standard_completion_symbols():
+    found = {
+        "arr": [{"value": 1, "role": "found"}],
+        "search_complete": True,
+    }
+    missing = {
+        "arr": [{"value": 1, "role": "excluded"}],
+        "search_complete": True,
+    }
+    ordered = {"arr": [1], "roles": ["sorted"], "sorting_complete": True}
+
+    assert ">✓<" in case_analysis._result_symbol(found, "search")
+    assert ">×<" in case_analysis._result_symbol(missing, "search")
+    assert ">✓<" in case_analysis._result_symbol(ordered, "sort")
 
 
 def test_case_analysis_is_packaged_for_colab_and_jupyterlite():

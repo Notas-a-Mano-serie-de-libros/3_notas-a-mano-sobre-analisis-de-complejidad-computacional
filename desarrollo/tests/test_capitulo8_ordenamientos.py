@@ -1224,8 +1224,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         ).read_text(encoding="utf-8")
         chart_source = (DOMAIN_DIR / "ordenamientos_chart.py").read_text(encoding="utf-8")
 
-        self.assertEqual(len(code_cells), 1)
+        self.assertEqual(len(code_cells), 2)
         self.assertIn('SIMULATION_NAME = "radix"', "".join(code_cells[0]["source"]))
+        self.assertIn('SIMULATION_NAME = "radix_casos"', "".join(code_cells[-1]["source"]))
         for cell in code_cells:
             self.assertEqual(cell.get("outputs"), [])
             self.assertIsNone(cell.get("execution_count"))
@@ -1365,8 +1366,9 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         app_source = (DOMAIN_DIR / "4_ordenamiento_shell_app.py").read_text(encoding="utf-8")
 
-        self.assertEqual(len(code_cells), 2)
-        self.assertIn('SIMULATION_NAME = "shell_comparacion"', "".join(code_cells[-1]["source"]))
+        self.assertEqual(len(code_cells), 3)
+        self.assertIn('SIMULATION_NAME = "shell_comparacion"', "".join(code_cells[1]["source"]))
+        self.assertIn('SIMULATION_NAME = "shell_casos"', "".join(code_cells[-1]["source"]))
         self.assertIn('"shell_comparacion": "run_shell_comparacion"', bootstrap)
         self.assertIn("def run_shell_comparacion", launchers)
         self.assertIn("run_gap_comparison_app", app_source)
@@ -1380,9 +1382,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         app_source = (DOMAIN_DIR / "3_ordenamiento_insercion_app.py").read_text(encoding="utf-8")
 
-        self.assertEqual(len(code_cells), 3)
+        self.assertEqual(len(code_cells), 4)
         self.assertIn('SIMULATION_NAME = "insercion_binaria"', "".join(code_cells[1]["source"]))
         self.assertIn('SIMULATION_NAME = "insercion_comparacion"', "".join(code_cells[2]["source"]))
+        self.assertIn('SIMULATION_NAME = "insercion_casos"', "".join(code_cells[-1]["source"]))
         self.assertIn('"insercion_binaria": "run_insercion_binaria"', bootstrap)
         self.assertIn('"insercion_comparacion": "run_insercion_comparacion"', bootstrap)
         self.assertIn("def run_insercion_binaria", launchers)
@@ -1398,9 +1401,10 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         launchers = (CHAPTER_DIR / "runtime" / "launchers.py").read_text(encoding="utf-8")
         app_source = (DOMAIN_DIR / "6_ordenamiento_rapido_app.py").read_text(encoding="utf-8")
 
-        self.assertEqual(len(code_cells), 3)
+        self.assertEqual(len(code_cells), 4)
         self.assertIn('SIMULATION_NAME = "rapido_comparacion"', "".join(code_cells[1]["source"]))
         self.assertIn('SIMULATION_NAME = "rapido_pivotes"', "".join(code_cells[2]["source"]))
+        self.assertIn('SIMULATION_NAME = "rapido_casos"', "".join(code_cells[-1]["source"]))
         self.assertIn('"rapido_comparacion": "run_rapido_comparacion"', bootstrap)
         self.assertIn('"rapido_pivotes": "run_rapido_pivotes"', bootstrap)
         self.assertIn("def run_rapido_comparacion", launchers)
@@ -1606,13 +1610,13 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
                 notebook = json.loads((NOTEBOOK_DIR / notebook_name).read_text())
                 code_cells = [cell for cell in notebook["cells"] if cell["cell_type"] == "code"]
                 if notebook_name == "3_ordenamiento_insercion.ipynb":
-                    expected_code_cells = 3
+                    expected_code_cells = 4
                 elif notebook_name == "4_ordenamiento_shell.ipynb":
-                    expected_code_cells = 2
-                elif notebook_name == "6_ordenamiento_rapido.ipynb":
                     expected_code_cells = 3
+                elif notebook_name == "6_ordenamiento_rapido.ipynb":
+                    expected_code_cells = 4
                 else:
-                    expected_code_cells = 1
+                    expected_code_cells = 2
                 self.assertEqual(len(code_cells), expected_code_cells)
 
                 # Cell 0: simulation bootstrap
@@ -1630,6 +1634,10 @@ class TestCapitulo8IndividualNotebooks(unittest.TestCase):
                 self.assertNotIn("create_state", source)
                 self.assertEqual(code_cells[0].get("outputs"), [])
                 self.assertIsNone(code_cells[0].get("execution_count"))
+                case_source = "".join(code_cells[-1]["source"])
+                self.assertIn(f'SIMULATION_NAME = "{simulation_name}_casos"', case_source)
+                self.assertEqual(code_cells[-1].get("outputs"), [])
+                self.assertIsNone(code_cells[-1].get("execution_count"))
 
     def test_notebooks_omit_efficiency_by_array_size_section(self):
         for notebook_path in sorted(NOTEBOOK_DIR.glob("*.ipynb")):

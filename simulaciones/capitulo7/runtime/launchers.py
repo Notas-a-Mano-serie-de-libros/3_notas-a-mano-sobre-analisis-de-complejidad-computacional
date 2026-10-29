@@ -83,3 +83,60 @@ def run_interpolacion():
 def run_saltos():
     module = _load_module("4_busqueda_saltos_app.py", "cap7_saltos_app")
     module.run_app()
+
+
+_CASE_SEARCHES = {
+    "secuencial": ("1_busqueda_secuencial_app.py", "step_linear_search"),
+    "binaria": ("2_busqueda_binaria_app.py", "step_binary_search"),
+    "interpolacion": ("3_busqueda_interpolacion_app.py", "step_interpolation_search"),
+    "saltos": ("4_busqueda_saltos_app.py", "step_jump_search"),
+    "exponencial": ("5_busqueda_exponencial_app.py", "step_exponential_search"),
+    "ternaria": ("6_busqueda_ternaria_app.py", "step_ternary_search"),
+}
+
+
+def _run_case_analysis(algorithm):
+    relative_path, step_name = _CASE_SEARCHES[algorithm]
+    module = _load_module(relative_path, f"cap7_{algorithm}_cases_app")
+    from search_common import MAX_SIZE, copy_search_state
+
+    from common.case_analysis import run_case_analysis
+
+    def build_state(values, target, _case):
+        return module.create_state(size=len(values), target=target, values=values)
+
+    run_case_analysis(
+        family="search",
+        algorithm=algorithm,
+        build_state=build_state,
+        step_state=getattr(module, step_name),
+        copy_state=copy_search_state,
+        default_size=getattr(module, "DEFAULT_SIZE", 10),
+        max_size=MAX_SIZE,
+        book_array=module.BOOK_ARRAY,
+        role_styles=module.ROLE_STYLES,
+    )
+
+
+def run_secuencial_casos():
+    _run_case_analysis("secuencial")
+
+
+def run_binaria_casos():
+    _run_case_analysis("binaria")
+
+
+def run_interpolacion_casos():
+    _run_case_analysis("interpolacion")
+
+
+def run_saltos_casos():
+    _run_case_analysis("saltos")
+
+
+def run_exponencial_casos():
+    _run_case_analysis("exponencial")
+
+
+def run_ternaria_casos():
+    _run_case_analysis("ternaria")

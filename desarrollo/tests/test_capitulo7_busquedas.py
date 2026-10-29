@@ -382,12 +382,13 @@ class TestCapitulo7IndividualNotebooks(unittest.TestCase):
                     self.assertTrue(any("run_interpolation_visual" in source for source in sources))
                     self.assertTrue(any("def interpolation_search" in source for source in sources))
                     self.assertTrue(any("def fit_function" in source for source in sources))
+                    self.assertTrue(any('SIMULATION_NAME = "interpolacion_casos"' in source for source in sources))
                     for cell in code_cells:
                         self.assertEqual(cell.get("outputs"), [])
                         self.assertIsNone(cell.get("execution_count"))
                     continue
 
-                expected_code_cells = 2 if notebook_name == "6_busqueda_ternaria.ipynb" else 1
+                expected_code_cells = 3 if notebook_name == "6_busqueda_ternaria.ipynb" else 2
                 self.assertEqual(len(code_cells), expected_code_cells)
 
                 # Cell 0: simulation bootstrap
@@ -415,6 +416,11 @@ class TestCapitulo7IndividualNotebooks(unittest.TestCase):
                     self.assertIn('"savefig.dpi": 500', asymptotic_source)
                     self.assertEqual(code_cells[1].get("outputs"), [])
                     self.assertIsNone(code_cells[1].get("execution_count"))
+
+                case_source = "".join(code_cells[-1]["source"])
+                self.assertIn(f'SIMULATION_NAME = "{simulation_name}_casos"', case_source)
+                self.assertEqual(code_cells[-1].get("outputs"), [])
+                self.assertIsNone(code_cells[-1].get("execution_count"))
 
     def test_notebooks_omit_efficiency_by_array_size_section(self):
         notebook_dir = PROJECT_ROOT / "simulaciones" / "capitulo7" / "notebooks"

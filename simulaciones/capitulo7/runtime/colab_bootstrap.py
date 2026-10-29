@@ -41,6 +41,12 @@ SIMULATION_LAUNCHERS = {
     "saltos": "run_saltos",
     "exponencial": "run_exponencial",
     "ternaria": "run_ternaria",
+    "secuencial_casos": "run_secuencial_casos",
+    "binaria_casos": "run_binaria_casos",
+    "interpolacion_casos": "run_interpolacion_casos",
+    "saltos_casos": "run_saltos_casos",
+    "exponencial_casos": "run_exponencial_casos",
+    "ternaria_casos": "run_ternaria_casos",
 }
 
 

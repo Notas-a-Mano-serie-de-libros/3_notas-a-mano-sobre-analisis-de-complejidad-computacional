@@ -10,7 +10,6 @@ import ipywidgets as widgets
 from IPython.display import display
 
 from common.animation_runtime import FormulaOutput, OutputCache, formula_iframe_height, pause, set_disabled
-from common.case_analysis import run_case_analysis
 from common.desk_check import (
     pseudocode_algorithm_key,
     render_desk_check,
@@ -2530,34 +2529,6 @@ def run_sort_app(algorithm, book_array, has_pivot=False, has_tree=False, has_gap
     update_radix_control_visibility()
     redraw()
     sync_execution_buttons()
-
-    def build_case_state(values, _target, _case):
-        return create_state(
-            algorithm=algorithm,
-            size=len(values),
-            descending=False,
-            values=values,
-            view="cajas",
-            pivot_strategy="end" if algorithm == "rapido" else controls["pivot"].value,
-            partition_scheme=controls["partition"].value,
-            gap_sequence=controls["gap_sequence"].value,
-            radix_max=max((abs(int(value)) for value in values), default=9),
-            radix_data_type="numero",
-            radix_number_mode="positive",
-            radix_base=10,
-        )
-
-    run_case_analysis(
-        family="sort",
-        algorithm=algorithm,
-        build_state=build_case_state,
-        step_state=step_sort,
-        copy_state=copy_sort_state,
-        default_size=default_size_for_view("cajas"),
-        max_size=MAX_SIZE,
-        book_array=book_array,
-    )
-
 
 __all__ = [
     "DEFAULT_SIZE",
