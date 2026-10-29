@@ -205,11 +205,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo6/notebooks/comparacion_fibonacci.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2Fcomparacion_fibonacci.ipynb&revision=1050b61cd297" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2Fcomparacion_fibonacci.ipynb&revision=fe6e94be26af" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2Fcomparacion_fibonacci.ipynb&revision=1050b61cd297"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2Fcomparacion_fibonacci.ipynb&revision=fe6e94be26af"
     title="Simulación interactiva de Comparación de implementaciones de Fibonacci en JupyterLite"
     loading="lazy"
     scrolling="no"
@@ -233,11 +233,11 @@ Ejecuta este laboratorio interactivo integrado con **JupyterLite y Pyodide**. Ta
   </div>
   <div class="jupyterlite-demo__actions">
     <a class="md-button colab-button" href="https://colab.research.google.com/github/Notas-a-Mano-serie-de-libros/3_notas-a-mano-sobre-analisis-de-complejidad-computacional/blob/main/simulaciones/capitulo6/notebooks/ejemplo_recursion.ipynb" target="_blank" rel="noopener noreferrer">Abrir en Colab</a>
-    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2Fejemplo_recursion.ipynb&revision=1050b61cd297" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
+    <a class="md-button jupyterlite-button" href="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2Fejemplo_recursion.ipynb&revision=fe6e94be26af" target="_blank" rel="noopener noreferrer">Abrir en pantalla completa</a>
   </div>
   <iframe
     class="jupyterlite-demo__frame"
-    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2Fejemplo_recursion.ipynb&revision=1050b61cd297"
+    src="../../../jupyterlite/graficas/notebooks/index.html?path=simulaciones%2Fcapitulo6%2Fnotebooks%2Fejemplo_recursion.ipynb&revision=fe6e94be26af"
     title="Simulación interactiva de Ejemplos de análisis de recursión en JupyterLite"
     loading="lazy"
     scrolling="no"

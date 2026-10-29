@@ -190,7 +190,6 @@ def run_chart(fast=False) -> None:
     theory_check, algo_checks, algo_label, algo_grid = create_algorithm_controls(
         _CONFIGS,
         checkbox_width="150px",
-        grid_template_columns="repeat(5, 160px)",
     )
     out = widgets.Output()
 

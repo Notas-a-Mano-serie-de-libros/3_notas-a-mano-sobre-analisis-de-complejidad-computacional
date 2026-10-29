@@ -113,10 +113,6 @@ def build_range_formula(state):
     return exponential_formula(state=state)
 
 
-def symbolic_mid_formula(state=None):
-    return exponential_formula(state=state)
-
-
 def build_mid_formula(state):
     exponential_status, linear_status = phase_statuses(state)
     return rf"""

@@ -218,7 +218,7 @@ def configure_log_axes(ax, *, title, x_limit, legend_columns=1):
     ax.xaxis.set_major_formatter(mticker.FuncFormatter(format_large_tick))
 
 
-def create_algorithm_controls(configs, *, checkbox_width, grid_template_columns):
+def create_algorithm_controls(configs, *, checkbox_width):
     theory_check = widgets.Checkbox(
         value=False,
         description="Superponer funciones teóricas",

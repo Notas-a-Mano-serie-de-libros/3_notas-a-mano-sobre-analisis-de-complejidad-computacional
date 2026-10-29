@@ -599,7 +599,7 @@ def tabbed_panel(tabs, *, prefix, default_index=0, on_tab_change=None):
     return panel
 
 
-def compact_controls_grid(groups, columns):
+def compact_controls_grid(groups):
     return widgets.Box(
         groups,
         layout=widgets.Layout(

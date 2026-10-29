@@ -412,13 +412,6 @@ def packed_tree_layout(nodes, slot_width=TREE_SLOT_WIDTH, block_gap=TREE_BLOCK_G
     return tree_width, positions
 
 
-def visible_tree_depth(state):
-    nodes = state.get("merge_tree_nodes") or state.get("quick_tree_nodes") or []
-    if nodes:
-        return max(node["depth"] for node in nodes)
-    return 0
-
-
 def node_center(node, slot_width, left_offset=0, positions=None):
     if positions is not None and tree_node_key(node) in positions:
         return positions[tree_node_key(node)]["center"]

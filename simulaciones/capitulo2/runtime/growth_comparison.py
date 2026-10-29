@@ -92,13 +92,6 @@ def _log_value(key: str, n: float) -> float | None:
     raise ValueError(f"Familia desconocida: {key}")
 
 
-def _ratio(log_value: float | None, log_maximum: float) -> float:
-    if log_value is None:
-        return 0.0
-    difference = log_value - log_maximum
-    return math.exp(difference) if difference > -745 else 0.0
-
-
 def _decimal(value: float, digits: int = 2) -> str:
     if abs(value - round(value)) < 1e-9:
         return str(int(round(value)))

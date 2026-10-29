@@ -26,7 +26,6 @@ except (ImportError, ModuleNotFoundError):
 
 RUNNING_IN_COLAB = _colab_output is not None
 SUBSCRIPT = str.maketrans("0123456789-", "₀₁₂₃₄₅₆₇₈₉₋")
-SUPERSCRIPT = str.maketrans("0123456789-", "⁰¹²³⁴⁵⁶⁷⁸⁹⁻")
 MAX_VISIBLE_LEAVES = 128
 NODE_RADIUS = 29
 MINIMUM_LEAF_SPACING = 82
@@ -46,10 +45,6 @@ FUNCTION_LATEX = {
 
 def _subscript(value):
     return str(value).translate(SUBSCRIPT)
-
-
-def _superscript(value):
-    return str(value).translate(SUPERSCRIPT)
 
 
 def _visible_depth(branching_factor, requested_depth):
@@ -128,10 +123,6 @@ def _base_levels(branching_factor, depth, balanced):
     return frozenset(
         node["level"] for node in _walk(root) if not node["children"]
     )
-
-
-def _node_label(node):
-    return f"f(n{_subscript(node['level'])})"
 
 
 def _node_label_markup(node):

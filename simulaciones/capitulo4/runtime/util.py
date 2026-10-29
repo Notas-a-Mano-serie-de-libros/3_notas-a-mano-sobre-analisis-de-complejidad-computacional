@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 from matplotlib import ticker
 
 try:
@@ -63,59 +62,3 @@ def _format_axis_text(ax):
     ax.tick_params(axis='both', labelsize=10)
     for label in (*ax.get_xticklabels(), *ax.get_yticklabels()):
         label.set_fontfamily('STIXGeneral')
-
-def graficar_complejidad(x, y_experimental, y_teorico, nombre_archivo, ylabel, funcion,
-                         titulo='Complejidad teórica vs experimental',
-                         xlabel='Cantidad de datos de entrada (n)',
-                         path=None,
-                         legend_loc='best',
-                         y_headroom=0.08):
-    fig, ax = plt.subplots(figsize=ORIGINAL_FIGSIZE)
-    ax.plot(
-        x,
-        y_experimental,
-        label=rf'${funcion}\ \mathrm{{experimental}}$',
-        color='#1f77b4',
-        linewidth=1.5,
-    )
-    ax.plot(
-        x,
-        y_teorico,
-        ':',
-        label=rf'${funcion}\ \mathrm{{teórica}}$',
-        color='red',
-        linewidth=1.5,
-    )
-    ax.set_xlabel(_axis_label(xlabel))
-    ax.set_ylabel(_axis_label(ylabel))
-    ax.set_title(_title(titulo))
-
-    y_min, y_max = ax.get_ylim()
-    y_span = max(y_max - y_min, abs(y_max) * 0.05, 1e-12)
-    ax.set_ylim(y_min, y_max + y_span * max(0, y_headroom))
-    _format_axis_text(ax)
-    ax.legend(
-        loc=legend_loc,
-        frameon=True,
-        framealpha=0.9,
-        facecolor='white',
-        edgecolor='#E0E0E0',
-    )
-    ax.grid(True)
-    for spine in ax.spines.values():
-        spine.set_color('#000000')
-        spine.set_linewidth(0.8)
-    base_path = GRAPH_DIR if path is None else Path(path)
-    base_path.mkdir(parents=True, exist_ok=True)
-    fig.savefig(base_path / nombre_archivo, dpi=500, bbox_inches="tight", pad_inches=0.05)
-    plt.show()
-
-
-def modelo_cuadratico(n, a, b, c):
-    return a * n**2 + b * n + c
-
-def modelo_lineal(n, a, b):
-    return a * n + b
-
-def modelo_constante(n, c):
-    return c * np.ones_like(n)
