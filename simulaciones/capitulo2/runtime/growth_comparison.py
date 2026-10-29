@@ -377,6 +377,8 @@ def _render(
       </header><div class="growth-app__milestone" role="status" hidden></div><div class="growth-app__panel">{visualization}</div>
       <div class="growth-app__insight" role="status">{_comparison_message(n, logs)}</div>
       <section class="growth-app__summary" aria-live="polite" hidden></section>
+      <div class="growth-app__comparison" role="status" aria-live="polite" hidden></div>
+      <div class="growth-app__conclusion" role="status" aria-live="polite"></div>
       <p class="growth-app__note">{scale_note}</p></section>
     """
 
@@ -398,6 +400,7 @@ def _javascript_app(
   const scaleMode = __SCALE__;
   const keys = __KEYS__;
   const formulas = __FORMULAS__;
+  const FAMILY_COLORS = __COLORS__;
   const registry = window.__growthComparisonApps ||= {};
   registry[appId]?.destroy?.();
 
@@ -412,6 +415,8 @@ def _javascript_app(
     const insight = visual.querySelector('.growth-app__insight');
     const milestone = visual.querySelector('.growth-app__milestone');
     const summary = visual.querySelector('.growth-app__summary');
+    const comparison = visual.querySelector('.growth-app__comparison');
+    const conclusion = visual.querySelector('.growth-app__conclusion');
     const rangeLabel = visual.querySelector('.growth-app__range');
     const currentLabel = visual.querySelector('.growth-app__current strong');
     const curves = new Map(
@@ -425,6 +430,8 @@ def _javascript_app(
     const rows = new Map(
       [...visual.querySelectorAll('.growth-app__race-row')].map((node) => [node.dataset.family, node])
     );
+    const selectedSummaryKeys = new Set();
+    const previousSummaryRanks = new Map();
     const LN10 = Math.log(10);
     const lanczos = [
       0.99999999999980993, 676.5203681218851, -1259.1392167224028,
@@ -501,6 +508,22 @@ def _javascript_app(
       if (coefficient >= 9.995) { coefficient = 1; exponent += 1; }
       return `${decimal(coefficient)} × 10<sup>${exponent}</sup>`;
     };
+    const exactTooltip = (key, n) => {
+      const rounded = Math.max(0, Math.round(n));
+      if (key === 'constant') return '1';
+      if (key === 'log') return rounded > 0 ? String(Math.log2(rounded)) : '0';
+      if (key === 'linear') return String(rounded);
+      if (key === 'nlogn') return rounded > 0 ? String(rounded * Math.log2(rounded)) : '0';
+      if (key === 'square') return String(BigInt(rounded) ** 2n);
+      if (key === 'cube') return String(BigInt(rounded) ** 3n);
+      if (key === 'exponential') return String(2n ** BigInt(rounded));
+      if (key === 'factorial') {
+        let value = 1n;
+        for (let i = 2n; i <= BigInt(rounded); i += 1n) value *= i;
+        return String(value);
+      }
+      return '';
+    };
     const ratioFor = (value, maximum) => {
       if (!Number.isFinite(value)) return 0;
       if (scaleMode === 'log') {
@@ -559,19 +582,92 @@ def _javascript_app(
       milestone.hidden = !item;
       if (item) milestone.innerHTML = `<strong>Hito en <i>n</i> = ${item.at}</strong><span>${item.text}</span>`;
     };
-    const updateSummary = (logs) => {
+    const ratioText = (difference) => {
+      if (!Number.isFinite(difference)) return '—';
+      const orders = Math.max(0, difference / LN10);
+      const ratio = Math.exp(Math.min(difference, 700));
+      const ratioLabel = difference > 700 ? scientificHtml(difference) : formattedValueFromNumber(ratio);
+      return `${decimal(orders, 1)} órdenes de magnitud (≈ ${ratioLabel} veces)`;
+    };
+    const formattedValueFromNumber = (value) => {
+      if (!Number.isFinite(value) || value >= 1e6) return scientificHtml(Math.log(value));
+      return decimal(value);
+    };
+    const updateSelection = () => {
+      const active = selectedSummaryKeys.size > 0;
+      visual.classList.toggle('has-summary-selection', active);
+      curves.forEach((node, key) => node.classList.toggle('is-selected', selectedSummaryKeys.has(key)));
+      points.forEach((node, key) => node.classList.toggle('is-selected', selectedSummaryKeys.has(key)));
+      rows.forEach((node, key) => node.classList.toggle('is-selected', selectedSummaryKeys.has(key)));
+      summary?.querySelectorAll('tbody tr').forEach((node) => {
+        node.classList.toggle('is-selected', selectedSummaryKeys.has(node.dataset.family));
+        node.setAttribute('aria-selected', String(selectedSummaryKeys.has(node.dataset.family)));
+      });
+    };
+    const updateComparison = (n, logs) => {
+      if (!comparison) return;
+      const chosen = [...selectedSummaryKeys];
+      comparison.hidden = chosen.length !== 2;
+      if (chosen.length !== 2) return;
+      const [first, second] = chosen.sort((a, b) => logs[b] - logs[a]);
+      const difference = logs[first] - logs[second];
+      if (!Number.isFinite(difference)) {
+        comparison.innerHTML = `Para <i>n</i> = ${Math.round(n)}, ${formulas[first]} y ${formulas[second]} todavía no admiten una razón positiva comparable.`;
+        return;
+      }
+      comparison.innerHTML = `Para <i>n</i> = ${Math.round(n)}, <strong>${formulas[first]}</strong> es aproximadamente <strong>${scientificHtml(difference)}</strong> veces mayor que ${formulas[second]}.`;
+    };
+    const updateConclusion = (n, logs) => {
+      if (!conclusion) return;
+      const order = [...keys].sort((a, b) => logs[b] - logs[a]);
+      if (!order.length || n < 1) { conclusion.textContent = 'Reproduce la simulación para observar cómo se separan las familias de crecimiento.'; return; }
+      const leader = order[0];
+      const runnerUp = order[1];
+      const gap = runnerUp ? logs[leader] - logs[runnerUp] : 0;
+      const reason = gap > LN10
+        ? `La diferencia ya supera ${decimal(gap / LN10, 1)} órdenes de magnitud y seguirá ampliándose con entradas mayores.`
+        : 'Las primeras posiciones todavía están próximas, pero sus tasas de crecimiento no son equivalentes.';
+      conclusion.innerHTML = `<strong>Conclusión:</strong> para <i>n</i> = ${Math.round(n)}, ${formulas[leader]} domina la comparación. ${reason}`;
+    };
+    const updateSummary = (n, logs) => {
       if (!summary) return;
       const order = [...keys].sort((a, b) => logs[b] - logs[a]);
       const rows = order.map((key, index) => {
         const next = order[index + 1];
-        const gap = next && Number.isFinite(logs[key]) && Number.isFinite(logs[next])
-          ? Math.max(0, (logs[key] - logs[next]) / LN10)
-          : null;
-        const separation = gap === null ? '—' : `${decimal(gap, 1)} órdenes sobre la siguiente`;
-        return `<tr><th scope="row">${index + 1}</th><td class="growth-app__summary-formula">${formulas[key]}</td><td>${formattedValue(key, target)}</td><td>${separation}</td></tr>`;
+        const difference = next && Number.isFinite(logs[key]) && Number.isFinite(logs[next])
+          ? Math.max(0, logs[key] - logs[next]) : null;
+        const value = formattedValue(key, n);
+        const tooltip = exactTooltip(key, n);
+        return `<tr data-family="${key}" tabindex="0" role="button" aria-selected="false" title="Seleccionar ${formulas[key].replace(/<[^>]+>/g, '')}"><th scope="row">${index + 1}</th><td class="growth-app__summary-formula"><span class="growth-app__color-key" style="--family-color:${FAMILY_COLORS[key]}"></span>${formulas[key]}</td><td title="Valor completo: ${tooltip}">${value}</td><td>${difference === null ? '—' : ratioText(difference)}</td></tr>`;
       }).join('');
-      summary.innerHTML = `<h4>Resumen en <i>n</i> = ${target}</h4><div class="growth-app__summary-table-wrap"><table><thead><tr><th scope="col">Posición</th><th scope="col">Función</th><th scope="col">Resultado</th><th scope="col">Separación</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      summary.innerHTML = `<h4>Resumen en <i>n</i> = ${Math.round(n)}</h4><p class="growth-app__summary-help">Selecciona hasta dos filas para destacar y comparar funciones.</p><div class="growth-app__summary-table-wrap"><table><thead><tr><th scope="col">Posición</th><th scope="col">Función</th><th scope="col">Resultado</th><th scope="col">Diferencia respecto a la siguiente</th></tr></thead><tbody>${rows}</tbody></table></div>`;
       summary.hidden = false;
+      summary.querySelectorAll('tbody tr').forEach((row) => {
+        const currentRank = order.indexOf(row.dataset.family);
+        const previousRank = previousSummaryRanks.get(row.dataset.family);
+        if (!reduceMotion && previousRank !== undefined && previousRank !== currentRank) {
+          row.animate(
+            [{ transform: `translateY(${(previousRank - currentRank) * row.offsetHeight}px)` }, { transform: 'translateY(0)' }],
+            { duration: 260, easing: 'ease-out' }
+          );
+        }
+        previousSummaryRanks.set(row.dataset.family, currentRank);
+        const activate = () => {
+          const key = row.dataset.family;
+          if (selectedSummaryKeys.has(key)) selectedSummaryKeys.delete(key);
+          else {
+            if (selectedSummaryKeys.size >= 2) selectedSummaryKeys.delete(selectedSummaryKeys.values().next().value);
+            selectedSummaryKeys.add(key);
+          }
+          updateSelection();
+          updateComparison(n, logs);
+        };
+        row.addEventListener('click', activate);
+        row.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activate(); }
+        });
+      });
+      updateSelection();
     };
     const setPauseVisual = (isPaused, finished = false) => {
       if (!pauseButton) return;
@@ -604,6 +700,8 @@ def _javascript_app(
     let started = performance.now();
     let chartMaximum = 0;
     let previousFraction = 0;
+    let previousSummaryN = -1;
+    const summaryStep = Math.max(1, Math.ceil(target / 100));
     const render = (nextFraction) => {
       fraction = Math.max(0, Math.min(1, nextFraction));
       const n = target * fraction;
@@ -629,8 +727,17 @@ def _javascript_app(
       updateChart(n, logs, chartMaximum);
       updateMilestone(displayN);
       if (insight) insight.innerHTML = messageFor(displayN, logs);
-      if (summary) summary.hidden = fraction < 1;
-      if (fraction >= 1) updateSummary(logs);
+      const summaryDue = displayN < previousSummaryN
+        || displayN === target
+        || previousSummaryN < 0
+        || displayN - previousSummaryN >= summaryStep;
+      if (summaryDue) {
+        previousSummaryN = displayN;
+        if (displayN >= 1) updateSummary(displayN, logs);
+        else if (summary) summary.hidden = true;
+        updateComparison(displayN, logs);
+        updateConclusion(displayN, logs);
+      }
     };
     const tick = (now) => {
       if (!visual.isConnected) return;
@@ -685,6 +792,10 @@ def _javascript_app(
             "__FORMULAS__",
             json.dumps({key: FAMILY_BY_KEY[key][1] for key in selected_keys}, ensure_ascii=False),
         )
+        .replace(
+            "__COLORS__",
+            json.dumps({key: FAMILY_BY_KEY[key][3] for key in selected_keys}, ensure_ascii=False),
+        )
     )
 
 
@@ -704,7 +815,7 @@ def _styles() -> str:
         + """
 <style>
 .growth-comparison-app{width:100%;font-family:sans-serif}.growth-comparison-app .growth-app__configuration{padding:14px 16px 16px;border:1px solid #dedede;border-top:0}.growth-comparison-app .growth-app__controls{display:flex!important;flex-flow:row wrap!important;gap:12px 36px!important;align-items:center!important;width:100%}.growth-comparison-app .growth-app__controls>.widget-box{flex:0 0 292px!important;width:292px!important;min-width:292px!important;max-width:292px!important}.growth-comparison-app .growth-app__selection-message{color:#a94728;font-size:12px;min-height:18px}.growth-comparison-app .growth-app__visual{border:1px solid #dedede;border-top:4px solid #a94728;background:#fff;margin-top:16px;padding:18px}.growth-comparison-app .growth-app__header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.growth-comparison-app .growth-app__header span{color:#a94728;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase}.growth-comparison-app .growth-app__header h3{font-size:18px;margin:3px 0 0}.growth-comparison-app .growth-app__current{border-left:3px solid #a94728;padding-left:12px;text-align:right;white-space:nowrap}.growth-comparison-app .growth-app__current small{display:block;color:#666;font-size:12px}.growth-comparison-app .growth-app__current strong{display:block;color:#a94728;font-family:'STIX Two Math','Cambria Math',serif;font-size:24px}.growth-comparison-app .growth-app__panel{border:1px solid #dedede;margin-top:16px;padding:16px 12px}.growth-comparison-app .growth-app__insight{margin-top:16px;border-left:3px solid #a94728;background:#fbf5f2;padding:10px 12px;font-size:14px}.growth-comparison-app .growth-app__note{color:#666;font-size:12px}.growth-comparison-app .growth-app__chart{border:1px solid #dedede;background:#fff;width:100%;overflow:hidden}.growth-comparison-app .growth-app__chart svg{display:block;width:100%;height:auto;min-height:310px}.growth-comparison-app .growth-app__grid line{stroke:#ddd}.growth-comparison-app .growth-app__grid text,.growth-comparison-app .growth-app__x-labels{fill:#555;font:11px sans-serif}.growth-comparison-app .growth-app__axis{stroke:#777}.growth-comparison-app .growth-app__axis-name{fill:#333;font:600 15px sans-serif}
-.growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 94px minmax(90px,1fr) 104px;column-gap:12px;align-items:center;height:36px;transition:transform .12s linear}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap;padding-right:4px}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color)}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}.growth-comparison-app .growth-app__curve-point{pointer-events:none}
+.growth-comparison-app .growth-app__unified{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(350px,.88fr);gap:18px;align-items:stretch}.growth-comparison-app .growth-app__view{min-width:0;border:1px solid #dedede;background:#fff;padding:12px}.growth-comparison-app .growth-app__view h4{font-size:14px;text-align:center;margin:0 0 10px}.growth-comparison-app .growth-app__race{position:relative;width:100%}.growth-comparison-app .growth-app__race-row{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:20px 94px minmax(90px,1fr) 104px;column-gap:12px;align-items:center;height:36px;transition:transform .24s ease,opacity .18s ease}.growth-comparison-app .growth-app__rank{color:#777;font-size:11px;text-align:center;font-weight:700}.growth-comparison-app .growth-app__race-formula{color:var(--family-color);font:600 15px 'STIX Two Math','Cambria Math',serif;text-align:center;white-space:nowrap;padding-right:4px}.growth-comparison-app .growth-app__bar-track{height:22px;background:repeating-linear-gradient(90deg,#fafafa 0,#fafafa calc(25% - 1px),#e5e5e5 25%);overflow:hidden}.growth-comparison-app .growth-app__bar{display:block;height:100%;min-width:2px;background:var(--family-color);transition:width .08s linear}.growth-comparison-app .growth-app__race-value{font:12px 'STIX Two Math','Cambria Math',serif;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.growth-comparison-app .growth-app__panel{background:#fafafa}.growth-comparison-app .growth-app__chart{border:0}.growth-comparison-app .growth-app__chart svg{min-height:330px}.growth-comparison-app .growth-app__curve{transition:opacity .18s ease,stroke-width .18s ease}.growth-comparison-app .growth-app__curve-point{pointer-events:none;transition:opacity .18s ease,r .18s ease}.growth-comparison-app .has-summary-selection .growth-app__curve:not(.is-selected),.growth-comparison-app .has-summary-selection .growth-app__curve-point:not(.is-selected),.growth-comparison-app .has-summary-selection .growth-app__race-row:not(.is-selected){opacity:.18}.growth-comparison-app .growth-app__curve.is-selected{stroke-width:4}.growth-comparison-app .growth-app__curve-point.is-selected{r:6}.growth-comparison-app .growth-app__race-row.is-selected{filter:saturate(1.25)}
 .growth-comparison-app .growth-app__functions-frame{border:1px solid #767676;background:#fff;padding:6px 12px;border-radius:0;box-sizing:border-box}
 .growth-comparison-app .growth-app__functions-group{width:100%!important;min-width:0!important;max-width:none!important;overflow:visible!important;align-items:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label{align-self:stretch!important;height:auto!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.standard-control-label .compact-control-label{display:block!important;width:100%!important;text-align:center!important}.growth-comparison-app .growth-app__functions-group>.widget-box:last-child{width:auto!important;min-width:0!important;max-width:none!important;flex:1 1 520px!important}.growth-comparison-app .growth-app__function-grid{display:flex;flex-direction:column;gap:8px;width:100%}
 .growth-comparison-app .growth-app__function-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 16px;width:100%;align-items:center}
@@ -720,9 +831,9 @@ def _styles() -> str:
 .growth-comparison-app .growth-app__slider-wrap{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:2px}
 .growth-comparison-app .growth-app__slider-label{font-size:12px;font-weight:600;color:#555}
 .growth-comparison-app .growth-app__n-compound{display:flex!important;align-items:center!important;gap:10px!important}.growth-comparison-app .growth-app__n-compound>.widget-int{flex:0 0 88px!important;width:88px!important;min-width:88px!important;max-width:88px!important}
-.growth-comparison-app .growth-app__range{min-height:24px;padding:2px 8px 4px;color:#555;font:12px 'STIX Two Math','Cambria Math',serif;text-align:right}.growth-comparison-app .growth-app__milestone{display:flex;gap:8px 16px;align-items:center;margin-top:12px;padding:9px 12px;border-left:3px solid #1976d2;background:#f3f8fd;font:13px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__milestone[hidden]{display:none}.growth-comparison-app .growth-app__summary{margin-top:16px;background:#fff}.growth-comparison-app .growth-app__summary[hidden]{display:none}.growth-comparison-app .growth-app__summary h4{margin:0 0 8px;font-size:15px}.growth-comparison-app .growth-app__summary-table-wrap{width:100%;overflow-x:auto}.growth-comparison-app .growth-app__summary table{width:100%;min-width:680px;border-collapse:collapse;font:14px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__summary th,.growth-comparison-app .growth-app__summary td{border:1px solid #c8c8c8;padding:8px 10px;text-align:center;white-space:nowrap}.growth-comparison-app .growth-app__summary thead th{background:#ededed;font-size:15px}.growth-comparison-app .growth-app__summary tbody th{background:#f7f7f7}.growth-comparison-app .growth-app__summary-formula{font-weight:700}.growth-comparison-app .growth-app__summary tbody tr:first-child th,.growth-comparison-app .growth-app__summary tbody tr:first-child td{background:#fff5e9}
+.growth-comparison-app .growth-app__range{min-height:24px;padding:2px 8px 4px;color:#555;font:12px 'STIX Two Math','Cambria Math',serif;text-align:right}.growth-comparison-app .growth-app__milestone{display:flex;gap:8px 16px;align-items:center;margin-top:12px;padding:9px 12px;border-left:3px solid #1976d2;background:#f3f8fd;font:13px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__milestone[hidden]{display:none}.growth-comparison-app .growth-app__summary{margin-top:16px;background:#fff}.growth-comparison-app .growth-app__summary[hidden],.growth-comparison-app .growth-app__comparison[hidden]{display:none}.growth-comparison-app .growth-app__summary h4{margin:0 0 3px;font-size:15px}.growth-comparison-app .growth-app__summary-help{margin:0 0 8px;color:#666;font-size:12px}.growth-comparison-app .growth-app__summary-table-wrap{width:100%;overflow-x:auto}.growth-comparison-app .growth-app__summary table{width:100%;min-width:760px;border-collapse:collapse;font:14px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__summary th,.growth-comparison-app .growth-app__summary td{border:1px solid #c8c8c8;padding:8px 10px;text-align:center;white-space:nowrap}.growth-comparison-app .growth-app__summary thead th{background:#ededed;font-size:15px}.growth-comparison-app .growth-app__summary tbody th{background:#f7f7f7}.growth-comparison-app .growth-app__summary tbody tr{cursor:pointer;transition:background-color .2s ease,transform .2s ease}.growth-comparison-app .growth-app__summary tbody tr:hover th,.growth-comparison-app .growth-app__summary tbody tr:hover td{background:#f4f8fc}.growth-comparison-app .growth-app__summary tbody tr:focus{outline:3px solid #1976d2;outline-offset:-3px}.growth-comparison-app .growth-app__summary tbody tr.is-selected th,.growth-comparison-app .growth-app__summary tbody tr.is-selected td{background:#e7f2fd}.growth-comparison-app .growth-app__summary-formula{font-weight:700}.growth-comparison-app .growth-app__color-key{display:inline-block;width:12px;height:3px;margin-right:8px;vertical-align:middle;background:var(--family-color)}.growth-comparison-app .growth-app__summary tbody tr:first-child th,.growth-comparison-app .growth-app__summary tbody tr:first-child td{background:#fff5e9}.growth-comparison-app .growth-app__summary tbody tr:first-child.is-selected th,.growth-comparison-app .growth-app__summary tbody tr:first-child.is-selected td{background:#e7f2fd}.growth-comparison-app .growth-app__comparison,.growth-comparison-app .growth-app__conclusion{margin-top:12px;padding:10px 12px;font:13px 'STIX Two Math','Cambria Math',serif}.growth-comparison-app .growth-app__comparison{border-left:3px solid #1976d2;background:#f3f8fd}.growth-comparison-app .growth-app__conclusion{border-left:3px solid #558b2f;background:#f4f8f1}
 @media(prefers-reduced-motion:reduce){.growth-comparison-app *{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
-@media(max-width:900px){.growth-comparison-app .growth-app__unified{grid-template-columns:1fr}.growth-comparison-app .growth-app__race-view{order:2}.growth-comparison-app .growth-app__function-row{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__chart svg{min-height:260px}.growth-comparison-app .growth-app__race-row{grid-template-columns:18px 58px minmax(70px,1fr) 82px;gap:5px}.growth-comparison-app .growth-app__race-value{font-size:10px}}
+@media(max-width:900px){.growth-comparison-app .growth-app__unified{grid-template-columns:1fr}.growth-comparison-app .growth-app__race-view{order:2}.growth-comparison-app .growth-app__function-row{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.growth-comparison-app .growth-app__header{flex-direction:column}.growth-comparison-app .growth-app__chart svg{min-height:260px}.growth-comparison-app .growth-app__race-row{grid-template-columns:18px 58px minmax(70px,1fr) 82px;gap:5px}.growth-comparison-app .growth-app__race-value{font-size:10px}.growth-comparison-app .growth-app__summary th:nth-child(2),.growth-comparison-app .growth-app__summary td:nth-child(2){position:sticky;left:0;z-index:1;background:#fff}.growth-comparison-app .growth-app__summary thead th:nth-child(2){z-index:2;background:#ededed}}
 </style>"""
     )
 

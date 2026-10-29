@@ -151,6 +151,18 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     assert '<table><thead><tr><th scope="col">Posición</th>' in source
     assert 'class="growth-app__summary-formula"' in source
     assert "growth-app__summary-table-wrap" in source
+    assert "Diferencia respecto a la siguiente" in source
+    assert "Selecciona hasta dos filas" in source
+    assert "selectedSummaryKeys" in source
+    assert "previousSummaryRanks" in source
+    assert "row.animate" in source
+    assert "updateComparison" in source
+    assert "updateConclusion" in source
+    assert "exactTooltip" in source
+    assert "órdenes de magnitud (≈" in source
+    assert "aria-selected" in source
+    assert "tabindex=\"0\"" in source
+    assert "FAMILY_COLORS" in source
     assert "chartMaximum" in source
     assert "setPauseVisual" in source
     assert "const text = canContinue ? 'Continuar' : 'Pausar'" in source
@@ -158,6 +170,10 @@ def test_browser_runtime_uses_request_animation_frame_without_hover_focus():
     assert "mouseenter" not in source
     assert "growth-app__focus" not in _render(10, ("linear", "square"))
     assert "is-highlighted" not in _styles()
+    assert "has-summary-selection" in _styles()
+    assert "position:sticky" in _styles()
+    assert "growth-app__comparison" in _styles()
+    assert "growth-app__conclusion" in _styles()
 
 
 def test_reset_preserves_configuration_while_visual_returns_to_zero():
