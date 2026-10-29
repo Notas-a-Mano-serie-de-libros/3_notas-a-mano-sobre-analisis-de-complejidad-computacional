@@ -77,10 +77,18 @@ def test_autorun_extension_executes_after_the_default_kernel_is_ready():
     assert 'parameters.get("revision")' in extension
     assert 'fetch(publishedUrl, { cache: "no-store" })' in extension
     assert "panel.context.model.fromJSON(notebook)" in extension
+    assert "for (const cell of panel.context.model.cells)" in extension
+    assert "cell.trusted = true" in extension
     assert "await panel.context.save()" in extension
     assert "window.localStorage.getItem" not in extension
     assert "await panel.context.sessionContext.ready" in extension
     assert "await installWidgetPackage(panel)" in extension
+    assert "await prepareKernel(panel)" in extension
+    assert "await sessionContext.restartKernel()" in extension
+    assert "installedWidgetKernels.delete(kernel.id)" in extension
+    assert extension.index("await prepareKernel(panel)") < extension.index(
+        "statusChanged.connect"
+    )
     assert "await piplite.install('ipywidgets==8.1.9')" in extension
     assert '"import ipywidgets"' in extension
     assert "SCIENTIFIC_NOTEBOOK_PATH.test(panel.context.path)" in extension

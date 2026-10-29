@@ -44,6 +44,13 @@ async function refreshPublishedNotebook(panel: NotebookPanel): Promise<void> {
   // ejecutar, incluso si una carga anterior alcanzó a guardar la revisión en
   // localStorage pero no llegó a actualizar el widget visible.
   panel.context.model.fromJSON(notebook);
+  // El contenido procede del artefacto publicado por el proyecto, no de una
+  // carga arbitraria del usuario. JupyterLite puede conservar en IndexedDB una
+  // copia marcada como no confiable; se normaliza antes de guardar y ejecutar
+  // para que los widgets y el JavaScript del notebook puedan renderizarse.
+  for (const cell of panel.context.model.cells) {
+    cell.trusted = true;
+  }
   await panel.context.save();
   await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
 }
@@ -257,11 +264,37 @@ async function installWidgetPackage(panel: NotebookPanel): Promise<void> {
   };
   const reply = await future.done;
   if (installationError || reply.content.status === "error") {
+    installedWidgetKernels.delete(kernel.id);
     throw new Error(
       `No fue posible instalar ipywidgets antes de ejecutar ${panel.context.path}: ${
         installationError ?? "el kernel devolvió un error"
       }`,
     );
+  }
+}
+
+async function prepareKernel(panel: NotebookPanel): Promise<void> {
+  await panel.context.sessionContext.ready;
+  if (panel.isDisposed) return;
+
+  const sessionContext = panel.context.sessionContext;
+  if (!sessionContext.session?.kernel) {
+    await sessionContext.startKernel();
+    await sessionContext.ready;
+  }
+
+  try {
+    await installWidgetPackage(panel);
+  } catch (firstError) {
+    const failedKernelId = sessionContext.session?.kernel?.id;
+    if (failedKernelId) installedWidgetKernels.delete(failedKernelId);
+    console.warn(
+      "El primer arranque de Pyodide falló; se reiniciará el kernel una vez.",
+      firstError,
+    );
+    await sessionContext.restartKernel();
+    await sessionContext.ready;
+    await installWidgetPackage(panel);
   }
 }
 
@@ -282,16 +315,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
         await refreshPublishedNotebook(panel);
         await panel.context.sessionContext.ready;
         if (panel.isDisposed) return;
-        // Un reinicio crea un kernel nuevo sin ipywidgets: se reinstala antes de
-        // cualquier ejecución manual.
+        await prepareKernel(panel);
+        if (panel.isDisposed) return;
+        // Un reinicio posterior crea un kernel nuevo sin ipywidgets: se
+        // reinstala antes de cualquier ejecución manual. El observador se
+        // conecta después del primer arranque para no competir con su reintento.
         panel.context.sessionContext.statusChanged.connect((_session, status) => {
           if (status !== "idle" && status !== "starting") return;
           installWidgetPackage(panel).catch((error: unknown) => {
             console.error("No fue posible reinstalar ipywidgets tras reiniciar el kernel.", error);
           });
         });
-        await installWidgetPackage(panel);
-        if (panel.isDisposed) return;
         await NotebookActions.runAll(panel.content, panel.context.sessionContext);
         scheduleHeightReport();
         reportEmbeddedState(EMBEDDED_READY_MESSAGE);
