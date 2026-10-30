@@ -1392,7 +1392,7 @@ def run_app(builder_only=False):
           .recursion-general-expression .recursion-equation,
           .recursion-result-expression .recursion-equation{
             display:flex;align-items:center;justify-content:center;
-            height:220px;min-height:220px;overflow-y:hidden}
+            height:144px;min-height:144px;overflow-y:hidden}
           .recursion-level-table{display:flex;flex-direction:column;
             box-sizing:border-box;align-items:center;justify-content:center;overflow:clip;
             padding-bottom:12px;text-align:center;font-size:16px}

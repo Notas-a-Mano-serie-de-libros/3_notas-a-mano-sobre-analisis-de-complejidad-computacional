@@ -88,7 +88,7 @@ def test_general_expression_always_keeps_symbolic_external_cost():
 def test_general_expression_panel_reserves_a_stable_equation_height():
     assert ".recursion-general-expression .recursion-equation," in SOURCE
     assert ".recursion-result-expression .recursion-equation{" in SOURCE
-    assert "height:220px;min-height:220px" in SOURCE
+    assert "height:144px;min-height:144px" in SOURCE
     assert "recursion-equation-appear" not in SOURCE
     assert "typesetClear([activeRoot])" not in SOURCE
     assert "mathJax.typesetPromise([activeRoot])" in SOURCE
