@@ -56,6 +56,16 @@ def test_playback_buttons_use_kernel_callbacks_instead_of_injected_javascript():
     assert "playbackTimer" not in SOURCE
 
 
+def test_mathjax_rendering_recovers_from_transient_startup_failures():
+    assert "mountRecursionTreeController(attempt + 1)" in SOURCE
+    assert "attempt < 120" in SOURCE
+    assert "createRecursionTreeMathJaxReady" in SOURCE
+    assert "window.__recursionTreeMathJaxReady = null" in SOURCE
+    assert "MathJax no estuvo disponible dentro del tiempo esperado" in SOURCE
+    assert "typesetFailureCount <= 5" in SOURCE
+    assert "250 * (2 ** (typesetFailureCount - 1))" in SOURCE
+
+
 def test_general_expression_always_keeps_symbolic_external_cost():
     from simulaciones.capitulo5.runtime.recursion_tree_animation import _equation_markup
 

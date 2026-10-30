@@ -1907,12 +1907,21 @@ def run_app(builder_only=False):
     display(Javascript(
         r"""
         (() => {
-          if (!window.__recursionTreeMathJaxReady || (window.MathJax && typeof window.MathJax.typesetPromise !== 'function')) {
+          const createRecursionTreeMathJaxReady = () => {
             if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
-              const startup = window.MathJax?.startup?.promise;
-              window.__recursionTreeMathJaxReady = Promise.resolve(startup).then(() => window.MathJax);
-            } else if (window.MathJax && window.MathJax.startup?.promise) {
-              window.__recursionTreeMathJaxReady = Promise.resolve(window.MathJax.startup.promise).then(() => window.MathJax);
+              return Promise.resolve(window.MathJax);
+            }
+            if (window.__recursionTreeMathJaxReady) {
+              return window.__recursionTreeMathJaxReady;
+            }
+            const startup = window.MathJax?.startup?.promise;
+            if (startup) {
+              window.__recursionTreeMathJaxReady = Promise.resolve(startup).then(() => {
+                if (typeof window.MathJax?.typesetPromise !== 'function') {
+                  throw new Error('MathJax terminó de iniciar sin habilitar typesetPromise.');
+                }
+                return window.MathJax;
+              });
             } else {
               window.__recursionTreeMathJaxReady = new Promise((resolve, reject) => {
               window.MathJax = {
@@ -1923,6 +1932,7 @@ def run_app(builder_only=False):
                 svg: {fontCache: 'none', mtextInheritFont: true}
               };
               const script = document.createElement('script');
+              script.id = 'recursion-tree-mathjax-script';
               script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js';
               script.integrity = 'sha256-1CldwzdEg2k1wTmf7s5RWVd7NMXI/7nxxjJM2C4DqII=';
               script.crossOrigin = 'anonymous';
@@ -1940,15 +1950,39 @@ def run_app(builder_only=False):
               document.head.appendChild(script);
               });
             }
-          }
+            window.__recursionTreeMathJaxReady = window.__recursionTreeMathJaxReady.catch(error => {
+              window.__recursionTreeMathJaxReady = null;
+              const failedScript = document.getElementById('recursion-tree-mathjax-script');
+              if (failedScript && typeof window.MathJax?.typesetPromise !== 'function') {
+                failedScript.remove();
+              }
+              throw error;
+            });
+            return window.__recursionTreeMathJaxReady;
+          };
+          const recursionTreeMathJaxReady = () => Promise.race([
+            createRecursionTreeMathJaxReady(),
+            new Promise((resolve, reject) => setTimeout(
+              () => reject(new Error('MathJax no estuvo disponible dentro del tiempo esperado.')),
+              8000
+            ))
+          ]);
+          const mountRecursionTreeController = (attempt = 0) => {
           if (window.__recursionTreeController) {
             window.__recursionTreeController.abort();
           }
-          const controller = new AbortController();
-          const signal = controller.signal;
           const roots = document.querySelectorAll('.recursion-tree-root');
           const activeRoot = roots.length ? roots[roots.length - 1] : null;
-          if (!activeRoot) return;
+          if (!activeRoot) {
+            if (attempt < 120) {
+              setTimeout(() => mountRecursionTreeController(attempt + 1), 50);
+            } else {
+              console.error('La simulación no terminó de montarse en el documento.');
+            }
+            return;
+          }
+          const controller = new AbortController();
+          const signal = controller.signal;
           const rootFor = el => el.closest('.recursion-tree-root');
           const pathIsDescendant = (path, parent) =>
             parent === '' ? path !== '' : path.startsWith(parent + '.');
@@ -2007,6 +2041,7 @@ def run_app(builder_only=False):
           let typesetTimer = 0;
           let typesetRunning = false;
           let typesetQueued = false;
+          let typesetFailureCount = 0;
           const pendingMathReveal = new Map();
           const rawMathPattern = /\\\(|\\\[/;
           const MAX_HIDDEN_MS = 2000;
@@ -2085,7 +2120,7 @@ def run_app(builder_only=False):
               if (typesetRunning) return;
               typesetRunning = true;
               typesetQueued = false;
-              window.__recursionTreeMathJaxReady
+              recursionTreeMathJaxReady()
                 .then(mathJax => {
                   if (typeof mathJax.typesetClear === 'function') {
                     try { mathJax.typesetClear([activeRoot]); } catch (e) {}
@@ -2094,6 +2129,7 @@ def run_app(builder_only=False):
                     .then(() => renderNodeMath(mathJax));
                 })
                 .then(() => {
+                  typesetFailureCount = 0;
                   const stillPending = reconcilePendingMath();
                   applyZoom(activeRoot);
                   repaintGraph(activeRoot);
@@ -2101,7 +2137,11 @@ def run_app(builder_only=False):
                 })
                 .catch(error => {
                   reconcilePendingMath();
-                  typesetQueued = true;
+                  typesetFailureCount += 1;
+                  const retryDelay = Math.min(2000, 250 * (2 ** (typesetFailureCount - 1)));
+                  if (!signal.aborted && typesetFailureCount <= 5) {
+                    setTimeout(typesetActiveApp, retryDelay);
+                  }
                   console.error(error);
                 })
                 .finally(() => {
@@ -2174,6 +2214,8 @@ def run_app(builder_only=False):
           window.addEventListener('pagehide', () => {
             window.__recursionTreeController?.abort();
           }, {once:true});
+          };
+          mountRecursionTreeController();
         })();
         """
     ))
