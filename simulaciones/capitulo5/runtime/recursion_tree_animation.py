@@ -555,7 +555,7 @@ def _expanded_equation_markup(
     )
 
     return (
-        '<details class="recursion-info-section" open>'
+        '<details class="recursion-info-section recursion-result-expression" open>'
         '<summary>Expresión resultante</summary>'
         f'<div class="recursion-equation">\\(\\displaystyle {recurrence}\\)</div>'
         "</details>"
@@ -1389,13 +1389,10 @@ def run_app(builder_only=False):
           .recursion-tree-panel-content.is-collapsed{display:none!important}
           .recursion-equation{width:100%;box-sizing:border-box;padding:16px 20px;
             text-align:center;font-size:15px;overflow-x:auto;max-width:100%}
-          .recursion-general-expression .recursion-equation{
+          .recursion-general-expression .recursion-equation,
+          .recursion-result-expression .recursion-equation{
             display:flex;align-items:center;justify-content:center;
             height:220px;min-height:220px;overflow-y:hidden}
-          .recursion-general-expression .recursion-equation mjx-container{
-            animation:recursion-equation-appear .16s ease-out both}
-          @keyframes recursion-equation-appear{
-            from{opacity:0}to{opacity:1}}
           .recursion-level-table{display:flex;flex-direction:column;
             box-sizing:border-box;align-items:center;justify-content:center;overflow:clip;
             padding-bottom:12px;text-align:center;font-size:16px}
@@ -2129,9 +2126,6 @@ def run_app(builder_only=False):
               typesetQueued = false;
               recursionTreeMathJaxReady()
                 .then(mathJax => {
-                  if (typeof mathJax.typesetClear === 'function') {
-                    try { mathJax.typesetClear([activeRoot]); } catch (e) {}
-                  }
                   return mathJax.typesetPromise([activeRoot])
                     .then(() => renderNodeMath(mathJax));
                 })

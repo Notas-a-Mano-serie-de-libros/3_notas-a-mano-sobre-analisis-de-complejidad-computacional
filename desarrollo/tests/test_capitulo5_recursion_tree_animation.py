@@ -86,9 +86,12 @@ def test_general_expression_always_keeps_symbolic_external_cost():
 
 
 def test_general_expression_panel_reserves_a_stable_equation_height():
-    assert ".recursion-general-expression .recursion-equation{" in SOURCE
+    assert ".recursion-general-expression .recursion-equation," in SOURCE
+    assert ".recursion-result-expression .recursion-equation{" in SOURCE
     assert "height:220px;min-height:220px" in SOURCE
-    assert "animation:recursion-equation-appear .16s ease-out both" in SOURCE
+    assert "recursion-equation-appear" not in SOURCE
+    assert "typesetClear([activeRoot])" not in SOURCE
+    assert "mathJax.typesetPromise([activeRoot])" in SOURCE
 
 
 def test_result_expression_formats_exact_division_factors_as_fractions():
@@ -98,6 +101,7 @@ def test_result_expression_formats_exact_division_factors_as_fractions():
         "division", (2, 1), (0.5, 0.75), "linear", 4
     )
 
+    assert "recursion-result-expression" in markup
     assert r"2C\left(\dfrac{n}{2}\right)" in markup
     assert r"C\left(\dfrac{3}{4}\cdot n\right)" in markup
     assert r"\(\displaystyle C(n)=\begin{cases}" in markup
