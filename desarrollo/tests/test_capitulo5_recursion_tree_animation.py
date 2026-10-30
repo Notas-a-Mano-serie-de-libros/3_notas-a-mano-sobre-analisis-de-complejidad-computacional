@@ -77,11 +77,18 @@ def test_general_expression_always_keeps_symbolic_external_cost():
     )
 
     for markup in (quadratic, zero):
+        assert "recursion-general-expression" in markup
         assert "Expresión general" in markup
         assert "+f(n)" in markup
         assert r"\sum_{i=1}^{m}" in markup
         assert r"\(\displaystyle C(n)=" in markup
     assert "+n^2" not in quadratic
+
+
+def test_general_expression_panel_reserves_a_stable_equation_height():
+    assert ".recursion-general-expression .recursion-equation{" in SOURCE
+    assert "height:220px;min-height:220px" in SOURCE
+    assert "animation:recursion-equation-appear .16s ease-out both" in SOURCE
 
 
 def test_result_expression_formats_exact_division_factors_as_fractions():
