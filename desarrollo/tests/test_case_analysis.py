@@ -24,8 +24,28 @@ def test_search_case_inputs_satisfy_best_average_and_worst_conditions():
 
     interpolation = case_analysis.search_case_inputs("interpolacion", 10)
     worst_values, worst_target = interpolation["worst"]
-    assert worst_values[-1] == 10**3
+    assert worst_values == sorted(worst_values)
     assert worst_target == worst_values[-2]
+    for low in range(len(worst_values) - 2):
+        high = len(worst_values) - 1
+        position = low + (
+            (worst_target - worst_values[low]) * (high - low)
+            // (worst_values[high] - worst_values[low])
+        )
+        assert position == low
+
+
+def test_interpolation_worst_case_regenerates_without_losing_adversarial_shape(monkeypatch):
+    import random
+
+    monkeypatch.setattr(case_analysis, "random", random.Random(20261030))
+    first = case_analysis.search_case_inputs("interpolacion", 10)["worst"]
+    second = case_analysis.search_case_inputs("interpolacion", 10)["worst"]
+
+    assert first != second
+    for values, target in (first, second):
+        assert target == values[-2]
+        assert values[-1] > values[-2]
 
 
 def test_average_search_case_samples_the_declared_uniform_model(monkeypatch):

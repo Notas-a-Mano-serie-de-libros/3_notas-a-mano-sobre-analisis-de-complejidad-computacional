@@ -22,6 +22,7 @@ from search_common import (
     colab_pause,
     enforce_target_membership,
     generate_sorted_values,
+    render_search_condition,
     resolve_node_style,
     set_widget_visibility,
 )
@@ -124,6 +125,7 @@ button.comparison-subpanel-title{height:44px!important;min-height:44px!important
 .comparison-action-row>.widget-button{margin:0!important;border-color:#cfcfcf!important;border-radius:0!important}
 </style>
 """
+COMPARISON_CONDITION_WIDTH = 130
 
 try:
     import nest_asyncio
@@ -412,6 +414,7 @@ def comparison_row_key(item, show_indexes=False):
         show_indexes,
         search_state.get("search_complete"),
         search_state.get("found_index"),
+        render_search_condition(search_state),
         nodes,
     )
 
@@ -438,6 +441,7 @@ def render_compact_array(item, show_indexes=False):
     state_nodes = item["state"]["arr"]
     indexes = render_index_row(state_nodes) if show_indexes else ""
     nodes = "".join(render_compact_node(node, role_styles) for node in state_nodes)
+    condition = render_search_condition(item["state"])
     result = render_result_symbol(item)
     html = f"""
     <div class="comparison-row">
@@ -448,6 +452,7 @@ def render_compact_array(item, show_indexes=False):
           {indexes}
           <div class="comparison-array">{nodes}</div>
         </div>
+        <div class="comparison-condition" aria-label="Condición lógica evaluada">{condition}</div>
         <div class="comparison-result" aria-live="polite">{result}</div>
       </div>
     </div>
@@ -551,7 +556,7 @@ def render_comparison_styles(array_width):
       }}
       .comparison-array-head {{
         display: grid;
-        grid-template-columns: minmax(0, {array_width}px) {RESULT_SYMBOL_BOX_SIZE}px;
+        grid-template-columns: minmax(0, {array_width}px) {COMPARISON_CONDITION_WIDTH}px {RESULT_SYMBOL_BOX_SIZE}px;
         column-gap: 4px;
         justify-content: center;
         text-align: left;
@@ -560,6 +565,10 @@ def render_comparison_styles(array_width):
         display: block;
         grid-column: 1;
         width: 100%;
+        text-align: center;
+      }}
+      .comparison-condition-head-label {{
+        grid-column: 2;
         text-align: center;
       }}
       .comparison-name {{
@@ -586,11 +595,26 @@ def render_comparison_styles(array_width):
         width: 100%;
         min-width: 0;
         display: grid;
-        grid-template-columns: minmax(0, {array_width}px) {RESULT_SYMBOL_BOX_SIZE}px;
+        grid-template-columns: minmax(0, {array_width}px) {COMPARISON_CONDITION_WIDTH}px {RESULT_SYMBOL_BOX_SIZE}px;
         justify-content: center;
         align-items: center;
         gap: 4px;
         contain: layout paint;
+      }}
+      .comparison-condition {{
+        width: {COMPARISON_CONDITION_WIDTH}px;
+        min-width: {COMPARISON_CONDITION_WIDTH}px;
+        min-height: 58px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        line-height: 24px;
+        white-space: nowrap;
+      }}
+      .comparison-condition .search-condition-expression {{
+        display: block;
       }}
       .comparison-index-row {{
         display: grid;
@@ -683,7 +707,10 @@ def render_comparison_header_html():
     <div class="comparison-header">
       <div class="comparison-head-cell">Algoritmo</div>
       <div class="comparison-head-cell">Pasos</div>
-      <div class="comparison-head-cell comparison-array-head"><span class="comparison-array-head-label">Arreglo</span></div>
+      <div class="comparison-head-cell comparison-array-head">
+        <span class="comparison-array-head-label">Arreglo</span>
+        <span class="comparison-condition-head-label">Condición</span>
+      </div>
     </div>
     """
 

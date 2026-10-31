@@ -749,6 +749,51 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn("pos =", interpolation_state["formula"])
         self.assertNotIn("elemento", interpolation_state["formula"])
 
+    def test_each_search_shows_the_active_logical_condition_beside_the_array(self):
+        cases = {
+            "secuencial": ("1_busqueda_secuencial_app.py", "step_linear_search", "(6 &gt; 1)"),
+            "binaria": ("2_busqueda_binaria_app.py", "step_binary_search", "(6 &gt; 4)"),
+            "interpolacion": ("3_busqueda_interpolacion_app.py", "step_interpolation_search", "(6 = 6)"),
+            "saltos": ("4_busqueda_saltos_app.py", "step_jump_search", "(6 &gt; 2)"),
+            "exponencial": ("5_busqueda_exponencial_app.py", "step_exponential_search", "(6 &gt; 1)"),
+        }
+        values = [1, 2, 3, 4, 5, 6, 7, 8]
+
+        for name, (filename, step_name, expected) in cases.items():
+            with self.subTest(name=name):
+                module = self.launchers._load_module(filename, f"capitulo7_{name}_condition_test")
+                kwargs = {"uniform": False} if name == "interpolacion" else {}
+                state = module.create_state(size=len(values), target=6, values=values, **kwargs)
+                getattr(module, step_name)(state)
+                html = module.render_state_html(state)
+                self.assertIn('class="search-condition"', html)
+                self.assertIn(expected, html)
+
+        ternary = self.launchers._load_module(
+            "6_busqueda_ternaria_app.py",
+            "capitulo7_ternaria_condition_test",
+        )
+        ternary_state = ternary.create_state(size=len(values), target=6, values=values)
+        ternary.step_ternary_search(ternary_state)
+        ternary_html = ternary.render_state_html(ternary_state)
+        self.assertIn("(6 &gt; 3)", ternary_html)
+        self.assertIn("(6 &gt; 5)", ternary_html)
+
+        comparison = self.launchers._load_module(
+            "0_comparacion_busquedas_app.py",
+            "capitulo7_comparison_condition_test",
+        )
+        comparison_state = comparison.create_comparison_state(
+            size=len(values),
+            target=6,
+            values=values,
+        )
+        comparison.step_all_searches(comparison_state)
+        comparison_html = comparison.render_comparison_html(comparison_state)
+        self.assertIn("Condición", comparison_html)
+        self.assertIn('class="comparison-condition"', comparison_html)
+        self.assertIn("(6 &gt; 1)", comparison_html)
+
     def test_no_remaining_search_uses_automatic_target_checkbox(self):
         for name, (path, _step, _launcher) in SEARCH_MODULES.items():
             with self.subTest(name=name):
@@ -1155,7 +1200,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertIn("font-weight: 700;", html)
         self.assertIn("background: #ffffff;", html)
         self.assertIn("comparison-array-head", html)
-        self.assertIn("grid-template-columns: minmax(0, 432px) 34px;", html)
+        self.assertIn("grid-template-columns: minmax(0, 432px) 130px 34px;", html)
         self.assertIn("grid-column: 1;", html)
         self.assertIn("comparison-result", html)
         self.assertIn("COMPARISON_NODE_WIDTH = 54", source)
@@ -1194,7 +1239,7 @@ class TestCapitulo7BusquedasRestantes(unittest.TestCase):
         self.assertNotIn(r"$\checkmark$", html)
         self.assertNotIn(r"$\times$", html)
         self.assertIn("grid-template-columns: minmax(170px, 232px) 88px minmax(0, 1fr);", html)
-        self.assertIn("grid-template-columns: minmax(0, 432px) 34px;", html)
+        self.assertIn("grid-template-columns: minmax(0, 432px) 130px 34px;", html)
         self.assertIn("grid-template-columns: repeat(8, minmax(0, 54px));", html)
         self.assertNotIn("overflow-x: auto;", html)
         self.assertNotIn("Arreglo:</strong>", html)

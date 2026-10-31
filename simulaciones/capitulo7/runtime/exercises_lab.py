@@ -186,8 +186,11 @@ def inputs(n, case):
 
 def interpolation_inputs(n, case):
     if case == "peor" and n > 1:
-        a = list(range(n - 1)) + [n**3]
-        return a, n - 2
+        prefix = sorted(random.sample(range(max(100, n * 12)), n - 1))
+        span = max(1, prefix[-1] - prefix[0])
+        outlier = prefix[-1] + span * random.randint(n, n * 4)
+        a = prefix + [outlier]
+        return a, a[-2]
     if case == "promedio":
         rng = random.Random(202607 + n)
         a = []

@@ -121,6 +121,16 @@ def _random_sorted(size):
     return sorted(random.sample(range(upper), size))
 
 
+def _interpolation_worst_values(size):
+    """Genera una entrada adversaria nueva sin perder el avance lineal."""
+    prefix = _random_sorted(size - 1)
+    span = max(1, prefix[-1] - prefix[0])
+    # El valor extremo domina cualquier estimación hacia el penúltimo valor:
+    # la posición calculada coincide con ``low`` y avanza de uno en uno.
+    outlier = prefix[-1] + span * random.randint(size, size * 4)
+    return prefix + [outlier]
+
+
 def search_case_inputs(algorithm, size, book_array=None):
     """Construye entradas que ejercitan los tres casos del algoritmo de búsqueda."""
     base = sorted(book_array) if book_array is not None else _random_sorted(size)
@@ -134,7 +144,7 @@ def search_case_inputs(algorithm, size, book_array=None):
         for _ in range(size):
             value += random.randint(1, 18)
             average.append(value)
-        worst = list(range(size - 1)) + [max(size**3, size + 1)]
+        worst = _interpolation_worst_values(size)
         return {
             "best": (base, base[len(base) // 2]),
             "average": (average, random.choice(average)),

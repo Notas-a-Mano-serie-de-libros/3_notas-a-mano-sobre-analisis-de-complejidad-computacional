@@ -1575,6 +1575,33 @@ class TestCapitulo8Ordenamientos(unittest.TestCase):
         self.assertIn("Ordenamiento<br>rápido", html)
         self.assertNotIn("Ordenamiento<br>selección", html)
 
+    def test_comparison_focus_can_change_during_a_trace_and_todos_clears_it(self):
+        module = self.launchers._load_module(
+            "0_comparacion_ordenamientos_app.py",
+            "capitulo8_comparacion_dynamic_focus_test_app",
+        )
+        state = module.create_comparison_state(
+            size=5,
+            values=[5, 1, 4, 2, 8],
+            focused_algorithm="rapido",
+        )
+        snapshot = next(module.build_comparison_trace(state))
+
+        module.update_comparison_focus(snapshot, "mezcla")
+        focused_html = module.render_comparison_html(snapshot)
+        self.assertEqual(snapshot["focused_algorithm"], "mezcla")
+        self.assertEqual(focused_html.count("comparison-row-focused"), 2)
+        self.assertEqual(focused_html.count("comparison-row-muted"), len(snapshot["algorithms"]))
+
+        module.update_comparison_focus(snapshot, "")
+        all_html = module.render_comparison_html(snapshot)
+        self.assertEqual(snapshot["focused_algorithm"], "")
+        self.assertEqual(all_html.count("comparison-row-focused"), 1)
+        self.assertEqual(all_html.count("comparison-row-muted"), 1)
+
+        source = (DOMAIN_DIR / "0_comparacion_ordenamientos_app.py").read_text(encoding="utf-8")
+        self.assertEqual(source.count("update_comparison_focus(snapshot, focus_dropdown.value)"), 2)
+
     def test_comparison_reads_selected_checkboxes(self):
         module = self.launchers._load_module(
             "0_comparacion_ordenamientos_app.py",

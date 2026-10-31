@@ -69,6 +69,7 @@ SEARCH_LABEL_HEIGHT = 28
 SEARCH_MESSAGE_HEIGHT = 44
 SEARCH_VERTICAL_PADDING = 16
 SEARCH_RESULT_WIDTH = RESULT_SYMBOL_BOX_SIZE
+SEARCH_CONDITION_WIDTH = 156
 SEARCH_FORMULA_RESERVED_HEIGHTS = {
     "secuencial": 26,
     "binaria": 45,
@@ -357,6 +358,7 @@ def calculate_search_dimensions(state):
         "nodes_height": nodes_height,
         "app_height": app_height,
         "nodes_width": SEARCH_NODES_PER_ROW * SEARCH_NODE_WIDTH + (SEARCH_NODES_PER_ROW - 1) * SEARCH_NODE_GAP,
+        "condition_width": SEARCH_CONDITION_WIDTH,
         "result_width": SEARCH_RESULT_WIDTH,
     }
     _SEARCH_DIMENSION_CACHE[node_count] = dimensions
@@ -680,6 +682,25 @@ def _build_search_css() -> str:
     justify-content: center;
     contain: layout paint;
   }}
+  .search-condition {{
+    width: {SEARCH_CONDITION_WIDTH}px;
+    min-width: {SEARCH_CONDITION_WIDTH}px;
+    min-height: 54px;
+    align-self: flex-start;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 24px;
+    line-height: 26px;
+    white-space: nowrap;
+    contain: layout paint;
+  }}
+  .search-condition-expression {{
+    display: block;
+  }}
   .search-result-symbol {{
     {RESULT_SYMBOL_BASE_CSS}
     font-family: '{FONT_FAMILY}', serif;
@@ -770,8 +791,14 @@ def _build_search_css() -> str:
       width: 34px;
       min-width: 34px;
     }}
+    .search-condition {{
+      width: 106px;
+      min-width: 106px;
+      font-size: 20px;
+      line-height: 22px;
+    }}
     .search-array-line .search-nodes {{
-      max-width: calc(100% - 38px);
+      max-width: calc(100% - 152px);
     }}
   }}
   @media (prefers-reduced-motion: reduce) {{
@@ -799,6 +826,64 @@ def render_result_symbol(state):
         f'<span class="search-result-symbol {class_name}" role="img" '
         f'aria-label="{label}" title="{label}">{symbol}</span>'
     )
+
+
+def _relation_operator(left, right):
+    if left == right:
+        return "="
+    return ">" if left > right else "<"
+
+
+def evaluated_search_indices(state):
+    """Return the array positions whose logical comparison is active."""
+
+    if state.get("search_complete"):
+        return ()
+
+    algorithm = state.get("algorithm")
+    phase = state.get("phase")
+    indices = ()
+
+    if algorithm == "secuencial" and phase == "compare_current":
+        indices = (state.get("current_index"),)
+    elif algorithm == "binaria" and phase == "compare":
+        indices = (state.get("mid"),)
+    elif algorithm == "interpolacion" and phase == "compare":
+        indices = (state.get("pos"),)
+    elif algorithm == "saltos":
+        if phase == "decide_block":
+            indices = (state.get("block_end", 0) - 1,)
+        elif phase == "linear_compare":
+            indices = (state.get("linear_index"),)
+    elif algorithm == "exponencial":
+        if phase == "exponential_compare":
+            indices = (state.get("current_index"),)
+        elif phase == "binary_compare":
+            indices = (state.get("mid"),)
+    elif algorithm == "ternaria" and phase == "compare":
+        indices = (state.get("m1"), state.get("m2"))
+
+    valid = []
+    for index in indices:
+        if isinstance(index, int) and 0 <= index < len(state.get("arr", [])) and index not in valid:
+            valid.append(index)
+    return tuple(valid)
+
+
+def render_search_condition(state):
+    target = state.get("target")
+    expressions = []
+    for index in evaluated_search_indices(state):
+        value = state["arr"][index]["value"]
+        if state.get("algorithm") == "saltos" and state.get("phase") == "decide_block":
+            operator = "≤" if target <= value else ">"
+        else:
+            operator = _relation_operator(target, value)
+        expressions.append(
+            f'<span class="search-condition-expression">('
+            f'{escape(str(target))} {escape(operator)} {escape(str(value))})</span>'
+        )
+    return "".join(expressions) or "&nbsp;"
 
 
 def render_search_step_status(state):
@@ -843,9 +928,15 @@ def render_state_html(state, role_styles, label_map):
         node_markup.append(node_cache[key])
     nodes = "".join(node_markup)
     dimensions = calculate_search_dimensions(state)
+    condition = render_search_condition(state)
     result = render_result_symbol(state)
     step_status = render_search_step_status(state)
-    legend_width = dimensions["nodes_width"] + dimensions["result_width"] + 4
+    legend_width = (
+        dimensions["nodes_width"]
+        + dimensions["condition_width"]
+        + dimensions["result_width"]
+        + 32
+    )
     legend = render_search_legend(state, role_styles, legend_width)
     found = any(node["role"] == "found" for node in state.get("arr", []))
     status_class = " search-app-found" if found else " search-app-missing"
@@ -862,6 +953,7 @@ def render_state_html(state, role_styles, label_map):
         f'<div class="search-step-strip" style="width: min(100%, {legend_width}px);">{step_status}</div>'
         f'<div class="search-array-line" role="group" aria-label="Representación visual del arreglo">'
         f'<div class="search-nodes" role="list" aria-label="Elementos del arreglo" style="width: min(100%, {dimensions["nodes_width"]}px); min-height: {dimensions["nodes_height"]}px;">{nodes}</div>'
+        f'<div class="search-condition" aria-label="Condición lógica evaluada">{condition}</div>'
         f'<div class="search-result">{result}</div>'
         f'</div>'
         f'{text_alternative}'
@@ -1421,5 +1513,7 @@ __all__ = [
     "_SEARCH_CSS",
     "render_result_symbol",
     "render_state_html",
+    "evaluated_search_indices",
+    "render_search_condition",
     "run_search_app",
 ]

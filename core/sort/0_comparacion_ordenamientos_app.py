@@ -138,6 +138,15 @@ def copy_comparison_state(state):
     }
 
 
+def update_comparison_focus(state, focused_algorithm):
+    """Apply the current UI focus without letting trace snapshots restore an old value."""
+    state["focused_algorithm"] = (
+        focused_algorithm
+        if focused_algorithm in state["selected_algorithms"]
+        else ""
+    )
+
+
 def build_comparison_trace(state):
     probe = copy_comparison_state(state)
     while not all_sorts_complete(probe):
@@ -693,6 +702,7 @@ def run_app():
         for snapshot in build_comparison_trace(state):
             final_state = snapshot
         if final_state is not None:
+            update_comparison_focus(final_state, focus_dropdown.value)
             state = final_state
 
     def reset_comparison(*_args):
@@ -718,6 +728,7 @@ def run_app():
             if execution_state["finish_requested"]:
                 finish_all_sorts()
                 break
+            update_comparison_focus(snapshot, focus_dropdown.value)
             state = snapshot
             redraw()
             await asyncio.sleep(0.08 / float(speed_dropdown.value or 1.0))
@@ -734,6 +745,7 @@ def run_app():
             if execution_state["finish_requested"]:
                 finish_all_sorts()
                 break
+            update_comparison_focus(snapshot, focus_dropdown.value)
             state = snapshot
             redraw()
             colab_pause(0.08 / float(speed_dropdown.value or 1.0))
@@ -771,7 +783,7 @@ def run_app():
     def update_focus(change):
         if change["name"] != "value":
             return
-        state["focused_algorithm"] = change["new"]
+        update_comparison_focus(state, change["new"])
         redraw()
 
     focus_dropdown.observe(update_focus, names="value")
@@ -811,4 +823,5 @@ __all__ = [
     "run_app",
     "selected_from_checks",
     "step_all_sorts",
+    "update_comparison_focus",
 ]
