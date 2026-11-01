@@ -1,0 +1,56 @@
+{
+  "budgets": {
+    "notebook_ready_ms": 15000,
+    "simulation_ready_ms": 45000,
+    "requests": 250
+  },
+  "profiles": [
+    {
+      "profile": "graficas",
+      "notebook": "simulaciones/capitulo2/notebooks/1_complejidad_constante.ipynb",
+      "notebook_ready_ms": 1862.2,
+      "requests": 158,
+      "failed_requests": []
+    },
+    {
+      "profile": "graficas-cientificas",
+      "notebook": "simulaciones/capitulo3/notebooks/0_comparacion_notaciones_asintoticas.ipynb",
+      "notebook_ready_ms": 1849.8,
+      "requests": 162,
+      "failed_requests": []
+    },
+    {
+      "profile": "algebra-simbolica",
+      "notebook": "simulaciones/capitulo5/notebooks/0_arboles_recursion.ipynb",
+      "notebook_ready_ms": 1858.5,
+      "requests": 162,
+      "failed_requests": []
+    },
+    {
+      "profile": "analisis-completo",
+      "notebook": "simulaciones/capitulo7/notebooks/0_comparacion_busquedas.ipynb",
+      "notebook_ready_ms": 1854.8,
+      "requests": 182,
+      "failed_requests": []
+    }
+  ],
+  "simulation_smoke": [
+    {
+      "profile": "analisis-completo",
+      "notebook": "simulaciones/capitulo7/notebooks/1_busqueda_secuencial.ipynb",
+      "simulation_ready_ms": 38136.7,
+      "responsive": true,
+      "failed_requests": [],
+      "unexpected_scientific_requests": []
+    },
+    {
+      "profile": "graficas",
+      "notebook": "simulaciones/capitulo8/notebooks/5_ordenamiento_mezcla.ipynb",
+      "simulation_ready_ms": 34568.6,
+      "responsive": true,
+      "failed_requests": [],
+      "unexpected_scientific_requests": []
+    }
+  ],
+  "errors": []
+}

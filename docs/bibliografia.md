@@ -1,0 +1,198 @@
+# Bibliografía de la obra
+
+Esta página reúne las referencias del manuscrito que sustenta la edición web. Los DOI y enlaces disponibles conducen a la fuente original; su inclusión no implica que el recurso sea de acceso abierto.
+
+**Total de referencias:** 192.
+
+- Abramowitz, Milton; Stegun, Irene A. (1964). Handbook of Mathematical Functions with Formulas, Graphs, and Mathematical Tables. *National Bureau of Standards*.
+- Aho, Alfred V.; Lam, Monica S.; Sethi, Ravi; Ullman, Jeffrey D. (2006). Compilers: Principles, Techniques, and Tools. *Pearson Education*.
+- Alan M. Turing (1936). [On Computable Numbers, with an Application to the Entscheidungsproblem](https://doi.org/10.1112/plms/s2-42.1.230). *Proceedings of the London Mathematical Society*.
+- Aldous, David J.; Bandyopadhyay, Antar (2005). [A Survey of Max-Type Recursive Distributional Equations](https://doi.org/10.1214/105051605000000142). *The Annals of Applied Probability*.
+- Alonzo Church (1932). [A Set of Postulates for the Foundation of Logic](https://doi.org/10.2307/1968337). *Annals of Mathematics*.
+- Alonzo Church (1936). [An Unsolvable Problem of Elementary Number Theory](https://doi.org/10.2307/2371045). *American Journal of Mathematics*.
+- Anthropic (2023). [Claude: An AI Assistant by Anthropic](https://www.anthropic.com/index/introducing-claude).
+- Appel, Andrew W. (1992). Compiling with Continuations. *ACM Computing Surveys*.
+- Ardila, Carlos; Amador, Siler; Villalba, Katerine (2023). Lógica Proposicional: teoría y ejercicios. *Sello Editorial Uniautónoma del Cauca*.
+- Arnold, Ken; Gosling, James; Holmes, David (2005). The Java Programming Language. *Addison-Wesley Professional*.
+- Arute, Frank; Arya, Kunal; Babbush, Ryan; Bacon, Dave; Bardin, Joseph C.; others (2019). [Quantum Supremacy Using a Programmable Superconducting Processor](https://doi.org/10.1038/s41586-019-1666-5). *Nature*.
+- Ashish Vaswani; Noam Shazeer; Niki Parmar; Jakob Uszkoreit; Llion Jones; Aidan N. Gomez; Lukasz Kaiser; Illia Polosukhin (2017). [Attention Is All You Need](https://arxiv.org/abs/1706.03762). *Advances in Neural Information Processing Systems 30 (NeurIPS 2017)*.
+- Augustin-Louis Cauchy (1821). Cours d'Analyse de l'École Royale Polytechnique. *Imprimerie Royale*.
+- Austrian, Geoffrey D. (1982). Herman Hollerith: Forerunner of Automatic Computation. *Columbia University Press*.
+- Backus, John W.; others (1960). [Report on the Algorithmic Language ALGOL 60](https://doi.org/10.1145/367236.367262). *Communications of the ACM*.
+- Baldor, Aurelio (2009). Álgebra. *Grupo Editorial Patria*.
+- Ball, W. W. Rouse (1892). Mathematical Recreations and Essays. *Macmillan*.
+- Bellman, Richard (1957). Dynamic Programming. *Princeton University Press*.
+- Bentley, Jon L.; Yao, Andrew Chi-Chih (1976). An Almost Optimal Algorithm for Unbounded Searching. *Information Processing Letters*.
+- Bentley, Jon Louis; Haken, Dorothea; Saxe, James B. (1980). A General Method for Solving Divide-and-Conquer Recurrences. *SIGACT News*.
+- Berggren, J. Lennart (1986). Episodes in the Mathematics of Medieval Islam. *Springer*.
+- Biamonte, Jacob; Wittek, Peter; Pancotti, Nicola; Rebentrost, Patrick; Wiebe, Nathan; Lloyd, Seth (2017). [Quantum machine learning](https://doi.org/10.1038/nature23474). *Nature*.
+- BIPM (2024). [The International System of Units (SI)](https://www.bipm.org/en/publications/si-brochure). *Bureau International des Poids et Mesures*.
+- Blum, Manuel; Floyd, Robert W.; Pratt, Vaughan R.; Rivest, Ronald L.; Tarjan, Robert E. (1973). Time Bounds for Selection. *Journal of Computer and System Sciences*.
+- Bondy, J. A.; Murty, U. S. R. (2008). Graph Theory. *Springer*.
+- Bottenbruch, Hermann (1962). [Structure and Use of ALGOL 60](https://doi.org/10.1145/321119.321120). *Journal of the ACM*.
+- Boyer, Carl B.; Merzbach, Uta C. (2011). A History of Mathematics. *Wiley*.
+- Brin, Sergey; Page, Lawrence (1998). [The Anatomy of a Large-Scale Hypertextual Web Search Engine](https://doi.org/10.1016/S0169-7552(98)00110-X). *Computer Networks and ISDN Systems*.
+- Bruce Alberts; Alexander Johnson; Julian Lewis; David Morgan; Martin Raff; Keith Roberts; Peter Walter (2014). Molecular Biology of the Cell. *Garland Science*.
+- Burden, Richard L.; Faires, J. Douglas (2010). Numerical Analysis. *Brooks/Cole*.
+- C. A. R. Hoare (1962). [Quicksort](https://doi.org/10.1093/comjnl/5.1.10). *The Computer Journal*.
+- C. A. R. Hoare (1969). [An Axiomatic Basis for Computer Programming](https://doi.org/10.1145/363235.363259). *Communications of the ACM*.
+- Carl B. Boyer; Uta C. Merzbach (2011). A History of Mathematics. *Wiley*.
+- Church, Alonzo (1941). The Calculi of Lambda Conversion. *Princeton University Press*.
+- Claude E. Shannon (1950). [Programming a Computer for Playing Chess](https://doi.org/10.1080/14786445008521796). *Philosophical Magazine*.
+- Clay Institute (2000). [Millennium Prize Problems](https://www.claymath.org/millennium-problems/).
+- Clocksin, William F.; Mellish, Christopher S. (1981). Programming in Prolog. *Springer*.
+- Copi, Irving M.; Cohen, Carl; McMahon, Kenneth (2019). Introduction to Logic. *Routledge*.
+- Cormen, Thomas H.; Leiserson, Charles E.; Rivest, Ronald L. (1990). Introduction to Algorithms. *MIT Press and McGraw-Hill*.
+- Cormen, Thomas H.; Leiserson, Charles E.; Rivest, Ronald L.; Stein, Clifford (2009). Introduction to Algorithms. *The MIT Press*.
+- Cormen, Thomas H.; Leiserson, Charles E.; Rivest, Ronald L.; Stein, Clifford (2022). Introduction to Algorithms. *MIT Press*.
+- Corrado Böhm; Giuseppe Jacopini (1966). [Flow Diagrams, Turing Machines and Languages with Only Two Formation Rules](https://doi.org/10.1145/355592.365646). *Communications of the ACM*.
+- Daniel J. Bernstein; Johannes Buchmann; Erik Dahmen (2009). Post-Quantum Cryptography. *Springer*.
+- de Moivre, Abraham (1730). Miscellanea Analytica de Seriebus et Quadraturis. *J. Tonson & J. Watts*.
+- DeepSeek (2023). [DeepSeek Coder: A Large Language Model for Code Generation and Completion](https://deepseek.com/research/).
+- DeepSeek-AI (2024). [DeepSeek LLM: Scaling Open-Source Language Models with Longtermism](https://arxiv.org/abs/2401.02954). *arXiv preprint*.
+- Devroye, Luc (1986). [A Note on the Height of Binary Search Trees](https://doi.org/10.1145/5925.5930). *Journal of the ACM*.
+- Donald E. Knuth (1968). The Art of Computer Programming, Volume 1: Fundamental Algorithms. *Addison-Wesley*.
+- Donald E. Knuth (1974). [Structured Programming with go to Statements](https://doi.org/10.1145/356635.356640). *ACM Computing Surveys*.
+- Donald E. Knuth (1976). [Big Omicron and Big Omega and Big Theta](https://doi.org/10.1145/1008920.1008921). *SIGACT News*.
+- Eddington, Arthur S. (1938). The Philosophy of Physical Science. *Cambridge University Press*.
+- Edmund Landau (1909). Handbuch der Lehre von der Verteilung der Primzahlen. *B. G. Teubner*.
+- Edsger W. Dijkstra (1968). [Go To Statement Considered Harmful](https://doi.org/10.1145/362929.362947). *Communications of the ACM*.
+- Elbroch, Mark; Kusler, Anna; Quigley, Howard; Laundré, John; Lendrum, Patrick E. (2019). [Recolonizing wolves influence the realized niche of resident cougars](https://doi.org/10.6620/ZS.2019.58-07). *Zoological Studies*.
+- Eli Maor (2012). To Infinity and Beyond: A Cultural History of the Infinite. *Princeton University Press*.
+- Erich Gamma; Richard Helm; Ralph Johnson; John Vlissides (1995). Design Patterns: Elements of Reusable Object-Oriented Software. *Addison-Wesley Professional*.
+- Ethan Bernstein; Umesh Vazirani (1993). [Quantum Complexity Theory](https://doi.org/10.1145/167088.167097). *Proceedings of the 25th Annual ACM Symposium on Theory of Computing (STOC)*.
+- Farhi, Edward; Goldstone, Jeffrey; Gutmann, Sam (2014). [A Quantum Approximate Optimization Algorithm](https://doi.org/10.48550/arXiv.1411.4028). *arXiv preprint*.
+- Fibonacci, Leonardo (1202). Liber Abaci.
+- Frederick P. Brooks (1995). The Mythical Man-Month: Essays on Software Engineering. *Addison-Wesley Professional*.
+- Gemini Team (2023). [Gemini: A Family of Highly Capable Multimodal Models](https://arxiv.org/abs/2312.11805).
+- GitHub (2023). [Introducing GitHub Copilot: your AI pair programmer](https://github.com/features/copilot).
+- Goldberg, Adele; Robson, David (1983). Smalltalk-80: The Language and Its Implementation. *Addison-Wesley*.
+- Google DeepMind (2023). [Introducing Gemini: Our most capable and general AI model yet](https://deepmind.google/technologies/gemini/).
+- Gosling, James; Joy, Bill; Steele, Guy L.; Bracha, Gilad; Buckley, Alex; Smith, Daniel (2023). [The Java Language Specification: Java SE 21 Edition](https://docs.oracle.com/javase/specs/jls/se21/html/index.html). *Oracle America, Inc.*.
+- Gottfried Wilhelm Leibniz (1684). Nova Methodus pro Maximis et Minimis. *Acta Eruditorum*.
+- Graham, Ronald L.; Knuth, Donald E.; Patashnik, Oren (1994). Concrete Mathematics: A Foundation for Computer Science. *Addison-Wesley*.
+- Graham, Ronald L.; Knuth, Donald E.; Patashnik, Oren (1994). Concrete Mathematics: A Foundation for Computer Science. *Addison-Wesley*.
+- Grant, Karen A.; Grant, Verne (1993). The Hummingbirds' Role in Pollination. *Oxford University Press*.
+- Gödel, Kurt (1931). [\"Uber formal unentscheidbare Sätze der Principia Mathematica](https://doi.org/10.1007/BF01700692). *Monatshefte für Mathematik und Physik*.
+- Han, Byung-Chul (2012). La sociedad del cansancio. *Herder*.
+- Harel, David (1980). [On Folk Theorems](https://doi.org/10.1145/1008861.1008869). *ACM SIGACT News*.
+- Harold Abelson; Gerald Jay Sussman; Julie Sussman (1996). Structure and Interpretation of Computer Programs. *MIT Press*.
+- Havil, Julian (2003). Gamma: Exploring Euler's Constant. *Princeton University Press*.
+- Hibbard, Thomas N. (1963). [An Empirical Study of Minimal Storage Sorting](https://doi.org/10.1145/366552.366557). *Communications of the ACM*.
+- Hou, Xinyi; Zhao, Yanjie; Liu, Yue; Yang, Zhou; Wang, Kailong; Li, Li; Luo, Xiapu; Lo, David; Grundy, John; Wang, Haoyu (2024). [Large Language Models for Software Engineering: A Systematic Literature Review](https://doi.org/10.1145/3695988). *ACM Transactions on Software Engineering and Methodology*.
+- Hudak, Paul; Hughes, John; Peyton Jones, Simon; Wadler, Philip (2007). The History of Haskell: Being Lazy With Class. *ACM*.
+- Huntley, H. E. (1970). The Divine Proportion: A Study in Mathematical Beauty. *Dover Publications*.
+- Ian Goodfellow; Yoshua Bengio; Aaron Courville (2016). [Deep Learning](https://www.deeplearningbook.org/). *MIT Press*.
+- IBM (1956). Reference Manual for the Programming Language FORTRAN -- The IBM Mathematical Formula Translating System. *IBM*.
+- Intel Corporation (2022). [Quantum computing overview](https://www.intel.com/content/www/us/en/research/quantum-computing.html).
+- International Organization for Standardization (2019). Quantities and Units -- Part 2: Mathematics. *International Organization for Standardization*.
+- Isaac Nassi; Ben Shneiderman (1973). Flowchart Techniques for Structured Programming. *SIGPLAN Notices*.
+- Isaac Newton (1687). Philosophiae Naturalis Principia Mathematica. *Royal Society*.
+- ISO/IEC (2008). Quantities and Units -- Part 13: Information Science and Technology. *International Organization for Standardization / International Electrotechnical Commission*.
+- Israel Kleiner (2007). [The Roots of Analysis: Euler to Riemann](https://doi.org/10.1080/0025570X.2007.11953644). *Mathematics Magazine*.
+- J. A. N. Lee (2003). The History of Computing. *MIT Press*.
+- Jack Edmonds (1965). [Paths, Trees, and Flowers](https://doi.org/10.4153/CJM-1965-045-4). *Canadian Journal of Mathematics*.
+- James Gleick (2011). The Information: A History, a Theory, a Flood. *Pantheon Books*.
+- James Stewart (2015). Calculus: Early Transcendentals. *Cengage Learning*.
+- Jay L. Devore (2016). Probability and Statistics for Engineering and the Sciences. *Cengage Learning*.
+- Jeffrey Dean; Sanjay Ghemawat (2004). [MapReduce: Simplified Data Processing on Large Clusters](https://research.google/pubs/mapreduce-simplified-data-processing-on-large-clusters/). *Proceedings of the 6th Symposium on Operating Systems Design and Implementation (OSDI)*.
+- John von Neumann (1945). First Draft of a Report on the EDVAC. *Moore School of Electrical Engineering, University of Pennsylvania*.
+- K. A. Stroud (2007). Engineering Mathematics. *Palgrave Macmillan*.
+- Karl Weierstrass (1886). Mathematische Werke. *Mayer & Müller*.
+- Karp, Richard M. (1972). [Reducibility Among Combinatorial Problems](https://doi.org/10.1007/978-1-4684-2001-2_9). *Complexity of Computer Computations*.
+- Kasner, Edward; Newman, James R. (1940). Mathematics and the Imagination. *Simon & Schuster*.
+- Kenneth H. Rosen (2012). Discrete Mathematics and Its Applications. *McGraw-Hill Education*.
+- Kernighan, Brian W.; Ritchie, Dennis M. (1988). The C Programming Language. *Prentice Hall*.
+- Kim, Youngseok; Eddins, Andrew; Anand, Sajant; Wei, Ken Xuan; van den Berg, Ewout; others (2023). [Evidence for the Utility of Quantum Computing Before Fault Tolerance](https://doi.org/10.1038/s41586-023-06096-3). *Nature*.
+- Knuth, Donald E. (1970). Von Neumann's First Computer Program. *ACM Computing Surveys*.
+- Knuth, Donald E. (1973). The Art of Computer Programming, Volume 1: Fundamental Algorithms. *Addison-Wesley*.
+- Knuth, Donald E. (1973). The Art of Computer Programming, Volume 3: Sorting and Searching. *Addison-Wesley*.
+- Knuth, Donald E. (1997). The Art of Computer Programming, Volume 1: Fundamental Algorithms. *Addison-Wesley*.
+- Koshy, Thomas (2001). Fibonacci and Lucas Numbers with Applications. *Wiley-Interscience*.
+- Kumar, Ravi; Rubinfeld, Ronitt (2003). Sublinear time algorithms. *ACM SIGACT News*.
+- Kushilevitz, Eyal; Nisan, Noam (1997). Communication Complexity. *Cambridge University Press*.
+- Lay, David C.; Lay, Steven R.; McDonald, Judi J. (2015). Linear Algebra and Its Applications. *Pearson*.
+- Lehmer, Derrick Henry (1960). Teaching Combinatorial Tricks to a Computer. *Proceedings of Symposia in Applied Mathematics*.
+- Leighton, Tom (1996). Notes on Better Master Theorems for Divide-and-Conquer Recurrences.
+- Leonid A. Levin (1973). Universal'nye perebornye zadachi (Universal Search Problems). *Problemy Peredachi Informatsii*.
+- Libri, Guillaume (1838). Histoire des sciences mathématiques en Italie, depuis la renaissance des lettres jusqu'\`a la fin du dix-septi\`eme si\`ecle. *Jules Renouard et Cie*.
+- Livio, Mario (2002). The Golden Ratio: The Story of Phi, the World's Most Astonishing Number. *Broadway Books*.
+- Lov K. Grover (1996). [A Fast Quantum Mechanical Algorithm for Database Search](https://doi.org/10.1145/237814.237866). *Proceedings of the 28th Annual ACM Symposium on Theory of Computing (STOC)*.
+- Lovelace, Ada Augusta (1843). Sketch of the Analytical Engine Invented by Charles Babbage, Esq. By L.~F.~Menabrea. Translated from the French with Notes by the Translator. *Scientific Memoirs*.
+- Lucas, Édouard (1878). Théorie des fonctions numériques simplement périodiques. *American Journal of Mathematics*.
+- Luigi Federico Menabrea (1843). Sketch of the Analytical Engine Invented by Charles Babbage, with Notes by the Translator Ada Augusta Lovelace. *Scientific Memoirs*.
+- Manfred Broy; Ernst Denert (2002). Software Pioneers: Contributions to Software Engineering. *Springer*.
+- Mantilla, Horacio; Vargas, Mario (2016). [Distribución y conservación del puma (Puma concolor) en Colombia: una revisión del conocimiento actual](https://dialnet.unirioja.es/descarga/articulo/7400367.pdf). *Revista de la Academia Colombiana de Ciencias Exactas, Físicas y Naturales*.
+- Mark Chen; Jerry Tworek; Heewoo Jun; Qiming Yuan; Henrique Ponde de Oliveira Pinto; Jared Kaplan; Harri Edwards; Yuri Burda; Nicholas Joseph; Greg Brockman; Alex Ray; Raul Puri; Gretchen Krueger; Michael Petrov; Heidy Khlaaf; Girish Sastry; Amanda Askell; Sandhini Agarwal; Ariel Herbert-Voss; William Saunders; John Schulman; Jacob Hilton; Suchir Balaji; Christopher Hesse; Andrew Zeng; Nando de Freitas; Scott Gray; Alec Radford; Rewon Child; Aditya Ramesh; Jeff Wu; Clemens Winter; Michael Brundage; Dario Amodei; Ilya Sutskever (2021). [Evaluating Large Language Models Trained on Code](https://arxiv.org/abs/2107.03374). *arXiv preprint*.
+- Martin Campbell-Kelly; William Aspray (1996). Computer: A History of the Information Machine. *Basic Books*.
+- McCarthy, John (1978). History of LISP. *ACM SIGPLAN*.
+- Menabrea, Luigi Federico (1842). Notions sur la machine analytique de M. Charles Babbage. *Biblioth\`eque Universelle de Gen\`eve*.
+- Michael A. Nielsen; Isaac L. Chuang (2010). Quantum Computation and Quantum Information. *Cambridge University Press*.
+- Michael R. Garey; David S. Johnson (1979). Computers and Intractability: A Guide to the Theory of NP-Completeness. *W. H. Freeman*.
+- Microsoft (2023). [What is quantum computing?](https://learn.microsoft.com/en-us/azure/quantum/overview-what-is-quantum-computing).
+- MIT OpenCourseWare (2023). Physics Course Materials.
+- Mohamad Akra; Laurent Bazzi (1996). On the Solution of Linear Recurrence Equations. *Computational Optimization and Applications*.
+- Musser, David R. (1997). [Introspective Sorting and Selection Algorithms](https://doi.org/10.1002/(SICI)1097-024X(199708)27:8<983::AID-SPE117>3.0.CO;2-%23). *Software: Practice and Experience*.
+- National Bureau of Standards (1968). CODASYL COBOL Journal of Development.
+- Niklaus Wirth (1971). The Design and Development of Pascal. *Acta Informatica*.
+- Norman P. Jouppi; Cliff Young; Nishant Patil; David Patterson; others (2017). [In-Datacenter Performance Analysis of a Tensor Processing Unit](https://doi.org/10.1145/3079856.3080246). *Proceedings of the 44th Annual International Symposium on Computer Architecture (ISCA)*.
+- O'Reilly Media (2010). [El significado de los animales en las portadas de O'Reilly](https://www.oreilly.com/content/animals-covers/).
+- Observatorio de Colibríes (2021). [El Jardín Encantado de San Francisco](https://www.jardinencantado.net).
+- Observatorio de Colibríes (2021). [Observatorio de Colibríes en Montes de Oca](https://www.observatoriodecolibries.com).
+- Odersky, Martin; Altherr, Philippe; Cremet, Vincent; Emir, Burak; Maneth, Sebastian; Micheloud, Stéphane; Mihaylov, Nikolay; Schinz, Michel; Stenman, Erik; Zenger, Matthias (2004). [An Overview of the Scala Programming Language](https://infoscience.epfl.ch/record/52456). *École Polytechnique Fédérale de Lausanne (EPFL)*.
+- Ole-Johan Dahl; Edsger W. Dijkstra; C. A. R. Hoare (1972). Structured Programming. *Academic Press*.
+- OpenAI (2023). [ChatGPT: Optimizing Language Models for Dialogue](https://openai.com/blog/chatgpt).
+- Owen Astrachan (2003). [Bubble Sort: An Archaeological Algorithmic Analysis](https://doi.org/10.1145/611892.611918). *Proceedings of the 34th SIGCSE Technical Symposium on Computer Science Education*.
+- Page, Rex; Gamboa, Ruben (2019). [Essential Logic for Computer Science](https://mitpress.mit.edu/9780262039185/essential-logic-for-computer-science/). *The MIT Press*.
+- Papadimitriou, Christos H. (1994). Computational Complexity. *Addison-Wesley*.
+- Paul Bachmann (1894). Die analytische Zahlentheorie. *Teubner*.
+- Paul E. Ceruzzi (1998). A History of Modern Computing. *MIT Press*.
+- Peruzzo, Alberto; McClean, Jarrod; Shadbolt, Peter; Yung, Man-Hong; Zhou, Xiao-Qi; Love, Peter J.; Aspuru-Guzik, Alán; O'Brien, Jeremy L. (2014). [A variational eigenvalue solver on a photonic quantum processor](https://doi.org/10.1038/ncomms5213). *Nature Communications*.
+- Peter Naur; others (1960). [Report on the Algorithmic Language ALGOL 60](https://doi.org/10.1145/367236.367262). *Communications of the ACM*.
+- Peter W. Shor (1994). [Algorithms for Quantum Computation: Discrete Logarithms and Factoring](https://doi.org/10.1109/SFCS.1994.365700). *Proceedings of the 35th Annual Symposium on Foundations of Computer Science (FOCS)*.
+- Peterson, W. W. (1957). Addressing for Random-Access Storage. *IBM Journal of Research and Development*.
+- Planck Collaboration (2020). [Planck 2018 results. VI. Cosmological parameters](https://doi.org/10.1051/0004-6361/201833910). *Astronomy & Astrophysics*.
+- Pratt, Vaughan Ronald (1972). Shellsort and Sorting Networks.
+- Preskill, John (2018). [Quantum Computing in the NISQ Era and Beyond](https://doi.org/10.22331/q-2018-08-06-79). *Quantum*.
+- Rajeev Motwani; Prabhakar Raghavan (1995). Randomized Algorithms. *Cambridge University Press*.
+- Raymond A. Serway; John W. Jewett (2014). Physics for Scientists and Engineers. *Cengage Learning*.
+- Richard P. Feynman (1982). [Simulating Physics with Computers](https://doi.org/10.1007/BF02650179). *International Journal of Theoretical Physics*.
+- Rod G. Downey; Michael R. Fellows (1999). Parameterized Complexity. *Springer*.
+- Roger S. Pressman (2014). Software Engineering: A Practitioner's Approach. *McGraw-Hill Education*.
+- Rosen, Kenneth H. (2019). Discrete Mathematics and Its Applications. *McGraw-Hill Education*.
+- Rosen, Kenneth H. (2020). Discrete Mathematics and Its Applications. *McGraw-Hill Education*.
+- Roura, Salvador (2001). Improved Master Theorems for Divide-and-Conquer Recurrences. *Journal of the ACM*.
+- Rudin, Walter (1976). Principles of Mathematical Analysis. *McGraw-Hill*.
+- S. Muthukrishnan (2005). [Data Streams: Algorithms and Applications](https://doi.org/10.1561/0400000002). *Foundations and Trends in Theoretical Computer Science*.
+- Sanjeev Arora; Boaz Barak (2009). Computational Complexity: A Modern Approach. *Cambridge University Press*.
+- Sanjeev Arora; Shmuel Safra (1998). [Probabilistic Checking of Proofs: A New Characterization of NP](https://doi.org/10.1145/273865.273901). *Journal of the ACM*.
+- Scott Aaronson (2013). Quantum Computing Since Democritus. *Cambridge University Press*.
+- Sedgewick, Robert (1978). Implementing Quicksort Programs. *Communications of the ACM*.
+- Sedgewick, Robert (1986). [A New Upper Bound for Shellsort](https://doi.org/10.1016/0196-6774(86)90001-5). *Journal of Algorithms*.
+- Sedgewick, Robert; Flajolet, Philippe (2013). An Introduction to the Analysis of Algorithms. *Addison-Wesley*.
+- Sedgewick, Robert; Wayne, Kevin (2011). Algorithms. *Addison-Wesley Professional*.
+- Seward, Harold H. (1954). Information Sorting in the Application of Electronic Digital Computers to Business Operations.
+- Shai Shalev-Shwartz; Shai Ben-David (2014). Understanding Machine Learning: From Theory to Algorithms. *Cambridge University Press*.
+- Shell, Donald L. (1959). [A High-Speed Sorting Procedure](https://doi.org/10.1145/368370.368387). *Communications of the ACM*.
+- Shneiderman, Ben (1978). Jump Searching: A Fast Sequential Search Technique. *Communications of the ACM*.
+- Sipser, Michael (2012). Introduction to the Theory of Computation. *Cengage Learning*.
+- Stephen A. Cook (1971). [The Complexity of Theorem-Proving Procedures](https://doi.org/10.1145/800157.805047). *Proceedings of the Third Annual ACM Symposium on Theory of Computing (STOC)*.
+- Steve McConnell (2004). Code Complete. *Microsoft Press*.
+- Stewart, James (2016). Calculus: Early Transcendentals. *Cengage Learning*.
+- Stewart, James; Redlin, Lothar; Watson, Saleem (2015). Precalculus: Mathematics for Calculus. *Cengage Learning*.
+- Stiles, F. G. (2017). Guide to the Hummingbirds of Colombia. *Princeton University Press*.
+- Stroustrup, Bjarne (1986). The C++ Programming Language. *Addison-Wesley*.
+- Sunquist, Melvin; Sunquist, Fiona (2002). Wild Cats of the World. *University of Chicago Press*.
+- Thomas J. Bergin; Richard G. Gibson (1996). History of Programming Languages. *ACM Press*.
+- Thorburn, William M. (1915). The Myth of Occam's Razor. *Mind*.
+- Tom Wheeler (2019). From Gutenberg to Google: The History of Our Future. *Brookings Institution Press*.
+- Tomaso Poggio; Qianli Liao; Brando Miranda; Andrzej Banburski; Xuanqing Liu; Demetrios Vlachas (2017). [Theory of Deep Learning III: Explaining the Non-overfitting Puzzle](https://arxiv.org/abs/1801.00173). *arXiv preprint*.
+- Tweddle, Ian (2003). James Stirling's Methodus Differentialis: An Annotated Translation of Stirling's Text. *Springer-Verlag*.
+- U.S. District Court (2009). [Demandas colectivas por representación incorrecta de capacidad en dispositivos de almacenamiento (gigabyte decimal vs.\ binario)](https://dockets.justia.com/docket/california/candce/3:2005cv03353/33822).
+- Verma, Rakesh M. (1994). A General Method and a Master Theorem for Divide-and-Conquer Recurrences with Applications. *Journal of Algorithms*.
+- Wackerly, Dennis; Mendenhall, William; Scheaffer, Richard L. (2014). Mathematical Statistics with Applications. *Cengage Learning*.
+- Wall, Larry; Christiansen, Tom; Schwartz, Randal L. (1991). [Programming Perl](https://www.oreilly.com/library/view/programming-perl/9781449321451/). *O'Reilly Media*.
+- William Kahan (1996). [Lecture Notes on the Status of IEEE Standard 754 for Binary Floating-Point Arithmetic](https://people.eecs.berkeley.edu/~wkahan/ieee754status/IEEE754.PDF). *University of California, Berkeley*.
+- Xu, Feiyang; Medappa, Poonacha K.; Tunc, Murat M.; Vroegindeweij, Martijn; Fransoo, Jan C. (2025). [AI-assisted Programming May Decrease the Productivity of Experienced Developers by Increasing Maintenance Burden](https://doi.org/10.48550/arXiv.2510.10165). *arXiv preprint*.
+- Y. Perl; A. Itai; H. Avni (1978). [Interpolation search---a log log $N$ search](https://doi.org/10.1145/359545.359557). *Communications of the ACM*.
+- Yann LeCun; Yoshua Bengio; Geoffrey Hinton (2015). [Deep Learning](https://doi.org/10.1038/nature14539). *Nature*.
