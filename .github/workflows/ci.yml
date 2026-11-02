@@ -83,7 +83,7 @@ jobs:
           python -m pytest -q --junitxml=artifacts/pytest-${{ matrix.python-version }}.xml
       - name: Upload pytest report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: pytest-${{ matrix.python-version }}
           path: artifacts/pytest-${{ matrix.python-version }}.xml
@@ -112,7 +112,7 @@ jobs:
           python desarrollo/scripts/validate_benchmark_report.py --report artifacts/animation-benchmark.json
       - name: Upload benchmark report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: animation-benchmark
           path: artifacts/animation-benchmark.json
@@ -145,7 +145,7 @@ jobs:
           python desarrollo/scripts/benchmark_jupyterlite_runtime.py --output artifacts/jupyterlite-runtime.json
       - name: Upload browser performance report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: jupyterlite-runtime
           path: artifacts/jupyterlite-runtime.json
@@ -179,7 +179,7 @@ jobs:
         run: python desarrollo/scripts/check_secrets.py
       - name: Upload dependency audit
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: pip-audit
           path: artifacts/pip-audit.json
