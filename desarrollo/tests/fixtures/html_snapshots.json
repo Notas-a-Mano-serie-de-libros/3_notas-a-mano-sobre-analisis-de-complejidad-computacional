@@ -1,0 +1,62 @@
+{
+  "capitulo7.binaria.initial": {
+    "bytes": 4237,
+    "sha256": "d4d01c173189018a45f07427510dbb1a613ef847467936232a01ac02c195161d"
+  },
+  "capitulo7.comparacion.initial": {
+    "bytes": 15644,
+    "sha256": "43f15b2a102ea0e917a259e49ca27457df42fb023522ff1e4af07922234d617c"
+  },
+  "capitulo7.exponencial.initial": {
+    "bytes": 4281,
+    "sha256": "19a9fbb9126877af034587f643d4c3c28f1e8b753753321606ae4a0bd29b468c"
+  },
+  "capitulo7.interpolacion.initial": {
+    "bytes": 4116,
+    "sha256": "8b634512c516989db42f4fcd2ac6bcfb157eadee0761c0bcc2b4aeab66bcacad"
+  },
+  "capitulo7.saltos.initial": {
+    "bytes": 4117,
+    "sha256": "1e0d614a36c4a4e402a17387f6ff8e8977ee12e79fb6302181ed22bcf2d84cac"
+  },
+  "capitulo7.secuencial.initial": {
+    "bytes": 3960,
+    "sha256": "42eb3621e880c3598c0fa0c8f0b060f4e33bfb49cc4fc684f90480a4ae3531eb"
+  },
+  "capitulo7.ternaria.initial": {
+    "bytes": 4101,
+    "sha256": "da6437f0d426a4fc03f1c1db675167beddcb5127c34d064071f98ea67669b28d"
+  },
+  "capitulo8.burbuja.barras.initial": {
+    "bytes": 32994,
+    "sha256": "184b3b5627307b981373d650af04b7c00302d030429d1a3ed6fdea8cb1e49a61"
+  },
+  "capitulo8.comparacion.initial": {
+    "bytes": 35459,
+    "sha256": "d18673af7686b62eeb25c22416ff725205b0ccffdbc6c23a11248acdf4a7a942"
+  },
+  "capitulo8.insercion.barras.initial": {
+    "bytes": 32873,
+    "sha256": "f87dc87a5b8f61dc6f4ef5d9e25df040bc91a4fd8a33b7b3a483a65561641cb1"
+  },
+  "capitulo8.mezcla.arbol.initial": {
+    "bytes": 31403,
+    "sha256": "5eae20372e293af613aa626077e9f1814cc28815dbdada106252726681c929aa"
+  },
+  "capitulo8.radix.barras.initial": {
+    "bytes": 35556,
+    "sha256": "ede29d18a44d703c5bad6e13096c9249460573cc3fa3b8f14596f22653ac4c87"
+  },
+  "capitulo8.rapido.arbol.initial": {
+    "bytes": 31508,
+    "sha256": "a8161fad47c49eb1662df891e5f62a83c1507f1c552f39ce60547685852f9894"
+  },
+  "capitulo8.seleccion.barras.initial": {
+    "bytes": 33008,
+    "sha256": "e0f8b2f52d1d87bd70cab6baac0ae20155fcce8fd34ff7b33f6849e35c8ca548"
+  },
+  "capitulo8.shell.barras.initial": {
+    "bytes": 32855,
+    "sha256": "a3336e966b9e4860ece66ce3ac8dca1382ba8aceb0fd32940b2843a740bb83e4"
+  }
+}
