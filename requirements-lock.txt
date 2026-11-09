@@ -18,6 +18,6 @@ jupyter-server==2.21.1
 jupyterlab==4.6.4
 ipykernel==7.3.0
 jupyterlab_widgets==3.0.17
-tornado==6.5.8
+tornado==6.6
 pre-commit==4.6.2
 playwright==1.63.0
